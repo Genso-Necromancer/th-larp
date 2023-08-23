@@ -1,0 +1,81 @@
+[gd_scene load_steps=7 format=3 uid="uid://r6wtvva5qput"]
+
+[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_2n2uh"]
+[ext_resource type="Script" path="res://scenes/GUIManager.gd" id="1_d2r44"]
+[ext_resource type="PackedScene" uid="uid://cxjo0fdu14w3o" path="res://scenes/profile.tscn" id="3_14h0a"]
+[ext_resource type="PackedScene" uid="uid://2ggl8hw7vq8n" path="res://scenes/action_menu.tscn" id="4_o6laq"]
+[ext_resource type="PackedScene" uid="uid://ct2rsfnl7fi6u" path="res://scenes/combat_forecast.tscn" id="6_kojdq"]
+[ext_resource type="PackedScene" uid="uid://cv8yj4b660do" path="res://scenes/hud.tscn" id="6_odogd"]
+
+[node name="GUIManager" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 288.0
+offset_bottom = 162.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 1
+theme = ExtResource("1_2n2uh")
+script = ExtResource("1_d2r44")
+metadata/_edit_use_anchors_ = true
+
+[node name="ActionMenu" parent="." instance=ExtResource("4_o6laq")]
+layout_mode = 0
+offset_left = 501.0
+offset_top = 245.0
+offset_right = 501.0
+offset_bottom = 245.0
+
+[node name="Count" parent="ActionMenu" index="0"]
+offset_top = 136.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="VBoxContainer" parent="ActionMenu/Count/ActionBox/CenterContainer" index="0"]
+theme_override_constants/separation = 1
+
+[node name="AtkBtn" parent="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer" index="0"]
+focus_neighbor_top = NodePath("")
+focus_neighbor_bottom = NodePath("")
+
+[node name="WaitBtn" parent="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer" index="2"]
+focus_neighbor_top = NodePath("")
+focus_neighbor_bottom = NodePath("")
+
+[node name="m" parent="ActionMenu" index="1"]
+y_sort_enabled = true
+
+[node name="menu_cursor" parent="ActionMenu" index="2"]
+menu_parent_path = NodePath("../Count/ActionBox/CenterContainer/VBoxContainer")
+
+[node name="CombatForecast" parent="." instance=ExtResource("6_kojdq")]
+layout_mode = 1
+
+[node name="Margin" parent="CombatForecast/GC/HBC/Labels" index="1"]
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="Profile" parent="." instance=ExtResource("3_14h0a")]
+layout_mode = 1
+offset_right = 278.0
+offset_bottom = 256.0
+
+[node name="Eqp" parent="Profile/M/G/VB/MC2/VB/BG/MC" index="0"]
+visible_characters = -1
+visible_ratio = 1.0
+
+[node name="HUD" parent="." instance=ExtResource("6_odogd")]
+layout_mode = 1
+offset_left = -144.0
+offset_top = -81.0
+offset_right = -144.0
+offset_bottom = -81.0
+
+[connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/AtkBtn" to="." method="_on_atk_btn_pressed"]
+[connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/SklBtn" to="." method="_on_skl_btn_pressed"]
+[connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/WaitBtn" to="." method="_on_wait_btn_pressed"]
+
+[editable path="ActionMenu"]
+[editable path="CombatForecast"]
+[editable path="Profile"]
+[editable path="HUD"]

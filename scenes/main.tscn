@@ -1,0 +1,82 @@
+[gd_scene load_steps=8 format=3 uid="uid://d1kccw7cbe252"]
+
+[ext_resource type="Script" path="res://Main.gd" id="1_i7i5r"]
+[ext_resource type="PackedScene" uid="uid://bcypnaxbma61j" path="res://scenes/TestMap.tscn" id="3_joonu"]
+[ext_resource type="PackedScene" uid="uid://cmvmjk0jj7dam" path="res://scenes/Gameboard.tscn" id="3_nhbdj"]
+[ext_resource type="PackedScene" uid="uid://r6wtvva5qput" path="res://scenes/GUIManager.tscn" id="4_e3q25"]
+[ext_resource type="Script" path="res://scenes/gameState.gd" id="5_kfxdl"]
+[ext_resource type="Texture2D" uid="uid://cpcoxo8pcta47" path="res://sprites/tileset_unit_overlay.svg" id="6_vhip0"]
+[ext_resource type="PackedScene" uid="uid://6p32x2w6sd8m" path="res://scenes/skill_manager.tscn" id="7_tc0l7"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_i7i5r")
+
+[node name="Gameboard" parent="." instance=ExtResource("3_nhbdj")]
+mouseSens = 0.2
+
+[node name="UnitOverlay" parent="Gameboard" index="0"]
+visibility_layer = 1
+layer_0/z_index = 2
+
+[node name="UnitPath" parent="Gameboard" index="1"]
+layer_0/z_index = 2
+
+[node name="Cursor" parent="Gameboard" index="2"]
+z_index = 5
+y_sort_enabled = true
+
+[node name="TestMap" parent="Gameboard" instance=ExtResource("3_joonu")]
+
+[node name="TextureRect" parent="Gameboard/TestMap/Control" index="0"]
+top_level = true
+z_index = 0
+y_sort_enabled = true
+
+[node name="Control" type="Control" parent="Gameboard"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="TurnLight" type="TextureRect" parent="Gameboard/Control"]
+top_level = true
+layout_mode = 0
+offset_left = 3.0
+offset_top = 2.0
+offset_right = 83.0
+offset_bottom = 82.0
+scale = Vector2(0.389885, 0.36713)
+texture = ExtResource("6_vhip0")
+
+[node name="gameState" type="Node" parent="Gameboard"]
+script = ExtResource("5_kfxdl")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="GUIManager" parent="CanvasLayer" instance=ExtResource("4_e3q25")]
+top_level = true
+y_sort_enabled = true
+scale = Vector2(1.8, 1.8)
+game_cursor_path = NodePath("../../Gameboard/Cursor")
+
+[node name="Profile" parent="CanvasLayer/GUIManager" index="2"]
+visible = false
+
+[node name="SkillManager" parent="." instance=ExtResource("7_tc0l7")]
+
+[connection signal="target_focused" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_target_focused"]
+[connection signal="toggle_action" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_action"]
+[connection signal="toggle_prof" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_prof"]
+[connection signal="turn_changed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_turn_changed"]
+[connection signal="actionSelected" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_action_selected"]
+[connection signal="gui_closed" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_gui_closed"]
+[connection signal="startTheJustice" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_start_the_justice"]
+[connection signal="wep_updated" from="CanvasLayer/GUIManager/ActionMenu/menu_cursor" to="Gameboard" method="_on_menu_cursor_wep_updated"]
+
+[editable path="Gameboard"]
+[editable path="Gameboard/TestMap"]
+[editable path="CanvasLayer/GUIManager"]
+[editable path="CanvasLayer/GUIManager/ActionMenu"]
+[editable path="CanvasLayer/GUIManager/CombatForecast"]
+[editable path="CanvasLayer/GUIManager/Profile"]
+[editable path="CanvasLayer/GUIManager/HUD"]

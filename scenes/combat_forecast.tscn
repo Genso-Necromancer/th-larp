@@ -1,0 +1,351 @@
+[gd_scene load_steps=5 format=3 uid="uid://ct2rsfnl7fi6u"]
+
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_3ryf8"]
+[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_jeq77"]
+[ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="3_hiwoo"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_twugi"]
+
+[node name="CombatForecast" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 640.0
+offset_bottom = 360.0
+size_flags_vertical = 0
+mouse_filter = 2
+theme = ExtResource("1_jeq77")
+metadata/_edit_use_anchors_ = true
+
+[node name="GC" type="GridContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -259.0
+offset_right = 259.0
+offset_bottom = 144.0
+grow_horizontal = 2
+theme = ExtResource("1_jeq77")
+theme_override_constants/h_separation = 0
+columns = 5
+
+[node name="BGA1" type="NinePatchRect" parent="GC"]
+custom_minimum_size = Vector2(80, 144)
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+texture = ExtResource("1_3ryf8")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MC" type="MarginContainer" parent="GC/BGA1"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -36.0
+offset_top = -68.0
+offset_right = 36.0
+offset_bottom = 68.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="AtkFull" type="TextureRect" parent="GC/BGA1/MC"]
+layout_mode = 2
+texture = ExtResource("3_hiwoo")
+expand_mode = 1
+
+[node name="s5" type="PanelContainer" parent="GC"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_twugi")
+
+[node name="HBC" type="GridContainer" parent="GC"]
+layout_mode = 2
+columns = 3
+
+[node name="AtkPanel" type="PanelContainer" parent="GC/HBC"]
+layout_mode = 2
+
+[node name="BackgroundCenter2" type="NinePatchRect" parent="GC/HBC/AtkPanel"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+texture = ExtResource("1_3ryf8")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="AMa" type="MarginContainer" parent="GC/HBC/AtkPanel"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+
+[node name="MC" type="MarginContainer" parent="GC/HBC/AtkPanel/AMa"]
+layout_mode = 2
+
+[node name="bg?" type="TextureRect" parent="GC/HBC/AtkPanel/AMa/MC"]
+layout_mode = 2
+
+[node name="AVB" type="VBoxContainer" parent="GC/HBC/AtkPanel/AMa"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+theme_override_constants/separation = 2
+
+[node name="NAME" type="Label" parent="GC/HBC/AtkPanel/AMa/AVB"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+text = "Null"
+
+[node name="LIFE" type="RichTextLabel" parent="GC/HBC/AtkPanel/AMa/AVB"]
+custom_minimum_size = Vector2(24, 10)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_jeq77")
+bbcode_enabled = true
+text = "[center]Null[/center]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+meta_underlined = false
+hint_underlined = false
+deselect_on_focus_loss_enabled = false
+text_direction = 1
+
+[node name="ACC" type="Label" parent="GC/HBC/AtkPanel/AMa/AVB"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_jeq77")
+text = "Null"
+horizontal_alignment = 1
+
+[node name="DMG" type="Label" parent="GC/HBC/AtkPanel/AMa/AVB"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_jeq77")
+text = "Null"
+horizontal_alignment = 1
+
+[node name="CRIT" type="Label" parent="GC/HBC/AtkPanel/AMa/AVB"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_jeq77")
+text = "Null"
+horizontal_alignment = 1
+
+[node name="DEF" type="Label" parent="GC/HBC/AtkPanel/AMa/AVB"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_jeq77")
+text = "Null"
+horizontal_alignment = 1
+
+[node name="Labels" type="PanelContainer" parent="GC/HBC"]
+layout_mode = 2
+
+[node name="BackgroundCenter2" type="NinePatchRect" parent="GC/HBC/Labels"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+texture = ExtResource("1_3ryf8")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="Margin" type="MarginContainer" parent="GC/HBC/Labels"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GC/HBC/Labels/Margin"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+theme_override_constants/separation = 2
+
+[node name="BLANK" type="Label" parent="GC/HBC/Labels/Margin/VBoxContainer"]
+custom_minimum_size = Vector2(0, 8)
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+horizontal_alignment = 1
+
+[node name="LIFELB" type="Label" parent="GC/HBC/Labels/Margin/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+text = "Life"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ACCLB" type="Label" parent="GC/HBC/Labels/Margin/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+text = "Accuracy"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DMGLB" type="Label" parent="GC/HBC/Labels/Margin/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+text = "Damage"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CRITLB" type="Label" parent="GC/HBC/Labels/Margin/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+text = "Crit"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DEFLB" type="Label" parent="GC/HBC/Labels/Margin/VBoxContainer"]
+visible = false
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+text = "Defense"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TargetPanel" type="PanelContainer" parent="GC/HBC"]
+layout_mode = 2
+
+[node name="BackgroundCenter2" type="NinePatchRect" parent="GC/HBC/TargetPanel"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+texture = ExtResource("1_3ryf8")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="TMa" type="MarginContainer" parent="GC/HBC/TargetPanel"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+
+[node name="TVB" type="VBoxContainer" parent="GC/HBC/TargetPanel/TMa"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+theme_override_constants/separation = 2
+
+[node name="NAME" type="Label" parent="GC/HBC/TargetPanel/TMa/TVB"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+text = "Null"
+horizontal_alignment = 2
+
+[node name="LIFE" type="RichTextLabel" parent="GC/HBC/TargetPanel/TMa/TVB"]
+custom_minimum_size = Vector2(15, 10)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_jeq77")
+bbcode_enabled = true
+text = "[center]Null[/center]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+meta_underlined = false
+hint_underlined = false
+deselect_on_focus_loss_enabled = false
+
+[node name="ACC" type="Label" parent="GC/HBC/TargetPanel/TMa/TVB"]
+custom_minimum_size = Vector2(15, 10)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_jeq77")
+text = "Null"
+horizontal_alignment = 1
+
+[node name="DMG" type="Label" parent="GC/HBC/TargetPanel/TMa/TVB"]
+custom_minimum_size = Vector2(15, 10)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_jeq77")
+text = "Null"
+horizontal_alignment = 1
+
+[node name="CRIT" type="Label" parent="GC/HBC/TargetPanel/TMa/TVB"]
+custom_minimum_size = Vector2(15, 10)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_jeq77")
+text = "Null"
+horizontal_alignment = 1
+
+[node name="DEF" type="Label" parent="GC/HBC/TargetPanel/TMa/TVB"]
+visible = false
+custom_minimum_size = Vector2(15, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_jeq77")
+text = "Null"
+horizontal_alignment = 1
+
+[node name="PanelContainer2" type="PanelContainer" parent="GC/HBC"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_twugi")
+
+[node name="PanelContainer3" type="PanelContainer" parent="GC/HBC"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_twugi")
+
+[node name="PanelContainer4" type="PanelContainer" parent="GC/HBC"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_twugi")
+
+[node name="PanelContainer6" type="PanelContainer" parent="GC"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_twugi")
+
+[node name="BGA2" type="NinePatchRect" parent="GC"]
+custom_minimum_size = Vector2(80, 0)
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+texture = ExtResource("1_3ryf8")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MC" type="MarginContainer" parent="GC/BGA2"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -36.0
+offset_top = -68.0
+offset_right = 36.0
+offset_bottom = 68.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="TrgtFull" type="TextureRect" parent="GC/BGA2/MC"]
+layout_mode = 2
+texture = ExtResource("3_hiwoo")
+expand_mode = 1

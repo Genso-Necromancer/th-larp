@@ -1,0 +1,267 @@
+[gd_scene load_steps=4 format=3 uid="uid://cxjo0fdu14w3o"]
+
+[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_phvm5"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_sedhl"]
+[ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="3_x6e7x"]
+
+[node name="Profile" type="MarginContainer"]
+offset_right = 198.0
+offset_bottom = 200.0
+mouse_filter = 0
+theme = ExtResource("1_phvm5")
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="."]
+custom_minimum_size = Vector2(96, 16)
+layout_mode = 2
+texture = ExtResource("2_sedhl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="M" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="G" type="GridContainer" parent="M"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+theme_override_constants/h_separation = 5
+columns = 3
+
+[node name="UnitExpTag" type="Label" parent="M/G"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "EXP:"
+
+[node name="UnitExp" type="Label" parent="M/G"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0
+"
+visible_characters = 3
+visible_ratio = 1.5
+
+[node name="UnitName" type="Label" parent="M/G"]
+custom_minimum_size = Vector2(60, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource("1_phvm5")
+text = "unitName"
+
+[node name="VTags" type="VBoxContainer" parent="M/G"]
+layout_mode = 2
+
+[node name="UnitLevelTag" type="Label" parent="M/G/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "Level:"
+
+[node name="UnitHpTag" type="Label" parent="M/G/VTags"]
+layout_mode = 2
+focus_neighbor_bottom = NodePath("../UnitStrTag")
+theme = ExtResource("1_phvm5")
+text = "Health:"
+
+[node name="UnitStrTag" type="Label" parent="M/G/VTags"]
+layout_mode = 2
+focus_neighbor_bottom = NodePath("../UnitMagTag")
+theme = ExtResource("1_phvm5")
+text = "Power:"
+
+[node name="UnitMagTag" type="Label" parent="M/G/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "Magic:"
+
+[node name="UnitElegTag2" type="Label" parent="M/G/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "Elegance:"
+
+[node name="UnitCeleTag3" type="Label" parent="M/G/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "Celerity:"
+
+[node name="UnitBarTag4" type="Label" parent="M/G/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "Barrier:"
+
+[node name="UnitChaTag5" type="Label" parent="M/G/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "Charisma:"
+
+[node name="VStats" type="VBoxContainer" parent="M/G"]
+layout_mode = 2
+
+[node name="UnitLevel" type="Label" parent="M/G/VStats"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitHp" type="Label" parent="M/G/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_phvm5")
+text = "60/60"
+horizontal_alignment = 2
+
+[node name="UnitStr" type="Label" parent="M/G/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitMag" type="Label" parent="M/G/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitEle" type="Label" parent="M/G/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitCele" type="Label" parent="M/G/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitBar" type="Label" parent="M/G/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitCha" type="Label" parent="M/G/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="VB" type="VBoxContainer" parent="M/G"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MC" type="MarginContainer" parent="M/G/VB"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="SpriteBG" type="NinePatchRect" parent="M/G/VB/MC"]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+texture = ExtResource("2_sedhl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MC" type="MarginContainer" parent="M/G/VB/MC"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="UnitPrt" type="TextureRect" parent="M/G/VB/MC/MC"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("3_x6e7x")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="MC2" type="MarginContainer" parent="M/G/VB"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+
+[node name="bg2" type="NinePatchRect" parent="M/G/VB/MC2"]
+layout_mode = 2
+texture = ExtResource("2_sedhl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MC" type="MarginContainer" parent="M/G/VB/MC2"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 36
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="VB" type="GridContainer" parent="M/G/VB/MC2/MC"]
+layout_mode = 2
+
+[node name="Wep1" type="Label" parent="M/G/VB/MC2/MC/VB"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Wep2" type="Label" parent="M/G/VB/MC2/MC/VB"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Wep3" type="Label" parent="M/G/VB/MC2/MC/VB"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Wep4" type="Label" parent="M/G/VB/MC2/MC/VB"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VB" type="VBoxContainer" parent="M/G/VB/MC2"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="BG" type="NinePatchRect" parent="M/G/VB/MC2/VB"]
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("2_sedhl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MC" type="MarginContainer" parent="M/G/VB/MC2/VB/BG"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -17.0
+offset_top = -6.0
+offset_right = 17.0
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="Eqp" type="Label" parent="M/G/VB/MC2/VB/BG/MC"]
+layout_mode = 2
+text = "Test"
+horizontal_alignment = 1
+vertical_alignment = 1
+visible_characters = 0
+visible_ratio = 0.0

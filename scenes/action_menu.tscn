@@ -1,0 +1,111 @@
+[gd_scene load_steps=4 format=3 uid="uid://2ggl8hw7vq8n"]
+
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_rcm7k"]
+[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="4_cpge4"]
+[ext_resource type="PackedScene" uid="uid://cmh8ono4w82cq" path="res://fonts/menu_cursor.tscn" id="5_uyjk8"]
+
+[node name="ActionMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+size_flags_horizontal = 4
+theme = ExtResource("4_cpge4")
+
+[node name="Count" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+offset_right = 48.0
+offset_bottom = 47.0
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="Count"]
+custom_minimum_size = Vector2(48, 16)
+layout_mode = 2
+texture = ExtResource("1_rcm7k")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="ActionBox" type="MarginContainer" parent="Count"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="CenterContainer" type="CenterContainer" parent="Count/ActionBox"]
+layout_mode = 2
+theme = ExtResource("4_cpge4")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Count/ActionBox/CenterContainer"]
+layout_mode = 2
+theme = ExtResource("4_cpge4")
+theme_override_constants/separation = 0
+
+[node name="AtkBtn" type="Button" parent="Count/ActionBox/CenterContainer/VBoxContainer"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../WaitBtn")
+focus_neighbor_bottom = NodePath("../SklBtn")
+theme = ExtResource("4_cpge4")
+action_mode = 0
+text = "Attack"
+
+[node name="SklBtn" type="Button" parent="Count/ActionBox/CenterContainer/VBoxContainer"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../AtkBtn")
+focus_neighbor_bottom = NodePath("../WaitBtn")
+theme = ExtResource("4_cpge4")
+disabled = true
+action_mode = 0
+text = "Skill"
+
+[node name="WaitBtn" type="Button" parent="Count/ActionBox/CenterContainer/VBoxContainer"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../SklBtn")
+focus_neighbor_bottom = NodePath("../AtkBtn")
+theme = ExtResource("4_cpge4")
+action_mode = 0
+text = "Wait"
+
+[node name="m" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -32.0
+offset_bottom = 32.0
+grow_horizontal = 0
+theme = ExtResource("4_cpge4")
+metadata/_edit_use_anchors_ = true
+
+[node name="b" type="NinePatchRect" parent="m"]
+layout_mode = 2
+theme = ExtResource("4_cpge4")
+texture = ExtResource("1_rcm7k")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="m" type="MarginContainer" parent="m"]
+layout_mode = 2
+theme = ExtResource("4_cpge4")
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="c" type="CenterContainer" parent="m/m"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("4_cpge4")
+
+[node name="v" type="VBoxContainer" parent="m/m/c"]
+layout_mode = 2
+theme = ExtResource("4_cpge4")
+
+[node name="menu_cursor" parent="." instance=ExtResource("5_uyjk8")]
+layout_mode = 0
+scale = Vector2(2, 2)

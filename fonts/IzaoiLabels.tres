@@ -1,0 +1,8 @@
+[gd_resource type="LabelSettings" load_steps=2 format=3 uid="uid://dkj3aj4bd8oqg"]
+
+[ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="1_dmigp"]
+
+[resource]
+line_spacing = 0.0
+font = ExtResource("1_dmigp")
+font_size = 6

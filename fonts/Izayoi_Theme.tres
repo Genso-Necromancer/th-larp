@@ -1,0 +1,48 @@
+[gd_resource type="Theme" load_steps=9 format=3 uid="uid://du12ka2217r4x"]
+
+[ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="1_8ljwi"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_s7ira"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_t31wv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kl6js"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hsiuf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rfvx0"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_y8ifr"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_63pdl"]
+
+[resource]
+default_base_scale = 1.0
+default_font = ExtResource("1_8ljwi")
+default_font_size = 12
+Button/colors/font_color = Color(0.87451, 0.87451, 0.87451, 1)
+Button/colors/font_disabled_color = Color(0.255659, 0.255659, 0.255659, 1)
+Button/colors/font_focus_color = Color(0.95, 0.95, 0.95, 1)
+Button/colors/font_hover_color = Color(0.95, 0.95, 0.95, 1)
+Button/colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+Button/colors/font_outline_color = Color(1, 1, 1, 1)
+Button/colors/font_pressed_color = Color(1, 1, 1, 1)
+Button/colors/icon_disabled_color = Color(1, 1, 1, 0.4)
+Button/colors/icon_focus_color = Color(1, 1, 1, 1)
+Button/colors/icon_hover_color = Color(1, 1, 1, 1)
+Button/colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
+Button/colors/icon_normal_color = Color(1, 1, 1, 1)
+Button/colors/icon_pressed_color = Color(1, 1, 1, 1)
+Button/constants/h_separation = 2
+Button/constants/outline_size = 0
+Button/font_sizes/font_size = 12
+Button/styles/disabled = SubResource("StyleBoxEmpty_s7ira")
+Button/styles/focus = SubResource("StyleBoxEmpty_t31wv")
+Button/styles/hover = SubResource("StyleBoxEmpty_kl6js")
+Button/styles/normal = SubResource("StyleBoxEmpty_hsiuf")
+Button/styles/pressed = SubResource("StyleBoxEmpty_rfvx0")
+Fonts/fonts/normal = ExtResource("1_8ljwi")
+Label/font_sizes/font_size = 12
+Panel/styles/panel = SubResource("StyleBoxEmpty_y8ifr")
+PanelContainer/styles/panel = SubResource("StyleBoxEmpty_63pdl")
+RichTextLabel/font_sizes/normal_font_size = 8

@@ -1,0 +1,67 @@
+[gd_scene load_steps=13 format=3 uid="uid://cmvmjk0jj7dam"]
+
+[ext_resource type="Script" path="res://scrpt/GameBoard.gd" id="1_kkv4d"]
+[ext_resource type="Texture2D" uid="uid://cwdtp8f162l40" path="res://sprites/hexAttackTest.png" id="3_qec1v"]
+[ext_resource type="Texture2D" uid="uid://bn4u1sykritxk" path="res://sprites/hex cover test.png" id="4_8xptj"]
+[ext_resource type="Script" path="res://scenes/UnitOverlay.gd" id="5_b7qkm"]
+[ext_resource type="PackedScene" uid="uid://dar8sp5uxx2aw" path="res://scrpt/unit_path.tscn" id="6_sxhsu"]
+[ext_resource type="PackedScene" uid="uid://de42f2dvbgkri" path="res://scenes/cursor.tscn" id="7_bctkf"]
+[ext_resource type="Script" path="res://scenes/AiManager.gd" id="7_rin0x"]
+[ext_resource type="PackedScene" uid="uid://dxoxyyj8wpdgu" path="res://scenes/combat_manager.tscn" id="8_06m4j"]
+[ext_resource type="Script" path="res://scenes/TurnSort.gd" id="9_gu2p2"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_imj64"]
+texture = ExtResource("4_8xptj")
+texture_region_size = Vector2i(48, 16)
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jtw8t"]
+texture = ExtResource("3_qec1v")
+texture_region_size = Vector2i(48, 16)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_8btam"]
+tile_shape = 3
+tile_offset_axis = 1
+tile_size = Vector2i(160, 48)
+sources/0 = SubResource("TileSetAtlasSource_imj64")
+sources/1 = SubResource("TileSetAtlasSource_jtw8t")
+
+[node name="Gameboard" type="Node2D"]
+script = ExtResource("1_kkv4d")
+
+[node name="UnitOverlay" type="TileMap" parent="."]
+modulate = Color(1, 1, 1, 0.905882)
+visibility_layer = 2
+y_sort_enabled = true
+tile_set = SubResource("TileSet_8btam")
+format = 2
+layer_0/y_sort_enabled = true
+layer_0/y_sort_origin = 4
+script = ExtResource("5_b7qkm")
+
+[node name="UnitPath" parent="." instance=ExtResource("6_sxhsu")]
+visibility_layer = 2
+
+[node name="Cursor" parent="." instance=ExtResource("7_bctkf")]
+position = Vector2(288, 156)
+
+[node name="Camera2D" type="Camera2D" parent="Cursor"]
+position_smoothing_enabled = true
+drag_horizontal_enabled = true
+drag_vertical_enabled = true
+drag_left_margin = 0.6
+drag_top_margin = 0.6
+drag_right_margin = 0.6
+drag_bottom_margin = 0.6
+editor_draw_drag_margin = true
+
+[node name="AiManager" type="Node" parent="."]
+script = ExtResource("7_rin0x")
+
+[node name="CombatManager" parent="." instance=ExtResource("8_06m4j")]
+
+[node name="TurnSort" type="Node" parent="."]
+script = ExtResource("9_gu2p2")
