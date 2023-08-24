@@ -29,53 +29,23 @@ var terrainValues = {}
 @export var maxDepth = 3
 
 func init_Ai():
+	#link up dependancies
 	gameBoard = get_parent()
 	aHex = gameBoard._astar
-#	print(plUnits)
-#	print(enUnits)
 
-#func rein_units(units):
-#	player.clear()
-#	enemy.clear()
-#	var i = 0
-#	for unit in units:
-#		match units[unit].is_in_group("Player"):
-#			true: player.append(units[unit])
-#			false: enemy.append(units[unit])
-
-#func init_mapdata(terrain):
-#	terrainData = terrain
-#	print(terrain)
-
-#func minimax(node, depth, maximizing_player):
-#	pass
-
-#func minimax(node, depth, maximizing_player, alpha, beta):
-#	pass
 
 func get_move(state: GameState):
-#	var bestScore = -INF
-#	var bestMove = null
+
 	playerValues.clear()
 	enemyValues.clear()
 	terrainValues.clear()
+	#assigns weighted value for the AI to compare
 	playerValues = assign_unit_value(state.player)
 	enemyValues = assign_unit_value(state.enemy)
 	terrainValues = assign_terrain_value(state.terrainData)
+	
 	var moves = find_moves(state)
 	return moves
-#	for move in find_moves(state):
-#		var score = minimax(move, maxDepth, false)
-#		if score > bestScore:
-#			bestScore = score
-#			bestMove = move
-
-#	return bestMove
-	
-#	var bestAction = evaluate_units()
-#
-#	print(bestAction)
-#	return compile_action(bestAction)
 
 func find_moves(state: GameState):
 	var validMoves = []
@@ -105,6 +75,7 @@ func find_best_action(moves):
 	return bestMove
 	
 func get_valid_moves(unit, cell, move, state):
+	#This just runs the functions which actually compares all the possible moves before sending it up the pipeline
 	var path = aHex.find_all_paths(cell, move, unit.moveType, true)
 	var threat
 	var bestAttack = null

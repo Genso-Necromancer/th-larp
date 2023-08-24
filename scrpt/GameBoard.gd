@@ -1,28 +1,22 @@
-## Represents and manages the game board. Stores references to entities that are in each cell and
-## tells whether cells are occupied or not.
-## Units can only move around the grid one at a time.
+#This class is what I see when I wake up in the middle of the night in a cold sweat
+#It controls pretty much all facets of gameplay when within a playable "map"
+#UIManager, the map itself, all units, skills and combat are manipulated from this point and acts almost like a veritable hub
+#UIManager is not a true child of this class so that it can be used outside of simply maps and keep all UI elements in one place.
+#signals are uses for communication between them and many of the children of this class
 class_name GameBoard
 extends Node2D
+
+#signals sent from here
 signal toggle_action
 signal toggle_prof
 signal target_focused
 signal aimove_finished
 signal turn_changed
 
-
-const DIRECTIONS = [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]
-var oddq_directions = [
-	[[+1,  0], [+1, -1], [ 0, -1], 
-	[-1, -1], [-1,  0], [ 0, +1]],
-	[[+1, +1], [+1,  0], [ 0, -1], 
-	[-1,  0], [-1, +1], [ 0, +1]],
-]
-
-## Resource of type Grid.
-#@export var grid: Resource
-
-## Mapping of coordinates of a cell to a reference to the unit it contains.
+# units is used to map units to it's hex coordinate
 var units := {}
+
+#these are used to store references to actual units that are passed around this class and those it controls
 var focusUnit : Unit :
 	set(value):
 		focusUnit = value
@@ -32,39 +26,49 @@ var activeUnit: Unit :
 		activeUnit = value
 		Global.activeUnit = activeUnit
 var targetUnit: Unit
+
+#variables related to the active map in use
 var currMap: GameMap
-var _walkable_cells = []
-var HpBarVis = true
-var _astar: AHexGrid2D
-#misc Variables
 var mapSize
-var canter = false
-#var _used_cells
 var mapCellSize
 var mapRect
-var testPath = false
+var terrainData = []
+var conditions: Array
+
+#input state
+var state : int = 0
+var previousState : int = 0
+
+
+#related to pathfinding
+var hexStar: AHexGrid2D
+var _walkable_cells = []
 var solidsArray = []
 var walkable_rect : Rect2
 var unitMoving = false
 var snapPath = null
-var state : int = 0
-var previousState : int = 0
+
+#game turns
 var turnOrder = []
 var roundCounter = 0
 var turnCounter = 0
 var aiTurn = false
 var maxTurns = 0
-var terrainData = []
-var conditions: Array
-var prevMousePos: Vector2
-var smoothedMouseDelta: Vector2 = Vector2.ZERO
+
+#I don't even know if I need this
 var activeSkill
+
+#controls pseudo UI elements, like HP bars
+var HpBarVis = true
+
 #Time
 @export var mouseSens: float = 0.4
 @export var smoothing: float = 0.2
-#control Variables
+
+#GUI control Variables
 var profileMenu = Global.profileMenu
 var actionMenu = Global.actionMenu
+
 #Nodes
 @onready var _unit_overlay: UnitOverlay = $UnitOverlay
 @onready var _unit_path: UnitPath = $UnitPath
@@ -75,7 +79,10 @@ var actionMenu = Global.actionMenu
 @onready var gameState = $gameState
 @export var ui_cooldown := 0.2
 @onready var gameCamera = $Cursor/Camera2D
+@onready var Ai = $AiManager
+@onready var _timer: Timer = $Cursor/Timer
 
+#cursor location
 var cursorCell := Vector2.ZERO:
 	set(value):
 		if value == cursorCell:
@@ -84,8 +91,9 @@ var cursorCell := Vector2.ZERO:
 		cursor.position = currMap.map_to_local(cursorCell)
 		_on_cursor_moved(cursorCell)
 		_timer.start()
-@onready var _timer: Timer = $Cursor/Timer
-@onready var Ai = $AiManager
+
+
+
 
 func _ready() -> void:
 	_reinitialize()
@@ -124,8 +132,8 @@ func _reinitialize() -> void:
 	mapCellSize = currMap.tileSize
 	conditions = currMap.lossConditions
 	#start up pathfinder
-	_astar = AHexGrid2D.new(currMap)
-	_astar.tileSize = mapCellSize
+	hexStar = AHexGrid2D.new(currMap)
+	hexStar.tileSize = mapCellSize
 
 	#grab units from map
 	for child in currMap.get_children():
@@ -170,6 +178,7 @@ func update_unit_terrain(unit):
 	unit.update_terrain_bonus(terrainData)
 	
 func _unhandled_input(event: InputEvent) -> void:
+	#input uses a series of states to direct where everything goes, if it goes anywhere
 	#States:
 	#0: default- no menues open, nothing is happening.
 	#1: unit has been selected
@@ -177,30 +186,26 @@ func _unhandled_input(event: InputEvent) -> void:
 	#3: profile menu is open
 	#4: Attack targeting
 	#5: Combat Forecast
+	#6: Skill targeting
 	
 	
 	
-	#T key
-	
+	#T key: Passes current turn for debugging, preventing from doing this if a unit is actively moving or it is not the player turn
 	if aiTurn:
 		return
 	if event.is_action_pressed("debug"):
 		turn_change()
 	if unitMoving:
 		return
-#	if state == 2 or state == 5:
-#		return
+#
+#Start of the actual player input control while in an active game
 	if event is InputEventMouseMotion:
-#			var cameraPos = gameCamera.position
 			var cameraScale = gameCamera.zoom
 			var cursorPos = cursor.position
 			var mouseDelta = event.relative * mouseSens
 			var mousePos = gameCamera.get_local_mouse_position()
 			
 			cursorPos += mouseDelta 
-#			if event.relative.x != 0 and event.relative.y != 0:
-#				cursorPos.x += 10
-#				cursorPos.y += 10
 			
 			mouseDelta = null
 			match state:
@@ -297,15 +302,13 @@ func _unhandled_input(event: InputEvent) -> void:
 					2: return
 			else: return
 			
-## Returns `true` if the cell is occupied by a unit.
+## Returns `true` if the cell is occupied by a unit
 func is_occupied(cell: Vector2) -> bool:
 		return units.has(cell)
 	
 
 
 ## Returns an array of cells a given unit can walk using the flood fill algorithm.
-
-	
 func get_region_rect(region: Array) -> Rect2:
 	var minPos = Vector2(INF, INF)
 	var maxPos = Vector2(-INF, -INF)
@@ -319,14 +322,14 @@ func get_region_rect(region: Array) -> Rect2:
 	return Rect2(minPos, rectSize)
 
 
-## Clears, and refills the `units` dictionary with game objects that are on the board.
-
-
-func init_astar_terrain(attack: bool = false):
+#Initializes the astar style pathfinding class
+func init_hexStar_terrain(attack: bool = false):
 	solidsArray.clear()
 	solidsArray = []
-	_astar.size = mapRect.size
-	_astar.cell_size = mapCellSize
+	hexStar.size = mapRect.size
+	hexStar.cell_size = mapCellSize
+	#units are split between factions, then it's opposing faction is considered "solid"
+	##Plans to allow for flying units to go 'over' opposing units in the future possibly, not currently implemented
 	var team = null
 	if !aiTurn:
 		if activeUnit.is_in_group("Player"):
@@ -338,7 +341,6 @@ func init_astar_terrain(attack: bool = false):
 	if !attack:
 		for y in mapRect.size.y:
 			for x in mapRect.size.x:
-				
 					var unit = Vector2(x,y)
 					var friendly = false
 					if unit == null:
@@ -349,36 +351,30 @@ func init_astar_terrain(attack: bool = false):
 					if units.has(Vector2(x,y)) and !friendly:
 						solidsArray.append(Vector2(x,y))
 		if solidsArray.size() > 0:
-			_astar.set_solid(solidsArray)
+			hexStar.set_solid(solidsArray)
 	else:
-		_astar.set_solid(solidsArray)
+		hexStar.set_solid(solidsArray)
 				
 		
-
-#func set_region_border(cells):
-#	for y in mapRect.size.y:
-#		for x in mapRect.size.x:
-#			if not cells.has(Vector2(x,y)):
-#				solidsArray.append(Vector2(x,y))
-#	if solidsArray.size() > 0:
-#		_astar.set_solid(solidsArray)
-#	solidsArray.clear()
-#	solidsArray = []
 		
 func get_walkable_cells(unit: Unit) -> Array:
-	
+	#Possibly unnecessary. 
+	#It's convienent to just call using only unit variable and let the function split the necessary info
 	return _flood_fill(unit.cell, unit.unitData.Stats.MOVE, unit.moveType)
 
 func _flood_fill(cell: Vector2, max_distance: int, moveType : String, terrain: bool = true, attack: bool = false) -> Array:
-	init_astar_terrain(attack)
+	#initializes pathfinder, calls floodfill pathfind and visual displays it all at once
+	init_hexStar_terrain(attack)
 #	print(moveType)
-	var path = _astar.find_all_paths(cell, max_distance, moveType, terrain,)
+	var path = hexStar.find_all_paths(cell, max_distance, moveType, terrain,)
 	return path
 
 func get_path_to_cell(cell, current, moveType: String):
-	return _astar.find_path(cell, current, moveType)
+	#this might be a bit unnecessary after changes. does not have convience of "get_walkable_cells"
+	return hexStar.find_path(cell, current, moveType)
 
 func is_within_bounds(cell_coordinates: Vector2) -> bool:
+	#Keeps the map cursor in bounds
 	var valid
 	if cell_coordinates.x > mapSize.x and cell_coordinates.y > mapSize.y:
 		valid = false
@@ -388,8 +384,9 @@ func is_within_bounds(cell_coordinates: Vector2) -> bool:
 		valid = true
 	return valid
 
-## Updates the units dictionary with the target position for the unit and asks the activeUnit to walk to it.
+
 func _move_active_unit(new_cell: Vector2, enemy: bool = false, enemyPath = null) -> void:
+	# Updates the units dictionary with the target position for the unit and asks the activeUnit to walk to it.
 #	print("move_active: ", new_cell)
 	var path = null
 	if !new_cell == activeUnit.cell and !enemy:
@@ -415,9 +412,10 @@ func _move_active_unit(new_cell: Vector2, enemy: bool = false, enemyPath = null)
 		emit_signal("aimove_finished")
 
 
-## Selects the unit in the `cell` if there's one there.
-## Sets it as the `activeUnit` and draws its walkable cells and interactive move path. 
+
 func _select_unit(cell: Vector2) -> void:
+	# Selects the unit in the `cell` if there's one there.
+	# Sets it as the `activeUnit` and draws its walkable cells and interactive move path. 
 #	#print(units, units.has(cell))
 #	print(cell)
 	if not units.has(cell):
@@ -434,8 +432,9 @@ func _select_unit(cell: Vector2) -> void:
 
 
 
-## Deselects the active unit, clearing the cells overlay and interactive path drawing.
 func _deselect_active_unit(confirm) -> void:
+	# Deselects the active unit, clearing the cells overlay and interactive path drawing
+	#confirm is used to let the game know if this is a temporary movement(can be canceled by player) or a confirmed move so it knows to retain previous position or update the units dictionary
 #	#print(confirm)
 #	print(units)
 	if units.has(activeUnit.cell):
@@ -457,6 +456,7 @@ func _deselect_active_unit(confirm) -> void:
 	_unit_path.stop()
 
 func grab_target(cell, skillState = false):
+	#Called to assign values based on unit at cursor's coordinate
 	var distance
 	if not units.has(cell):
 		print("oops")
@@ -464,19 +464,22 @@ func grab_target(cell, skillState = false):
 	targetUnit = units[cell]
 	if !skillState:
 		combatManager.combat_forecast(activeUnit, targetUnit)
-		distance = _astar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.moveType, false)
+		distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.moveType, false)
 		emit_signal("target_focused", distance)
 	elif skillState:
 		print("Skill Manager")
 	
-## Clears the reference to the activeUnit and the corresponding walkable cells.
 func _clear_active_unit() -> void:
+	# Clears the reference to the activeUnit and the corresponding walkable cells
+	
 	activeUnit = null
 	_walkable_cells.clear()
 
 
-## Selects or moves a unit based on where the cursor is.
 func cursor_accept_pressed(cell: Vector2) -> void:
+	# Controls what happens when an element is selected by the player based on input state
+	#Includes: Selecting Unit, Destinations; Targets
+	#Currently also checks if selection is valid
 	
 	cell = currMap.local_to_map(cell)
 #	print(cell, activeUnit)
@@ -546,8 +549,9 @@ func cursor_accept_pressed(cell: Vector2) -> void:
 						$Cursor.visible = false
 						grab_target(cell, true)
 
-## Updates the interactive path's drawing if there's an active and selected unit.
+#
 func _on_cursor_moved(new_cell: Vector2) -> void:
+	# Updates the dynamic visual path if there's an active and selected unit.
 #	print(currMap.map_to_local(new_cell))
 	
 	if units.has(new_cell) and units[new_cell] == null:
@@ -566,6 +570,7 @@ func _on_cursor_moved(new_cell: Vector2) -> void:
 				_unit_path.draw(path)
 
 func attack_targeting(unit: Unit, usingSkill = false, skill = null):
+	#draws a visual representation of a unit's attack range, and binds the cursor within this space(snapPath)
 	var maxRange = 0
 	var minRange = 1000
 	var wepData
@@ -588,13 +593,14 @@ func attack_targeting(unit: Unit, usingSkill = false, skill = null):
 	minRange = minRange - 1
 	minRange = clampi(minRange, 0, 1000)
 	var invalid = _flood_fill(unit.cell, minRange, unit.moveType, false, true)
-	path = _astar.trim_path(path, invalid)
+	path = hexStar.trim_path(path, invalid)
 	snapPath = path
 	_unit_overlay.draw_attack(path)
 	_unit_path.stop()
 	
 
 func combat_sequence(a,_t):
+	#Place holder for when combat has a visual component, currently handles end of combat duties that would occur right after
 	state = 0
 	snapPath = null
 	_deselect_active_unit(true)
@@ -605,6 +611,7 @@ func combat_sequence(a,_t):
 	turn_change()
 
 func _on_gui_manager_action_selected(selection, skill = null):
+	#Controls what to do based on the action selected, GUIManager passes that information via Signal
 #	var cell = cursor.cell
 	match selection:
 		0: 
@@ -624,6 +631,7 @@ func _on_gui_manager_action_selected(selection, skill = null):
 			
 
 func toggle_extra_info():
+	#Toggles HP bars
 	if HpBarVis == true: 
 		get_tree().set_group("HPBar", "visible", false)
 		HpBarVis = false
@@ -633,6 +641,7 @@ func toggle_extra_info():
 	return
 
 func region_clamp(grid_position: Vector2) -> Vector2:
+	#Keeps cursor inside temporary boundaries without messing with it's map boundaries
 	var out := grid_position
 	
 	if snapPath != null:
@@ -644,12 +653,19 @@ func region_clamp(grid_position: Vector2) -> Vector2:
 		out.y = clamp(out.y, 0, mapSize.y - 1.0)
 	return out
 	
-func free_up():
-	if _astar != null:
-		_astar.qeue_free()
+func free_up():																						#Free Up, worst show on television
+	#Not really used atm, exists for when a map is completed
+	#Prevents memory leaks by freeing the pathfinding and combat manage from memory
+	#SKill Manager, turn sorter, etc will need to be added to this later, unless things fundamentally change down the line once the game is threaded together
+	if hexStar != null:
+		hexStar.qeue_free()
 	if combatManager.rng != null:
 		combatManager.rng.qeue_free()
+		
 func on_imdead(unit: Unit):
+	#When Unit signals that it has died, this removes it from units and free's it's coordinates
+	#Plan to alter this down the line for Seiga fight, where fallen units will be cached instead of completely removed
+	#Intention would be for Seiga to "reanimate" fallen units as part of her "danmaku"
 	var remove = unit.cell
 	units.erase(remove)
 #	var filterDick = []
@@ -661,6 +677,7 @@ func on_imdead(unit: Unit):
 
 
 func _on_menu_cursor_wep_updated():
+	#required for updating combat forecast as the player hovers weapon selection before combat. Signal is sent from /menu_cursor class
 	combatManager.combat_forecast(activeUnit, targetUnit)
 	
 	
@@ -668,6 +685,7 @@ func _on_menu_cursor_wep_updated():
 
 	
 func turn_change():
+	#change turn
 #	Ai.rein_units(units)
 	gameState.update_unit_data(units)
 	turnOrder.pop_front()
@@ -700,6 +718,7 @@ func turn_change():
 	emit_signal("turn_changed")
 		
 func round_change():
+	#Changes the round and reloads the "turn order" magazine
 	turnOrder.clear()
 	for child in currMap.get_children():
 		var unit := child as Unit
@@ -721,6 +740,7 @@ func round_change():
 	initialize_turns(turnOrder)
 	
 func initialize_turns(turns):
+	#this calls the turn sorter, which is better explain within it's class
 #	turnOrder.clear()
 	turnOrder = turnSort.sort_turns(turns)
 	aiTurn = false
@@ -729,7 +749,8 @@ func initialize_turns(turns):
 #	print(turnOrder)
 
 func start_ai_turn():
-	init_astar_terrain(false)
+	#Gets the ball rolling for the AI to take actions
+	init_hexStar_terrain(false)
 	if gameState.enemy.size() > 0:
 		var result = Ai.get_move(gameState)
 		
@@ -740,14 +761,15 @@ func start_ai_turn():
 	else: turn_change()
 		
 	
-
+#The next three functions process the AI's decided action based on which one is taken
+##Attacking, Move without attacking; waiting in place
 func ai_attack(result):
 	var actor = result["Unit"]
 	var target = result["Best Move"]["target"]
 	var destination = Vector2(result["Best Move"]["launch"])
 	var weapon = result["Best Move"]["weapon"]
 	_select_unit(actor.cell)
-#	var closestCell = _astar.find_closest(actor.cell, target.cell, actor.moveType, _walkable_cells)
+#	var closestCell = hexStar.find_closest(actor.cell, target.cell, actor.moveType, _walkable_cells)
 	var path = get_path_to_cell(actor.cell, destination, actor.moveType)
 	if actor.cell != destination:
 		_move_active_unit(destination, true, path)
@@ -785,6 +807,10 @@ func ai_wait(result):
 	
 
 func _on_gui_manager_start_the_justice():
+	#Called via Singal from GUIManager when player initiaties combat
+	#Sends necessary data to the combat manager, then initiates the visual representation after results are returned
+	#Currently does not return the results, nor pass them due to having no implemented visual representation
+	#next step to this will be implementing an ingame text read out of combat to set up framework without need for actual animations yet
 	state = 0
 	combatManager.start_the_justice(activeUnit, focusUnit)
 	emit_signal("target_focused")
@@ -794,5 +820,8 @@ func _on_gui_manager_start_the_justice():
 
 
 func _on_combat_manager_combat_resolved():
+	#Makes the map cursor visible again after combat manager signals that combat is over
+	#Probably unecessary, would be better to move this to the turn change function, as cursor visibility in all other cases are handled else where
+	#Left over from very early development
 	$Cursor.visible = true
 
