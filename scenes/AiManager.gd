@@ -28,7 +28,7 @@ var enemyValues = {}
 var terrainValues = {}
 @export var maxDepth = 3
 
-func init_Ai():
+func init_ai():
 	#link up dependancies
 	gameBoard = get_parent()
 	aHex = gameBoard._astar

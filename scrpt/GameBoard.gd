@@ -42,7 +42,7 @@ var previousState : int = 0
 
 #related to pathfinding
 var hexStar: AHexGrid2D
-var _walkable_cells = []
+var walkableCells = []
 var solidsArray = []
 var walkable_rect : Rect2
 var unitMoving = false
@@ -70,17 +70,17 @@ var profileMenu = Global.profileMenu
 var actionMenu = Global.actionMenu
 
 #Nodes
-@onready var _unit_overlay: UnitOverlay = $UnitOverlay
-@onready var _unit_path: UnitPath = $UnitPath
+@onready var unitOverlay: UnitOverlay = $UnitOverlay
+@onready var unitPath: UnitPath = $UnitPath
 @onready var cursor: Cursor = $Cursor
 @onready var combatManager : CombatManager = $CombatManager
 @onready var turnSort : TurnSort = $TurnSort
 @onready var turnTest = $Control/TurnLight
 @onready var gameState = $gameState
-@export var ui_cooldown := 0.2
+@export var uiCooldown := 0.2
 @onready var gameCamera = $Cursor/Camera2D
-@onready var Ai = $AiManager
-@onready var _timer: Timer = $Cursor/Timer
+@onready var ai = $aiManager
+@onready var cTimer: Timer = $Cursor/Timer
 
 #cursor location
 var cursorCell := Vector2.ZERO:
@@ -90,7 +90,7 @@ var cursorCell := Vector2.ZERO:
 		cursorCell = region_clamp(value)
 		cursor.position = currMap.map_to_local(cursorCell)
 		_on_cursor_moved(cursorCell)
-		_timer.start()
+		cTimer.start()
 
 
 
@@ -99,14 +99,14 @@ func _ready() -> void:
 	_reinitialize()
 	initialize_turns(turnOrder)
 	init_gamestate()
-	Ai.init_Ai()
-#	Ai.rein_units(units)
-#	Ai.init_mapdata(terrainData)
+	ai.init_ai()
+#	ai.rein_units(units)
+#	ai.init_mapdata(terrainData)
 	
 	for unit in units:
 		if units[unit].unitName == "Remilia Scarlet":
 			cursorCell = units[unit].cell
-	_timer.wait_time = ui_cooldown
+	cTimer.wait_time = uiCooldown
 	var grabber = units.keys()
 	focusUnit = units[grabber[0]]
 #	print(units)
@@ -262,7 +262,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					4, 6: 
 						snapPath = null
 						state = 2
-						_unit_overlay.clear()
+						unitOverlay.clear()
 						emit_signal("toggle_action")
 					5: 
 						state = 4
@@ -276,11 +276,11 @@ func _unhandled_input(event: InputEvent) -> void:
 				pass
 			var shouldMove := event.is_pressed()
 			if event.is_echo():
-				shouldMove = shouldMove and _timer.is_stopped()
-				_timer.wait_time -= 0.05
-				_timer.wait_time = clampf(_timer.wait_time, 0.05, 0.2)
+				shouldMove = shouldMove and cTimer.is_stopped()
+				cTimer.wait_time -= 0.05
+				cTimer.wait_time = clampf(cTimer.wait_time, 0.05, 0.2)
 			elif !event.is_echo():
-				_timer.wait_time = ui_cooldown
+				cTimer.wait_time = uiCooldown
 			if not shouldMove:
 				return
 			if event.is_action("ui_right"):
@@ -390,7 +390,7 @@ func _move_active_unit(new_cell: Vector2, enemy: bool = false, enemyPath = null)
 #	print("move_active: ", new_cell)
 	var path = null
 	if !new_cell == activeUnit.cell and !enemy:
-		if is_occupied(new_cell) or not new_cell in _walkable_cells:
+		if is_occupied(new_cell) or not new_cell in walkableCells:
 			return
 	if !new_cell == activeUnit.cell:
 		#print("it's walkable")
@@ -398,7 +398,7 @@ func _move_active_unit(new_cell: Vector2, enemy: bool = false, enemyPath = null)
 		units.erase(activeUnit.cell)
 		units[new_cell] = activeUnit
 		if !enemy:
-			path = _unit_path.current_path
+			path = unitPath.current_path
 		else:
 			path = enemyPath
 		activeUnit.walk_along(path)
@@ -423,10 +423,10 @@ func _select_unit(cell: Vector2) -> void:
 		return
 	activeUnit = units[cell]
 	activeUnit.is_selected = true
-	_walkable_cells = get_walkable_cells(activeUnit)
-	walkable_rect = get_region_rect(_walkable_cells)
-	_unit_overlay.draw(_walkable_cells)
-#	set_region_border(_walkable_cells)
+	walkableCells = get_walkable_cells(activeUnit)
+	walkable_rect = get_region_rect(walkableCells)
+	unitOverlay.draw(walkableCells)
+#	set_region_border(walkableCells)
 	
 	
 
@@ -434,8 +434,10 @@ func _select_unit(cell: Vector2) -> void:
 
 func _deselect_active_unit(confirm) -> void:
 	# Deselects the active unit, clearing the cells overlay and interactive path drawing
-	#confirm is used to let the game know if this is a temporary movement(can be canceled by player) or a confirmed move so it knows to retain previous position or update the units dictionary
-#	#print(confirm)
+	#confirm is used to let the game know if this is a temporary movement(can be canceled by player) 
+	#or a confirmed move so it knows to retain previous position or update the units dictionary
+
+#	print(confirm)
 #	print(units)
 	if units.has(activeUnit.cell):
 		if !confirm: 
@@ -452,8 +454,8 @@ func _deselect_active_unit(confirm) -> void:
 	#	#print(units)
 		activeUnit.is_selected = false
 	_clear_active_unit()
-	_unit_overlay.clear()
-	_unit_path.stop()
+	unitOverlay.clear()
+	unitPath.stop()
 
 func grab_target(cell, skillState = false):
 	#Called to assign values based on unit at cursor's coordinate
@@ -473,7 +475,7 @@ func _clear_active_unit() -> void:
 	# Clears the reference to the activeUnit and the corresponding walkable cells
 	
 	activeUnit = null
-	_walkable_cells.clear()
+	walkableCells.clear()
 
 
 func cursor_accept_pressed(cell: Vector2) -> void:
@@ -562,12 +564,12 @@ func _on_cursor_moved(new_cell: Vector2) -> void:
 	match state:
 		1:
 			if new_cell == activeUnit.cell:
-				_unit_path.clear()
+				unitPath.clear()
 			if activeUnit and activeUnit.is_selected:
-				if !_walkable_cells.has(new_cell):
+				if !walkableCells.has(new_cell):
 					return
 				var path = get_path_to_cell(activeUnit.cell, new_cell, activeUnit.moveType)
-				_unit_path.draw(path)
+				unitPath.draw(path)
 
 func attack_targeting(unit: Unit, usingSkill = false, skill = null):
 	#draws a visual representation of a unit's attack range, and binds the cursor within this space(snapPath)
@@ -595,8 +597,8 @@ func attack_targeting(unit: Unit, usingSkill = false, skill = null):
 	var invalid = _flood_fill(unit.cell, minRange, unit.moveType, false, true)
 	path = hexStar.trim_path(path, invalid)
 	snapPath = path
-	_unit_overlay.draw_attack(path)
-	_unit_path.stop()
+	unitOverlay.draw_attack(path)
+	unitPath.stop()
 	
 
 func combat_sequence(a,_t):
@@ -686,7 +688,7 @@ func _on_menu_cursor_wep_updated():
 	
 func turn_change():
 	#change turn
-#	Ai.rein_units(units)
+#	ai.rein_units(units)
 	gameState.update_unit_data(units)
 	turnOrder.pop_front()
 	turnCounter += 1
@@ -707,7 +709,7 @@ func turn_change():
 	gameState.update_remaining_turns(turnOrder)
 	
 	if aiTurn:
-		await get_tree().create_timer(0.5).timeout
+		await get_tree().createcTimer(0.5).timeout
 		start_ai_turn()
 	if Global.gameTime >= 24 - Global.timeFactor:
 		var timeMod = Global.gameTime - 24
@@ -752,7 +754,7 @@ func start_ai_turn():
 	#Gets the ball rolling for the AI to take actions
 	init_hexStar_terrain(false)
 	if gameState.enemy.size() > 0:
-		var result = Ai.get_move(gameState)
+		var result = ai.get_move(gameState)
 		
 		
 		match result["Best Move"]["action"]:
@@ -769,7 +771,7 @@ func ai_attack(result):
 	var destination = Vector2(result["Best Move"]["launch"])
 	var weapon = result["Best Move"]["weapon"]
 	_select_unit(actor.cell)
-#	var closestCell = hexStar.find_closest(actor.cell, target.cell, actor.moveType, _walkable_cells)
+#	var closestCell = hexStar.find_closest(actor.cell, target.cell, actor.moveType, walkableCells)
 	var path = get_path_to_cell(actor.cell, destination, actor.moveType)
 	if actor.cell != destination:
 		_move_active_unit(destination, true, path)
