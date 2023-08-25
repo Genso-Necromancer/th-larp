@@ -31,7 +31,7 @@ var terrainValues = {}
 func init_ai():
 	#link up dependancies
 	gameBoard = get_parent()
-	aHex = gameBoard._astar
+	aHex = gameBoard.hexStar
 
 
 func get_move(state: GameState):

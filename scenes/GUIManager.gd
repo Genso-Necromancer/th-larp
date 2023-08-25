@@ -379,13 +379,13 @@ func open_skills():
 		var first: Button = null
 		var skills = Global.activeUnit.unitData.Skills
 		var i = 0
-		for skill in skills.keys():
+		for skill in skills:
 			var b = Button.new()
 			var skillData = UnitData.skillData
 			b.set_text(skill)
 			
-			b.set_meta("skill_index", skills[skill]) 
-			b.set_button_icon(skillData[skills[skill]].Icon)
+			b.set_meta("skill_index", skill) 
+			b.set_button_icon(skillData[skill].Icon)
 			b.set_expand_icon(false)
 			weaponFrame.add_child(b)
 			b.button_down.connect(self.skill_selected.bind(b.get_meta("skill_index")))

@@ -79,7 +79,7 @@ var actionMenu = Global.actionMenu
 @onready var gameState = $gameState
 @export var uiCooldown := 0.2
 @onready var gameCamera = $Cursor/Camera2D
-@onready var ai = $aiManager
+@onready var ai = $AiManager
 @onready var cTimer: Timer = $Cursor/Timer
 
 #cursor location

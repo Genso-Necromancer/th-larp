@@ -64,7 +64,7 @@ static func get_named_unit_data(unitInd):
 					"Fate": true,
 					"SunWeak": true,
 					"Fly": true},
-				"Skills":{"TestSkill":1}
+				"Skills":["TEST1"]
 			}
 		}
 		UNIT_ID.Sakuya: 
@@ -115,7 +115,7 @@ static func get_named_unit_data(unitInd):
 				"StartInv":["SLVKNF", "THKN"],
 				"EQUIP":"",
 				"Passive":{},
-				"Skills":{}
+				"Skills":[]
 			}
 		}
 		UNIT_ID.Patchy: 
@@ -166,7 +166,7 @@ static func get_named_unit_data(unitInd):
 				"StartInv":["BK"],
 				"EQUIP":"Book",
 				"Passive":{},
-				"Skills":{}
+				"Skills":[]
 			}
 		}
 	return unitData
@@ -437,18 +437,20 @@ static func get_skill_effects():
 static func get_skills():
 	var skills : Dictionary
 	skills = {
-		0: {
+		"TEST1": {
 		"SkillName": "SkillName",
 		"Icon": load(("res://sprites/gungnir.png")),
+		"ACC": 0,
 		"RangeMin": 0,
 		"RangeMax": 0,
 		"Target": "Self",
 		"Cost": 0,
 		"Effect": "EffectName"
 		},
-		1: {
+		"TEST2": {
 		"SkillName": "TestSkill",
 		"Icon": load(("res://sprites/gungnir.png")),
+		"ACC": 0,
 		"RangeMin": 1,
 		"RangeMax": 2,
 		"Target": "Enemy",
