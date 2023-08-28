@@ -102,7 +102,6 @@ func _ready() -> void:
 	ai.init_ai()
 #	ai.rein_units(units)
 #	ai.init_mapdata(terrainData)
-	
 	for unit in units:
 		if units[unit].unitName == "Remilia Scarlet":
 			cursorCell = units[unit].cell
@@ -155,7 +154,7 @@ func _reinitialize() -> void:
 		update_unit_terrain(unit)
 			
 	#grab dice
-	combatManager.init_rng()
+#	rng = RandomNumberGenerator.new()
 	#set time
 	Global.gameTime = currMap.gameTime
 	checkSun()
@@ -457,20 +456,22 @@ func _deselect_active_unit(confirm) -> void:
 	unitOverlay.clear()
 	unitPath.stop()
 
-func grab_target(cell, skillState = false):
+func grab_target(cell, skillState = false, skill = null):
 	#Called to assign values based on unit at cursor's coordinate
 	var distance
 	if not units.has(cell):
 		print("oops")
 		return
 	targetUnit = units[cell]
+	distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.moveType, false)
+	
 	if !skillState:
-		combatManager.combat_forecast(activeUnit, targetUnit)
-		distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.moveType, false)
+		combatManager.combat_forecast(activeUnit, targetUnit, distance)
 		emit_signal("target_focused", distance)
 	elif skillState:
 		print("Skill Manager")
-	
+		combatManager.combat_forecast(activeUnit, targetUnit, distance, skillState, skill)
+		
 func _clear_active_unit() -> void:
 	# Clears the reference to the activeUnit and the corresponding walkable cells
 	
@@ -584,7 +585,7 @@ func attack_targeting(unit: Unit, usingSkill = false, skill = null):
 		wepData = UnitData.plrInv
 	if !usingSkill:
 		for wep in unit.unitData.Inv:
-			if wepData[wep].LIMIT and wepData[wep].USES == 0:
+			if wepData[wep].LIMIT and wepData[wep].DUR == 0:
 				continue
 			maxRange = max(maxRange, wepData[wep].MAXRANGE, maxRange)
 			minRange = min(minRange, wepData[wep].MINRANGE, minRange)
@@ -680,7 +681,8 @@ func on_imdead(unit: Unit):
 
 func _on_menu_cursor_wep_updated():
 	#required for updating combat forecast as the player hovers weapon selection before combat. Signal is sent from /menu_cursor class
-	combatManager.combat_forecast(activeUnit, targetUnit)
+	var distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.moveType, false)
+	combatManager.combat_forecast(activeUnit, targetUnit, distance)
 	
 	
 	
@@ -709,7 +711,7 @@ func turn_change():
 	gameState.update_remaining_turns(turnOrder)
 	
 	if aiTurn:
-		await get_tree().createcTimer(0.5).timeout
+		await get_tree().create_timer(0.5).timeout
 		start_ai_turn()
 	if Global.gameTime >= 24 - Global.timeFactor:
 		var timeMod = Global.gameTime - 24
@@ -770,6 +772,7 @@ func ai_attack(result):
 	var target = result["Best Move"]["target"]
 	var destination = Vector2(result["Best Move"]["launch"])
 	var weapon = result["Best Move"]["weapon"]
+	var distance = hexStar.compute_cost(actor.cell, target.cell, actor.moveType, false)
 	_select_unit(actor.cell)
 #	var closestCell = hexStar.find_closest(actor.cell, target.cell, actor.moveType, walkableCells)
 	var path = get_path_to_cell(actor.cell, destination, actor.moveType)
@@ -778,7 +781,7 @@ func ai_attack(result):
 		await self.aimove_finished
 	actor.set_equipped(weapon)
 	actor.update_combatdata()
-	combatManager.combat_forecast(actor, target)
+	combatManager.combat_forecast(actor, target, distance)
 	combatManager.start_the_justice(actor,target)
 #	print(activeUnit)
 	

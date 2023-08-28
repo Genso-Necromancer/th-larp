@@ -264,7 +264,7 @@ func combat_values(aiUnit, attack, targetDef):
 	return value
 	
 func check_safe(aiUnit, target, launch):
-	var distance = aHex.find_distance(launch, target.cell, aiUnit.moveType, true)
+	var distance = aHex.compute_cost(launch, target.cell, aiUnit.moveType, false)
 	var targetWep = target.unitData.EQUIP
 	var targetReach
 	var safe = false

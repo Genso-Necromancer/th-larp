@@ -147,6 +147,7 @@ func _on_wait_btn_pressed():
 	var selection = 2
 	accept_event()
 	_on_gameboard_toggle_action()
+	emit_signal("actionSelected", selection)
 
 
 func _on_gameboard_toggle_action():

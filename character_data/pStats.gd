@@ -64,7 +64,7 @@ static func get_named_unit_data(unitInd):
 					"Fate": true,
 					"SunWeak": true,
 					"Fly": true},
-				"Skills":["TEST1"]
+				"Skills":["TEST1", "TEST2"]
 			}
 		}
 		UNIT_ID.Sakuya: 
@@ -394,8 +394,9 @@ static func get_skill_effects():
 	skillEffects = {
 		"EffectName": {
 			"Target": "self",
-			"Miss": false,
-			"Accuracy": 0,
+			"OnHit": false,
+			"Proc": 99,
+			"Duration": 0,
 			"Time": false,
 			"TimeScale": 0,
 			"Buff": false,
@@ -403,19 +404,21 @@ static func get_skill_effects():
 			"BuffStat": "PWR",
 			"BuffValue": 0,
 			"Damaging": false,
-			"Type": "Phys",
+			"Type": "Physical",
 			"Damage": 0,
 			"Cure": false,
 			"CureType": "all",
 			"Healing": false,
 			"Heal": 0,
+			"Sleep": false,
 			"Relocate": false,
 			"MoveType": "reposition"
 			},
 			"TestEffect": {
 			"Target": "self",
-			"Miss": false,
-			"Accuracy": 0,
+			"OnHit": false,
+			"Proc": false,
+			"Duration": 0,
 			"Time": false,
 			"TimeScale": 0,
 			"Buff": false,
@@ -423,12 +426,13 @@ static func get_skill_effects():
 			"BuffStat": "PWR",
 			"BuffValue": 0,
 			"Damaging": false,
-			"Type": "Phys",
+			"Type": "Physical",
 			"Damage": 0,
 			"Cure": false,
 			"CureType": "all",
 			"Healing": false,
 			"Heal": 0,
+			"Sleep": false,
 			"Relocate": false,
 			"MoveType": "reposition"
 			}
@@ -440,22 +444,24 @@ static func get_skills():
 		"TEST1": {
 		"SkillName": "SkillName",
 		"Icon": load(("res://sprites/gungnir.png")),
+		"Target": "Self",
+		"CanMiss": true,
 		"ACC": 0,
 		"RangeMin": 0,
 		"RangeMax": 0,
-		"Target": "Self",
 		"Cost": 0,
-		"Effect": "EffectName"
+		"Effect": ["EffectName"]
 		},
 		"TEST2": {
 		"SkillName": "TestSkill",
 		"Icon": load(("res://sprites/gungnir.png")),
+		"Target": "Enemy",
+		"CanMiss": true,
 		"ACC": 0,
 		"RangeMin": 1,
 		"RangeMax": 2,
-		"Target": "Enemy",
 		"Cost": 0,
-		"Effect": "TestEffect"
+		"Effect": ["TestEffect"]
 		}
 	}
 	return skills

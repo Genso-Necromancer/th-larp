@@ -5,22 +5,23 @@ var cbtFC : Array
 var cbtUD : Array
 var cbtCL : Array
 var cbtAW : Array
-var rng
+var rng = Global.rng
 var aWep
 var tWep
 var fateChance = 15
 var deathFlag = false
+var skillData = UnitData.skillData
+var effectData = UnitData.effectData
+var canReach = false
 
-func init_rng():
-	rng = RandomNumberGenerator.new()
-
-func combat_forecast(a: Unit, t: Unit):
+func combat_forecast(a: Unit, t: Unit, distance, isSkill = false, skill = null):
 	cbtFC.clear()
 	cbtUD.clear()
 	cbtCL.clear()
 	cbtAW.clear()
 	aWep = a.unitData.EQUIP
 	tWep = t.unitData.EQUIP
+	canReach = false
 	var AtkInv
 	var TarInv
 	match a.faction:
@@ -38,6 +39,7 @@ func combat_forecast(a: Unit, t: Unit):
 	cbtUD = [a.unitData.Stats, t.unitData.Stats]
 	cbtAW = [AtkInv[aWep], TarInv[tWep]]
 	var i = 0
+	var revI = 1
 	var atkr = 0
 	var trgt = 1
 	var wAcc = [cbtAW[0].ACC, cbtAW[1].ACC]
@@ -46,6 +48,26 @@ func combat_forecast(a: Unit, t: Unit):
 	var wGrz = [cbtAW[0].GRAZE, cbtAW[1].GRAZE]
 #	var wLimit = [cbtAW[0].LIMIT, cbtAW[1].LIMIT]
 	var wType = [cbtAW[0].TYPE, cbtAW[1].TYPE]
+	var wMinReach = [cbtAW[0].MINRANGE, cbtAW[1].MINRANGE]
+	var wMaxReach = [cbtAW[0].MAXRANGE, cbtAW[1].MAXRANGE]
+	
+	if isSkill:
+		if skillData.skill.CanMiss:
+			wAcc[0] = skillData.skill.ACC
+		for effect in skillData.skill.Effect:
+			if effectData.effect.Damaging == true:
+				wCrt[0] = 0
+				wType[0] = effectData.effect.Type
+				match  effectData.effect.Type: 
+					"Physical": 
+						wDmg[0] += skillData.skill.Damage
+					"Magical": 
+						wDmg[0] += skillData.skill.Damage
+				
+	if distance in range(wMinReach[1], wMaxReach[1]):
+		canReach = true
+		
+	
 	
 	
 	cbtFC[0].NAME = a.unitData.Profile.UnitName
@@ -55,11 +77,18 @@ func combat_forecast(a: Unit, t: Unit):
 	#factor each unit's solo combat stats based on specific factors
 	while i < cbtFC.size():
 		cbtFC[i].ACC = cbtUD[i].ELEG * 2 + wAcc[i] + (cbtUD[i].CHA)
-		if wType[i] == "Physical":
-			cbtFC[i].DMG = cbtUD[i].PWR + wDmg[i]
+		match wType[i]: 
+			"Physical":
+				cbtFC[i].DMG = cbtUD[i].PWR + wDmg[i]
+			"Magical": 
+				cbtFC[i].DMG = cbtUD[i].MAG + wDmg[i]
+		
 		cbtFC[i].AVOID = (cbtUD[i].CELE * 2) + (cbtUD[i].CHA)
-		if wType[i] == "Physical":
-			cbtFC[i].DEF = cbtUD[i].BAR
+		match wType[revI]:
+			"Physical":
+				cbtFC[i].DEF = cbtUD[i].BAR
+			"Magical":
+				cbtFC[i].DEF = cbtUD[i].MAG
 		cbtFC[i].CRIT = cbtUD[i].ELEG + wCrt[i]
 		cbtFC[i].CAVOID = (cbtUD[i].CHA)
 		cbtFC[i].LIFE = cbtUD[i].LIFE
@@ -67,6 +96,7 @@ func combat_forecast(a: Unit, t: Unit):
 		cbtFC[i].GRAZE = wGrz[i]
 		cbtFC[i].GRZPRC = cbtUD[i].ELEG + cbtUD[i].BAR
 		i += 1
+		revI -= 1
 	i = 0
 	#Formulate the results of the two units fighting
 	while i < cbtFC.size():
@@ -90,13 +120,11 @@ func combat_forecast(a: Unit, t: Unit):
 	cbtFC[trgt].RLIFE = cbtFC[trgt].CLIFE - cbtFC[atkr].DMG
 	cbtFC[trgt].RLIFE = clampi(cbtFC[trgt].RLIFE, 0, 1000)
 	
-	
 func start_the_justice(a: Unit, t: Unit):
 	cbtUD = [a.unitData.Stats, t.unitData.Stats]
 	cbtCL = [a.unitData, t.unitData]
-	var hit = false
+	var hurt = false
 #	var roll
-	var crt = 0
 	var r1 = false
 	var r2 = false
 	var r3 = false
@@ -121,37 +149,42 @@ func start_the_justice(a: Unit, t: Unit):
 	print("Round 1 begins: ", cbtFC[0].NAME, " is attacking ", cbtFC[1].NAME)
 	r1 = get_attack(0, 1)
 	if r1 and check_uses(cbtAW[0]) and !deathFlag: 
-			crt = get_crit(0,1)
-			var dmg = get_dmg(0, 1, crt)
-			if dmg != 0:
-				hit = true
+			hurt = combat_round(0, 1)
 			
-	if !hit and check_uses(cbtAW[1]) and !deathFlag:
+	if !hurt and check_uses(cbtAW[1]) and !deathFlag and canReach:
 			print("Round 2 begins: ", cbtFC[1].NAME, " is attacking ", cbtFC[0].NAME)
 			r2 = get_attack(1,0)
 	if r2:
-		crt = get_crit(1,0)
-		var dmg = get_dmg(1, 0, crt)
-		if dmg != 0:
-				hit = true
+		hurt = combat_round(1, 0)
 	#if it failed, or did 0 dmg. check both units for FUP true
-	if !hit and !deathFlag: 
+	if !hurt and !deathFlag: 
 		if cbtFC[0].FUP and check_uses(cbtAW[0]):
 			print("Round 3 begins: ", cbtFC[0].NAME, " is attacking ", cbtFC[1].NAME)
 			r3 = get_attack(0,1)
 		if r3:
-			crt = get_crit(0,1)
-			get_dmg(0,1, crt)
-		if cbtFC[1].FUP and check_uses(cbtAW[1]):
+			hurt = combat_round(0, 1)
+		if cbtFC[1].FUP and check_uses(cbtAW[1]) and canReach:
 			print("Round 3 begins: ", cbtFC[1].NAME, " is attacking ", cbtFC[0].NAME)
 			r3 = get_attack(1,0)
 		if r3:
-			crt = get_crit(1,0)
-			get_dmg(1,0, crt)
+			hurt = combat_round(1, 0)
 			
 	print("Combat has resolved.")
 	emit_signal("combat_resolved")
 	
+	
+
+
+	
+	
+#call to roll crit and damage after hit, returns true if any damage was actually done
+func combat_round(a, t):
+	var crt = get_crit(a,t)
+	var dmg = get_dmg(a, t, crt)
+	var hurt = false
+	if dmg != 0:
+			hurt = true
+	return hurt
 	
 func get_crit(a, _t):
 	#test variable
@@ -169,7 +202,6 @@ func get_crit(a, _t):
 	
 
 func get_dmg(a, t, crt):
-	
 	var roll = get_roll()
 	var graze = 0
 	var dmg = 0
@@ -220,3 +252,36 @@ func check_uses(weapon):
 		return false
 	else:
 		return true
+		
+
+#Skills handled here and below#
+func run_skill(actor, target, activeSkill):
+	var skillResult = {}
+	var skill = skillData.activeSkill
+	
+	match skill.Target:
+		"Enemy":
+			pass #skillResult = skill_combat(actor, target, skill)
+		"Self", "Player":
+			pass #skillResult = check_effects(actor, target, skill)
+	# actor.add_composure(skill.Cost) #not an existing function yet
+	return skillResult
+	
+func skill_combat():
+	var canCounter = false #placeholder, implement passive in future that can enable skill countering
+	var result = {}
+	var hit = false
+	var attacker = Global.attacker
+	var defender = Global.defender
+	var check = get_roll()
+	var r1
+	if check + attacker.ACC < defender.AVOID:
+		hit = true
+	if hit:
+		pass #check_effects
+	if !hit and canCounter and canReach and check_uses(cbtAW[1]):
+		r1 = get_attack(1, 0)
+	if r1:
+		combat_round(1, 0)
+	
+

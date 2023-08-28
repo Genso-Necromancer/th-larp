@@ -26,6 +26,7 @@ var acted = false
 var moveType = "Foot"
 var baseMove
 var needDeath = false
+var buffData = {}
 
 #FormulaDic
 var combatData = {"DMG": 0, "HIT": 0, "AVOID": 0, "GRAZE": 0, "GRZPRC": 0, "CRIT": 0, "CRTAVD": 0, "TYPE":"Physical"}
@@ -200,6 +201,13 @@ func load_stats():
 #	var groups = get_groups()
 #	print(unitName, " ", groups)
 		
+#keep track of active buffs during gameplay, seperate from actual stats
+func buff_manager(stat, buff):
+	pass
+	
+#tracks duration of effects, then removes them when reaching 0
+func duration_tick():
+	pass
 	
 func load_sprites():
 	
@@ -275,13 +283,19 @@ func update_combatdata(terrainBonus: int = 0):
 		wep = UnitData.npcInv[equipped]
 	
 	combatData.TYPE = wep.TYPE
-	combatData.DMG = wep.DMG + stat.PWR
+	if wep.TYPE == "Physical":
+		combatData.DMG = wep.DMG + stat.PWR
+	else:
+		combatData.DMG = wep.DMG + stat.MAG
 	combatData.ACC = stat.ELEG * 2 + (wep.ACC + stat.CHA)
 	combatData.AVOID = stat.CELE * 2 + stat.CHA + terrainBonus
 	combatData.GRAZE = wep.GRAZE
 	combatData.GRZPRC = stat.ELEG + stat.BAR
 	combatData.CRIT = stat.ELEG + wep.CRIT
 	combatData.CRTAVD = stat.CHA
+	combatData.MAGBASE = stat.MAG
+	combatData.PWRBASE = stat.PWR
+	combatData.ACCBASE = stat.ELEG * 2 + stat.CHA
 
 func update_stats():
 	lifeBar.max_value = unitData["Stats"]["LIFE"]

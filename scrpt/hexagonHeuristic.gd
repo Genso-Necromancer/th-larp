@@ -57,8 +57,10 @@ func find_path(start: Vector2, end: Vector2, moveType: String, attack: bool = fa
 	var initial_g_cost = 0.0
 	var initial_h_cost = 0.0
 	var parent = null
+	var terrain = true
 	add_to_open_list(start_node, initial_f_cost, initial_g_cost, initial_h_cost, parent)
-	
+	if attack:
+		terrain = false
 	while open_list.size() > 0:
 		var current_node = get_lowest_f_cost_node()
 
@@ -79,8 +81,8 @@ func find_path(start: Vector2, end: Vector2, moveType: String, attack: bool = fa
 #				continue
 				
 				
-			var g_cost = current_node.g_cost + compute_cost(current_node.node, neighbor.node, moveType)
-			var h_cost = compute_cost(neighbor.node, end_node, moveType)
+			var g_cost = current_node.g_cost + compute_cost(current_node.node, neighbor.node, moveType, terrain)
+			var h_cost = compute_cost(neighbor.node, end_node, moveType, terrain)
 			var f_cost = g_cost + h_cost
 			
 			
