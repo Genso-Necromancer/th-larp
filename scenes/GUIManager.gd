@@ -383,7 +383,7 @@ func open_skills():
 		for skill in skills:
 			var b = Button.new()
 			var skillData = UnitData.skillData
-			b.set_text(skill)
+			b.set_text(str(skillData[skill].SkillName))
 			
 			b.set_meta("skill_index", skill) 
 			b.set_button_icon(skillData[skill].Icon)

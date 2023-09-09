@@ -10,8 +10,8 @@ var aWep
 var tWep
 var fateChance = 15
 var deathFlag = false
-var skillData = UnitData.skillData
-var effectData = UnitData.effectData
+@onready var skillData = UnitData.skillData
+@onready var effectData = UnitData.effectData
 var canReach = false
 
 func combat_forecast(a: Unit, t: Unit, distance, isSkill = false, skill = null):
@@ -50,19 +50,18 @@ func combat_forecast(a: Unit, t: Unit, distance, isSkill = false, skill = null):
 	var wType = [cbtAW[0].TYPE, cbtAW[1].TYPE]
 	var wMinReach = [cbtAW[0].MINRANGE, cbtAW[1].MINRANGE]
 	var wMaxReach = [cbtAW[0].MAXRANGE, cbtAW[1].MAXRANGE]
-	
 	if isSkill:
-		if skillData.skill.CanMiss:
-			wAcc[0] = skillData.skill.ACC
-		for effect in skillData.skill.Effect:
-			if effectData.effect.Damaging == true:
+		if skill.CanMiss:
+			wAcc[0] = skill.ACC
+		for effect in skill.Effect:
+			if effectData[effect].Damaging == true:
 				wCrt[0] = 0
-				wType[0] = effectData.effect.Type
-				match  effectData.effect.Type: 
+				wType[0] = effectData[effect].Type
+				match  effectData[effect].Type: 
 					"Physical": 
-						wDmg[0] += skillData.skill.Damage
+						wDmg[0] += skill.Damage
 					"Magical": 
-						wDmg[0] += skillData.skill.Damage
+						wDmg[0] += skill.Damage
 				
 	if distance in range(wMinReach[1], wMaxReach[1]):
 		canReach = true
@@ -257,15 +256,38 @@ func check_uses(weapon):
 #Skills handled here and below#
 func run_skill(actor, target, activeSkill):
 	var skillResult = {}
-	var skill = skillData.activeSkill
 	
-	match skill.Target:
+	match activeSkill.Target:
 		"Enemy":
 			pass #skillResult = skill_combat(actor, target, skill)
 		"Self", "Player":
-			pass #skillResult = check_effects(actor, target, skill)
+			run_effects(actor, target, activeSkill, true)
 	# actor.add_composure(skill.Cost) #not an existing function yet
 	return skillResult
+	
+func run_effects(actor, target, activeSkill, hit):
+	var proc
+	for effID in activeSkill.Effect:
+		var effect = effectData[effID]
+		proc = false
+		if effect.OnHit and !hit:
+			continue
+		if effect.Proc == -1:
+			proc = true
+		elif get_roll() < effect.Proc:
+			proc = true
+		if proc:
+			for attribute in effect:
+				if typeof(effect[attribute]) == TYPE_BOOL and effect[attribute] == true:
+					match attribute:
+						"Time": print("Time")
+						"Buff": print("Buff")
+						"Debuff": print("Debuff")
+						"Damaging": print("Damaging")
+						"Cure": print("Cure")
+						"Healing": print("Healing")
+						"Sleeping": print("Sleeping")
+						"Relocate": print("Relocate")
 	
 func skill_combat():
 	var canCounter = false #placeholder, implement passive in future that can enable skill countering

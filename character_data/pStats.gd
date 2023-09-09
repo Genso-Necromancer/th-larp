@@ -392,7 +392,7 @@ static func get_wep():
 static func get_skill_effects():
 	var skillEffects : Dictionary
 	skillEffects = {
-		"EffectName": {
+		"EffectTest": {
 			"Target": "self",
 			"OnHit": false,
 			"Proc": 99,
@@ -417,9 +417,31 @@ static func get_skill_effects():
 			"TestEffect": {
 			"Target": "self",
 			"OnHit": false,
-			"Proc": false,
+			"Proc": -1,
 			"Duration": 0,
 			"Time": false,
+			"TimeScale": 0,
+			"Buff": false,
+			"Debuff": false,
+			"BuffStat": "PWR",
+			"BuffValue": 0,
+			"Damaging": false,
+			"Type": "Physical",
+			"Damage": 0,
+			"Cure": false,
+			"CureType": "all",
+			"Healing": false,
+			"Heal": 0,
+			"Sleep": false,
+			"Relocate": false,
+			"MoveType": "reposition"
+			},
+			"Test1": {
+			"Target": "self",
+			"OnHit": false,
+			"Proc": -1,
+			"Duration": 0,
+			"Time": true,
 			"TimeScale": 0,
 			"Buff": false,
 			"Debuff": false,
@@ -442,7 +464,7 @@ static func get_skills():
 	var skills : Dictionary
 	skills = {
 		"TEST1": {
-		"SkillName": "SkillName",
+		"SkillName": "Test Skill",
 		"Icon": load(("res://sprites/gungnir.png")),
 		"Target": "Self",
 		"CanMiss": true,
@@ -450,10 +472,10 @@ static func get_skills():
 		"RangeMin": 0,
 		"RangeMax": 0,
 		"Cost": 0,
-		"Effect": ["EffectName"]
+		"Effect": ["Test1"]
 		},
 		"TEST2": {
-		"SkillName": "TestSkill",
+		"SkillName": "dummy",
 		"Icon": load(("res://sprites/gungnir.png")),
 		"Target": "Enemy",
 		"CanMiss": true,

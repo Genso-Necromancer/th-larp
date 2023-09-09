@@ -19,6 +19,7 @@ signal deathDone
 @export var move_speed := 150.0
 @export var genLevel : int
 var unitData
+var cacheData #Temp Variable: REMOVE SOON
 var groupKeys = UnitData.groups
 var statKeys = UnitData.stats
 var ykTag
@@ -26,11 +27,16 @@ var acted = false
 var moveType = "Foot"
 var baseMove
 var needDeath = false
-var buffData = {}
 
-#FormulaDic
+
+#Call for pre-formualted combat stats
 var combatData = {"DMG": 0, "HIT": 0, "AVOID": 0, "GRAZE": 0, "GRZPRC": 0, "CRIT": 0, "CRTAVD": 0, "TYPE":"Physical"}
-
+#base stats of the unit
+var baseStats = {}
+#combination of base stats and buffs
+var activeStats = {}
+#de/buffs applied to unit
+var activeBuffs = {}
 #var skin = UnitData.playerUnits[unitName]["Sprite"]:
 #	set(value):
 #		skin = value
@@ -161,15 +167,15 @@ func return_original():
 	return cell
 	
 func load_stats():
-	
+	cacheData = UnitData
 	if faction == "Player":
 		add_to_group("Player")
 		unitData = UnitData.unitData[unitName.get_slice(" ", 0)]
-		unitName = unitData["Profile"]["UnitName"]
-		baseMove = unitData["Stats"]["MOVE"]
+		baseStats = unitData.duplicate(true)
+		unitName = baseStats["Profile"]["UnitName"]
+		baseMove = baseStats["Stats"]["MOVE"]
 		check_passives()
-		unitData["CLIFE"] = unitData["Stats"]["LIFE"]
-		update_stats()
+		baseStats["CLIFE"] = unitData["Stats"]["LIFE"]
 		init_wep(true)
 	if faction == "Enemy":
 		add_to_group("Enemy")
@@ -189,25 +195,50 @@ func load_stats():
 					unique = true
 					UnitData.stat_gen(ykTag, genLevel, species, job)
 			unitData = UnitData.unitData[ykTag]
-			unitData["StartInv"] = []
+			baseStats = unitData.duplicate(true)
+			baseStats["StartInv"] = []
 			for wep in weapons:
 				if wep == null or wep == "Skip" or wep == "":
 					continue
 				else:
-					unitData["StartInv"].append(wep)
-			update_stats()
+					baseStats["StartInv"].append(wep)
 		init_wep(false)
+	active_and_buff_set_up()
+	update_stats()
 	update_combatdata()
 #	var groups = get_groups()
 #	print(unitName, " ", groups)
+
+func active_and_buff_set_up():
+	var keys = baseStats["Stats"].keys()
+	for stat in keys:
+		activeStats[stat] = baseStats.Stats[stat]
+		activeBuffs[stat] = {}
+		activeBuffs[stat]["Mod"] = 0
+		activeBuffs[stat]["Duration"] = 0
+		activeBuffs[stat]["Fresh"] = false
+		activeBuffs[stat]["Source"] = ""
 		
-#keep track of active buffs during gameplay, seperate from actual stats
-func buff_manager(stat, buff):
-	pass
+#keep track of active de/buffs during gameplay, seperate from actual stats
+func apply_buff(stat, buff, duration, selfCast = false, source = ""):
+	activeBuffs[stat].Mod = buff
+	activeBuffs[stat].Duration = duration
+	activeBuffs[stat].Fresh = selfCast
+	activeBuffs[stat].Source = source
 	
 #tracks duration of effects, then removes them when reaching 0
-func duration_tick():
-	pass
+func status_duration_tick():
+	var keys = activeBuffs.keys()
+	for stat in keys:
+		if activeBuffs[stat].Fresh:
+			activeBuffs[stat].Fresh = false
+			continue
+		if activeBuffs[stat].Duration > 0:
+			activeBuffs[stat].Duration -= 1
+		if activeBuffs[stat].Duration == 0:
+			activeBuffs[stat].Mod = 0
+			activeBuffs[stat].Source = ""
+	update_stats()
 	
 func load_sprites():
 	
@@ -218,15 +249,15 @@ func load_sprites():
 		_sprite.self_modulate = Color(1,0,0)
 		
 func init_wep(isPlayer):
-	if unitData.StartInv.size() == 0:
+	if baseStats.StartInv.size() == 0:
 		return
 	var equipped = false
 	var uniqueID
-	for wep in unitData.StartInv:
+	for wep in baseStats.StartInv:
 		uniqueID = UnitData.add_inv(wep, isPlayer, true)
-		unitData.Inv.append(uniqueID)
+		baseStats.Inv.append(uniqueID)
 		if !equipped:
-			unitData.EQUIP = uniqueID
+			baseStats.EQUIP = uniqueID
 			equipped == true
 #	print(unitData.EQUIP)
 #	print(unitData.Inv)
@@ -259,28 +290,31 @@ func init_wep(isPlayer):
 #	emit_signal("exp_handled")
 
 func check_passives():
-	var passives = unitData["Passive"]
-	if passives.has("Fly"):
-		moveType = "Fly"
-		unitData.Stats.MOVE = baseMove+1
-	if passives.has("SunWeak") and Global.day == true:
-		moveType = "Foot"
-		unitData.Stats.Move = baseMove
+	#ATTENTION
+	#Terrible, garbage, what the fuck. Cheap imitation of how it should be.
+	#will remake this
+	var passives = baseStats["Passive"]
+#	if passives.has("Fly"):
+#		moveType = "Fly"
+#		unitData.Stats.MOVE = baseMove+1
+#	if passives.has("SunWeak") and Global.day == true:
+#		moveType = "Foot"
+#		unitData.Stats.Move = baseMove
 		
 			
 		
 
 func set_equipped(weapon):
-	unitData.EQUIP = weapon
+	baseStats.EQUIP = weapon
 	
 func update_combatdata(terrainBonus: int = 0):
-	var equipped = unitData.EQUIP
+	var equipped = baseStats.EQUIP
 	var wep 
-	var stat = unitData.Stats
+	var stat = activeStats
 	if faction == "Player":
-		wep = UnitData.plrInv[equipped]
+		wep = cacheData.plrInv[equipped]
 	else:
-		wep = UnitData.npcInv[equipped]
+		wep = cacheData.npcInv[equipped]
 	
 	combatData.TYPE = wep.TYPE
 	if wep.TYPE == "Physical":
@@ -298,10 +332,18 @@ func update_combatdata(terrainBonus: int = 0):
 	combatData.ACCBASE = stat.ELEG * 2 + stat.CHA
 
 func update_stats():
-	lifeBar.max_value = unitData["Stats"]["LIFE"]
-	lifeBar.value = unitData["CLIFE"]
-	if unitData["CLIFE"] == 0:
+	#ATTENTION
+	#Combat currently adjusts the stored base stats, not the unit's stats. 
+	#Need to change it so unit alters it's stats itself.
+	lifeBar.max_value = baseStats.Stats.LIFE
+	lifeBar.value = baseStats.CLIFE
+	if baseStats["CLIFE"] == 0:
 		run_death()
+	#######
+		
+	var keys = baseStats["Stats"].keys()
+	for stat in keys:
+		activeStats[stat] = baseStats.Stats[stat] + activeBuffs[stat].Mod
 
 func _on_test_map_map_ready():
 	cell = map.local_to_map(position)

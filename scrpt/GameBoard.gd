@@ -153,8 +153,7 @@ func _reinitialize() -> void:
 			self.turn_changed.connect(unit.on_turn_changed)
 		update_unit_terrain(unit)
 			
-	#grab dice
-#	rng = RandomNumberGenerator.new()
+
 	#set time
 	Global.gameTime = currMap.gameTime
 	checkSun()
@@ -471,6 +470,7 @@ func grab_target(cell, skillState = false, skill = null):
 	elif skillState:
 		print("Skill Manager")
 		combatManager.combat_forecast(activeUnit, targetUnit, distance, skillState, skill)
+		combatManager.run_skill(activeUnit, targetUnit, skill)
 		
 func _clear_active_unit() -> void:
 	# Clears the reference to the activeUnit and the corresponding walkable cells
@@ -536,21 +536,21 @@ func cursor_accept_pressed(cell: Vector2) -> void:
 					if is_occupied(cell) and activeUnit == focusUnit:
 						state = 5
 						$Cursor.visible = false
-						grab_target(cell, true)
+						grab_target(cell, true, activeSkill)
 				"Enemy":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and !friendly:
 						state = 5
 						$Cursor.visible = false
-						grab_target(cell, true)
+						grab_target(cell, true, activeSkill)
 				"Ally":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and friendly:
 						state = 5
 						$Cursor.visible = false
-						grab_target(cell, true)
+						grab_target(cell, true, activeSkill)
 
 #
 func _on_cursor_moved(new_cell: Vector2) -> void:
