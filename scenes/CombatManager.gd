@@ -10,6 +10,7 @@ var aWep
 var tWep
 var fateChance = 15
 var deathFlag = false
+var units
 @onready var skillData = UnitData.skillData
 @onready var effectData = UnitData.effectData
 var canReach = false
@@ -34,8 +35,9 @@ func combat_forecast(a: Unit, t: Unit, distance, isSkill = false, skill = null):
 			TarInv = UnitData.plrInv
 		"Enemy":
 			TarInv = UnitData.npcInv
+	units = [a, t]
 	cbtFC = [Global.attacker, Global.defender]
-	cbtCL = [a.unitData, t.unitData]
+	cbtCL = [a.activeStats.CLIFE, t.activeStats.CLIFE]
 	cbtUD = [a.unitData.Stats, t.unitData.Stats]
 	cbtAW = [AtkInv[aWep], TarInv[tWep]]
 	var i = 0
@@ -54,7 +56,7 @@ func combat_forecast(a: Unit, t: Unit, distance, isSkill = false, skill = null):
 		if skill.CanMiss:
 			wAcc[0] = skill.ACC
 		for effect in skill.Effect:
-			if effectData[effect].Damaging == true:
+			if  effectData[effect].has("Damaging") and effectData[effect].Damaging == true:
 				wCrt[0] = 0
 				wType[0] = effectData[effect].Type
 				match  effectData[effect].Type: 
@@ -91,7 +93,7 @@ func combat_forecast(a: Unit, t: Unit, distance, isSkill = false, skill = null):
 		cbtFC[i].CRIT = cbtUD[i].ELEG + wCrt[i]
 		cbtFC[i].CAVOID = (cbtUD[i].CHA)
 		cbtFC[i].LIFE = cbtUD[i].LIFE
-		cbtFC[i].CLIFE = cbtCL[i].CLIFE
+		cbtFC[i].CLIFE = cbtCL[i]
 		cbtFC[i].GRAZE = wGrz[i]
 		cbtFC[i].GRZPRC = cbtUD[i].ELEG + cbtUD[i].BAR
 		i += 1
@@ -120,8 +122,8 @@ func combat_forecast(a: Unit, t: Unit, distance, isSkill = false, skill = null):
 	cbtFC[trgt].RLIFE = clampi(cbtFC[trgt].RLIFE, 0, 1000)
 	
 func start_the_justice(a: Unit, t: Unit):
-	cbtUD = [a.unitData.Stats, t.unitData.Stats]
-	cbtCL = [a.unitData, t.unitData]
+	cbtUD = [a.activeStats, t.activeStats]
+	cbtCL = [a.activeStats.CLIFE, t.activeStats.CLIFE]
 	var hurt = false
 #	var roll
 	var r1 = false
@@ -207,12 +209,12 @@ func get_dmg(a, t, crt):
 	if roll <= cbtFC[t].GRZPRC:
 		graze = cbtFC[t].GRAZE
 		print(cbtFC[t].NAME, " Grazed! [-", cbtFC[t].GRAZE, "]")
+	print(cbtFC[t].NAME, "'s LIFE was reduced from ", cbtCL[t])
 	dmg = ((cbtFC[a].DMG + crt) - graze)
-	cbtCL[t].CLIFE = cbtCL[t].CLIFE - dmg
-	cbtCL[t].CLIFE = clampi(cbtCL[t].CLIFE, 0, 1000)
-	print(cbtFC[t].NAME, "'s LIFE was reduced from ", cbtFC[t].CLIFE)
-	print(" to ", cbtCL[t].CLIFE, " of which ", crt, " was critical damage!")
-	if cbtCL[t].CLIFE <= 0:
+	cbtCL[t] = units[t].apply_dmg(dmg)
+	print(" to ", cbtCL[t], " of which ", crt, " was critical damage!")
+	
+	if cbtCL[t] <= 0:
 		deathFlag = true
 	return dmg
 	
@@ -232,12 +234,12 @@ func get_attack(a, t):
 	else:
 		print("She missed!")
 		hit = false
-	if hit == false and cbtCL[a]["Passive"].has("Fate"):
-		var fate = get_roll()
-		print("Fate!: ", fate)
-		if  fate < fateChance:
-			print("Fate Success")
-			hit = true
+#	if hit == false and cbtCL[a]["Passive"].has("Fate"):
+#		var fate = get_roll()
+#		print("Fate!: ", fate)
+#		if  fate < fateChance:
+#			print("Fate Success")
+#			hit = true
 			
 	return hit
 	
@@ -279,9 +281,16 @@ func run_effects(actor, target, activeSkill, hit):
 		if proc:
 			for attribute in effect:
 				if typeof(effect[attribute]) == TYPE_BOOL and effect[attribute] == true:
+					var selfTarget = false
 					match attribute:
+						#Need to go through and enable each effect one at a time
 						"Time": print("Time")
-						"Buff": print("Buff")
+						"Buff": 
+							print("Buff ", effect.BuffStat, " by +", effect.BuffValue, " for ", effect.Duration, " rounds.")
+							if actor == target:
+								selfTarget = true
+							print("Self Targeting: ", selfTarget)
+							target.apply_buff(effect.BuffStat, effect.BuffValue, effect.Duration, selfTarget)
 						"Debuff": print("Debuff")
 						"Damaging": print("Damaging")
 						"Cure": print("Cure")

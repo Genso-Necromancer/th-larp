@@ -358,13 +358,13 @@ func init_hexStar_terrain(attack: bool = false):
 func get_walkable_cells(unit: Unit) -> Array:
 	#Possibly unnecessary. 
 	#It's convienent to just call using only unit variable and let the function split the necessary info
-	return _flood_fill(unit.cell, unit.unitData.Stats.MOVE, unit.moveType)
+	return _flood_fill(unit.cell, unit.activeStats.MOVE, unit.moveType)
 
 func _flood_fill(cell: Vector2, max_distance: int, moveType : String, terrain: bool = true, attack: bool = false) -> Array:
 	#initializes pathfinder, calls floodfill pathfind and visual displays it all at once
 	init_hexStar_terrain(attack)
 #	print(moveType)
-	var path = hexStar.find_all_paths(cell, max_distance, moveType, terrain,)
+	var path = hexStar.find_all_paths(cell, max_distance, moveType, terrain)
 	return path
 
 func get_path_to_cell(cell, current, moveType: String):
@@ -471,6 +471,7 @@ func grab_target(cell, skillState = false, skill = null):
 		print("Skill Manager")
 		combatManager.combat_forecast(activeUnit, targetUnit, distance, skillState, skill)
 		combatManager.run_skill(activeUnit, targetUnit, skill)
+		combat_sequence(activeUnit, targetUnit)
 		
 func _clear_active_unit() -> void:
 	# Clears the reference to the activeUnit and the corresponding walkable cells
@@ -602,15 +603,15 @@ func attack_targeting(unit: Unit, usingSkill = false, skill = null):
 	unitPath.stop()
 	
 
-func combat_sequence(a,_t):
+func combat_sequence(a,t):
 	#Place holder for when combat has a visual component, currently handles end of combat duties that would occur right after
 	state = 0
 	snapPath = null
 	_deselect_active_unit(true)
 	a.update_stats()
+	t.update_stats()
 	if a.needDeath:
 		await a.deathDone
-	
 	turn_change()
 
 func _on_gui_manager_action_selected(selection, skill = null):

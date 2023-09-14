@@ -440,23 +440,10 @@ static func get_skill_effects():
 			"Target": "self",
 			"OnHit": false,
 			"Proc": -1,
-			"Duration": 0,
-			"Time": true,
-			"TimeScale": 0,
-			"Buff": false,
-			"Debuff": false,
+			"Duration": 1,
+			"Buff": true,
 			"BuffStat": "PWR",
-			"BuffValue": 0,
-			"Damaging": false,
-			"Type": "Physical",
-			"Damage": 0,
-			"Cure": false,
-			"CureType": "all",
-			"Healing": false,
-			"Heal": 0,
-			"Sleep": false,
-			"Relocate": false,
-			"MoveType": "reposition"
+			"BuffValue": 2
 			}
 	}
 	return skillEffects

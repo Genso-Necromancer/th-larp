@@ -319,7 +319,7 @@ func assign_unit_value(team):
 				value = ((oldValue-(avgLv - 20))*newRange/oldRange) + 0
 				value = value * uWeight
 				if unit.is_in_group("Player"):
-					var lifeValue: float = ((unit.unitData.Stats.LIFE - unit.unitData.CLIFE) / unit.unitData.Stats.LIFE)
+					var lifeValue: float = ((unit.activeStats.LIFE - unit.unitData.CLIFE) / unit.unitData.Stats.LIFE)
 					lifeValue = lifeValue * ulWeight
 					value += lifeValue
 				if unit.is_in_group("Enemy"):
