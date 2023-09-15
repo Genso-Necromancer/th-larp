@@ -262,7 +262,7 @@ func run_skill(actor, target, activeSkill):
 	match activeSkill.Target:
 		"Enemy":
 			pass #skillResult = skill_combat(actor, target, skill)
-		"Self", "Player":
+		"Self", "Ally":
 			run_effects(actor, target, activeSkill, true)
 	# actor.add_composure(skill.Cost) #not an existing function yet
 	return skillResult
@@ -286,11 +286,17 @@ func run_effects(actor, target, activeSkill, hit):
 						#Need to go through and enable each effect one at a time
 						"Time": print("Time")
 						"Buff": 
-							print("Buff ", effect.BuffStat, " by +", effect.BuffValue, " for ", effect.Duration, " rounds.")
-							if actor == target:
-								selfTarget = true
-							print("Self Targeting: ", selfTarget)
-							target.apply_buff(effect.BuffStat, effect.BuffValue, effect.Duration, selfTarget)
+							
+#							if actor == target:
+#								selfTarget = true
+#							print("Self Targeting: ")
+							match effect.Target:
+								"Target": 
+									target.apply_buff(effect.BuffStat, effect.BuffValue, effect.Duration)
+									print("Actor: ", actor.unitName, "Target: ", target.unitName, " Buffed ", effect.BuffStat, " by +", effect.BuffValue, " for ", effect.Duration, " rounds.")
+								"Self":  
+									actor.apply_buff(effect.BuffStat, effect.BuffValue, effect.Duration)
+									print("Actor: ", actor.unitName, " Buffed ", effect.BuffStat, " by +", effect.BuffValue, " for ", effect.Duration, " rounds.")
 						"Debuff": print("Debuff")
 						"Damaging": print("Damaging")
 						"Cure": print("Cure")

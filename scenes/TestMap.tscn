@@ -170,7 +170,7 @@ unitName = "Remilia Scarlet"
 
 [node name="Saku" parent="." instance=ExtResource("3_ysf1k")]
 z_index = 2
-position = Vector2(924, 493)
+position = Vector2(556, 419)
 faction = "Player"
 unitName = "Sakuya Izayoi"
 

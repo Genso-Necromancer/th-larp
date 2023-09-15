@@ -437,10 +437,10 @@ static func get_skill_effects():
 			"MoveType": "reposition"
 			},
 			"Test1": {
-			"Target": "self",
+			"Target": "Target",
 			"OnHit": false,
 			"Proc": -1,
-			"Duration": 1,
+			"Duration": 2,
 			"Buff": true,
 			"BuffStat": "PWR",
 			"BuffValue": 2
@@ -453,11 +453,11 @@ static func get_skills():
 		"TEST1": {
 		"SkillName": "Test Skill",
 		"Icon": load(("res://sprites/gungnir.png")),
-		"Target": "Self",
+		"Target": "Ally",
 		"CanMiss": true,
 		"ACC": 0,
-		"RangeMin": 0,
-		"RangeMax": 0,
+		"RangeMin": 1,
+		"RangeMax": 1,
 		"Cost": 0,
 		"Effect": ["Test1"]
 		},
