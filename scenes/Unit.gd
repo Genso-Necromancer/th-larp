@@ -204,13 +204,13 @@ func load_stats():
 				else:
 					unitData["StartInv"].append(wep)
 		init_wep(false)
-	active_and_buff_set_up()
+#	active_and_buff_set_up()
 	update_stats()
 	update_combatdata()
 #	var groups = get_groups()
 #	print(unitName, " ", groups)
 
-func active_and_buff_set_up():
+func active_and_buff_set_up(): #Used to be needed, marked for deletion
 	var keys = baseStats.keys()
 	for stat in keys:
 		activeStats[stat] = baseStats[stat]
@@ -221,24 +221,31 @@ func active_and_buff_set_up():
 		activeBuffs[stat]["Source"] = ""
 		
 #keep track of active de/buffs during gameplay, seperate from actual stats
-func apply_buff(stat, buff, duration, selfCast = false, source = ""):
-	activeBuffs[stat].Mod = buff
-	activeBuffs[stat].Duration = duration
-	activeBuffs[stat].Fresh = selfCast
-	activeBuffs[stat].Source = source
+func apply_buff(skillId, stat, buff, duration, selfCast = false, source = ""):
+	if skillId == null:
+		print("No SkillID found")
+		return
+	activeBuffs[skillId] = {}
+	activeBuffs[skillId]["Stat"] = stat
+	activeBuffs[skillId]["Mod"] = buff
+	activeBuffs[skillId]["Duration"] = duration
+	#the following are currently not considered worth using. Thought they were needed, but don't see a purpose currently.
+	activeBuffs[skillId]["Fresh"] = selfCast
+	activeBuffs[skillId]["Source"] = source
 	
 #tracks duration of effects, then removes them when reaching 0
 func status_duration_tick():
-	var keys = activeBuffs.keys()
-	for stat in keys:
-		if activeBuffs[stat].Fresh:
-			activeBuffs[stat].Fresh = false
+	var idKeys = activeBuffs.keys()
+	for skillId in idKeys:
+#		var statKeys = activeBuffs[skillId].keys()
+#		for stat in statKeys:
+		if activeBuffs[skillId].Fresh:
+			activeBuffs[skillId].Fresh = false
 			continue
-		if activeBuffs[stat].Duration > 0:
-			activeBuffs[stat].Duration -= 1
-		if activeBuffs[stat].Duration == 0:
-			activeBuffs[stat].Mod = 0
-			activeBuffs[stat].Source = ""
+		if activeBuffs[skillId].Duration > 0:
+			activeBuffs[skillId].Duration -= 1
+		if activeBuffs[skillId].Duration == 0:
+			activeBuffs.erase(skillId)
 #	print(activeBuffs)
 	update_stats()
 	
@@ -334,18 +341,22 @@ func update_combatdata(terrainBonus: int = 0):
 	combatData.ACCBASE = stat.ELEG * 2 + stat.CHA
 
 func update_stats():
-	#ATTENTION
-	#Combat currently adjusts the stored base stats, not the unit's stats. 
-	#Need to change it so unit alters it's stats itself.
-	lifeBar.max_value = activeStats.LIFE
+	lifeBar.max_value = baseStats.LIFE
 	lifeBar.value = activeStats.CLIFE
 	if activeStats["CLIFE"] == 0:
 		run_death()
 	#######
 		
-	var keys = baseStats.keys()
-	for stat in keys:
-		activeStats[stat] = baseStats[stat] + activeBuffs[stat].Mod
+	var statKeys = baseStats.keys()
+	var idKeys = activeBuffs.keys()
+	var buffTotal = {}
+	for stat in statKeys:
+		buffTotal[stat] = 0
+	for id in idKeys:
+		buffTotal[activeBuffs[id].Stat] += activeBuffs[id].Mod
+	for stat in statKeys:
+		activeStats[stat] = baseStats[stat] + buffTotal[stat]
+	print(unitName, ": ", activeStats)
 
 func apply_dmg(dmg = 0):
 	activeStats.CLIFE = activeStats.CLIFE - dmg

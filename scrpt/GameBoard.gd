@@ -12,6 +12,7 @@ signal toggle_prof
 signal target_focused
 signal aimove_finished
 signal turn_changed
+signal toggle_skills
 
 # units is used to map units to it's hex coordinate
 var units := {}
@@ -35,8 +36,8 @@ var mapRect
 var terrainData = []
 var conditions: Array
 
-#input state
-var state : int = 0
+#input Global.state
+#var Global.state : int = 0
 var previousState : int = 0
 
 
@@ -206,7 +207,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			cursorPos += mouseDelta 
 			
 			mouseDelta = null
-			match state:
+			match Global.state:
 				0, 1, 3, 4, 6: 
 #					print(cursorCell, " + ", currMap.local_to_map(mousePos))
 					cursorCell += Vector2(currMap.local_to_map(mousePos))
@@ -215,7 +216,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				5: return
 	if event is InputEventMouseButton:
 			if event.is_action_pressed("ui_accept"):
-				match state:
+				match Global.state:
 					0: cursor_accept_pressed(currMap.map_to_local(cursorCell))
 					1: cursor_accept_pressed(currMap.map_to_local(cursorCell))
 					2, 3: return
@@ -224,49 +225,56 @@ func _unhandled_input(event: InputEvent) -> void:
 					
 	if event is InputEventKey:
 			if event.is_action_pressed("ui_accept"):
-				match state:
+				match Global.state:
 					0: cursor_accept_pressed(currMap.map_to_local(cursorCell))
 					1: cursor_accept_pressed(currMap.map_to_local(cursorCell))
 					2, 3: return
 					4, 6: cursor_accept_pressed(currMap.map_to_local(cursorCell))
 					5: return
 			elif event.is_action_pressed("ui_info"):
-				match state:
+				match Global.state:
 					0, 1, 2, 4, 6: 
 						if is_occupied(cursorCell):
-							previousState = state
-							state = 3
+							previousState = Global.state
+							Global.state = 3
 							emit_signal("toggle_prof")
 						else: toggle_extra_info()
 					3: 
-						state = previousState
+						Global.state = previousState
 						emit_signal("toggle_prof")
 						
 			elif event.is_action_pressed("ui_return"):
-				match state:
+				match Global.state:
 					0: return
 					1:
 						snapPath = null
-						state = 0
+						Global.state = 0
 						_deselect_active_unit(false)
 					2: 
 						snapPath = null
-						state = 0
+						Global.state = 0
 						emit_signal("toggle_action")
 						_deselect_active_unit(false)
 					3: 
-						state = previousState
+						Global.state = previousState
 						emit_signal("toggle_prof")
-					4, 6: 
+					4, 6:
 						snapPath = null
-						state = 2
+						Global.state = 2
 						unitOverlay.clear()
 						emit_signal("toggle_action")
+					
 					5: 
-						state = 4
+						Global.state = 4
 						cursor.visible = true
 						attack_targeting(activeUnit)
 						emit_signal("target_focused")
+					7:
+#						snapPath = null
+						Global.state = 2
+#						cursor.visible = true
+#						unitOverlay.clear()
+						emit_signal("toggle_skills")
 						
 			elif event.is_action_pressed("ui_scroll_left"):
 				pass
@@ -282,20 +290,20 @@ func _unhandled_input(event: InputEvent) -> void:
 			if not shouldMove:
 				return
 			if event.is_action("ui_right"):
-				match state: 
+				match Global.state: 
 					0, 1, 3, 4, 6: cursorCell += Vector2.RIGHT
 					2: return
 			elif event.is_action("ui_up"):
-				match state: 
+				match Global.state: 
 					0, 1, 3, 4, 6: cursorCell += (Vector2.UP)
 					2: return
 				
 			elif event.is_action("ui_left"):
-				match state: 
+				match Global.state: 
 					0, 1, 3, 4, 6: cursorCell += (Vector2.LEFT)
 					2: return
 			elif event.is_action("ui_down"):
-				match state: 
+				match Global.state: 
 					0, 1, 3, 4, 6: cursorCell += (Vector2.DOWN)
 					2: return
 			else: return
@@ -481,24 +489,24 @@ func _clear_active_unit() -> void:
 
 
 func cursor_accept_pressed(cell: Vector2) -> void:
-	# Controls what happens when an element is selected by the player based on input state
+	# Controls what happens when an element is selected by the player based on input Global.state
 	#Includes: Selecting Unit, Destinations; Targets
 	#Currently also checks if selection is valid
 	
 	cell = currMap.local_to_map(cell)
 #	print(cell, activeUnit)
-	match state:
+	match Global.state:
 		0: 
 			if !activeUnit and is_occupied(cell) and focusUnit.is_in_group("Player") and !focusUnit.acted:
-				state = 1
+				Global.state = 1
 				_select_unit(cell)
 			else: return
 		1: 
 			if !is_occupied(cell):
-				state = 2
+				Global.state = 2
 				_move_active_unit(cell)
 			elif cell == activeUnit.cell:
-				state = 2
+				Global.state = 2
 				emit_signal("toggle_action")
 			else:
 				return
@@ -512,7 +520,7 @@ func cursor_accept_pressed(cell: Vector2) -> void:
 			if focusUnit.is_in_group(team):
 				friendly = true
 			if is_occupied(cell) and !friendly:
-				state = 5
+				Global.state = 5
 				$Cursor.visible = false
 				grab_target(cell)
 				
@@ -520,7 +528,7 @@ func cursor_accept_pressed(cell: Vector2) -> void:
 			else: return
 		5:
 			return
-#			state = 0
+#			Global.state = 0
 #			combatManager.start_the_justice(activeUnit, focusUnit)
 #			emit_signal("target_focused")
 #			combat_sequence(activeUnit, focusUnit)
@@ -535,21 +543,21 @@ func cursor_accept_pressed(cell: Vector2) -> void:
 			match targeting:
 				"Self":
 					if is_occupied(cell) and activeUnit == focusUnit:
-						state = 5
+						Global.state = 5
 						$Cursor.visible = false
 						grab_target(cell, true, activeSkill)
 				"Enemy":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and !friendly:
-						state = 5
+						Global.state = 5
 						$Cursor.visible = false
 						grab_target(cell, true, activeSkill)
 				"Ally":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and friendly:
-						state = 5
+						Global.state = 5
 						$Cursor.visible = false
 						grab_target(cell, true, activeSkill)
 
@@ -563,7 +571,7 @@ func _on_cursor_moved(new_cell: Vector2) -> void:
 	if is_occupied(new_cell):
 			focusUnit = units[new_cell]
 	
-	match state:
+	match Global.state:
 		1:
 			if new_cell == activeUnit.cell:
 				unitPath.clear()
@@ -605,7 +613,7 @@ func attack_targeting(unit: Unit, usingSkill = false, skill = null):
 
 func combat_sequence(a,t):
 	#Place holder for when combat has a visual component, currently handles end of combat duties that would occur right after
-	state = 0
+	Global.state = 0
 	snapPath = null
 	_deselect_active_unit(true)
 	a.update_stats()
@@ -619,16 +627,16 @@ func _on_gui_manager_action_selected(selection, skill = null):
 #	var cell = cursor.cell
 	match selection:
 		0: 
-			previousState = state
-			state = 4
+			previousState = Global.state
+			Global.state = 4
 			attack_targeting(activeUnit)
 		1: 
-			previousState = state
-			state = 6
+			previousState = Global.state
+			Global.state = 6
 			attack_targeting(activeUnit, true, skill)
 		2: 
-			previousState = state
-			state = 0
+			previousState = Global.state
+			Global.state = 0
 			_deselect_active_unit(true)
 			turn_change()
 #			Input.warp_mouse(currMap.map_to_local(activeUnit.position))
@@ -817,7 +825,7 @@ func _on_gui_manager_start_the_justice():
 	#Sends necessary data to the combat manager, then initiates the visual representation after results are returned
 	#Currently does not return the results, nor pass them due to having no implemented visual representation
 	#next step to this will be implementing an ingame text read out of combat to set up framework without need for actual animations yet
-	state = 0
+	Global.state = 0
 	combatManager.start_the_justice(activeUnit, focusUnit)
 	emit_signal("target_focused")
 	gameState.add_acted(activeUnit)

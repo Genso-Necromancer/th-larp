@@ -292,10 +292,10 @@ func run_effects(actor, target, activeSkill, hit):
 #							print("Self Targeting: ")
 							match effect.Target:
 								"Target": 
-									target.apply_buff(effect.BuffStat, effect.BuffValue, effect.Duration)
+									target.apply_buff(activeSkill, effect.BuffStat, effect.BuffValue, effect.Duration)
 									print("Actor: ", actor.unitName, "Target: ", target.unitName, " Buffed ", effect.BuffStat, " by +", effect.BuffValue, " for ", effect.Duration, " rounds.")
 								"Self":  
-									actor.apply_buff(effect.BuffStat, effect.BuffValue, effect.Duration)
+									actor.apply_buff(activeSkill, effect.BuffStat, effect.BuffValue, effect.Duration)
 									print("Actor: ", actor.unitName, " Buffed ", effect.BuffStat, " by +", effect.BuffValue, " for ", effect.Duration, " rounds.")
 						"Debuff": print("Debuff")
 						"Damaging": print("Damaging")

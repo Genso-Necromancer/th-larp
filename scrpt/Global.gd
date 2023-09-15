@@ -10,7 +10,7 @@ var gameTime
 var timeFactor = 1
 var rotationFactor = 15
 var rng
-
+var state: int = 0
 #combat variables
 var attacker = {
 	"NAME" : "Null", "ACC": 0, "DMG": 0, "AVOID": 0, "DEF": 0,

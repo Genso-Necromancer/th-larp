@@ -451,6 +451,7 @@ static func get_skills():
 	var skills : Dictionary
 	skills = {
 		"TEST1": {
+		"SkillID": "TEST1",
 		"SkillName": "Test Skill",
 		"Icon": load(("res://sprites/gungnir.png")),
 		"Target": "Ally",

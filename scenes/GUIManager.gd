@@ -140,8 +140,9 @@ func _on_skl_btn_pressed():
 	
 	accept_event()
 	open_skills()
+	Global.state = 7
 #	_on_gameboard_toggle_action()
-	
+
 
 func _on_wait_btn_pressed():
 	var selection = 2
@@ -150,10 +151,10 @@ func _on_wait_btn_pressed():
 	emit_signal("actionSelected", selection)
 
 
-func _on_gameboard_toggle_action():
+func _on_gameboard_toggle_action(skillClose = false):
 #	print("Size: ", $ActionMenu/Count/BackgroundCenter.get_size(), "Offset: ", $ActionMenu/Count/BackgroundCenter.get_size().x / 2)
 	var actor = Global.activeUnit
-	if ActionC.visible == false:
+	if ActionC.visible == false or skillClose:
 		check_connect()
 		ActionC.visible= true
 		menu_cursor.state = 2
@@ -376,6 +377,7 @@ func weapon_selected(index):
 		
 #skills menu
 func open_skills():
+#	clearInventoryButtons()
 	if !weaponBox.visible:
 		var first: Button = null
 		var skills = Global.activeUnit.unitData.Skills
@@ -408,6 +410,12 @@ func open_skills():
 		menu_cursor.state = 0
 		weaponBox.visible = false
 		
+func _on_gameboard_toggle_skills():
+	accept_event()
+	open_skills()
+	_on_gameboard_toggle_action(true)
+	
+		
 func skill_selected(index):
 #	var wep = Global.activeUnit.unitData.EQUIP
 #	var wepData = UnitData.wepData
@@ -416,6 +424,7 @@ func skill_selected(index):
 	var selection = 1
 	accept_event()
 	emit_signal("actionSelected", selection, skill)
+	open_skills()
 	_on_gameboard_toggle_action()
 #	if wepData[wep].LIMIT:
 #		if wepData[wep].USES == 0:
@@ -441,9 +450,6 @@ func _on_gameboard_turn_changed():
 #	else: sunDial.rotation_degrees += sunRot
 	sunDial.rotation_degrees += sunRot
 	clockLabel.set_text(str(Global.gameTime))
-	
-	
-
 
 
 

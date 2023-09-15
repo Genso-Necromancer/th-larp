@@ -64,6 +64,7 @@ visible = false
 [connection signal="target_focused" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_target_focused"]
 [connection signal="toggle_action" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_action"]
 [connection signal="toggle_prof" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_prof"]
+[connection signal="toggle_skills" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_skills"]
 [connection signal="turn_changed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_turn_changed"]
 [connection signal="actionSelected" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_action_selected"]
 [connection signal="gui_closed" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_gui_closed"]
