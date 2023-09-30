@@ -115,7 +115,7 @@ static func get_named_unit_data(unitInd):
 				"StartInv":["SLVKNF", "THKN"],
 				"EQUIP":"",
 				"Passive":{},
-				"Skills":[]
+				"Skills":["ST05"]
 			}
 		}
 		UNIT_ID.Patchy: 
@@ -393,40 +393,18 @@ static func get_skill_effects():
 	var skillEffects : Dictionary
 	skillEffects = {
 		"EffectTest": {
-			"Target": "self",
+			"Target": "Self", #Self, Target, Global
 			"OnHit": false,
 			"Proc": 99,
 			"Duration": 0,
 			"Time": false,
-			"TimeScale": 0,
+			"TimeFactor": 0,
 			"Buff": false,
 			"Debuff": false,
-			"BuffStat": "PWR",
+			"BuffStat": "PWR", #Any core Stat
 			"BuffValue": 0,
 			"Damaging": false,
-			"Type": "Physical",
-			"Damage": 0,
-			"Cure": false,
-			"CureType": "all",
-			"Healing": false,
-			"Heal": 0,
-			"Sleep": false,
-			"Relocate": false,
-			"MoveType": "reposition"
-			},
-			"TestEffect": {
-			"Target": "self",
-			"OnHit": false,
-			"Proc": -1,
-			"Duration": 0,
-			"Time": false,
-			"TimeScale": 0,
-			"Buff": false,
-			"Debuff": false,
-			"BuffStat": "PWR",
-			"BuffValue": 0,
-			"Damaging": false,
-			"Type": "Physical",
+			"Type": "Physical", #Physical, Magic
 			"Damage": 0,
 			"Cure": false,
 			"CureType": "all",
@@ -438,12 +416,26 @@ static func get_skill_effects():
 			},
 			"Test1": {
 			"Target": "Target",
+			"OnHit": true,
+			"Proc": -1,
+			"Damaging": true,
+			"Type": "Physical",
+			"Damage": 5
+			},
+			"Test2": {
+			"Target": "Target",
+			"OnHit": false,
+			"Proc": -1,
+			"Healing": true,
+			"Heal": 2,
+			},
+			"SlowTime05": {
+			"Target": "Global",
 			"OnHit": false,
 			"Proc": -1,
 			"Duration": 2,
-			"Buff": true,
-			"BuffStat": "PWR",
-			"BuffValue": 2
+			"Time": true,
+			"TimeFactor": -0.5
 			}
 	}
 	return skillEffects
@@ -451,27 +443,40 @@ static func get_skills():
 	var skills : Dictionary
 	skills = {
 		"TEST1": {
-		"SkillID": "TEST1",
+		"SkillId": "TEST1",
 		"SkillName": "Test Skill",
 		"Icon": load(("res://sprites/gungnir.png")),
-		"Target": "Ally",
+		"Target": "Enemy", #Enemy, Self, Ally, Self+(This is Self and Ally)
 		"CanMiss": true,
-		"ACC": 0,
+		"ACC": 99,
 		"RangeMin": 1,
-		"RangeMax": 1,
+		"RangeMax": 2,
 		"Cost": 0,
 		"Effect": ["Test1"]
 		},
 		"TEST2": {
-		"SkillName": "dummy",
+		"SkillId": "TEST2",
+		"SkillName": "Test Heal",
 		"Icon": load(("res://sprites/gungnir.png")),
-		"Target": "Enemy",
-		"CanMiss": true,
-		"ACC": 0,
+		"Target": "Ally",
+		"CanMiss": false,
+		"ACC": 100,
 		"RangeMin": 1,
-		"RangeMax": 2,
+		"RangeMax": 1,
 		"Cost": 0,
-		"Effect": ["TestEffect"]
+		"Effect": ["Test2"]
+		},
+		"ST05": {
+		"SkillId": "ST05",
+		"SkillName": "Slow Time",
+		"Icon": load(("res://sprites/gungnir.png")),
+		"Target": "Self", #Enemy, Self, Ally
+		"CanMiss": false,
+		"ACC": 0,
+		"RangeMin": 0,
+		"RangeMax": 0,
+		"Cost": 0,
+		"Effect": ["SlowTime05"]
 		}
 	}
 	return skills

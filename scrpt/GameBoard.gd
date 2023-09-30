@@ -56,13 +56,16 @@ var turnCounter = 0
 var aiTurn = false
 var maxTurns = 0
 
+#Global effects
+var globalEffects = {}
+
 #I don't even know if I need this
 var activeSkill
 
 #controls pseudo UI elements, like HP bars
 var HpBarVis = true
 
-#Time
+#Mouse related
 @export var mouseSens: float = 0.4
 @export var smoothing: float = 0.2
 
@@ -179,13 +182,14 @@ func update_unit_terrain(unit):
 func _unhandled_input(event: InputEvent) -> void:
 	#input uses a series of states to direct where everything goes, if it goes anywhere
 	#States:
-	#0: default- no menues open, nothing is happening.
-	#1: unit has been selected
-	#2: action menu is open
-	#3: profile menu is open
-	#4: Attack targeting
-	#5: Combat Forecast
-	#6: Skill targeting
+#	default:0 no menues open, nothing is happening.
+#	selected:1 unit has been selected
+#	aMenu:2 action menu is open
+#	profile:3 profile menu is open
+#	aTarget:4 Attack targeting
+#	forecast:5 Combat Forecast
+#	sTarget:6 Skill targeting
+#	sMenu:7 Skill Menu
 	
 	
 	
@@ -194,6 +198,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("debug"):
 		turn_change()
+		
+	if event.is_action_pressed("debugHealTest"):
+		for cell in units:
+			units[cell].apply_dmg(2)
+		
 	if unitMoving:
 		return
 #
@@ -556,6 +565,13 @@ func cursor_accept_pressed(cell: Vector2) -> void:
 				"Ally":
 					if focusUnit.is_in_group(team):
 						friendly = true
+					if is_occupied(cell) and friendly and activeUnit != focusUnit:
+						Global.state = 5
+						$Cursor.visible = false
+						grab_target(cell, true, activeSkill)
+				"Self+":
+					if focusUnit.is_in_group(team):
+						friendly = true
 					if is_occupied(cell) and friendly:
 						Global.state = 5
 						$Cursor.visible = false
@@ -717,17 +733,19 @@ func turn_change():
 		cursor.visible = true
 #	print(turnCounter, " ", turnOrder[0][1], " aiTurn:", aiTurn, "
 #	", turnOrder)
+	global_durations_turn_tick()
 	gameState.update_remaining_turns(turnOrder)
 	
-	if aiTurn:
-		await get_tree().create_timer(0.5).timeout
-		start_ai_turn()
 	if Global.gameTime >= 24 - Global.timeFactor:
 		var timeMod = Global.gameTime - 24
 		timeMod += Global.timeFactor
 		Global.gameTime = timeMod
 	else: Global.gameTime += Global.timeFactor
 	checkSun()
+	
+	if aiTurn:
+		await get_tree().create_timer(0.5).timeout
+		start_ai_turn()
 	emit_signal("turn_changed")
 		
 func round_change():
@@ -839,3 +857,26 @@ func _on_combat_manager_combat_resolved():
 	#Left over from very early development
 	$Cursor.visible = true
 
+func set_time_factor(effId, factor, duration, type):
+	Global.timeFactor = factor
+	globalEffects[effId] = {}
+	globalEffects[effId]["Type"] = type
+	globalEffects[effId]["Factor"] = factor
+	globalEffects[effId]["Duration"] = duration
+	
+func reset_time_factor():
+	Global.timeFactor = Global.trueTimeFactor
+	
+func global_durations_turn_tick(): #tracks duration of global effects, removing them when duration is up
+	var keys = globalEffects.keys()
+	for effId in keys:
+		globalEffects[effId].Duration -= 1
+		if globalEffects[effId].Duration <= 0 and globalEffects[effId].Type == "Time":
+			reset_time_factor()
+			globalEffects.erase(effId)
+		else: #no other global effects exist, this needs to be expanded if a new one is made
+			globalEffects.erase(effId)
+
+
+func _on_combat_manager_time_factor_changed(effId, factor, duration, type):
+	set_time_factor(effId, factor, duration, type)

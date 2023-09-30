@@ -1,6 +1,7 @@
 extends Node
 class_name CombatManager
 signal combat_resolved
+signal time_factor_changed
 var cbtFC : Array
 var cbtUD : Array
 var cbtCL : Array
@@ -61,9 +62,9 @@ func combat_forecast(a: Unit, t: Unit, distance, isSkill = false, skill = null):
 				wType[0] = effectData[effect].Type
 				match  effectData[effect].Type: 
 					"Physical": 
-						wDmg[0] += skill.Damage
+						wDmg[0] += effectData[effect].Damage
 					"Magical": 
-						wDmg[0] += skill.Damage
+						wDmg[0] += effectData[effect].Damage
 				
 	if distance in range(wMinReach[1], wMaxReach[1]):
 		canReach = true
@@ -258,10 +259,10 @@ func check_uses(weapon):
 #Skills handled here and below#
 func run_skill(actor, target, activeSkill):
 	var skillResult = {}
-	
+	deathFlag = false
 	match activeSkill.Target:
 		"Enemy":
-			pass #skillResult = skill_combat(actor, target, skill)
+			skill_combat(actor, target, activeSkill)
 		"Self", "Ally":
 			run_effects(actor, target, activeSkill, true)
 	# actor.add_composure(skill.Cost) #not an existing function yet
@@ -269,8 +270,11 @@ func run_skill(actor, target, activeSkill):
 	
 func run_effects(actor, target, activeSkill, hit):
 	var proc
-	for effID in activeSkill.Effect:
-		var effect = effectData[effID]
+	var canCrit = false
+	var isSkill = true
+	#Add a check for if the Actor has a passive that enables criticals with skills
+	for effId in activeSkill.Effect:
+		var effect = effectData[effId]
 		proc = false
 		if effect.OnHit and !hit:
 			continue
@@ -284,7 +288,8 @@ func run_effects(actor, target, activeSkill, hit):
 					var selfTarget = false
 					match attribute:
 						#Need to go through and enable each effect one at a time
-						"Time": print("Time")
+						"Time": 
+							emit_signal("time_factor_changed", effId, effect.TimeFactor, effect.Duration, attribute)
 						"Buff": 
 							
 #							if actor == target:
@@ -292,19 +297,29 @@ func run_effects(actor, target, activeSkill, hit):
 #							print("Self Targeting: ")
 							match effect.Target:
 								"Target": 
-									target.apply_buff(activeSkill, effect.BuffStat, effect.BuffValue, effect.Duration)
+									target.apply_buff(attribute, effId, effect.BuffStat, effect.BuffValue, effect.Duration, effect.Curable)
 									print("Actor: ", actor.unitName, "Target: ", target.unitName, " Buffed ", effect.BuffStat, " by +", effect.BuffValue, " for ", effect.Duration, " rounds.")
 								"Self":  
-									actor.apply_buff(activeSkill, effect.BuffStat, effect.BuffValue, effect.Duration)
+									actor.apply_buff(attribute, effId, effect.BuffStat, effect.BuffValue, effect.Duration, effect.Curable)
 									print("Actor: ", actor.unitName, " Buffed ", effect.BuffStat, " by +", effect.BuffValue, " for ", effect.Duration, " rounds.")
-						"Debuff": print("Debuff")
-						"Damaging": print("Damaging")
+						"Debuff": 
+							match effect.Target:
+								"Target": 
+									target.apply_buff(attribute, effId, effect.BuffStat, effect.BuffValue, effect.Duration, effect.Curable)
+									print("Actor: ", actor.unitName, "Target: ", target.unitName, " Buffed ", effect.BuffStat, " by +", effect.BuffValue, " for ", effect.Duration, " rounds.")
+								"Self":  
+									actor.apply_buff(attribute, effId, effect.BuffStat, effect.BuffValue, effect.Duration, effect.Curable)
+									print("Actor: ", actor.unitName, " Buffed ", effect.BuffStat, " by +", effect.BuffValue, " for ", effect.Duration, " rounds.")
+						"Damaging": 
+							print("Target HP: ", target.activeStats.CLIFE)
+							factor_dmg(actor, target, effect, canCrit, isSkill)
 						"Cure": print("Cure")
-						"Healing": print("Healing")
+						"Healing": 
+							factor_healing(actor, target, effect)
 						"Sleeping": print("Sleeping")
 						"Relocate": print("Relocate")
 	
-func skill_combat():
+func skill_combat(actor, target, skill):
 	var canCounter = false #placeholder, implement passive in future that can enable skill countering
 	var result = {}
 	var hit = false
@@ -312,13 +327,67 @@ func skill_combat():
 	var defender = Global.defender
 	var check = get_roll()
 	var r1
-	if check + attacker.ACC < defender.AVOID:
+	print(actor.unitName, " skill: ", skill.SkillId, " ACC: ", attacker.ACC, " check: ", check, "/", defender.AVOID)
+	if check < (attacker.ACC - defender.AVOID):
 		hit = true
-	if hit:
-		pass #check_effects
-	if !hit and canCounter and canReach and check_uses(cbtAW[1]):
+		print("It's a hit")
+	if !skill.CanMiss:
+		hit = true
+	run_effects(actor, target, skill, hit)
+	if !hit and canCounter and canReach and check_uses(cbtAW[1]) and !deathFlag:
 		r1 = get_attack(1, 0)
 	if r1:
 		combat_round(1, 0)
 	
+func factor_dmg(actor, target, attack, canCrit = false, isSkill = false):
+	var aMag = actor.activeStats.MAG
+	var aPwr = actor.activeStats.PWR
+	var aBar = actor.activeStats.BAR
+	var tMag = target.activeStats.MAG
+	var tPwr = target.activeStats.PWR
+	var tBar = target.activeStats.BAR
+	var tReduc = 0
+	var aTotalDmg = 0
+	var critDmg = 0
+#	if canCrit:
+#		critDmg = roll_crit(actor, target, attack)
+	if isSkill:
+		var type = attack.Type
+		match type:
+			"Magic":
+				tReduc = tMag
+				aTotalDmg = aMag + attack.Damage + critDmg
+			"Physical":
+				tReduc = tBar
+				aTotalDmg = aPwr + attack.Damage + critDmg
+	else:
+		pass
+	print(aTotalDmg)
+	var dmgResult = aTotalDmg - tReduc
+	var tCLife = target.apply_dmg(dmgResult)
+	print(actor.unitName, "Dealt ", dmgResult, "Target's HP: ", target.activeStats.CLIFE)
+	if tCLife <= 0:
+		deathFlag = true
+	return dmgResult
 
+func roll_crit(a, _t, attack): #Rework the combat manager, it's a fucking mess and not as modular as I hoped. It also can't update mid combat reliably due to the distance check.
+	#test variable
+	var critRoll
+	var critDmg
+	critRoll = get_roll()
+	print(a.unitName, "'s crit check was ", critRoll, " / ", cbtFC[a].CRIT)
+	if cbtFC[a].CRIT >= critRoll:
+		print("Girl's are criting")
+		critDmg = rng.randi_range(10, 20)
+	else:
+		print("Critical Failure!")
+		critDmg = 0
+	return critDmg
+
+func factor_healing(actor, target, effect):
+	var bonusEff = 0
+	#Add checks for bonus effects here
+	var healPower = effect.Heal + actor.activeStats.MAG + bonusEff
+	print("Target Life: ", target.activeStats.CLIFE, " Heal:", healPower)
+	target.apply_heal(healPower)
+	print(target.activeStats.CLIFE)

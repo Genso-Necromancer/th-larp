@@ -48,5 +48,5 @@ func clear_acted():
 func set_win(conditions):
 	for condition in conditions:
 		win.append(condition)
-		
+
 

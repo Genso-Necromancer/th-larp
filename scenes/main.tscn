@@ -66,6 +66,7 @@ visible = false
 [connection signal="toggle_prof" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_prof"]
 [connection signal="toggle_skills" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_skills"]
 [connection signal="turn_changed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_turn_changed"]
+[connection signal="time_factor_changed" from="Gameboard/CombatManager" to="Gameboard" method="_on_combat_manager_time_factor_changed"]
 [connection signal="actionSelected" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_action_selected"]
 [connection signal="gui_closed" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_gui_closed"]
 [connection signal="startTheJustice" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_start_the_justice"]

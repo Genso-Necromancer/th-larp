@@ -221,17 +221,21 @@ func active_and_buff_set_up(): #Used to be needed, marked for deletion
 		activeBuffs[stat]["Source"] = ""
 		
 #keep track of active de/buffs during gameplay, seperate from actual stats
-func apply_buff(skillId, stat, buff, duration, selfCast = false, source = ""):
-	if skillId == null:
+func apply_buff(attribute, effId, stat, buff, duration, curable = true, selfCast = false, source = ""):
+	if effId == null:
 		print("No SkillID found")
 		return
-	activeBuffs[skillId] = {}
-	activeBuffs[skillId]["Stat"] = stat
-	activeBuffs[skillId]["Mod"] = buff
-	activeBuffs[skillId]["Duration"] = duration
+	activeBuffs[effId] = {}
+	activeBuffs[effId]["Type"] = attribute
+	activeBuffs[effId]["Stat"] = stat
+	activeBuffs[effId]["Mod"] = buff
+	activeBuffs[effId]["Duration"] = duration
+	activeBuffs[effId]["Curable"] = curable
 	#the following are currently not considered worth using. Thought they were needed, but don't see a purpose currently.
-	activeBuffs[skillId]["Fresh"] = selfCast
-	activeBuffs[skillId]["Source"] = source
+	activeBuffs[effId]["Fresh"] = selfCast
+	activeBuffs[effId]["Source"] = source
+	update_stats()
+	
 	
 #tracks duration of effects, then removes them when reaching 0
 func status_duration_tick():
@@ -356,11 +360,16 @@ func update_stats():
 		buffTotal[activeBuffs[id].Stat] += activeBuffs[id].Mod
 	for stat in statKeys:
 		activeStats[stat] = baseStats[stat] + buffTotal[stat]
-	print(unitName, ": ", activeStats)
+#	print(unitName, ": ", activeStats)
 
 func apply_dmg(dmg = 0):
-	activeStats.CLIFE = activeStats.CLIFE - dmg
-	activeStats.CLIFE = clampi(activeStats.CLIFE, 0, 1000)
+	activeStats.CLIFE -= dmg
+	activeStats.CLIFE = clampi(activeStats.CLIFE, 0, baseStats.LIFE)
+	return activeStats.CLIFE
+	
+func apply_heal(heal = 0):
+	activeStats.CLIFE += heal
+	activeStats.CLIFE = clampi(activeStats.CLIFE, 0, baseStats.LIFE)
 	return activeStats.CLIFE
 	
 func _on_test_map_map_ready():

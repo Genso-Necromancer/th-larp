@@ -71,6 +71,22 @@ offset_top = -81.0
 offset_right = -144.0
 offset_bottom = -81.0
 
+[node name="DEBUG" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="timeBox" type="VBoxContainer" parent="DEBUG"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="time" type="Label" parent="DEBUG/timeBox"]
+layout_mode = 2
+
+[node name="timeFactor" type="Label" parent="DEBUG/timeBox"]
+layout_mode = 2
+
 [connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/AtkBtn" to="." method="_on_atk_btn_pressed"]
 [connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/SklBtn" to="." method="_on_skl_btn_pressed"]
 [connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/WaitBtn" to="." method="_on_wait_btn_pressed"]

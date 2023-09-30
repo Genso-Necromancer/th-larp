@@ -36,6 +36,8 @@ class_name GUIManager
 @onready var WaitB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/WaitBtn
 @onready var sunDial = $HUD/SunDial
 @onready var clockLabel = $HUD/Clock
+@onready var timeLb = $DEBUG/timeBox/time
+@onready var timeFactorLb = $DEBUG/timeBox/timeFactor
 var currentButton: Button = null
 #@onready var _timer: Timer = $Timer
 
@@ -111,7 +113,9 @@ func _process(_delta):
 		$ActionMenu.position.y = adjustY
 	else:
 		$ActionMenu.position.y = originalPositionActY
-	
+		
+	timeLb.set_text("Time: " + str(Global.gameTime))
+	timeFactorLb.set_text("Time Factor: " + str(Global.timeFactor))
 
 #func _input(event):
 #	if event.is_action_pressed("ui_accept") and $ActionMenu.visible== true:
@@ -212,17 +216,20 @@ func update_prof():
 	var weps = [wep1, wep2]
 	var i = 0
 	var Inv
+	var unitStats
 	while i < weps.size():
 		weps[i].set_text("")
 		i += 1
 	if Global.focusUnit.is_in_group("Enemy"):
-		focusUnit = Global.focusUnit.ykTag
+		focusUnit = Global.focusUnit
 		$Profile/M/G/UnitExp.set_text("0")
-		unitData = UnitData.unitData[focusUnit]
+		unitData = focusUnit.unitData
 		Inv = UnitData.npcInv
+		unitStats = Global.focusUnit.activeStats
 	elif Global.focusUnit.is_in_group("Player"):
-		focusUnit = Global.focusUnit.unitName.get_slice(" ", 0)
-		unitData = UnitData.unitData[focusUnit]
+		focusUnit = Global.focusUnit
+		unitData = focusUnit.unitData
+		unitStats = focusUnit.activeStats
 		Inv = UnitData.plrInv
 #		$Profile/M/G/UnitName.set_text(unitData["Profile"]["UnitName"])
 		$Profile/M/G/UnitExp.set_text(str(unitData["Profile"]["EXP"]))
@@ -230,13 +237,13 @@ func update_prof():
 	$Profile/M/G/UnitName.set_text(unitData["Profile"]["UnitName"])
 	$Profile/M/G/VB/MC/MC/UnitPrt.set_texture(unitData["Profile"]["Prt"])
 	$Profile/M/G/VStats/UnitLevel.set_text(str(unitData["Profile"]["Level"]))
-	$Profile/M/G/VStats/UnitHp.set_text(str(unitData["CLIFE"]) + "/" + str(unitData["Stats"]["LIFE"]))
-	$Profile/M/G/VStats/UnitStr.set_text(str(unitData["Stats"]["PWR"]))
-	$Profile/M/G/VStats/UnitMag.set_text(str(unitData["Stats"]["MAG"]))
-	$Profile/M/G/VStats/UnitEle.set_text(str(unitData["Stats"]["ELEG"]))
-	$Profile/M/G/VStats/UnitCele.set_text(str(unitData["Stats"]["CELE"]))
-	$Profile/M/G/VStats/UnitBar.set_text(str(unitData["Stats"]["BAR"]))
-	$Profile/M/G/VStats/UnitCha.set_text(str(unitData["Stats"]["CHA"]))
+	$Profile/M/G/VStats/UnitHp.set_text(str(unitStats["CLIFE"]) + "/" + str(unitStats["LIFE"]))
+	$Profile/M/G/VStats/UnitStr.set_text(str(unitStats["PWR"]))
+	$Profile/M/G/VStats/UnitMag.set_text(str(unitStats["MAG"]))
+	$Profile/M/G/VStats/UnitEle.set_text(str(unitStats["ELEG"]))
+	$Profile/M/G/VStats/UnitCele.set_text(str(unitStats["CELE"]))
+	$Profile/M/G/VStats/UnitBar.set_text(str(unitStats["BAR"]))
+	$Profile/M/G/VStats/UnitCha.set_text(str(unitStats["CHA"]))
 	
 	var equipId = unitData.EQUIP
 	
