@@ -19,6 +19,22 @@ theme = ExtResource("1_2n2uh")
 script = ExtResource("1_d2r44")
 metadata/_edit_use_anchors_ = true
 
+[node name="DEBUG" type="Control" parent="."]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="timeBox" type="VBoxContainer" parent="DEBUG"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="time" type="Label" parent="DEBUG/timeBox"]
+layout_mode = 2
+
+[node name="timeFactor" type="Label" parent="DEBUG/timeBox"]
+layout_mode = 2
+
 [node name="ActionMenu" parent="." instance=ExtResource("4_o6laq")]
 layout_mode = 0
 offset_left = 501.0
@@ -66,30 +82,22 @@ visible_ratio = 1.0
 
 [node name="HUD" parent="." instance=ExtResource("6_odogd")]
 layout_mode = 1
-offset_left = -144.0
-offset_top = -81.0
-offset_right = -144.0
-offset_bottom = -81.0
-
-[node name="DEBUG" type="Control" parent="."]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="timeBox" type="VBoxContainer" parent="DEBUG"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="time" type="Label" parent="DEBUG/timeBox"]
-layout_mode = 2
-
-[node name="timeFactor" type="Label" parent="DEBUG/timeBox"]
-layout_mode = 2
+anchors_preset = 1
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+grow_horizontal = 0
+grow_vertical = 1
 
 [connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/AtkBtn" to="." method="_on_atk_btn_pressed"]
 [connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/SklBtn" to="." method="_on_skl_btn_pressed"]
 [connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/WaitBtn" to="." method="_on_wait_btn_pressed"]
+[connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/EndBtn" to="." method="_on_end_btn_pressed"]
 
 [editable path="ActionMenu"]
 [editable path="CombatForecast"]

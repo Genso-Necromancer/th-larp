@@ -8,8 +8,8 @@ signal deathDone
 
 #Unit Parameters
 @export_enum("Enemy", "Player", "NPC") var faction: String = "Enemy"
-@export_enum("Fairy", "Human", "Kappa", "Lunarian", "Oni", "Doll", "Devil", "Yukionna", "Zombie", "Hermit", "Magician", "Spirit") var species: String
-@export_enum("Trblr", "Thief") var job: String 
+@export_enum("Fairy", "Human", "Kappa", "Lunarian", "Oni", "Doll", "Devil", "Yukionna", "Zombie", "Hermit", "Magician", "Spirit") var species: String = "Fairy"
+@export_enum("Trblr", "Thief") var job: String = "Trblr"
 @export var weapon : String = "Skip"
 @export var weapon2: String = "Skip"
 @export var weapon3: String = "Skip"
@@ -25,8 +25,10 @@ var statKeys = UnitData.stats
 var ykTag
 var acted = false
 var moveType = "Foot"
-var baseMove
 var needDeath = false
+var terrainData
+#status effects
+var activeStatus = {"Sleep" : {"Active": false}}
 
 
 #Call for pre-formualted combat stats
@@ -70,7 +72,7 @@ var is_selected := false:
 var _is_walking := false:
 	set(value):
 		_is_walking = value
-		set_process(_is_walking)
+#		set_process(_is_walking)
 #var position := Vector2.ZERO:
 #	set(value):
 #		position = map.hex_centered(value)
@@ -91,11 +93,9 @@ var walk_directions = [
 ]
 var walk_directions_size = float(walk_directions.size())
 
-
-
-#Stats
-var currHp = 0
-
+#test
+var location
+var originLocation
 
 
 func _ready() -> void:
@@ -103,7 +103,9 @@ func _ready() -> void:
 #	#print("unit.gd:", unitId)
 	load_stats()
 	load_sprites()
-	if !map.mapReady.is_connected(self._on_test_map_map_ready):
+	if map.get_class() != "TileMap":
+		pass
+	elif !map.mapReady.is_connected(self._on_test_map_map_ready):
 		map.mapReady.connect(self._on_test_map_map_ready)
 	_path_follow.rotates = false
 	_anim_player.play("idle")
@@ -125,8 +127,9 @@ func _process(delta: float) -> void:
 		var norm_move_vec = current_move_vec.normalized()
 		var direction_id = int(walk_directions_size * (norm_move_vec.rotated(PI / walk_directions_size).angle() + PI) / TAU)
 		_anim_player.play(str(walk_directions[direction_id]))
-	var location = cell
-	$PathFollow2D/Label.set_text(str(location))
+	location = cell
+	$PathFollow2D/Cell.set_text(str(location))
+	
 	
 	if _path_follow.progress_ratio >= 1.0:
 		_is_walking = false
@@ -137,7 +140,7 @@ func _process(delta: float) -> void:
 		_anim_player.play("idle")
 		emit_signal("walk_finished")
 		
-		
+	update_stats()
 
 ## Starts walking along the `path`.
 ## `path` is an array of grid coordinates that the function converts to map coordinates.
@@ -173,7 +176,6 @@ func load_stats():
 		unitData = UnitData.unitData[unitName.get_slice(" ", 0)].duplicate(true)
 		baseStats = unitData.Stats.duplicate(true)
 		unitName = unitData["Profile"]["UnitName"]
-		baseMove = baseStats["MOVE"]
 		check_passives()
 		activeStats["CLIFE"] = baseStats["LIFE"]
 		init_wep(true)
@@ -182,9 +184,10 @@ func load_stats():
 		var unique = false
 		var baseTag = "youkai"
 		var counter = 0
-		if species == null or job == null or weapon == null:
+		var globalUD = UnitData.unitData
+		if species == null or job == null:
 			print("No Job, Weapon or Species.")
-			pass
+			return
 		else:
 			var weapons = [weapon4, weapon3, weapon2, weapon]
 			while !unique:
@@ -194,7 +197,7 @@ func load_stats():
 				elif !UnitData.unitData.has(ykTag):
 					unique = true
 					UnitData.stat_gen(ykTag, genLevel, species, job)
-			unitData = UnitData.unitData[ykTag].duplicate(true)
+			unitData = globalUD[ykTag].duplicate(true)
 			baseStats = unitData.Stats.duplicate(true)
 			activeStats["CLIFE"] = baseStats["LIFE"]
 			unitData["StartInv"] = []
@@ -203,22 +206,14 @@ func load_stats():
 					continue
 				else:
 					unitData["StartInv"].append(wep)
+			
 		init_wep(false)
-#	active_and_buff_set_up()
+
 	update_stats()
-	update_combatdata()
 #	var groups = get_groups()
 #	print(unitName, " ", groups)
 
-func active_and_buff_set_up(): #Used to be needed, marked for deletion
-	var keys = baseStats.keys()
-	for stat in keys:
-		activeStats[stat] = baseStats[stat]
-		activeBuffs[stat] = {}
-		activeBuffs[stat]["Mod"] = 0
-		activeBuffs[stat]["Duration"] = 0
-		activeBuffs[stat]["Fresh"] = false
-		activeBuffs[stat]["Source"] = ""
+
 		
 #keep track of active de/buffs during gameplay, seperate from actual stats
 func apply_buff(attribute, effId, stat, buff, duration, curable = true, selfCast = false, source = ""):
@@ -240,6 +235,7 @@ func apply_buff(attribute, effId, stat, buff, duration, curable = true, selfCast
 #tracks duration of effects, then removes them when reaching 0
 func status_duration_tick():
 	var idKeys = activeBuffs.keys()
+	var statusKeys = activeStatus.keys()
 	for skillId in idKeys:
 #		var statKeys = activeBuffs[skillId].keys()
 #		for stat in statKeys:
@@ -250,6 +246,13 @@ func status_duration_tick():
 			activeBuffs[skillId].Duration -= 1
 		if activeBuffs[skillId].Duration == 0:
 			activeBuffs.erase(skillId)
+			
+	for status in statusKeys:
+		if activeStatus[status].Active and activeStatus[status].Duration > 0:
+			activeStatus[status].Duration -= 1
+		if activeStatus[status].Active and activeStatus[status].Duration == 0:
+			activeStatus[status] = {"Active": false}
+	$PathFollow2D/Cell2.set_text(str(activeStatus.Sleep.Active))
 #	print(activeBuffs)
 	update_stats()
 	
@@ -263,6 +266,7 @@ func load_sprites():
 		
 func init_wep(isPlayer):
 	if unitData.StartInv.size() == 0:
+		unitData.EQUIP = "NONE"
 		return
 	var equipped = false
 	var uniqueID
@@ -318,16 +322,22 @@ func check_passives():
 		
 
 func set_equipped(weapon):
-	unitData.EQUIP = weapon
+	if weapon == null or weapon == "":
+		unitData.EQUIP = "NONE"
+	else: 
+		unitData.EQUIP = weapon
 	
-func update_combatdata(terrainBonus: int = 0):
+func update_combatdata():
+	var terrainBonus = update_terrain_bonus()
 	var equipped = unitData.EQUIP
 	var wep 
 	var stat = activeStats
-	if faction == "Player":
+	if faction == "Player" and equipped != "NONE":
 		wep = allUnitData.plrInv[equipped]
-	else:
+	elif faction!= "Player" and equipped != "NONE":
 		wep = allUnitData.npcInv[equipped]
+	else:
+		wep = allUnitData.wepData["NONE"]
 	
 	combatData.TYPE = wep.TYPE
 	if wep.TYPE == "Physical":
@@ -345,6 +355,8 @@ func update_combatdata(terrainBonus: int = 0):
 	combatData.ACCBASE = stat.ELEG * 2 + stat.CHA
 
 func update_stats():
+	if baseStats == null or activeStats == null:
+		return
 	lifeBar.max_value = baseStats.LIFE
 	lifeBar.value = activeStats.CLIFE
 	if activeStats["CLIFE"] == 0:
@@ -360,18 +372,35 @@ func update_stats():
 		buffTotal[activeBuffs[id].Stat] += activeBuffs[id].Mod
 	for stat in statKeys:
 		activeStats[stat] = baseStats[stat] + buffTotal[stat]
+	update_combatdata()
+	if activeStatus.Sleep.Active:
+		activeStats.MOVE = 0
+		combatData.AVOID = 0
+		combatData.GRZPRC = 0
 #	print(unitName, ": ", activeStats)
 
 func apply_dmg(dmg = 0):
 	activeStats.CLIFE -= dmg
 	activeStats.CLIFE = clampi(activeStats.CLIFE, 0, baseStats.LIFE)
+	if dmg > 0 and activeStatus.Sleep.Active:
+		cure_status("Sleep")
 	return activeStats.CLIFE
 	
 func apply_heal(heal = 0):
 	activeStats.CLIFE += heal
 	activeStats.CLIFE = clampi(activeStats.CLIFE, 0, baseStats.LIFE)
 	return activeStats.CLIFE
-	
+
+func cure_status(statusEff):
+	if statusEff == "All":
+		for status in activeStatus:
+			if activeStatus[status].Curable:
+				activeStatus[status] = {"Active" : false}
+	elif activeStatus[statusEff].Active and activeStatus.Curable:
+		activeStatus[statusEff] = {"Active" : false}
+	$PathFollow2D/Cell2.set_text(str(activeStatus.Sleep.Active))
+	update_stats()
+
 func _on_test_map_map_ready():
 	cell = map.local_to_map(position)
 	position = map.map_to_local(cell)
@@ -402,6 +431,19 @@ func fade_out(duration: float):
 	
 	
 
+func set_status(status, duration, isCurable): #I wish I could inflict sleep status on myself
+	if status == null:
+		print("No SkillID found")
+		return
+	activeStatus[status] = {"Active" : true, "Duration" : duration, "Curable" : isCurable}
+	$PathFollow2D/Cell2.set_text(str(activeStatus.Sleep.Active))
+	
+func check_status(status):
+	if activeStatus[status].Active:
+		return true
+	else:
+		return false
+
 func set_acted(actState: bool):
 	acted = actState
 	match acted:
@@ -411,20 +453,25 @@ func set_acted(actState: bool):
 			status_duration_tick()
 	
 	
-func update_terrain_bonus(terrainData):
+func update_terrain_data(data):
+	terrainData = data
+	
+	
+
+func update_terrain_bonus():
 #	print(combatData.AVOID)
 	var bonus = 0
 	var i = find_nested(terrainData, Vector2i(cell))
 	if i != -1:
 		bonus = terrainData[i][2]
-	if bonus != 0:
-		update_combatdata(bonus)
-#		print(unitName)
-#		print(combatData.AVOID)
+	return bonus
+
 	
 func find_nested(array, value):
 #	print(value)
 #	print(value)
+	if array == null:
+		return -1
 	for i in range(array.size()):
 #		print(array[i])
 		if array[i].find(value) != -1:

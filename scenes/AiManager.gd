@@ -100,10 +100,10 @@ func get_valid_moves(unit, cell, move, state):
 			
 func find_best_of_set(attack, move, wait):
 	var bestMove = null
-	if attack["value"] >= move["value"]:
+	if attack != null and attack["value"] >= move["value"]:
 		if attack["value"] >= wait["value"]:
 			bestMove = attack
-	elif move["value"] > wait["value"]:
+	elif move!= null and move["value"] > wait["value"]:
 		bestMove = move
 	else:
 		bestMove = wait

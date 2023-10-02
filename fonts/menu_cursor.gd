@@ -8,8 +8,14 @@ var currentButton : Button = null
 @onready var menu_parent := get_node(menu_parent_path)
 var state = 0
 @export var ui_cooldown := 0.1
-
+var menuIndex
 var cursor_index : int = 0
+var shouldUpdateCursor = false
+
+func _process(delta):
+	if shouldUpdateCursor:
+		set_cursor_from_index(menuIndex)
+		shouldUpdateCursor = false
 
 func _input(event: InputEvent) -> void:
 
@@ -59,13 +65,18 @@ func get_menu_item_at_index(index : int) -> Control:
 	
 	return menu_parent.get_child(index) as Control
 
+func update_cursor(index):
+	shouldUpdateCursor = true
+	menuIndex = index
+
 func set_cursor_from_index(index : int) -> void:
 	if index >= menu_parent.get_child_count():
 		index = 0
 	if index < 0:
 		index = menu_parent.get_child_count() - 1
 	var menu_item := get_menu_item_at_index(index)
-#	print(menu_item.position, position)
+#	
+#	print(menu_item)
 	if menu_item == null:
 		return
 	
@@ -75,6 +86,7 @@ func set_cursor_from_index(index : int) -> void:
 	
 	newPos = Vector2(cPosition.x, cPosition.y + cSize.y / 2.0) - (size / 2.0) - cursor_offset
 	set_global_position(newPos)
+#	print(menu_item.get_global_position(), newPos, get_global_position())
 	
 	cursor_index = index
 	if state == 1:

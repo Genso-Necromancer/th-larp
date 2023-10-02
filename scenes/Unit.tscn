@@ -267,9 +267,6 @@ _data = {
 
 [node name="Unit" type="Path2D"]
 script = ExtResource("1_torj4")
-species = "Null"
-job = "Null"
-weapon = ""
 move_speed = 250.0
 
 [node name="PathFollow2D" type="PathFollow2D" parent="."]
@@ -315,13 +312,24 @@ texture_over = ExtResource("5_aeeqq")
 texture_progress = ExtResource("6_2s8il")
 script = ExtResource("7_x5rnn")
 
-[node name="Label" type="Label" parent="PathFollow2D"]
-visible = false
-offset_left = -9.0
-offset_top = -26.0
-offset_right = 31.0
-offset_bottom = -3.0
+[node name="Cell" type="Label" parent="PathFollow2D"]
+offset_left = -35.0
+offset_top = 16.0
+offset_right = 36.0
+offset_bottom = 42.0
 theme = ExtResource("8_y1qcc")
+theme_override_colors/font_color = Color(0.776471, 0, 0, 1)
+theme_override_font_sizes/font_size = 22
 text = "(0, 0)"
+
+[node name="Cell2" type="Label" parent="PathFollow2D"]
+offset_left = -33.0
+offset_top = 40.0
+offset_right = 38.0
+offset_bottom = 66.0
+theme = ExtResource("8_y1qcc")
+theme_override_colors/font_color = Color(0.776471, 0, 0, 1)
+theme_override_font_sizes/font_size = 22
+text = "<null>"
 
 [connection signal="animation_finished" from="PathFollow2D/Sprite/AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

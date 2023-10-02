@@ -170,28 +170,21 @@ unitName = "Remilia Scarlet"
 
 [node name="Saku" parent="." instance=ExtResource("3_ysf1k")]
 z_index = 2
-position = Vector2(556, 419)
+y_sort_enabled = true
+position = Vector2(678, 404)
 faction = "Player"
 unitName = "Sakuya Izayoi"
 
 [node name="Fairy" parent="." instance=ExtResource("3_ysf1k")]
 z_index = 2
-position = Vector2(201, 201)
-species = "Fairy"
-job = "Trblr"
+y_sort_enabled = true
+position = Vector2(193, 213)
 weapon = "CLB"
-unitName = "Fairy Troublemaker"
-genLevel = 1
 
 [node name="Fairy2" parent="." instance=ExtResource("3_ysf1k")]
 z_index = 2
-position = Vector2(186, 151)
-species = "Fairy"
-job = "Thief"
+y_sort_enabled = true
+position = Vector2(193, 213)
 weapon = "CLB"
-unitName = "Fairy Troublemaker"
-genLevel = 1
 
 [connection signal="mapReady" from="." to="Remi" method="_on_test_map_map_ready"]
-[connection signal="mapReady" from="." to="Saku" method="_on_test_map_map_ready"]
-[connection signal="mapReady" from="." to="Fairy" method="_on_test_map_map_ready"]

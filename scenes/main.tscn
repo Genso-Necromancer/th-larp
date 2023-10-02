@@ -58,7 +58,7 @@ y_sort_enabled = true
 scale = Vector2(1.8, 1.8)
 game_cursor_path = NodePath("../../Gameboard/Cursor")
 
-[node name="Profile" parent="CanvasLayer/GUIManager" index="2"]
+[node name="Profile" parent="CanvasLayer/GUIManager" index="3"]
 visible = false
 
 [connection signal="target_focused" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_target_focused"]

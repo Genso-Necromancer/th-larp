@@ -68,6 +68,15 @@ theme = ExtResource("4_cpge4")
 action_mode = 0
 text = "Wait"
 
+[node name="EndBtn" type="Button" parent="Count/ActionBox/CenterContainer/VBoxContainer"]
+visible = false
+layout_mode = 2
+focus_neighbor_top = NodePath("../SklBtn")
+focus_neighbor_bottom = NodePath("../AtkBtn")
+theme = ExtResource("4_cpge4")
+action_mode = 0
+text = "End"
+
 [node name="m" type="PanelContainer" parent="."]
 layout_mode = 1
 anchors_preset = 1

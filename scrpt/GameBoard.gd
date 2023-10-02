@@ -55,6 +55,7 @@ var roundCounter = 0
 var turnCounter = 0
 var aiTurn = false
 var maxTurns = 0
+var earlyEnd = false
 
 #Global effects
 var globalEffects = {}
@@ -177,7 +178,8 @@ func init_gamestate():
 	gameState.set_win(conditions)
 	
 func update_unit_terrain(unit):
-	unit.update_terrain_bonus(terrainData)
+	unit.update_terrain_data(terrainData)
+	
 	
 func _unhandled_input(event: InputEvent) -> void:
 	#input uses a series of states to direct where everything goes, if it goes anywhere
@@ -190,6 +192,7 @@ func _unhandled_input(event: InputEvent) -> void:
 #	forecast:5 Combat Forecast
 #	sTarget:6 Skill targeting
 #	sMenu:7 Skill Menu
+#	rEnd: 8 Ended Round early
 	
 	
 	
@@ -223,6 +226,7 @@ func _unhandled_input(event: InputEvent) -> void:
 #					print(cursorCell)
 				2: return
 				5: return
+				8: return
 	if event is InputEventMouseButton:
 			if event.is_action_pressed("ui_accept"):
 				match Global.state:
@@ -231,6 +235,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					2, 3: return
 					4, 6: cursor_accept_pressed(currMap.map_to_local(cursorCell))
 					5: return
+					8: return
 					
 	if event is InputEventKey:
 			if event.is_action_pressed("ui_accept"):
@@ -240,6 +245,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					2, 3: return
 					4, 6: cursor_accept_pressed(currMap.map_to_local(cursorCell))
 					5: return
+					8: return
 			elif event.is_action_pressed("ui_info"):
 				match Global.state:
 					0, 1, 2, 4, 6: 
@@ -251,6 +257,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					3: 
 						Global.state = previousState
 						emit_signal("toggle_prof")
+					8: return
 						
 			elif event.is_action_pressed("ui_return"):
 				match Global.state:
@@ -284,6 +291,7 @@ func _unhandled_input(event: InputEvent) -> void:
 #						cursor.visible = true
 #						unitOverlay.clear()
 						emit_signal("toggle_skills")
+					8: return
 						
 			elif event.is_action_pressed("ui_scroll_left"):
 				pass
@@ -302,19 +310,22 @@ func _unhandled_input(event: InputEvent) -> void:
 				match Global.state: 
 					0, 1, 3, 4, 6: cursorCell += Vector2.RIGHT
 					2: return
+					8: return
 			elif event.is_action("ui_up"):
 				match Global.state: 
 					0, 1, 3, 4, 6: cursorCell += (Vector2.UP)
 					2: return
-				
+					8: return
 			elif event.is_action("ui_left"):
 				match Global.state: 
 					0, 1, 3, 4, 6: cursorCell += (Vector2.LEFT)
 					2: return
+					8: return
 			elif event.is_action("ui_down"):
 				match Global.state: 
 					0, 1, 3, 4, 6: cursorCell += (Vector2.DOWN)
 					2: return
+					8: return
 			else: return
 			
 ## Returns `true` if the cell is occupied by a unit
@@ -454,7 +465,7 @@ func _deselect_active_unit(confirm) -> void:
 
 #	print(confirm)
 #	print(units)
-	if units.has(activeUnit.cell):
+	if activeUnit != null and units.has(activeUnit.cell):
 		if !confirm: 
 			units.erase(activeUnit.cell)
 			var new_cell = activeUnit.return_original()
@@ -509,9 +520,11 @@ func cursor_accept_pressed(cell: Vector2) -> void:
 			if !activeUnit and is_occupied(cell) and focusUnit.is_in_group("Player") and !focusUnit.acted:
 				Global.state = 1
 				_select_unit(cell)
-			else: return
+			else: 
+				Global.state = 2
+				emit_signal("toggle_action", false, true)
 		1: 
-			if !is_occupied(cell):
+			if !is_occupied(cell) and walkableCells.has(cell):
 				Global.state = 2
 				_move_active_unit(cell)
 			elif cell == activeUnit.cell:
@@ -656,6 +669,10 @@ func _on_gui_manager_action_selected(selection, skill = null):
 			_deselect_active_unit(true)
 			turn_change()
 #			Input.warp_mouse(currMap.map_to_local(activeUnit.position))
+		3:
+			Global.state = 8
+			earlyEnd = true
+			turn_change()
 			
 
 func toggle_extra_info():
@@ -733,7 +750,7 @@ func turn_change():
 		cursor.visible = true
 #	print(turnCounter, " ", turnOrder[0][1], " aiTurn:", aiTurn, "
 #	", turnOrder)
-	global_durations_turn_tick()
+	round_duration_tick()
 	gameState.update_remaining_turns(turnOrder)
 	
 	if Global.gameTime >= 24 - Global.timeFactor:
@@ -747,9 +764,14 @@ func turn_change():
 		await get_tree().create_timer(0.5).timeout
 		start_ai_turn()
 	emit_signal("turn_changed")
+	if !aiTurn and earlyEnd:
 		
+		set_next_acted()
+		turn_change()
+	
 func round_change():
 	#Changes the round and reloads the "turn order" magazine
+	earlyEnd = false
 	turnOrder.clear()
 	for child in currMap.get_children():
 		var unit := child as Unit
@@ -767,7 +789,7 @@ func round_change():
 			false: 
 				turnOrder.append([true, "Enemy"])
 	gameState.clear_acted()
-	print(units)
+#	print(units)
 	initialize_turns(turnOrder)
 	
 func initialize_turns(turns):
@@ -778,6 +800,13 @@ func initialize_turns(turns):
 	turnTest.self_modulate = Color(0,0,1)
 	gameState.update_remaining_turns(turnOrder)
 #	print(turnOrder)
+
+func set_next_acted():
+	for cell in units:
+		if !units[cell].acted and units[cell].faction == "Player":
+			units[cell].set_acted(true)
+			return
+	
 
 func start_ai_turn():
 	#Gets the ball rolling for the AI to take actions
@@ -807,7 +836,7 @@ func ai_attack(result):
 		_move_active_unit(destination, true, path)
 		await self.aimove_finished
 	actor.set_equipped(weapon)
-	actor.update_combatdata()
+	actor.update_stats()
 	combatManager.combat_forecast(actor, target, distance)
 	combatManager.start_the_justice(actor,target)
 #	print(activeUnit)
@@ -867,7 +896,7 @@ func set_time_factor(effId, factor, duration, type):
 func reset_time_factor():
 	Global.timeFactor = Global.trueTimeFactor
 	
-func global_durations_turn_tick(): #tracks duration of global effects, removing them when duration is up
+func round_duration_tick(): #tracks duration of round based effects, removing them when duration is up
 	var keys = globalEffects.keys()
 	for effId in keys:
 		globalEffects[effId].Duration -= 1

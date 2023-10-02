@@ -142,8 +142,10 @@ func start_the_justice(a: Unit, t: Unit):
 	#if it failed, or did 0 dmg. check both units for FUP true
 	#start round 3 for whoever had FUP true, if any
 	#conclude combat
+	var canRetaliate = true
 	
-	
+	if units[1].activeStatus.Sleep.Active or units[1].unitData.EQUIP == "NONE":
+		canRetaliate = false
 	
 	#TAKING 0 DAMAGE DOESNT ALLOW FOR A FOLLOW UP. FIX IT.
 	#first round
@@ -153,7 +155,7 @@ func start_the_justice(a: Unit, t: Unit):
 	if r1 and check_uses(cbtAW[0]) and !deathFlag: 
 			hurt = combat_round(0, 1)
 			
-	if !hurt and check_uses(cbtAW[1]) and !deathFlag and canReach:
+	if !hurt and check_uses(cbtAW[1]) and !deathFlag and canReach and canRetaliate:
 			print("Round 2 begins: ", cbtFC[1].NAME, " is attacking ", cbtFC[0].NAME)
 			r2 = get_attack(1,0)
 	if r2:
@@ -165,7 +167,7 @@ func start_the_justice(a: Unit, t: Unit):
 			r3 = get_attack(0,1)
 		if r3:
 			hurt = combat_round(0, 1)
-		if cbtFC[1].FUP and check_uses(cbtAW[1]) and canReach:
+		if cbtFC[1].FUP and check_uses(cbtAW[1]) and canReach and canRetaliate:
 			print("Round 3 begins: ", cbtFC[1].NAME, " is attacking ", cbtFC[0].NAME)
 			r3 = get_attack(1,0)
 		if r3:
@@ -316,7 +318,7 @@ func run_effects(actor, target, activeSkill, hit):
 						"Cure": print("Cure")
 						"Healing": 
 							factor_healing(actor, target, effect)
-						"Sleeping": print("Sleeping")
+						"Sleep": target.set_status(attribute, effect.Duration, effect.Curable)
 						"Relocate": print("Relocate")
 	
 func skill_combat(actor, target, skill):

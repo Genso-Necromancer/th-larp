@@ -64,7 +64,7 @@ static func get_named_unit_data(unitInd):
 					"Fate": true,
 					"SunWeak": true,
 					"Fly": true},
-				"Skills":["TEST1", "TEST2"]
+				"Skills":["SLP1"]
 			}
 		}
 		UNIT_ID.Sakuya: 
@@ -314,7 +314,19 @@ static func get_terrain_costs():
 	return terrainCost
 	
 static func get_wep():
-	var wepData = {"GNG":{
+	var wepData = {"NONE":{
+				"NAME":"",
+				"ICON": load(("res://sprites/gungnir.png")),
+				"TYPE": "Physical",
+				"DMG": 0,
+				"ACC": 0,
+				"CRIT": 0,
+				"GRAZE": 0,
+				"MINRANGE": 0,
+				"MAXRANGE": 0,
+				"LIMIT": false },
+				##################
+				"GNG":{
 				"NAME":"Gungnir",
 				"ICON": load(("res://sprites/gungnir.png")),
 				"TYPE": "Physical",
@@ -394,11 +406,12 @@ static func get_skill_effects():
 	skillEffects = {
 		"EffectTest": {
 			"Target": "Self", #Self, Target, Global
-			"OnHit": false,
-			"Proc": 99,
+			"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
+			"Proc": 99, #Set to -1 to have gaurenteed proc chance
 			"Duration": 0,
 			"Time": false,
 			"TimeFactor": 0,
+			"Curable": true, #For status effects, buffs/debuffs. Dictates if effects can remove them.
 			"Buff": false,
 			"Debuff": false,
 			"BuffStat": "PWR", #Any core Stat
@@ -436,6 +449,13 @@ static func get_skill_effects():
 			"Duration": 2,
 			"Time": true,
 			"TimeFactor": -0.5
+			},"SleepTest": {
+			"Target": "Target", #Self, Target, Global
+			"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
+			"Proc": -1, #Set to -1 to have gaurenteed proc chance
+			"Duration": 1,
+			"Sleep": true,
+			"Curable": true
 			}
 	}
 	return skillEffects
@@ -477,6 +497,18 @@ static func get_skills():
 		"RangeMax": 0,
 		"Cost": 0,
 		"Effect": ["SlowTime05"]
+		},
+		"SLP1": {
+		"SkillId": "SLP1",
+		"SkillName": "Sleep",
+		"Icon": load(("res://sprites/gungnir.png")),
+		"Target": "Ally", #Enemy, Self, Ally
+		"CanMiss": false,
+		"ACC": 0,
+		"RangeMin": 1,
+		"RangeMax": 1,
+		"Cost": 0,
+		"Effect": ["SleepTest"]
 		}
 	}
 	return skills

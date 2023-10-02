@@ -12,8 +12,6 @@ class_name GUIManager
 @onready var weaponFrame = $ActionMenu/m/m/c/v
 @onready var weaponBox = $ActionMenu/m
 @onready var ActionC = $ActionMenu/Count
-@onready var ActionAtk = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/AtkBtn
-@onready var ActionSkl = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/SklBtn
 @onready var ActionBox = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer
 @onready var menu_cursor =  $ActionMenu/menu_cursor
 @onready var foreCast = $CombatForecast
@@ -34,6 +32,7 @@ class_name GUIManager
 @onready var AtkB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/AtkBtn
 @onready var SklB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/SklBtn
 @onready var WaitB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/WaitBtn
+@onready var EndB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/EndBtn
 @onready var sunDial = $HUD/SunDial
 @onready var clockLabel = $HUD/Clock
 @onready var timeLb = $DEBUG/timeBox/time
@@ -153,9 +152,15 @@ func _on_wait_btn_pressed():
 	accept_event()
 	_on_gameboard_toggle_action()
 	emit_signal("actionSelected", selection)
+	
+func _on_end_btn_pressed():
+	var selection = 3
+	accept_event()
+	_on_gameboard_toggle_action()
+	emit_signal("actionSelected", selection)
 
 
-func _on_gameboard_toggle_action(skillClose = false):
+func _on_gameboard_toggle_action(skillClose = false, genericMenu = false):
 #	print("Size: ", $ActionMenu/Count/BackgroundCenter.get_size(), "Offset: ", $ActionMenu/Count/BackgroundCenter.get_size().x / 2)
 	var actor = Global.activeUnit
 	if ActionC.visible == false or skillClose:
@@ -163,20 +168,53 @@ func _on_gameboard_toggle_action(skillClose = false):
 		ActionC.visible= true
 		menu_cursor.state = 2
 		menu_cursor.visible= true
-		menu_cursor.set_cursor_from_index(0)
-		ActionAtk.grab_focus()
-		if actor.unitData.Skills.size() != null and actor.unitData.Skills.size() > 0:
-			ActionSkl.disabled = false
+		
+		if actor != null and actor.unitData.EQUIP == "NONE":
+			AtkB.disabled = true
+		else:
+			AtkB.disabled = false
+		
+		if actor != null and actor.unitData.Skills.size() != null and actor.unitData.Skills.size() > 0:
+			SklB.disabled = false
+		else: 
+			SklB.disabled = true
+			
+		if actor.check_status("Sleep"):
+			AtkB.disabled = true
+			SklB.disabled = true
+			
+			
+		if genericMenu == true:
+			AtkB.visible = false
+			SklB.visible = false
+			WaitB.visible = false 
+			EndB.visible = true
+#			print(EndB.get_global_position())
+#			print(AtkB.get_global_position())
+			menu_cursor.update_cursor(3)
+			EndB.grab_focus()
+		else:
+			
+			AtkB.visible = true
+			SklB.visible = true
+			WaitB.visible = true
+			EndB.visible = false
+			menu_cursor.update_cursor(0)
+			AtkB.grab_focus()
 		
 #		print(windowMode)
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		
 	else:
-		ActionSkl.disabled = true
+		SklB.disabled = true
 		ActionC.visible= false
 		menu_cursor.state = 0
 		menu_cursor.visible= false
 		weaponBox.visible = false
+		AtkB.visible = true
+		SklB.visible = true
+		WaitB.visible = true
+		EndB.visible = true
 #		emit_signal("gui_closed")
 		Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
 	return
@@ -188,6 +226,8 @@ func check_connect():
 		SklB.mouse_entered.connect(menu_cursor.mouse_entered.bind(1))
 	if !WaitB.mouse_entered.is_connected(menu_cursor.mouse_entered):
 		WaitB.mouse_entered.connect(menu_cursor.mouse_entered.bind(2))
+	if !EndB.mouse_entered.is_connected(menu_cursor.mouse_entered):
+		EndB.mouse_entered.connect(menu_cursor.mouse_entered.bind(3))
 
 func _on_gameboard_toggle_prof():
 #	print("GUI",state, unitId)
@@ -211,8 +251,8 @@ func update_prof():
 	var unitData 
 	var wep1 = $Profile/M/G/VB/MC2/MC/VB/Wep1
 	var wep2 = $Profile/M/G/VB/MC2/MC/VB/Wep2
-	var wep3 = $Profile/M/G/VB/MC2/MC/VB/Wep3
-	var wep4 = $Profile/M/G/VB/MC2/MC/VB/Wep4
+#	var wep3 = $Profile/M/G/VB/MC2/MC/VB/Wep3
+#	var wep4 = $Profile/M/G/VB/MC2/MC/VB/Wep4
 	var weps = [wep1, wep2]
 	var i = 0
 	var Inv
@@ -233,7 +273,7 @@ func update_prof():
 		Inv = UnitData.plrInv
 #		$Profile/M/G/UnitName.set_text(unitData["Profile"]["UnitName"])
 		$Profile/M/G/UnitExp.set_text(str(unitData["Profile"]["EXP"]))
-		
+	var combatData = focusUnit.combatData
 	$Profile/M/G/UnitName.set_text(unitData["Profile"]["UnitName"])
 	$Profile/M/G/VB/MC/MC/UnitPrt.set_texture(unitData["Profile"]["Prt"])
 	$Profile/M/G/VStats/UnitLevel.set_text(str(unitData["Profile"]["Level"]))
@@ -244,6 +284,12 @@ func update_prof():
 	$Profile/M/G/VStats/UnitCele.set_text(str(unitStats["CELE"]))
 	$Profile/M/G/VStats/UnitBar.set_text(str(unitStats["BAR"]))
 	$Profile/M/G/VStats/UnitCha.set_text(str(unitStats["CHA"]))
+	$Profile/M/G/VB/G2/VB/MC2/MC/VB/VStats/UnitAcc.set_text(str(combatData.ACC))
+	$Profile/M/G/VB/G2/VB/MC2/MC/VB/VStats/UnitAvd.set_text(str(combatData.AVOID))
+	$Profile/M/G/VB/G2/VB/MC2/MC/VB/VStats/UnitDmg.set_text(str(combatData.DMG))
+	$Profile/M/G/VB/G2/VB/MC2/MC/VB/VStats/UnitGrz.set_text(str(combatData.GRAZE) + " %" + str(combatData.GRZPRC))
+	$Profile/M/G/VB/G2/VB/MC2/MC/VB/VStats/UnitCrit.set_text(str(combatData.CRIT))
+	$Profile/M/G/VB/G2/VB/MC2/MC/VB/VStats/UnitCritAvd.set_text(str(combatData.CRTAVD))
 	
 	var equipId = unitData.EQUIP
 	
@@ -353,7 +399,7 @@ func open_weapons(distance: int = 0):
 				
 		weaponBox.visible = true
 		menu_cursor.menu_parent = $ActionMenu/m/m/c/v
-		menu_cursor.set_cursor_from_index(0)
+		menu_cursor.update_cursor(0)
 #		await get_tree().create_timer(0.1).timeout
 		menu_cursor.state = 1
 		menu_cursor.visible= true
@@ -406,7 +452,7 @@ func open_skills():
 				
 		weaponBox.visible = true
 		menu_cursor.menu_parent = $ActionMenu/m/m/c/v
-		menu_cursor.set_cursor_from_index(0)
+		menu_cursor.update_cursor(0)
 #		await get_tree().create_timer(0.1).timeout
 		menu_cursor.state = 2
 		menu_cursor.visible= true
@@ -457,6 +503,9 @@ func _on_gameboard_turn_changed():
 #	else: sunDial.rotation_degrees += sunRot
 	sunDial.rotation_degrees += sunRot
 	clockLabel.set_text(str(Global.gameTime))
+
+
+
 
 
 
