@@ -420,7 +420,7 @@ static func get_skill_effects():
 			"Type": "Physical", #Physical, Magic
 			"Damage": 0,
 			"Cure": false,
-			"CureType": "all",
+			"CureType": "all", #Sleep, or All. This is because Sleep is the only status atm. As new status are added, this parameter does not need to be updated.
 			"Healing": false,
 			"Heal": 0,
 			"Sleep": false,

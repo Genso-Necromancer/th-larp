@@ -5,6 +5,7 @@ signal walk_finished
 signal exp_handled
 signal imdead
 signal deathDone
+signal unit_relocated
 
 #Unit Parameters
 @export_enum("Enemy", "Player", "NPC") var faction: String = "Enemy"
@@ -478,7 +479,12 @@ func find_nested(array, value):
 			return i
 	return -1
 
-
+func relocate_unit(location):
+	var oldCell = cell
+	var cell = location
+	position = map.map_to_local(cell)
+	emit_signal("unit_relocated", oldCell, cell, self)
+	
 func _on_animation_player_animation_finished(anim_name):
 #	if anim_name == "death":
 #		var oka

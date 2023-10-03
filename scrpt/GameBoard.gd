@@ -156,6 +156,8 @@ func _reinitialize() -> void:
 			unit.imdead.connect(self.on_imdead)
 		if !self.turn_changed.is_connected(unit.on_turn_changed):
 			self.turn_changed.connect(unit.on_turn_changed)
+		if !unit.unit_relocated.is_connected(self.on_unit_relocated):
+			unit.unit_relocated.connect(self.on_unit_relocated)
 		update_unit_terrain(unit)
 			
 
@@ -482,6 +484,10 @@ func _deselect_active_unit(confirm) -> void:
 	_clear_active_unit()
 	unitOverlay.clear()
 	unitPath.stop()
+	
+func on_unit_relocated(oldCell, newCell, unit): #updates unit locations with it's new location
+	units.erase(oldCell)
+	units[newCell] = unit
 
 func grab_target(cell, skillState = false, skill = null):
 	#Called to assign values based on unit at cursor's coordinate

@@ -315,7 +315,7 @@ func run_effects(actor, target, activeSkill, hit):
 						"Damaging": 
 							print("Target HP: ", target.activeStats.CLIFE)
 							factor_dmg(actor, target, effect, canCrit, isSkill)
-						"Cure": print("Cure")
+						"Cure": target.cure_status(effect.CureType)
 						"Healing": 
 							factor_healing(actor, target, effect)
 						"Sleep": target.set_status(attribute, effect.Duration, effect.Curable)
