@@ -550,7 +550,7 @@ func cursor_accept_pressed(cell: Vector2) -> void:
 				friendly = true
 			if is_occupied(cell) and !friendly:
 				Global.state = 5
-				$Cursor.visible = false
+#				$Cursor.visible = false
 				grab_target(cell)
 				
 				
@@ -573,29 +573,35 @@ func cursor_accept_pressed(cell: Vector2) -> void:
 				"Self":
 					if is_occupied(cell) and activeUnit == focusUnit:
 						Global.state = 5
-						$Cursor.visible = false
+#						$Cursor.visible = false
 						grab_target(cell, true, activeSkill)
 				"Enemy":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and !friendly:
 						Global.state = 5
-						$Cursor.visible = false
+#						$Cursor.visible = false
 						grab_target(cell, true, activeSkill)
 				"Ally":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and friendly and activeUnit != focusUnit:
 						Global.state = 5
-						$Cursor.visible = false
+#						$Cursor.visible = false
 						grab_target(cell, true, activeSkill)
 				"Self+":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and friendly:
 						Global.state = 5
-						$Cursor.visible = false
+#						$Cursor.visible = false
 						grab_target(cell, true, activeSkill)
+				"Other":
+					if is_occupied(cell) and activeUnit != focusUnit:
+						Global.state = 5
+#						$Cursor.visible = false
+						grab_target(cell, true, activeSkill)
+	
 
 #
 func _on_cursor_moved(new_cell: Vector2) -> void:

@@ -474,7 +474,7 @@ static func get_skills():
 		"SkillId": "TEST1",
 		"SkillName": "Test Skill",
 		"Icon": load(("res://sprites/gungnir.png")),
-		"Target": "Enemy", #Enemy, Self, Ally, Self+(This is Self and Ally) #need Enemy+Ally
+		"Target": "Enemy", #Enemy, Self, Ally, Self+(This is Self and Ally), Other(Enemy or Ally, not Self)
 		"CanMiss": true,
 		"ACC": 99,
 		"RangeMin": 1,
