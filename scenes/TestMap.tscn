@@ -178,13 +178,13 @@ unitName = "Sakuya Izayoi"
 [node name="Fairy" parent="." instance=ExtResource("3_ysf1k")]
 z_index = 2
 y_sort_enabled = true
-position = Vector2(193, 213)
+position = Vector2(196, 202)
 weapon = "CLB"
 
 [node name="Fairy2" parent="." instance=ExtResource("3_ysf1k")]
 z_index = 2
 y_sort_enabled = true
-position = Vector2(193, 213)
+position = Vector2(682, 248)
 weapon = "CLB"
 
 [connection signal="mapReady" from="." to="Remi" method="_on_test_map_map_ready"]

@@ -130,15 +130,15 @@ func find_best_move(validMoves, unit, state, bestAttack):
 	var curLife = unit.unitData.CLIFE
 	var maxLife = unit.unitData.Stats.LIFE
 	var lifePrc:float = (maxLife - ((maxLife-curLife) / maxLife)) / 10
-	var value:float = 0
+#	var value:float = 0
 	for cell in validMoves:
 		if !state.occupied.has(cell):
 			movePairs.append({"action": "Move","tile":Vector2i(cell), "value": terrainValues[Vector2i(cell)]})
 	var bestValue:float = -INF
 	var bestMove
-	var dmgTaken = 0
-	var dmgDealt = 0
-	var survRatio = 0
+#	var dmgTaken = 0
+#	var dmgDealt = 0
+#	var survRatio = 0
 	for pair in movePairs:
 #		print(pair)
 		if pair["value"] > terrainValues[Vector2i(unit.cell)]:

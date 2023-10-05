@@ -104,6 +104,7 @@ func _ready() -> void:
 	_reinitialize()
 	initialize_turns(turnOrder)
 	init_gamestate()
+	combatManager.init_manager()
 	ai.init_ai()
 #	ai.rein_units(units)
 #	ai.init_mapdata(terrainData)

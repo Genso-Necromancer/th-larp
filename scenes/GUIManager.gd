@@ -179,7 +179,7 @@ func _on_gameboard_toggle_action(skillClose = false, genericMenu = false):
 		else: 
 			SklB.disabled = true
 			
-		if actor.check_status("Sleep"):
+		if actor != null and actor.check_status("Sleep"):
 			AtkB.disabled = true
 			SklB.disabled = true
 			

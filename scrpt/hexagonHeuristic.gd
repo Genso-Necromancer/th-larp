@@ -261,7 +261,7 @@ func get_neighbor_nodes(hex: Dictionary, attack: bool = false) -> Array:
 	else:
 #		print("Odd")
 	# even row
-		offsets = [			
+		offsets = [
 			Vector2(1, 0),  # Top-Right
 			Vector2(1, 1), # Bottom-Right
 			Vector2(0, 1), # Bottom
@@ -289,7 +289,7 @@ func get_neighbor_nodes(hex: Dictionary, attack: bool = false) -> Array:
 			
 	return neighbors
 	
-func get_BFS_nhbr(hex: Vector2, threat: bool = false) -> Array:
+func get_BFS_nhbr(hex: Vector2, ignoreSolid: bool = false, justNhbrs = false) -> Array:
 #	print("??")
 	var neighbors = []
 	var q = hex.x
@@ -319,30 +319,81 @@ func get_BFS_nhbr(hex: Vector2, threat: bool = false) -> Array:
 			Vector2(-1, 0),  # Top-Left
 			Vector2(0, -1)   # Top
 		]
-	
-	# Get the neighboring nodes based on the offsets
-	for offsetH in offsets:
-		var neighbor = hex
-		neighbor += offsetH
+		
+		
+	if justNhbrs:
+		for offsetH in offsets:
+			var neighbor = hex
+			neighbor += offsetH
+			neighbors.append(neighbor)
+		return neighbors
+	else:
+		for offsetH in offsets:
+			var neighbor = hex
+			neighbor += offsetH
 	
 		
 		# Check if the neighbor is valid
-		if !threat:
-			if is_valid_position(neighbor) and !is_solid_check(neighbor):
-				neighbors.append(neighbor)
-		elif threat:
-			if is_valid_position(neighbor):
-				neighbors.append(neighbor)
-			
-	return neighbors
+			if !ignoreSolid:
+				if check_valid_nhbr(neighbor, false, ignoreSolid):
+					neighbors.append(neighbor)
+			elif ignoreSolid:
+				if check_valid_nhbr(neighbor, false, ignoreSolid):
+					neighbors.append(neighbor)
+		return neighbors
+
+		
+		
+func resolve_shove(actorHex, targetHex, neighbors, distance):
+	#if <3 +3 if >= 3 -3
+	var i = 0
+	var shoveTo
+	var isSlam = false
+	var travel = 0
+	for hex in neighbors:
+		if hex == actorHex and i < 3:
+			i += 3
+			shoveTo = neighbors[i]
+			break
+		elif hex == actorHex and i >= 3:
+			i -= 3
+			shoveTo = neighbors[i]
+			break
+		i += 1
+	if check_valid_nhbr(shoveTo, true, false):
+		isSlam = true
+		shoveTo = targetHex
+	distance -= 1
+	while distance > 0 and !isSlam:
+		neighbors = get_BFS_nhbr(shoveTo, false, true)
+		if check_valid_nhbr(neighbors[i], true, false):
+			isSlam = true
+		else:
+			shoveTo = neighbors[i]
+			travel += 1
+		distance -= 1
+	var shoveResult = {"Hex": shoveTo, "Slam": isSlam, "Travel": travel}
+	return shoveResult
+
+func check_valid_nhbr(hex, checkSlam = false, ignoreSolid = true):
+		# Check if the hex is valid
+		if checkSlam:
+			if is_valid_position(hex) and !is_solid_check(hex):
+				return false
+			else:
+				return true
+		elif !ignoreSolid:
+			if is_valid_position(hex) and !is_solid_check(hex):
+				return hex
+		elif ignoreSolid:
+			if is_valid_position(hex):
+				return hex
+
 	
-	
-func is_valid_position(neighbor):
+func is_valid_position(neighbor): 
 	var valid
 	if neighbor.x > mapSize.x or neighbor.y > mapSize.y:
 		valid = false
-#	elif !neighbor.y >= mapSize.y and neighbor.y < mapSize.y:
-#		out = true
 	elif neighbor.x < 0 or neighbor.y < 0:
 		valid = false
 	else:

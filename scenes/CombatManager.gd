@@ -15,6 +15,15 @@ var units
 @onready var skillData = UnitData.skillData
 @onready var effectData = UnitData.effectData
 var canReach = false
+var gameBoard
+var aHex
+
+func init_manager():
+	#link up dependancies
+	gameBoard = get_parent()
+	aHex = gameBoard.hexStar
+
+
 
 func combat_forecast(a: Unit, t: Unit, distance, isSkill = false, skill = null):
 	cbtFC.clear()
@@ -319,7 +328,7 @@ func run_effects(actor, target, activeSkill, hit):
 						"Healing": 
 							factor_healing(actor, target, effect)
 						"Sleep": target.set_status(attribute, effect.Duration, effect.Curable)
-						"Relocate": print("Relocate")
+						"Relocate": start_relocation(actor, target, effect.MoveType, effect.RelocRange)
 	
 func skill_combat(actor, target, skill):
 	var canCounter = false #placeholder, implement passive in future that can enable skill countering
@@ -372,6 +381,14 @@ func factor_dmg(actor, target, attack, canCrit = false, isSkill = false):
 		deathFlag = true
 	return dmgResult
 
+func factor_healing(actor, target, effect):
+	var bonusEff = 0
+	#Add checks for bonus effects here
+	var healPower = effect.Heal + actor.activeStats.MAG + bonusEff
+	print("Target Life: ", target.activeStats.CLIFE, " Heal:", healPower)
+	target.apply_heal(healPower)
+	print(target.activeStats.CLIFE)
+
 func roll_crit(a, _t, attack): #Rework the combat manager, it's a fucking mess and not as modular as I hoped. It also can't update mid combat reliably due to the distance check.
 	#test variable
 	var critRoll
@@ -386,10 +403,19 @@ func roll_crit(a, _t, attack): #Rework the combat manager, it's a fucking mess a
 		critDmg = 0
 	return critDmg
 
-func factor_healing(actor, target, effect):
-	var bonusEff = 0
-	#Add checks for bonus effects here
-	var healPower = effect.Heal + actor.activeStats.MAG + bonusEff
-	print("Target Life: ", target.activeStats.CLIFE, " Heal:", healPower)
-	target.apply_heal(healPower)
-	print(target.activeStats.CLIFE)
+
+func start_relocation(actor, target, type, range): #determines method of relocation, then passes to the correct type
+	match type:
+		"Warp": pass
+		"Shove": shove_unit(actor, target, range)
+		"Toss": pass
+
+func shove_unit(actor, target, range):
+	var neighbors = aHex.get_BFS_nhbr(target.cell, false, true)
+	var shoveResult = aHex.resolve_shove(actor.cell, target.cell, neighbors, range)
+	var slamDmg = Global.slamage + actor.activeStats.PWR + (shoveResult.Travel * 2)
+	if shoveResult.Slam:
+		target.apply_dmg(slamDmg)
+		target.relocate_unit(shoveResult.Hex)
+	else:
+		target.relocate_unit(shoveResult.Hex)
