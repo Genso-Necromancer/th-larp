@@ -2,6 +2,7 @@ extends Node
 class_name CombatManager
 signal combat_resolved
 signal time_factor_changed
+signal warp_selected
 var cbtFC : Array
 var cbtUD : Array
 var cbtCL : Array
@@ -156,7 +157,7 @@ func start_the_justice(a: Unit, t: Unit):
 	if units[1].activeStatus.Sleep.Active or units[1].unitData.EQUIP == "NONE":
 		canRetaliate = false
 	
-	#TAKING 0 DAMAGE DOESNT ALLOW FOR A FOLLOW UP. FIX IT.
+	
 	#first round
 	print("Girl's are fighting")
 	print("Round 1 begins: ", cbtFC[0].NAME, " is attacking ", cbtFC[1].NAME)
@@ -169,18 +170,12 @@ func start_the_justice(a: Unit, t: Unit):
 			r2 = get_attack(1,0)
 	if r2:
 		hurt = combat_round(1, 0)
-	#if it failed, or did 0 dmg. check both units for FUP true
-	if !hurt and !deathFlag: 
-		if cbtFC[0].FUP and check_uses(cbtAW[0]):
-			print("Round 3 begins: ", cbtFC[0].NAME, " is attacking ", cbtFC[1].NAME)
-			r3 = get_attack(0,1)
-		if r3:
-			hurt = combat_round(0, 1)
-		if cbtFC[1].FUP and check_uses(cbtAW[1]) and canReach and canRetaliate:
-			print("Round 3 begins: ", cbtFC[1].NAME, " is attacking ", cbtFC[0].NAME)
-			r3 = get_attack(1,0)
-		if r3:
-			hurt = combat_round(1, 0)
+	#if retaliation failed, or did 0 dmg, check if attacker can make a second attempt.
+	if !hurt and !deathFlag and cbtFC[0].FUP and check_uses(cbtAW[0]): 
+		print("Round 3 begins: ", cbtFC[0].NAME, " is attacking ", cbtFC[1].NAME)
+		r3 = get_attack(0,1)
+	if r3:
+		hurt = combat_round(0, 1)
 			
 	print("Combat has resolved.")
 	emit_signal("combat_resolved")
@@ -402,20 +397,39 @@ func roll_crit(a, _t, attack): #Rework the combat manager, it's a fucking mess a
 		print("Critical Failure!")
 		critDmg = 0
 	return critDmg
-
+	pass
 
 func start_relocation(actor, target, type, range): #determines method of relocation, then passes to the correct type
+	var pivotHex
+	var matchHex
 	match type:
-		"Warp": pass
-		"Shove": shove_unit(actor, target, range)
-		"Toss": pass
+		"Warp": emit_signal("warp_selected", actor, target, range)
+		"Shove": 
+			pivotHex = target.cell
+			matchHex = actor.cell
+			shove_or_toss_unit(actor, target, range, pivotHex, matchHex)
+		"Toss": 
+			pivotHex = actor.cell
+			matchHex = target.cell
+			shove_or_toss_unit(actor, target, range, pivotHex, matchHex)
 
-func shove_unit(actor, target, range):
-	var neighbors = aHex.get_BFS_nhbr(target.cell, false, true)
-	var shoveResult = aHex.resolve_shove(actor.cell, target.cell, neighbors, range)
+func shove_or_toss_unit(actor, target, range, pivotHex, matchHex):
+	#Toss: Grab Actor's Cell and Target's Cell. Look through Actor's Neighbors for a match with Target's cell. Adjust position in array to the opposite directional hex and move Target there.
+	#Shove: The same principle, except you are searching the Target's neighbors for the Actor's Cell and moving them to the opposite cell of that.
+
+	var neighbors = aHex.get_BFS_nhbr(pivotHex, false, true)
+	var shoveResult = aHex.resolve_shove(matchHex, target.cell, neighbors, range)
 	var slamDmg = Global.slamage + actor.activeStats.PWR + (shoveResult.Travel * 2)
-	if shoveResult.Slam:
+	
+	if shoveResult.Slam and !shoveResult.UniColl:
 		target.apply_dmg(slamDmg)
+		target.relocate_unit(shoveResult.Hex)
+	elif shoveResult.Slam:
+		target.apply_dmg(slamDmg)
+		shoveResult.UniColl.apply_dmg(slamDmg)
 		target.relocate_unit(shoveResult.Hex)
 	else:
 		target.relocate_unit(shoveResult.Hex)
+		
+
+	

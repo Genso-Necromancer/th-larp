@@ -64,7 +64,7 @@ static func get_named_unit_data(unitInd):
 					"Fate": true,
 					"SunWeak": true,
 					"Fly": true},
-				"Skills":["SLP1", "SHV1"]
+				"Skills":["SLP1", "SHV1", "TOSS1"]
 			}
 		}
 		UNIT_ID.Sakuya: 
@@ -464,6 +464,13 @@ static func get_skill_effects():
 			"Relocate": true,
 			"MoveType": "Shove", #Warp(pick a hex), Shove(moved X distance); Toss(Placed behind Actor)
 			"RelocRange": 2 #Distance Shoved, or range of valid tiles to warp to. Set to 0 for Toss.
+			},"Toss1": {
+			"Target": "Target", #Self, Target, Global
+			"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
+			"Proc": -1, #Set to -1 to have gaurenteed proc chance
+			"Relocate": true,
+			"MoveType": "Toss", #Warp(pick a hex), Shove(moved X distance); Toss(Placed behind Actor)
+			"RelocRange": 0 #Distance Shoved, or range of valid tiles to warp to. Set to 0 for Toss.
 			}
 	}
 	return skillEffects
@@ -529,6 +536,18 @@ static func get_skills():
 		"RangeMax": 1,
 		"Cost": 0,
 		"Effect": ["Shove1"]
+		},
+		"TOSS1": {
+		"SkillId": "TOSS1",
+		"SkillName": "Toss",
+		"Icon": load(("res://sprites/gungnir.png")),
+		"Target": "Enemy", #Enemy, Self, Ally
+		"CanMiss": false,
+		"ACC": 0,
+		"RangeMin": 1,
+		"RangeMax": 1,
+		"Cost": 0,
+		"Effect": ["Toss1"]
 		}
 	}
 	return skills

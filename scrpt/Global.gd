@@ -1,6 +1,17 @@
 extends Node
-enum controlState {default, selected, aMenu, profile, aTarget, forecast, sTarget, sMenu}
-#started on trying to convert states to enums. Then I got confused on how to actually use it for such and felt like I was over complicating things
+enum GameState {
+	DEFAULT,
+	SELECTED,
+	ACTION_MENU,
+	PROFILE,
+	ATTACK_TARGETING,
+	COMBAT_FORECAST,
+	SKILL_TARGETING,
+	SKILL_MENU,
+	ROUND_END,
+	WARP
+}
+
 
 var profileMenu = false
 var actionMenu = false

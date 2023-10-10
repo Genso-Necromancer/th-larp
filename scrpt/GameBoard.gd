@@ -161,11 +161,13 @@ func _reinitialize() -> void:
 			unit.unit_relocated.connect(self.on_unit_relocated)
 		update_unit_terrain(unit)
 			
-
+	connect_general_signals()
 	#set time
 	Global.gameTime = currMap.gameTime
 	checkSun()
 	
+func connect_general_signals():
+	combatManager.warp_selected.connect(self.on_warp_selected)
 	
 func checkSun():
 	if Global.gameTime >= 6 and Global.gameTime <= 18:
@@ -196,6 +198,7 @@ func _unhandled_input(event: InputEvent) -> void:
 #	sTarget:6 Skill targeting
 #	sMenu:7 Skill Menu
 #	rEnd: 8 Ended Round early
+#	Warp: 9 selecting warp location
 	
 	
 	
@@ -239,6 +242,7 @@ func _unhandled_input(event: InputEvent) -> void:
 					4, 6: cursor_accept_pressed(currMap.map_to_local(cursorCell))
 					5: return
 					8: return
+					9: cursor_accept_pressed(currMap.map_to_local(cursorCell))
 					
 	if event is InputEventKey:
 			if event.is_action_pressed("ui_accept"):
@@ -380,9 +384,9 @@ func init_hexStar_terrain(attack: bool = false):
 					if units.has(Vector2(x,y)) and !friendly:
 						solidsArray.append(Vector2(x,y))
 		if solidsArray.size() > 0:
-			hexStar.set_solid(solidsArray)
+			hexStar.set_solid(solidsArray, units)
 	else:
-		hexStar.set_solid(solidsArray)
+		hexStar.set_solid(solidsArray, units)
 				
 		
 		
@@ -623,7 +627,11 @@ func _on_cursor_moved(new_cell: Vector2) -> void:
 				var path = get_path_to_cell(activeUnit.cell, new_cell, activeUnit.moveType)
 				unitPath.draw(path)
 
-func attack_targeting(unit: Unit, usingSkill = false, skill = null):
+func on_warp_selected(actor, target, range):
+	
+	attack_targeting(actor, false, null, true, range)
+
+func attack_targeting(unit: Unit, usingSkill = false, skill = null, rangeOnly = false, rangeOverwrite = 0):
 	#draws a visual representation of a unit's attack range, and binds the cursor within this space(snapPath)
 	var maxRange = 0
 	var minRange = 1000
@@ -641,8 +649,11 @@ func attack_targeting(unit: Unit, usingSkill = false, skill = null):
 			maxRange = max(maxRange, wepData[wep].MAXRANGE, maxRange)
 			minRange = min(minRange, wepData[wep].MINRANGE, minRange)
 	elif usingSkill:
-		maxRange = max(maxRange, skill.RangeMax, maxRange)
-		minRange = min(minRange, skill.RangeMin, minRange)
+		maxRange = skill.RangeMax
+		minRange = skill.RangeMin
+	elif rangeOnly:
+		maxRange = rangeOverwrite
+		minRange = 1
 	var path = _flood_fill(unit.cell, maxRange, unit.moveType, false, true)
 	minRange = minRange - 1
 	minRange = clampi(minRange, 0, 1000)
@@ -711,7 +722,7 @@ func region_clamp(grid_position: Vector2) -> Vector2:
 		out.y = clamp(out.y, 0, mapSize.y - 1.0)
 	return out
 	
-func free_up():																						#Free Up, worst show on television
+func free_up():	#Free Up, worst show on television
 	#Not really used atm, exists for when a map is completed
 	#Prevents memory leaks by freeing the pathfinding and combat manage from memory
 	#SKill Manager, turn sorter, etc will need to be added to this later, unless things fundamentally change down the line once the game is threaded together
@@ -739,9 +750,6 @@ func _on_menu_cursor_wep_updated():
 	var distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.moveType, false)
 	combatManager.combat_forecast(activeUnit, targetUnit, distance)
 	
-	
-	
-
 	
 func turn_change():
 	#change turn

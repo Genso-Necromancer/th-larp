@@ -19,6 +19,8 @@ var solidList: Array
 var weight
 var lowest_f_cost
 var lowest_node
+var unitsList: Dictionary
+
 func reinit():
 	_init(tilemap)
 
@@ -36,14 +38,22 @@ func _init(tileMap: GameMap):
 #func set_hex_weight(hex, weight):
 #	pass
 
-func set_solid(solids: Array):
+func set_solid(solids: Array, units = null):
 	solidList.clear()
 	for solid in solids:
 		solidList.append(solid)
+	if units != null:
+		unitsList = units
 		
 func is_solid_check(cell: Vector2):
 	if solidList.has(cell):
 		return true
+	else:
+		return false
+		
+func is_units_check(cell):
+	if unitsList.has(cell):
+		return unitsList[cell]
 	else:
 		return false
 
@@ -344,36 +354,65 @@ func get_BFS_nhbr(hex: Vector2, ignoreSolid: bool = false, justNhbrs = false) ->
 
 		
 		
-func resolve_shove(actorHex, targetHex, neighbors, distance):
+func resolve_shove(matchHex, targetHex, neighbors, distance): #for Shove, give target's neighbores and matchHex = actor's hex. for Toss, give actor's neighbors and matchHex = target's hex.
 	#if <3 +3 if >= 3 -3
 	var i = 0
 	var shoveTo
 	var isSlam = false
 	var travel = 0
+	var shoveStopper
+	
 	for hex in neighbors:
-		if hex == actorHex and i < 3:
+		if hex == matchHex and i < 3:
 			i += 3
 			shoveTo = neighbors[i]
 			break
-		elif hex == actorHex and i >= 3:
+		elif hex == matchHex and i >= 3:
 			i -= 3
 			shoveTo = neighbors[i]
 			break
 		i += 1
 	if check_valid_nhbr(shoveTo, true, false):
 		isSlam = true
+		shoveStopper = shoveTo
 		shoveTo = targetHex
 	distance -= 1
 	while distance > 0 and !isSlam:
 		neighbors = get_BFS_nhbr(shoveTo, false, true)
 		if check_valid_nhbr(neighbors[i], true, false):
 			isSlam = true
+			shoveStopper = neighbors[i]
 		else:
 			shoveTo = neighbors[i]
 			travel += 1
 		distance -= 1
-	var shoveResult = {"Hex": shoveTo, "Slam": isSlam, "Travel": travel}
+	var unitCollide = is_units_check(shoveStopper)
+		
+	var shoveResult = {"Hex": shoveTo, "Slam": isSlam, "Travel": travel, "UniColl": unitCollide}
 	return shoveResult
+	
+#func resolve_toss(actorHex, targetHex, neighbors): #Delete if shove actually works for shove and toss
+#	var tossTo
+#	var isSlam
+#	var tossStopper
+#	var i = 0
+#	for hex in neighbors:
+#		if hex == targetHex and i < 3:
+#			i += 3
+#			tossTo = neighbors[i]
+#			break
+#		elif hex == targetHex and i >= 3:
+#			i -= 3
+#			tossTo = neighbors[i]
+#			break
+#		i += 1
+#	if check_valid_nhbr(tossTo, true, false):
+#		isSlam = true
+#		tossStopper = tossTo
+#		tossTo = targetHex
+#	var unitCollide = is_units_check(tossStopper)
+#	var tossResult = {"Hex": tossTo, "Slam": isSlam, "UniColl": unitCollide}
+#	return tossResult
 
 func check_valid_nhbr(hex, checkSlam = false, ignoreSolid = true):
 		# Check if the hex is valid
