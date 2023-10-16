@@ -1,10 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://d1kccw7cbe252"]
+[gd_scene load_steps=7 format=3 uid="uid://cpfuhf552ada7"]
 
 [ext_resource type="Script" path="res://Main.gd" id="1_i7i5r"]
 [ext_resource type="PackedScene" uid="uid://bcypnaxbma61j" path="res://scenes/TestMap.tscn" id="3_joonu"]
 [ext_resource type="PackedScene" uid="uid://cmvmjk0jj7dam" path="res://scenes/Gameboard.tscn" id="3_nhbdj"]
 [ext_resource type="PackedScene" uid="uid://r6wtvva5qput" path="res://scenes/GUIManager.tscn" id="4_e3q25"]
-[ext_resource type="Script" path="res://scenes/gameState.gd" id="5_kfxdl"]
+[ext_resource type="Script" path="res://scenes/BoardState.gd" id="5_nk620"]
 [ext_resource type="Texture2D" uid="uid://cpcoxo8pcta47" path="res://sprites/tileset_unit_overlay.svg" id="6_vhip0"]
 
 [node name="Main" type="Node"]
@@ -47,8 +47,8 @@ offset_bottom = 82.0
 scale = Vector2(0.389885, 0.36713)
 texture = ExtResource("6_vhip0")
 
-[node name="gameState" type="Node" parent="Gameboard"]
-script = ExtResource("5_kfxdl")
+[node name="BoardStateCompiler" type="Node" parent="Gameboard"]
+script = ExtResource("5_nk620")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

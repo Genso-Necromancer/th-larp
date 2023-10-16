@@ -13,6 +13,7 @@ signal target_focused
 signal aimove_finished
 signal turn_changed
 signal toggle_skills
+signal gb_ready
 
 # units is used to map units to it's hex coordinate
 var units := {}
@@ -35,10 +36,16 @@ var mapCellSize
 var mapRect
 var terrainData = []
 var conditions: Array
+var lastSkill
+
+@onready var mainCon = get_parent()
+
+#states
+@onready var GameState = mainCon.GameState
 
 #input Global.state
 #var Global.state : int = 0
-var previousState : int = 0
+
 
 
 #related to pathfinding
@@ -70,9 +77,7 @@ var HpBarVis = true
 @export var mouseSens: float = 0.4
 @export var smoothing: float = 0.2
 
-#GUI control Variables
-var profileMenu = Global.profileMenu
-var actionMenu = Global.actionMenu
+
 
 #Nodes
 @onready var unitOverlay: UnitOverlay = $UnitOverlay
@@ -81,11 +86,11 @@ var actionMenu = Global.actionMenu
 @onready var combatManager : CombatManager = $CombatManager
 @onready var turnSort : TurnSort = $TurnSort
 @onready var turnTest = $Control/TurnLight
-@onready var gameState = $gameState
+@onready var boardState = $BoardStateCompiler
 @export var uiCooldown := 0.2
 @onready var gameCamera = $Cursor/Camera2D
 @onready var ai = $AiManager
-@onready var cTimer: Timer = $Cursor/Timer
+#@onready var cTimer: Timer = $Cursor/Timer
 
 #cursor location
 var cursorCell := Vector2.ZERO:
@@ -95,7 +100,7 @@ var cursorCell := Vector2.ZERO:
 		cursorCell = region_clamp(value)
 		cursor.position = currMap.map_to_local(cursorCell)
 		_on_cursor_moved(cursorCell)
-		cTimer.start()
+#		cTimer.start()
 
 
 
@@ -111,11 +116,12 @@ func _ready() -> void:
 	for unit in units:
 		if units[unit].unitName == "Remilia Scarlet":
 			cursorCell = units[unit].cell
-	cTimer.wait_time = uiCooldown
+#	cTimer.wait_time = uiCooldown
 	var grabber = units.keys()
 	focusUnit = units[grabber[0]]
 #	print(units)
 	Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED_HIDDEN)
+	emit_signal("gb_ready", mainCon.GameState.GB_DEFAULT)
 	
 	
 func _reinitialize() -> void:
@@ -168,6 +174,7 @@ func _reinitialize() -> void:
 	
 func connect_general_signals():
 	combatManager.warp_selected.connect(self.on_warp_selected)
+	self.gb_ready.connect(mainCon.set_new_state)
 	
 func checkSun():
 	if Global.gameTime >= 6 and Global.gameTime <= 18:
@@ -178,30 +185,15 @@ func checkSun():
 		units[unit].check_passives()
 		
 func init_gamestate():
-	gameState.update_map_data(terrainData)
-	gameState.update_unit_data(units)
-	gameState.set_win(conditions)
+	boardState.update_map_data(terrainData)
+	boardState.update_unit_data(units)
+	boardState.set_win(conditions)
 	
 func update_unit_terrain(unit):
 	unit.update_terrain_data(terrainData)
 	
 	
-func _unhandled_input(event: InputEvent) -> void:
-	#input uses a series of states to direct where everything goes, if it goes anywhere
-	#States:
-#	default:0 no menues open, nothing is happening.
-#	selected:1 unit has been selected
-#	aMenu:2 action menu is open
-#	profile:3 profile menu is open
-#	aTarget:4 Attack targeting
-#	forecast:5 Combat Forecast
-#	sTarget:6 Skill targeting
-#	sMenu:7 Skill Menu
-#	rEnd: 8 Ended Round early
-#	Warp: 9 selecting warp location
-	
-	
-	
+func _unhandled_input(event: InputEvent) -> void: #for debugging, delete later
 	#T key: Passes current turn for debugging, preventing from doing this if a unit is actively moving or it is not the player turn
 	if aiTurn:
 		return
@@ -214,127 +206,22 @@ func _unhandled_input(event: InputEvent) -> void:
 		
 	if unitMoving:
 		return
-#
-#Start of the actual player input control while in an active game
-	if event is InputEventMouseMotion:
-			var cameraScale = gameCamera.zoom
-			var cursorPos = cursor.position
-			var mouseDelta = event.relative * mouseSens
-			var mousePos = gameCamera.get_local_mouse_position()
 			
-			cursorPos += mouseDelta 
 			
-			mouseDelta = null
-			match Global.state:
-				0, 1, 3, 4, 6: 
-#					print(cursorCell, " + ", currMap.local_to_map(mousePos))
-					cursorCell += Vector2(currMap.local_to_map(mousePos))
-#					print(cursorCell)
-				2: return
-				5: return
-				8: return
-	if event is InputEventMouseButton:
-			if event.is_action_pressed("ui_accept"):
-				match Global.state:
-					0: cursor_accept_pressed(currMap.map_to_local(cursorCell))
-					1: cursor_accept_pressed(currMap.map_to_local(cursorCell))
-					2, 3: return
-					4, 6: cursor_accept_pressed(currMap.map_to_local(cursorCell))
-					5: return
-					8: return
-					9: cursor_accept_pressed(currMap.map_to_local(cursorCell))
-					
-	if event is InputEventKey:
-			if event.is_action_pressed("ui_accept"):
-				match Global.state:
-					0: cursor_accept_pressed(currMap.map_to_local(cursorCell))
-					1: cursor_accept_pressed(currMap.map_to_local(cursorCell))
-					2, 3: return
-					4, 6: cursor_accept_pressed(currMap.map_to_local(cursorCell))
-					5: return
-					8: return
-			elif event.is_action_pressed("ui_info"):
-				match Global.state:
-					0, 1, 2, 4, 6: 
-						if is_occupied(cursorCell):
-							previousState = Global.state
-							Global.state = 3
-							emit_signal("toggle_prof")
-						else: toggle_extra_info()
-					3: 
-						Global.state = previousState
-						emit_signal("toggle_prof")
-					8: return
-						
-			elif event.is_action_pressed("ui_return"):
-				match Global.state:
-					0: return
-					1:
-						snapPath = null
-						Global.state = 0
-						_deselect_active_unit(false)
-					2: 
-						snapPath = null
-						Global.state = 0
-						emit_signal("toggle_action")
-						_deselect_active_unit(false)
-					3: 
-						Global.state = previousState
-						emit_signal("toggle_prof")
-					4, 6:
-						snapPath = null
-						Global.state = 2
-						unitOverlay.clear()
-						emit_signal("toggle_action")
-					
-					5: 
-						Global.state = 4
-						cursor.visible = true
-						attack_targeting(activeUnit)
-						emit_signal("target_focused")
-					7:
-#						snapPath = null
-						Global.state = 2
-#						cursor.visible = true
-#						unitOverlay.clear()
-						emit_signal("toggle_skills")
-					8: return
-						
-			elif event.is_action_pressed("ui_scroll_left"):
-				pass
-			elif event.is_action_pressed("ui_scroll_right"):
-				pass
-			var shouldMove := event.is_pressed()
-			if event.is_echo():
-				shouldMove = shouldMove and cTimer.is_stopped()
-				cTimer.wait_time -= 0.05
-				cTimer.wait_time = clampf(cTimer.wait_time, 0.05, 0.2)
-			elif !event.is_echo():
-				cTimer.wait_time = uiCooldown
-			if not shouldMove:
-				return
-			if event.is_action("ui_right"):
-				match Global.state: 
-					0, 1, 3, 4, 6: cursorCell += Vector2.RIGHT
-					2: return
-					8: return
-			elif event.is_action("ui_up"):
-				match Global.state: 
-					0, 1, 3, 4, 6: cursorCell += (Vector2.UP)
-					2: return
-					8: return
-			elif event.is_action("ui_left"):
-				match Global.state: 
-					0, 1, 3, 4, 6: cursorCell += (Vector2.LEFT)
-					2: return
-					8: return
-			elif event.is_action("ui_down"):
-				match Global.state: 
-					0, 1, 3, 4, 6: cursorCell += (Vector2.DOWN)
-					2: return
-					8: return
-			else: return
-			
+func gb_mouse_motion(event):
+	var cameraScale = gameCamera.zoom
+	var cursorPos = cursor.position
+	var mouseDelta = event.relative * mouseSens
+	var mousePos = gameCamera.get_local_mouse_position()
+	
+	cursorPos += mouseDelta 
+	
+	mouseDelta = null
+	cursorCell += Vector2(currMap.local_to_map(mousePos))
+	
+func gb_mouse_pressed():
+	cursor_accept_pressed(currMap.map_to_local(cursorCell))
+
 ## Returns `true` if the cell is occupied by a unit
 func is_occupied(cell: Vector2) -> bool:
 		return units.has(cell)
@@ -460,9 +347,6 @@ func _select_unit(cell: Vector2) -> void:
 	walkable_rect = get_region_rect(walkableCells)
 	unitOverlay.draw(walkableCells)
 #	set_region_border(walkableCells)
-	
-	
-
 
 
 func _deselect_active_unit(confirm) -> void:
@@ -470,8 +354,7 @@ func _deselect_active_unit(confirm) -> void:
 	#confirm is used to let the game know if this is a temporary movement(can be canceled by player) 
 	#or a confirmed move so it knows to retain previous position or update the units dictionary
 
-#	print(confirm)
-#	print(units)
+
 	if activeUnit != null and units.has(activeUnit.cell):
 		if !confirm: 
 			units.erase(activeUnit.cell)
@@ -482,7 +365,7 @@ func _deselect_active_unit(confirm) -> void:
 			var new_cell = activeUnit.cell
 			activeUnit.originCell = activeUnit.cell
 			units[new_cell] = activeUnit
-			gameState.add_acted(activeUnit)
+			boardState.add_acted(activeUnit)
 			activeUnit.set_acted(true)
 	#	#print(units)
 		activeUnit.is_selected = false
@@ -518,32 +401,148 @@ func _clear_active_unit() -> void:
 	activeUnit = null
 	walkableCells.clear()
 
+func select_cell(): #DEFAULT STATE: If a cell has a valid unit, selects it
+	if !activeUnit and is_occupied(cursorCell) and focusUnit.is_in_group("Player") and !focusUnit.acted:
+		_select_unit(cursorCell)
+		mainCon.previousState = mainCon.state
+		mainCon.state = GameState.GB_SELECTED
+	else: 
+		mainCon.previousState = mainCon.state
+		mainCon.state = GameState.GB_ACTION_MENU
+		emit_signal("toggle_action", false, true)
+		
+func select_destination(): #SELECTED STATE
+	if !is_occupied(cursorCell) and walkableCells.has(cursorCell):
+		mainCon.previousState = mainCon.state
+		mainCon.state = GameState.GB_ACTION_MENU
+		_move_active_unit(cursorCell)
+	elif cursorCell == activeUnit.cell:
+		mainCon.previousState = mainCon.state
+		mainCon.state = GameState.GB_ACTION_MENU
+		emit_signal("toggle_action")
 
+func toggle_unit_profile(): 
+	if mainCon.state == GameState.GB_PROFILE:
+		var stateStore = mainCon.previousState
+		mainCon.previousState = mainCon.state
+		mainCon.state = stateStore
+		emit_signal("toggle_prof")
+	elif is_occupied(cursorCell):
+		mainCon.previousState = mainCon.state
+		mainCon.state = GameState.GB_PROFILE
+		emit_signal("toggle_prof")
+	else: toggle_extra_info()
+	
+func request_deselect():
+	wipe_region()
+	if Global.actionMenu:
+		emit_signal("toggle_action")
+	unitOverlay.clear()
+	mainCon.state = GameState.GB_DEFAULT
+	_deselect_active_unit(false)
+
+func menu_step_back():
+	match mainCon.previousState:
+		GameState.GB_ACTION_MENU:
+			if mainCon.state == GameState.GB_SKILL_MENU:
+				emit_signal("toggle_skills")
+			elif mainCon.state == GameState.GB_ATTACK_TARGETING:
+				emit_signal("toggle_action")
+			mainCon.previousState = mainCon.state
+			mainCon.state = GameState.GB_ACTION_MENU
+			wipe_region()
+			cursorCell = activeUnit.cell
+	
+	
+func attack_target_selected():
+	var friendly = false
+	var team = null
+	if activeUnit.is_in_group("Player"):
+		team = "Player"
+	if activeUnit.is_in_group("Enemy"):
+		team = "Enemy"
+	if focusUnit.is_in_group(team):
+		friendly = true
+	if is_occupied(cursorCell) and !friendly:
+		mainCon.previousState = mainCon.state
+		mainCon.state = GameState.GB_COMBAT_FORECAST
+#				$Cursor.visible = false
+		grab_target(cursorCell)
+		
+func skill_target_selected(): #find way to simplify and merge with attack targeting. See your notes, you fucking schizo
+	var friendly = false
+	var team = null
+	var targeting = activeSkill.Target
+	if activeUnit.is_in_group("Player"):
+		team = "Player"
+	if activeUnit.is_in_group("Enemy"):
+		team = "Enemy"
+	match targeting:
+		"Self":
+			if is_occupied(cursorCell) and activeUnit == focusUnit:
+				mainCon.state = GameState.GB_COMBAT_FORECAST
+#						$Cursor.visible = false
+				grab_target(cursorCell, true, activeSkill)
+		"Enemy":
+			if focusUnit.is_in_group(team):
+				friendly = true
+			if is_occupied(cursorCell) and !friendly:
+				mainCon.state = GameState.GB_COMBAT_FORECAST
+#						$Cursor.visible = false
+				grab_target(cursorCell, true, activeSkill)
+		"Ally":
+			if focusUnit.is_in_group(team):
+				friendly = true
+			if is_occupied(cursorCell) and friendly and activeUnit != focusUnit:
+				mainCon.state = GameState.GB_COMBAT_FORECAST
+#						$Cursor.visible = false
+				grab_target(cursorCell, true, activeSkill)
+		"Self+":
+			if focusUnit.is_in_group(team):
+				friendly = true
+			if is_occupied(cursorCell) and friendly:
+				mainCon.state = GameState.GB_COMBAT_FORECAST
+#						$Cursor.visible = false
+				grab_target(cursorCell, true, activeSkill)
+		"Other":
+			if is_occupied(cursorCell) and activeUnit != focusUnit:
+				mainCon.state = GameState.GB_COMBAT_FORECAST
+#						$Cursor.visible = false
+				grab_target(cursorCell, true, activeSkill)
+
+func return_targeting():
+	emit_signal("target_focused")
+	_on_gui_manager_action_selected(mainCon.previousState, lastSkill)
+			
 func cursor_accept_pressed(cell: Vector2) -> void:
 	# Controls what happens when an element is selected by the player based on input Global.state
 	#Includes: Selecting Unit, Destinations; Targets
 	#Currently also checks if selection is valid
 	
+	
 	cell = currMap.local_to_map(cell)
 #	print(cell, activeUnit)
-	match Global.state:
-		0: 
+	match mainCon.state:
+		GameState.GB_DEFAULT: 
 			if !activeUnit and is_occupied(cell) and focusUnit.is_in_group("Player") and !focusUnit.acted:
-				Global.state = 1
+				
+				mainCon.state = GameState.GB_SELECTED
 				_select_unit(cell)
 			else: 
-				Global.state = 2
+				mainCon.previousState = mainCon.state
+				mainCon.state = GameState.GB_ACTION_MENU
 				emit_signal("toggle_action", false, true)
-		1: 
+		GameState.GB_SELECTED: 
 			if !is_occupied(cell) and walkableCells.has(cell):
-				Global.state = 2
+				mainCon.state = GameState.GB_ACTION_MENU
 				_move_active_unit(cell)
 			elif cell == activeUnit.cell:
-				Global.state = 2
+				mainCon.previousState = mainCon.state
+				mainCon.state = GameState.GB_ACTION_MENU
 				emit_signal("toggle_action")
 			else:
 				return
-		4: #Attacks
+		GameState.GB_ATTACK_TARGETING: #Attacks
 			var friendly = false
 			var team = null
 			if activeUnit.is_in_group("Player"):
@@ -553,19 +552,20 @@ func cursor_accept_pressed(cell: Vector2) -> void:
 			if focusUnit.is_in_group(team):
 				friendly = true
 			if is_occupied(cell) and !friendly:
-				Global.state = 5
+				mainCon.previousState = mainCon.state
+				mainCon.state = GameState.GB_COMBAT_FORECAST
 #				$Cursor.visible = false
 				grab_target(cell)
 				
 				
 			else: return
-		5:
+		GameState.GB_COMBAT_FORECAST:
 			return
 #			Global.state = 0
 #			combatManager.start_the_justice(activeUnit, focusUnit)
 #			emit_signal("target_focused")
 #			combat_sequence(activeUnit, focusUnit)
-		6: 
+		GameState.GB_SKILL_TARGETING: 
 			var friendly = false
 			var team = null
 			var targeting = activeSkill.Target
@@ -576,56 +576,72 @@ func cursor_accept_pressed(cell: Vector2) -> void:
 			match targeting:
 				"Self":
 					if is_occupied(cell) and activeUnit == focusUnit:
-						Global.state = 5
+						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
 						grab_target(cell, true, activeSkill)
 				"Enemy":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and !friendly:
-						Global.state = 5
+						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
 						grab_target(cell, true, activeSkill)
 				"Ally":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and friendly and activeUnit != focusUnit:
-						Global.state = 5
+						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
 						grab_target(cell, true, activeSkill)
 				"Self+":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and friendly:
-						Global.state = 5
+						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
 						grab_target(cell, true, activeSkill)
 				"Other":
 					if is_occupied(cell) and activeUnit != focusUnit:
-						Global.state = 5
+						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
 						grab_target(cell, true, activeSkill)
 	
 
-#
+
+
 func _on_cursor_moved(new_cell: Vector2) -> void:
 	# Updates the dynamic visual path if there's an active and selected unit.
 #	print(currMap.map_to_local(new_cell))
+	var drawPath = false
+	if units.has(new_cell) and units[new_cell] == null: #safety measure, catches any uncleared cell storage that slips through the cracks
+		units.erase(new_cell)
+	if is_occupied(new_cell): #let's the game know what unit is the player's focus, and remains as such until a new unit is focused.
+		focusUnit = units[new_cell]
 	
-	if units.has(new_cell) and units[new_cell] == null:
-					units.erase(new_cell)
-	if is_occupied(new_cell):
-			focusUnit = units[new_cell]
-	
-	match Global.state:
-		1:
-			if new_cell == activeUnit.cell:
-				unitPath.clear()
-			if activeUnit and activeUnit.is_selected:
-				if !walkableCells.has(new_cell):
-					return
-				var path = get_path_to_cell(activeUnit.cell, new_cell, activeUnit.moveType)
-				unitPath.draw(path)
+	if activeUnit and activeUnit.is_selected:
+		drawPath = true
+		
+	if !drawPath:
+		return
+	elif !walkableCells.has(new_cell):
+		return
+	elif new_cell == activeUnit.cell:
+		unitPath.clear()
+	else:
+		var path = get_path_to_cell(activeUnit.cell, new_cell, activeUnit.moveType)
+		unitPath.draw(path)
+#	match mainCon.state:
+#		mainCon.GameState.GB_SELECTED:
+#			if new_cell == activeUnit.cell:
+#				unitPath.clear()
+#			if activeUnit and activeUnit.is_selected:
+#				if !walkableCells.has(new_cell):
+#					return
+#				var path = get_path_to_cell(activeUnit.cell, new_cell, activeUnit.moveType)
+#				unitPath.draw(path)
+
+func on_directional_press(direction):
+		cursorCell += direction
 
 func on_warp_selected(actor, target, range):
 	
@@ -660,14 +676,14 @@ func attack_targeting(unit: Unit, usingSkill = false, skill = null, rangeOnly = 
 	var invalid = _flood_fill(unit.cell, minRange, unit.moveType, false, true)
 	path = hexStar.trim_path(path, invalid)
 	snapPath = path
+	bump_cursor()
 	unitOverlay.draw_attack(path)
 	unitPath.stop()
 	
 
 func combat_sequence(a,t):
 	#Place holder for when combat has a visual component, currently handles end of combat duties that would occur right after
-	Global.state = 0
-	snapPath = null
+	wipe_region()
 	_deselect_active_unit(true)
 	a.update_stats()
 	t.update_stats()
@@ -678,23 +694,24 @@ func combat_sequence(a,t):
 func _on_gui_manager_action_selected(selection, skill = null):
 	#Controls what to do based on the action selected, GUIManager passes that information via Signal
 #	var cell = cursor.cell
+	lastSkill = skill
 	match selection:
-		0: 
-			previousState = Global.state
-			Global.state = 4
+		GameState.GB_ATTACK_TARGETING: 
+			mainCon.previousState = mainCon.state
+			mainCon.state = GameState.GB_ATTACK_TARGETING
 			attack_targeting(activeUnit)
-		1: 
-			previousState = Global.state
-			Global.state = 6
+		GameState.GB_SKILL_TARGETING: 
+			mainCon.previousState = mainCon.state
+			mainCon.state = GameState.GB_SKILL_TARGETING
 			attack_targeting(activeUnit, true, skill)
-		2: 
-			previousState = Global.state
-			Global.state = 0
+		"Wait": 
+			mainCon.previousState = mainCon.state
+			mainCon.state = GameState.DEFAULT
 			_deselect_active_unit(true)
 			turn_change()
 #			Input.warp_mouse(currMap.map_to_local(activeUnit.position))
-		3:
-			Global.state = 8
+		"End":
+			mainCon.state = GameState.GB_ROUND_END
 			earlyEnd = true
 			turn_change()
 			
@@ -721,6 +738,30 @@ func region_clamp(grid_position: Vector2) -> Vector2:
 		out.x = clamp(out.x, 0, mapSize.x - 1.0)
 		out.y = clamp(out.y, 0, mapSize.y - 1.0)
 	return out
+	
+func wipe_region():
+	snapPath = null
+	
+func bump_cursor():
+	var seek = false
+	var bumpTo
+	var shortest = 1000
+	var bumpFound = false
+	if !snapPath.has(cursorCell):
+		seek = true
+	if seek:
+		for cell in snapPath:
+			var distance = hexStar.find_distance(cursorCell, cell, "Foot", true)
+			if units.has(cell) and distance < shortest:
+				bumpTo = cell
+				shortest = distance
+				bumpFound = true
+				
+	if seek and bumpFound:
+		cursorCell = bumpTo
+	elif seek:
+		cursorCell = snapPath[0]
+	
 	
 func free_up():	#Free Up, worst show on television
 	#Not really used atm, exists for when a map is completed
@@ -754,7 +795,7 @@ func _on_menu_cursor_wep_updated():
 func turn_change():
 	#change turn
 #	ai.rein_units(units)
-	gameState.update_unit_data(units)
+	boardState.update_unit_data(units)
 	turnOrder.pop_front()
 	turnCounter += 1
 	if turnOrder.size() == 0:
@@ -772,7 +813,7 @@ func turn_change():
 #	print(turnCounter, " ", turnOrder[0][1], " aiTurn:", aiTurn, "
 #	", turnOrder)
 	round_duration_tick()
-	gameState.update_remaining_turns(turnOrder)
+	boardState.update_remaining_turns(turnOrder)
 	
 	if Global.gameTime >= 24 - Global.timeFactor:
 		var timeMod = Global.gameTime - 24
@@ -809,7 +850,7 @@ func round_change():
 				turnOrder.append([false, "Player"])
 			false: 
 				turnOrder.append([true, "Enemy"])
-	gameState.clear_acted()
+	boardState.clear_acted()
 #	print(units)
 	initialize_turns(turnOrder)
 	
@@ -819,7 +860,7 @@ func initialize_turns(turns):
 	turnOrder = turnSort.sort_turns(turns)
 	aiTurn = false
 	turnTest.self_modulate = Color(0,0,1)
-	gameState.update_remaining_turns(turnOrder)
+	boardState.update_remaining_turns(turnOrder)
 #	print(turnOrder)
 
 func set_next_acted():
@@ -832,8 +873,8 @@ func set_next_acted():
 func start_ai_turn():
 	#Gets the ball rolling for the AI to take actions
 	init_hexStar_terrain(false)
-	if gameState.enemy.size() > 0:
-		var result = ai.get_move(gameState)
+	if boardState.enemy.size() > 0:
+		var result = ai.get_move(boardState)
 		
 		
 		match result["Best Move"]["action"]:
@@ -862,7 +903,7 @@ func ai_attack(result):
 	combatManager.start_the_justice(actor,target)
 #	print(activeUnit)
 	
-	gameState.add_acted(activeUnit)
+	boardState.add_acted(activeUnit)
 	activeUnit.set_acted(true)
 	combat_sequence(activeUnit, focusUnit)
 	
@@ -874,7 +915,7 @@ func ai_move(result):
 	if actor.cell != destination:
 		_move_active_unit(destination, true, path)
 		await self.aimove_finished
-	gameState.add_acted(actor)
+	boardState.add_acted(actor)
 	actor.set_acted(true)
 	_deselect_active_unit(true)
 	turn_change()
@@ -882,7 +923,7 @@ func ai_move(result):
 func ai_wait(result):
 	var actor = result["Unit"]
 	_select_unit(actor.cell)
-	gameState.add_acted(actor)
+	boardState.add_acted(actor)
 	activeUnit.set_acted(true)
 	_deselect_active_unit(true)
 	turn_change()
@@ -893,12 +934,13 @@ func _on_gui_manager_start_the_justice():
 	#Sends necessary data to the combat manager, then initiates the visual representation after results are returned
 	#Currently does not return the results, nor pass them due to having no implemented visual representation
 	#next step to this will be implementing an ingame text read out of combat to set up framework without need for actual animations yet
-	Global.state = 0
+	mainCon.state = GameState.LOADING
 	combatManager.start_the_justice(activeUnit, focusUnit)
 	emit_signal("target_focused")
-	gameState.add_acted(activeUnit)
+	boardState.add_acted(activeUnit)
 	activeUnit.set_acted(true)
 	combat_sequence(activeUnit, focusUnit)
+	mainCon.state = GameState.GB_DEFAULT
 
 
 func _on_combat_manager_combat_resolved():

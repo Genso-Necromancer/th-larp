@@ -37,14 +37,18 @@ class_name GUIManager
 @onready var clockLabel = $HUD/Clock
 @onready var timeLb = $DEBUG/timeBox/time
 @onready var timeFactorLb = $DEBUG/timeBox/timeFactor
+@onready var canvasLayer = get_parent()
+@onready var mainCon = canvasLayer.get_parent()
+#states
+@onready var GameState = mainCon.GameState
 var currentButton: Button = null
 #@onready var _timer: Timer = $Timer
 
 var windowMode = DisplayServer.window_get_mode()
-var av = Global.actionMenu:
-	set(value):
-		av = value
-		Global.actionMenu = value
+#var Global.actionMenu = Global.actionMenu:
+#	set(value):
+#		Global.actionMenu = value
+#		Global.actionMenu = value
 var pv = Global.profileMenu:
 	set(value):
 		pv = value
@@ -53,6 +57,7 @@ var cf = Global.combatForecast:
 	set(value):
 		cf = value
 		Global.combatForecast = value
+
 
 
 var mouseSensitivity = 0.2
@@ -70,6 +75,7 @@ func _ready():
 func initialize():
 #	_timer.wait_time = 0.1
 	ActionC.visible = false
+	Global.actionMenu = ActionC.visible
 	$Profile.visible = false
 	menu_cursor.visible = false
 	foreCast.visible = false
@@ -132,7 +138,7 @@ func _process(_delta):
 
 
 func _on_atk_btn_pressed():
-	var selection = 0
+	var selection = GameState.GB_ATTACK_TARGETING
 	accept_event()
 	menu_cursor.visible= false
 	emit_signal("actionSelected", selection)
@@ -143,18 +149,19 @@ func _on_skl_btn_pressed():
 	
 	accept_event()
 	open_skills()
-	Global.state = 7
+	mainCon.previousState = mainCon.state
+	mainCon.state = GameState.GB_SKILL_MENU
 #	_on_gameboard_toggle_action()
 
 
 func _on_wait_btn_pressed():
-	var selection = 2
+	var selection = "Wait"
 	accept_event()
 	_on_gameboard_toggle_action()
 	emit_signal("actionSelected", selection)
 	
 func _on_end_btn_pressed():
-	var selection = 3
+	var selection = "End"
 	accept_event()
 	_on_gameboard_toggle_action()
 	emit_signal("actionSelected", selection)
@@ -165,9 +172,10 @@ func _on_gameboard_toggle_action(skillClose = false, genericMenu = false):
 	var actor = Global.activeUnit
 	if ActionC.visible == false or skillClose:
 		check_connect()
-		ActionC.visible= true
+		ActionC.visible = true
+		Global.actionMenu = ActionC.visible
 		menu_cursor.state = 2
-		menu_cursor.visible= true
+		menu_cursor.visible = true
 		
 		if actor != null and actor.unitData.EQUIP == "NONE":
 			AtkB.disabled = true
@@ -208,6 +216,7 @@ func _on_gameboard_toggle_action(skillClose = false, genericMenu = false):
 	else:
 		SklB.disabled = true
 		ActionC.visible= false
+		Global.actionMenu = ActionC.visible
 		menu_cursor.state = 0
 		menu_cursor.visible= false
 		weaponBox.visible = false
@@ -397,6 +406,7 @@ func open_weapons(distance: int = 0):
 			if first == null and !b.is_disabled():
 				first = b
 				
+				
 		weaponBox.visible = true
 		menu_cursor.menu_parent = $ActionMenu/m/m/c/v
 		menu_cursor.update_cursor(0)
@@ -404,11 +414,13 @@ func open_weapons(distance: int = 0):
 		menu_cursor.state = 1
 		menu_cursor.visible= true
 		first.grab_focus()
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	elif weaponBox.visible:
 		clearInventoryButtons()
 		menu_cursor.menu_parent = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer
 		menu_cursor.state = 0
 		weaponBox.visible = false
+		Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
 		
 func weapon_selected(index):
 	var wepData 
@@ -457,11 +469,13 @@ func open_skills():
 		menu_cursor.state = 2
 		menu_cursor.visible= true
 		first.grab_focus()
+		Global.skillMenu = true
 	elif weaponBox.visible:
 		clearInventoryButtons()
 		menu_cursor.menu_parent = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer
 		menu_cursor.state = 0
 		weaponBox.visible = false
+		Global.skillMenu = false
 		
 func _on_gameboard_toggle_skills():
 	accept_event()
@@ -474,7 +488,7 @@ func skill_selected(index):
 #	var wepData = UnitData.wepData
 	var skillData = UnitData.skillData
 	var skill = skillData[index]
-	var selection = 1
+	var selection = GameState.GB_SKILL_TARGETING
 	accept_event()
 	emit_signal("actionSelected", selection, skill)
 	open_skills()

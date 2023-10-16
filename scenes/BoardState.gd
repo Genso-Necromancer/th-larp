@@ -1,5 +1,5 @@
 extends Node
-class_name GameState
+class_name BoardState
 
 var terrainData: Array
 var player: Array

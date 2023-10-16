@@ -1,20 +1,10 @@
 extends Node
-enum GameState {
-	DEFAULT,
-	SELECTED,
-	ACTION_MENU,
-	PROFILE,
-	ATTACK_TARGETING,
-	COMBAT_FORECAST,
-	SKILL_TARGETING,
-	SKILL_MENU,
-	ROUND_END,
-	WARP
-}
+
 
 
 var profileMenu = false
 var actionMenu = false
+var skillMenu = false
 var combatForecast = false
 var focusUnit: Unit
 var activeUnit: Unit
@@ -24,7 +14,9 @@ var timeFactor = 1
 var trueTimeFactor = 1
 var rotationFactor = 15
 var rng
-var state: int = 0
+
+
+
 var slamage = 5
 #combat variables
 var attacker = {

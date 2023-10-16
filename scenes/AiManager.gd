@@ -6,7 +6,7 @@ var terrainData
 var unitData = UnitData.unitData
 var aHex : AHexGrid2D
 var threatArray = []
-var gameState
+var BoardState
 var lvCap = 20
 var terrainMax = 2
 var terrainMin = 0
@@ -34,7 +34,7 @@ func init_ai():
 	aHex = gameBoard.hexStar
 
 
-func get_move(state: GameState):
+func get_move(state: BoardState):
 
 	playerValues.clear()
 	enemyValues.clear()
@@ -47,7 +47,7 @@ func get_move(state: GameState):
 	var moves = find_moves(state)
 	return moves
 
-func find_moves(state: GameState):
+func find_moves(state: BoardState):
 	var validMoves = []
 	
 	for unit in state.enemy:

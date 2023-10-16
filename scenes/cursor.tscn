@@ -14,10 +14,8 @@ scale = Vector2(4, 4)
 texture = ExtResource("1_k2b8o")
 offset = Vector2(-16, 0)
 
-[node name="Timer" type="Timer" parent="."]
-wait_time = 0.1
-one_shot = true
-
 [node name="Sprite2D2" type="Sprite2D" parent="."]
 z_index = -4
 texture = ExtResource("3_h7uqh")
+
+[node name="Timer" type="Timer" parent="."]
