@@ -360,7 +360,7 @@ func update_stats():
 		return
 	lifeBar.max_value = baseStats.LIFE
 	lifeBar.value = activeStats.CLIFE
-	if activeStats["CLIFE"] == 0:
+	if activeStats["CLIFE"] <= 0:
 		run_death()
 	#######
 		

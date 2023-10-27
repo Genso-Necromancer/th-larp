@@ -22,7 +22,7 @@ func setup(newSlaves):
 	timer = Timer.new()
 	timer.one_shot = true
 	add_child(timer)
-	print(slaves)
+#	print(slaves)
 
 func mouse_motion(event):
 	pass

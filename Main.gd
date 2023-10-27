@@ -35,11 +35,15 @@ func _process(delta):
 	
 #note on 1 tick delay: I see this not being necessary down the line when the game doesn't go straight to a test map. It is also simple to remove the 1 tick delay once it's no longer needed without rewriting the foundation.
 
+#func _ready():
+#	var startScene = preload("res://scenes/start.tscn").instantiate()
+#	load_scene(startScene)
+#
+#func load_scene(scene):
+#	add_child(scene)
+
 func _init(): #Occurs when game first launches, sets to loading state
 	set_new_state(GameState.LOADING)
-	
-func _ready(): #needed for @onready?? I dunno lol.
-	pass
 	
 func _unhandled_input(event: InputEvent) -> void: #Main picks up the inputs, then directs them to the currently active state for processing.
 	if event.is_action_pressed("ui_snap"):
