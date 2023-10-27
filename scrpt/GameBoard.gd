@@ -9,10 +9,11 @@ extends Node2D
 #signals sent from here
 signal toggle_action
 signal toggle_prof
+signal toggle_skills
 signal target_focused
 signal aimove_finished
 signal turn_changed
-signal toggle_skills
+
 signal gb_ready
 
 # units is used to map units to it's hex coordinate
@@ -38,7 +39,8 @@ var terrainData = []
 var conditions: Array
 var lastSkill
 
-@onready var mainCon = get_parent()
+@onready var parent = get_parent()
+@onready var mainCon = parent.get_parent()
 
 #states
 @onready var GameState = mainCon.GameState
@@ -85,8 +87,8 @@ var HpBarVis = true
 @onready var cursor: Cursor = $Cursor
 @onready var combatManager : CombatManager = $CombatManager
 @onready var turnSort : TurnSort = $TurnSort
-@onready var turnTest = $Control/TurnLight
-@onready var boardState = $BoardStateCompiler
+#@onready var turnTest = $Control/TurnLight
+@onready var boardState: BoardState = $BoardState
 @export var uiCooldown := 0.2
 @onready var gameCamera = $Cursor/Camera2D
 @onready var ai = $AiManager
@@ -106,22 +108,11 @@ var cursorCell := Vector2.ZERO:
 
 
 func _ready() -> void:
+	pass
+	
+func load_new_map(map):
+	add_child(map)
 	_reinitialize()
-	initialize_turns(turnOrder)
-	init_gamestate()
-	combatManager.init_manager()
-	ai.init_ai()
-#	ai.rein_units(units)
-#	ai.init_mapdata(terrainData)
-	for unit in units:
-		if units[unit].unitName == "Remilia Scarlet":
-			cursorCell = units[unit].cell
-#	cTimer.wait_time = uiCooldown
-	var grabber = units.keys()
-	focusUnit = units[grabber[0]]
-#	print(units)
-	Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED_HIDDEN)
-	emit_signal("gb_ready", mainCon.GameState.GB_DEFAULT)
 	
 	
 func _reinitialize() -> void:
@@ -171,6 +162,22 @@ func _reinitialize() -> void:
 	#set time
 	Global.gameTime = currMap.gameTime
 	checkSun()
+	initialize_turns(turnOrder)
+	init_gamestate()
+	combatManager.init_manager()
+	ai.init_ai()
+#	ai.rein_units(units)
+#	ai.init_mapdata(terrainData)
+	for unit in units:
+		if units[unit].unitName == "Remilia Scarlet":
+			cursorCell = units[unit].cell
+#	cTimer.wait_time = uiCooldown
+	var grabber = units.keys()
+	focusUnit = units[grabber[0]]
+#	print(units)
+	Input.set_mouse_mode(Input.MOUSE_MODE_CONFINED_HIDDEN)
+	emit_signal("gb_ready", mainCon.GameState.GB_DEFAULT)
+	
 	
 func connect_general_signals():
 	combatManager.warp_selected.connect(self.on_warp_selected)
@@ -674,7 +681,8 @@ func attack_targeting(unit: Unit, usingSkill = false, skill = null, rangeOnly = 
 	minRange = minRange - 1
 	minRange = clampi(minRange, 0, 1000)
 	var invalid = _flood_fill(unit.cell, minRange, unit.moveType, false, true)
-	path = hexStar.trim_path(path, invalid)
+	if path.size() != 1:
+		path = hexStar.trim_path(path, invalid)
 	snapPath = path
 	bump_cursor()
 	unitOverlay.draw_attack(path)
@@ -706,7 +714,7 @@ func _on_gui_manager_action_selected(selection, skill = null):
 			attack_targeting(activeUnit, true, skill)
 		"Wait": 
 			mainCon.previousState = mainCon.state
-			mainCon.state = GameState.DEFAULT
+			mainCon.state = GameState.GB_DEFAULT
 			_deselect_active_unit(true)
 			turn_change()
 #			Input.warp_mouse(currMap.map_to_local(activeUnit.position))
@@ -801,14 +809,16 @@ func turn_change():
 	if turnOrder.size() == 0:
 		round_change()
 	if turnOrder[0][1] == "Enemy":
+		mainCon.state = GameState.LOADING
 		aiTurn = true
 		print("Enemy Turn")
-		turnTest.self_modulate = Color(1,0,0)
+#		turnTest.self_modulate = Color(1,0,0)
 		cursor.visible = false
 	elif turnOrder[0][1] == "Player":	
+		mainCon.state = GameState.GB_DEFAULT
 		aiTurn = false
 		print("Player Turn")
-		turnTest.self_modulate = Color(0,0,1)
+#		turnTest.self_modulate = Color(0,0,1)
 		cursor.visible = true
 #	print(turnCounter, " ", turnOrder[0][1], " aiTurn:", aiTurn, "
 #	", turnOrder)
@@ -859,7 +869,7 @@ func initialize_turns(turns):
 #	turnOrder.clear()
 	turnOrder = turnSort.sort_turns(turns)
 	aiTurn = false
-	turnTest.self_modulate = Color(0,0,1)
+#	turnTest.self_modulate = Color(0,0,1)
 	boardState.update_remaining_turns(turnOrder)
 #	print(turnOrder)
 

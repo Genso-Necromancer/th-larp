@@ -12,6 +12,9 @@ func setup(newSlaves):
 #	var i = 0
 	if timer:
 		timer.queue_free()
+	timer = Timer.new()
+	timer.one_shot = true
+	add_child(timer)
 	self.slaves.clear()
 	if newSlaves == null or newSlaves.size() <= 0:
 		print("NO NEW SLAVES")
@@ -19,9 +22,7 @@ func setup(newSlaves):
 	for slave in newSlaves:
 		self.slaves.append(slave)
 #		i += 1
-	timer = Timer.new()
-	timer.one_shot = true
-	add_child(timer)
+
 #	print(slaves)
 
 func mouse_motion(event):

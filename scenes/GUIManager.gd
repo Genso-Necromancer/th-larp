@@ -37,8 +37,10 @@ class_name GUIManager
 @onready var clockLabel = $HUD/Clock
 @onready var timeLb = $DEBUG/timeBox/time
 @onready var timeFactorLb = $DEBUG/timeBox/timeFactor
-@onready var canvasLayer = get_parent()
-@onready var mainCon = canvasLayer.get_parent()
+@onready var parent = get_parent()
+@onready var GRANDDAD = parent.get_parent()
+@onready var mainCon = GRANDDAD.get_parent()
+
 #states
 @onready var GameState = mainCon.GameState
 var currentButton: Button = null
@@ -66,25 +68,24 @@ var profFocus
 signal actionSelected(selection)
 signal gui_closed
 signal startTheJustice
+signal guiReady
 
 func _ready():
-	initialize()
-	
-	
-	
-func initialize():
-#	_timer.wait_time = 0.1
 	ActionC.visible = false
 	Global.actionMenu = ActionC.visible
 	$Profile.visible = false
 	menu_cursor.visible = false
 	foreCast.visible = false
 	weaponBox.visible = false
+	
+	
+func reinitialize():
 	if !menu_cursor.wep_updated.is_connected(self.update_forecast):
 		menu_cursor.wep_updated.connect(self.update_forecast)
 	var timeRotation = Global.gameTime * 15
 	sunDial.rotation_degrees = timeRotation
 	clockLabel.set_text(str(Global.gameTime))
+
 	
 
 func _process(_delta):
@@ -517,10 +518,7 @@ func _on_gameboard_turn_changed():
 #	else: sunDial.rotation_degrees += sunRot
 	sunDial.rotation_degrees += sunRot
 	clockLabel.set_text(str(Global.gameTime))
+	
 
-
-
-
-
-
-
+func _on_gameboard_gb_ready(_state):
+	reinitialize()

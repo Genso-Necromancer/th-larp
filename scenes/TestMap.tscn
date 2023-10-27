@@ -129,6 +129,7 @@ sources/3 = SubResource("TileSetAtlasSource_d410y")
 sources/5 = SubResource("TileSetAtlasSource_bco8r")
 
 [node name="TestMap" type="TileMap"]
+z_index = -2
 y_sort_enabled = true
 tile_set = SubResource("1")
 format = 2

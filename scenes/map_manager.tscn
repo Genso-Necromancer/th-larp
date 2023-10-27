@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://dtt1es8lctsrv"]
+
+[ext_resource type="PackedScene" uid="uid://cmvmjk0jj7dam" path="res://scenes/Gameboard.tscn" id="1_1o3kx"]
+[ext_resource type="PackedScene" uid="uid://r6wtvva5qput" path="res://scenes/GUIManager.tscn" id="2_3ng14"]
+
+[node name="mapManager" type="Node"]
+
+[node name="Gameboard" parent="." instance=ExtResource("1_1o3kx")]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="GUIManager" parent="CanvasLayer" instance=ExtResource("2_3ng14")]
+
+[connection signal="gb_ready" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_gb_ready"]
+[connection signal="toggle_action" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_action"]
+[connection signal="toggle_prof" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_prof"]
+[connection signal="toggle_skills" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_skills"]
+[connection signal="turn_changed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_turn_changed"]
+[connection signal="actionSelected" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_action_selected"]
+
+[editable path="Gameboard"]
+[editable path="CanvasLayer/GUIManager"]
+[editable path="CanvasLayer/GUIManager/ActionMenu"]
+[editable path="CanvasLayer/GUIManager/CombatForecast"]
+[editable path="CanvasLayer/GUIManager/Profile"]
+[editable path="CanvasLayer/GUIManager/HUD"]

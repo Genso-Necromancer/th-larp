@@ -10,10 +10,12 @@ enum GameState {
 	GB_SKILL_TARGETING,
 	GB_SKILL_MENU,
 	GB_ROUND_END,
-	GB_WARP
+	GB_WARP,
+	START
 } #state tags for easy swapping
 
-@onready var gameBoard = $Gameboard #temporarily grabbing Gameboard this way as there is nothing that swaps scenes yet. When scenes can be swapped, defining this would occur during scene swap.
+var gameBoard
+var newSlave
 var activeState
 var state:= GameState.LOADING: #when this variable is changed to a valid state tag, it does all the work in properly changing the state to streamline coding. See set_new_state function for more.
 	set(value):
@@ -27,20 +29,27 @@ var previousState
 var newState
 var shouldChangeState = false
 
-func _process(delta):
-	if shouldChangeState: #delay the change of state by 1 tick. If this is not done, values could be passed as "null", as their definitions have not updated yet. This is a temporary work around due to the skeletal nature of the game currently.
-#		shouldChangeState = false
-		delayed_state(newState)
+#func _process(delta):
+#	if shouldChangeState: #delay the change of state by 1 tick. If this is not done, values could be passed as "null", as their definitions have not updated yet. This is a temporary work around due to the skeletal nature of the game currently.
+##		shouldChangeState = false
+#		delayed_state(newState)
 		
 	
 #note on 1 tick delay: I see this not being necessary down the line when the game doesn't go straight to a test map. It is also simple to remove the 1 tick delay once it's no longer needed without rewriting the foundation.
 
-#func _ready():
-#	var startScene = preload("res://scenes/start.tscn").instantiate()
-#	load_scene(startScene)
-#
-#func load_scene(scene):
-#	add_child(scene)
+func _ready():
+	var startScene = preload("res://scenes/start.tscn").instantiate()
+#	gameBoard.queue_free()
+#	gui.queue_free()
+	load_scene(startScene)
+	
+
+	
+func load_scene(scene):
+	add_child(scene)
+	
+func load_map(map):
+	gameBoard.load_new_map(map)
 
 func _init(): #Occurs when game first launches, sets to loading state
 	set_new_state(GameState.LOADING)
@@ -97,13 +106,6 @@ func check_valid_state(value):
 	else: return false
 
 func change_state(value): #This is necessary for the 1 tick delay on state change, it is not called directly so variable change can be the streamlined method.
-	shouldChangeState = true
-	newState = value
-
-func set_new_state(value): #Value = new State Tag. Call this function, or simply changing the "state" variable from anywhere to change the state properly.
-	state = value
-
-func delayed_state(value): #actually changes the state
 	var oldState
 	var slaves = []
 	if activeState != null:
@@ -111,6 +113,19 @@ func delayed_state(value): #actually changes the state
 		oldState.queue_free() 
 	slaves = _switch_state_get_slaves(value)
 	activeState.setup(slaves)
+	
+
+func set_new_state(value): #Value = new State Tag. Call this function, or simply changing the "state" variable from anywhere to change the state properly.
+	state = value
+
+#func delayed_state(value): #actually changes the state
+#	var oldState
+#	var slaves = []
+#	if activeState != null:
+#		oldState = activeState
+#		oldState.queue_free() 
+#	slaves = _switch_state_get_slaves(value)
+#	activeState.setup(slaves)
 
 func _switch_state_get_slaves(value): 
 	var slaves = []
@@ -148,5 +163,20 @@ func _switch_state_get_slaves(value):
 		GameState.GB_WARP:
 			slaves = [gameBoard]
 			activeState = GBWarpSelectState.new()
+		GameState.START:
+			slaves = [newSlave]
+			activeState = StartState.new()
 	add_child(activeState)
 	return slaves
+
+func on_load_map_manager(map):
+	var manager = preload("res://scenes/map_manager.tscn").instantiate()
+	load_scene(manager)
+	set_map(map)
+	
+func set_map(map):
+	gameBoard = $mapManager/Gameboard
+	gameBoard.load_new_map(map)
+
+func unload_me(scene):
+	scene.queue_free()
