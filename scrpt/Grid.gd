@@ -10,7 +10,7 @@ extends Resource
 @export var size := Vector2(20, 20)
 ## The size of a cell in pixels.
 @export var cell_size := Vector2(64, 24)
-@export var game_map : GameMap
+#@export var game_map : GameMap
 
 
 ## Half of ``cell_size``

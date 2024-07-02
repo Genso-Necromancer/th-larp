@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://r6wtvva5qput"]
+[gd_scene load_steps=12 format=3 uid="uid://r6wtvva5qput"]
 
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_2n2uh"]
 [ext_resource type="Script" path="res://scenes/GUIManager.gd" id="1_d2r44"]
@@ -6,13 +6,19 @@
 [ext_resource type="PackedScene" uid="uid://2ggl8hw7vq8n" path="res://scenes/action_menu.tscn" id="4_o6laq"]
 [ext_resource type="PackedScene" uid="uid://ct2rsfnl7fi6u" path="res://scenes/combat_forecast.tscn" id="6_kojdq"]
 [ext_resource type="PackedScene" uid="uid://cv8yj4b660do" path="res://scenes/hud.tscn" id="6_odogd"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="7_llyu2"]
+[ext_resource type="Script" path="res://scenes/SetUpMain.gd" id="8_bwmqx"]
+[ext_resource type="Script" path="res://scenes/MngOptPnl.gd" id="9_k1i1t"]
+[ext_resource type="PackedScene" uid="uid://cmh8ono4w82cq" path="res://fonts/menu_cursor.tscn" id="10_qxe1h"]
+[ext_resource type="PackedScene" uid="uid://dsqet8mutarh6" path="res://scenes/trade_screen.tscn" id="11_qfsbm"]
 
 [node name="GUIManager" type="Control"]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 288.0
-offset_bottom = 162.0
-scale = Vector2(2, 2)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 1
@@ -21,6 +27,7 @@ script = ExtResource("1_d2r44")
 metadata/_edit_use_anchors_ = true
 
 [node name="DEBUG" type="Control" parent="."]
+visible = false
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
@@ -37,70 +44,230 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="ActionMenu" parent="." instance=ExtResource("4_o6laq")]
-layout_mode = 0
-offset_left = 501.0
-offset_top = 245.0
-offset_right = 501.0
-offset_bottom = 245.0
+visible = false
+layout_mode = 1
 
 [node name="Count" parent="ActionMenu" index="0"]
 offset_top = 136.0
-grow_horizontal = 0
-grow_vertical = 0
-
-[node name="VBoxContainer" parent="ActionMenu/Count/ActionBox/CenterContainer" index="0"]
-theme_override_constants/separation = 1
-
-[node name="AtkBtn" parent="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer" index="0"]
-focus_neighbor_top = NodePath("")
-focus_neighbor_bottom = NodePath("")
-
-[node name="WaitBtn" parent="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer" index="2"]
-focus_neighbor_top = NodePath("")
-focus_neighbor_bottom = NodePath("")
 
 [node name="m" parent="ActionMenu" index="1"]
 y_sort_enabled = true
 
-[node name="menu_cursor" parent="ActionMenu" index="2"]
-menu_parent_path = NodePath("../Count/ActionBox/CenterContainer/VBoxContainer")
-
 [node name="CombatForecast" parent="." instance=ExtResource("6_kojdq")]
+visible = false
 layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -320.0
+offset_right = 320.0
+grow_horizontal = 2
 
 [node name="Margin" parent="CombatForecast/GC/HBC/Labels" index="1"]
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_right = 8
 
-[node name="Profile" parent="." instance=ExtResource("3_14h0a")]
+[node name="HUD" parent="." instance=ExtResource("6_odogd")]
 layout_mode = 1
-offset_right = 278.0
-offset_bottom = 256.0
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_top = 31.0
+offset_bottom = 31.0
+grow_horizontal = 2
+
+[node name="Profile" parent="." instance=ExtResource("3_14h0a")]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -201.0
+offset_top = -144.0
+offset_right = 201.0
+offset_bottom = 144.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="Eqp" parent="Profile/M/G/VB/MC2/VB/BG/MC" index="0"]
 visible_characters = -1
 visible_ratio = 1.0
 
-[node name="HUD" parent="." instance=ExtResource("6_odogd")]
+[node name="SetUpMain" type="Control" parent="."]
+custom_minimum_size = Vector2(500, 500)
 layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_top = 0.0
+anchors_preset = 15
 anchor_right = 1.0
-anchor_bottom = 0.0
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 0.0
-offset_bottom = 0.0
-grow_horizontal = 0
-grow_vertical = 1
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("8_bwmqx")
 
-[connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/AtkBtn" to="." method="_on_atk_btn_pressed"]
-[connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/SklBtn" to="." method="_on_skl_btn_pressed"]
-[connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/WaitBtn" to="." method="_on_wait_btn_pressed"]
-[connection signal="pressed" from="ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/EndBtn" to="." method="_on_end_btn_pressed"]
+[node name="SetUpGrid" type="GridContainer" parent="SetUpMain"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -37.5
+offset_top = -25.0
+offset_right = 37.5
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 0
+columns = 3
+
+[node name="SetUpPnl1" type="PanelContainer" parent="SetUpMain/SetUpGrid"]
+layout_mode = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="SetUpMain/SetUpGrid/SetUpPnl1"]
+layout_mode = 2
+texture = ExtResource("7_llyu2")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="M" type="MarginContainer" parent="SetUpMain/SetUpGrid/SetUpPnl1"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBSet" type="VBoxContainer" parent="SetUpMain/SetUpGrid/SetUpPnl1/M"]
+layout_mode = 2
+
+[node name="BTNDeploy" type="Button" parent="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet"]
+layout_mode = 2
+text = "Deploy"
+
+[node name="FrmBtn" type="Button" parent="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet"]
+layout_mode = 2
+text = "Formation"
+
+[node name="MngBtn" type="Button" parent="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet"]
+layout_mode = 2
+text = "Manage"
+
+[node name="BeginBtn" type="Button" parent="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet"]
+layout_mode = 2
+text = "Begin"
+
+[node name="GRDRost" type="GridContainer" parent="SetUpMain/SetUpGrid/SetUpPnl1/M"]
+visible = false
+layout_mode = 2
+columns = 3
+
+[node name="SetUpPnl2" type="PanelContainer" parent="SetUpMain/SetUpGrid"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="SetUpMain/SetUpGrid/SetUpPnl2"]
+layout_mode = 2
+texture = ExtResource("7_llyu2")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="M" type="MarginContainer" parent="SetUpMain/SetUpGrid/SetUpPnl2"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="DLmtLbl" type="Label" parent="SetUpMain/SetUpGrid/SetUpPnl2/M"]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="SetUpMain"]
+visible = false
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -250.0
+offset_right = 250.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="MngOptPnl" type="PanelContainer" parent="SetUpMain/PanelContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+script = ExtResource("9_k1i1t")
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="SetUpMain/PanelContainer/MngOptPnl"]
+layout_mode = 2
+texture = ExtResource("7_llyu2")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="M" type="MarginContainer" parent="SetUpMain/PanelContainer/MngOptPnl"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBMng" type="VBoxContainer" parent="SetUpMain/PanelContainer/MngOptPnl/M"]
+layout_mode = 2
+alignment = 1
+
+[node name="tradeLb" type="Button" parent="SetUpMain/PanelContainer/MngOptPnl/M/VBMng"]
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+text = "Trade"
+
+[node name="supplyLb" type="Button" parent="SetUpMain/PanelContainer/MngOptPnl/M/VBMng"]
+layout_mode = 2
+text = "Supply"
+
+[node name="equipLb" type="Button" parent="SetUpMain/PanelContainer/MngOptPnl/M/VBMng"]
+visible = false
+layout_mode = 2
+text = "Equip"
+
+[node name="useLb" type="Button" parent="SetUpMain/PanelContainer/MngOptPnl/M/VBMng"]
+layout_mode = 2
+text = "Manage"
+
+[node name="menu_cursor" parent="." instance=ExtResource("10_qxe1h")]
+visible = false
+layout_mode = 0
+scale = Vector2(2, 2)
+cursor_offset = Vector2(25, 0)
+
+[node name="trade_screen" parent="." instance=ExtResource("11_qfsbm")]
+visible = false
+layout_mode = 1
+
+[connection signal="action_selected" from="ActionMenu" to="." method="_on_action_menu_action_selected"]
+[connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/BTNDeploy" to="." method="_on_btn_deploy_pressed"]
+[connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/FrmBtn" to="." method="_on_frm_btn_pressed"]
+[connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/MngBtn" to="." method="_on_mng_btn_pressed"]
+[connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/BeginBtn" to="." method="_on_begin_btn_pressed"]
+[connection signal="pressed" from="SetUpMain/PanelContainer/MngOptPnl/M/VBMng/tradeLb" to="." method="_on_trade_lb_pressed"]
+[connection signal="pressed" from="SetUpMain/PanelContainer/MngOptPnl/M/VBMng/supplyLb" to="." method="_on_supply_lb_pressed"]
+[connection signal="pressed" from="SetUpMain/PanelContainer/MngOptPnl/M/VBMng/equipLb" to="." method="_on_equip_lb_pressed"]
+[connection signal="pressed" from="SetUpMain/PanelContainer/MngOptPnl/M/VBMng/useLb" to="." method="_on_use_lb_pressed"]
 
 [editable path="ActionMenu"]
 [editable path="CombatForecast"]
-[editable path="Profile"]
 [editable path="HUD"]
+[editable path="Profile"]

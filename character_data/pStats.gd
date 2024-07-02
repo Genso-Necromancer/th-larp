@@ -1,5 +1,5 @@
 
-enum UNIT_ID {Remilia, Sakuya, Patchy}
+enum UNIT_ID {Remilia, Sakuya, Patchy, China}
 
 #these three are used in combination to create the data on a single enemy unit.
 
@@ -28,7 +28,7 @@ static func get_named_unit_data(unitInd):
 					"MOVE": 4,
 					"LIFE": 22,
 					"COMP": 100,
-					"PWR": 5,
+					"PWR": 15,
 					"MAG": 6,
 					"ELEG": 6,
 					"CELE": 6,
@@ -37,10 +37,10 @@ static func get_named_unit_data(unitInd):
 					},
 				"Growths": {
 					"MOVE": 0,
-					"LIFE": 0.7,
+					"LIFE": 1,
 					"COMP": 0,
-					"PWR": 0.3,
-					"MAG": 0.35,
+					"PWR": 1,
+					"MAG": 1,
 					"ELEG": 0.4,
 					"CELE": 0.4,
 					"BAR": 0.2,
@@ -48,7 +48,7 @@ static func get_named_unit_data(unitInd):
 					},
 				"Caps": {
 					"MOVE": 10,
-					"LIFE": 20,
+					"LIFE": 60,
 					"COMP": 20,
 					"PWR": 20,
 					"MAG": 20,
@@ -57,14 +57,26 @@ static func get_named_unit_data(unitInd):
 					"BAR": 20,
 					"CHA": 20
 					},
-				"Inv":[],
-				"StartInv":["GNG"],
-				"EQUIP": "",
+				"MaxInv": 6,
+				"Inv":[{"Data":"GNG", "DUR":40}],
+				"EQUIP": {"Data":"GNG", "DUR":40},
 				"Passive":{"Vampire": true,
 					"Fate": true,
 					"SunWeak": true,
 					"Fly": true},
-				"Skills":["SLP1", "SHV1", "TOSS1"]
+				"Skills":["SLP1", "SHV1", "TOSS1", "WARP1"],
+				"Weapons": {
+					"BLADE": false,
+					"BLUNT": false,
+					"STICK": true,
+					"BOOK": false,
+					"GOHEI": false,
+					"FAN": false,
+					"BOW": false,
+					"GUN": false,
+					"SUB": false
+					
+				}
 			}
 		}
 		UNIT_ID.Sakuya: 
@@ -111,11 +123,22 @@ static func get_named_unit_data(unitInd):
 					"BAR": 20,
 					"CHA": 20
 					},
-				"Inv":[],
-				"StartInv":["SLVKNF", "THKN"],
-				"EQUIP":"",
+				"MaxInv": 6,
+				"Inv":[{"Data":"SLVKNF", "DUR":40}, {"Data":"PWRELIX", "DUR":1}],
+				"EQUIP": {"Data":"SLVKNF", "DUR":40},
 				"Passive":{},
-				"Skills":["ST05"]
+				"Skills":["ST05"],
+				"Weapons": {
+					"BLADE": true,
+					"BLUNT": false,
+					"STICK": false,
+					"BOOK": false,
+					"GOHEI": false,
+					"FAN": false,
+					"BOW": false,
+					"GUN": false,
+					"SUB": ("KNIFE")
+				}
 			}
 		}
 		UNIT_ID.Patchy: 
@@ -123,7 +146,7 @@ static func get_named_unit_data(unitInd):
 				"Profile": {
 					"UnitName": "Patchouli Knowledge",
 					"Prt": load(("res://sprites/PatchouliPrt.png")),
-					"Sprite": load(("res://sprites/SakuyaTest.png")),
+					"Sprite": load(("res://sprites/RemiliaTest.png")),
 					"Level": 1,
 					"EXP": 0,
 					"CurCOMP": 0,
@@ -162,11 +185,86 @@ static func get_named_unit_data(unitInd):
 					"BAR": 20,
 					"CHA": 20
 					},
-				"Inv":[],
-				"StartInv":["BK"],
-				"EQUIP":"Book",
+				"MaxInv": 6,
+				"Inv":[{"Data":"BK", "DUR":40}],
+				"EQUIP": {"Data":"BK", "DUR":40},
 				"Passive":{},
-				"Skills":[]
+				"Skills":[],
+				"Weapons": {
+					"BLADE": false,
+					"BLUNT": false,
+					"STICK": false,
+					"BOOK": true,
+					"GOHEI": false,
+					"FAN": false,
+					"BOW": false,
+					"GUN": false,
+					"SUB": false
+					
+				}
+			}
+		}
+		UNIT_ID.China: 
+			unitData = {"Meiling": {"CLIFE": 1,
+				"Profile": {
+					"UnitName": "Hong Meiling",
+					"Prt": load(("res://sprites/MeilingPrt.png")),
+					"Sprite": load(("res://sprites/RemiliaTest.png")),
+					"Level": 1,
+					"EXP": 0,
+					"CurCOMP": 0,
+					"Class": "Guard"
+					},
+				"Stats": {
+					"MOVE": 4,
+					"LIFE": 18,
+					"COMP": 100,
+					"PWR": 2,
+					"MAG": 7,
+					"ELEG": 6,
+					"CELE": 3,
+					"BAR": 1,
+					"CHA": 6
+					},
+				"Growths": {
+					"MOVE": 0.02,
+					"LIFE": 0.5,
+					"COMP": 0,
+					"PWR": 0.3,
+					"MAG": 0.2,
+					"ELEG": 0.55,
+					"CELE": 0.55,
+					"BAR": 0.2,
+					"CHA": 0.7
+					},
+				"Caps": {
+					"MOVE": 10,
+					"LIFE": 20,
+					"COMP": 20,
+					"PWR": 20,
+					"MAG": 20,
+					"ELEG": 20,
+					"CELE": 20,
+					"BAR": 20,
+					"CHA": 20
+					},
+				"MaxInv": 6,
+				"Inv":[{"Data":"CLB", "DUR":40}, {"Data":"CLB", "DUR":40}],
+				"EQUIP": {"Data":"CLB", "DUR":40},
+				"Passive":{},
+				"Skills":[],
+				"Weapons": {
+					"BLADE": false,
+					"BLUNT": true,
+					"STICK": false,
+					"BOOK": false,
+					"GOHEI": false,
+					"FAN": false,
+					"BOW": false,
+					"GUN": false,
+					"SUB": ("NATURAL")
+					
+				}
 			}
 		}
 	return unitData
@@ -252,7 +350,17 @@ static func get_job(jobInd):
 					"BAR": 20,
 					"CHA": 20
 					},
-				"Passive":{"Test2": true}
+				"Passive":{"Test2": true},
+				"Weapons": {
+					"BLADE": false,
+					"BLUNT":true,
+					"STICK": false,
+					"BOOK": false,
+					"GOHEI": false,
+					"FAN": false,
+					"BOW": false,
+					"GUN": false
+				}
 				},
 			"Thief": {"Role": "Cointaker",
 				"Stats": {
@@ -288,7 +396,18 @@ static func get_job(jobInd):
 					"BAR": 20,
 					"CHA": 20
 					},
-				"Passive":{"Test3": true}
+				"Passive":{"Test3": true},
+				"Weapons": {
+					"BLADE": true,
+					"BLUNT": false,
+					"STICK": false,
+					"BOOK": false,
+					"GOHEI": false,
+					"FAN": false,
+					"BOW": false,
+					"GUN": false,
+					"SUB": ("KNIFE")
+				}
 				}
 			}
 	return jobData
@@ -313,9 +432,9 @@ static func get_terrain_costs():
 	}
 	return terrainCost
 	
-static func get_wep():
-	var wepData = {"NONE":{
-				"NAME":"",
+static func get_items():
+	var iData = {"NONE":{
+				"NAME":"--",
 				"ICON": load(("res://sprites/gungnir.png")),
 				"TYPE": "Physical",
 				"DMG": 0,
@@ -324,7 +443,9 @@ static func get_wep():
 				"GRAZE": 0,
 				"MINRANGE": 0,
 				"MAXRANGE": 0,
-				"LIMIT": false },
+				"CATEGORY": "NONE",
+				"MAXDUR": 40,
+				"SUBGROUP": false},
 				##################
 				"GNG":{
 				"NAME":"Gungnir",
@@ -336,7 +457,9 @@ static func get_wep():
 				"GRAZE": 3,
 				"MINRANGE": 1,
 				"MAXRANGE": 2,
-				"LIMIT": false },
+				"CATEGORY": "STICK",
+				"MAXDUR": 40,
+				"SUBGROUP": false},
 				###############
 				"SLVKNF":{
 				"NAME":"Silver Knife",
@@ -348,7 +471,9 @@ static func get_wep():
 				"GRAZE": 2,
 				"MINRANGE": 1,
 				"MAXRANGE": 2,
-				"LIMIT": false},
+				"CATEGORY": "BLADE",
+				"MAXDUR": 40,
+				"SUBGROUP": "KNIVES"},
 				###############
 				"CLB": {
 				"NAME":"Club",
@@ -360,7 +485,9 @@ static func get_wep():
 				"GRAZE": 4,
 				"MINRANGE": 1,
 				"MAXRANGE": 1,
-				"LIMIT": false},
+				"CATEGORY": "BLUNT",
+				"MAXDUR": 40,
+				"SUBGROUP": false},
 				###############
 				"DGR": {
 				"NAME":"Dagger",
@@ -372,7 +499,9 @@ static func get_wep():
 				"GRAZE": 1,
 				"MINRANGE": 1,
 				"MAXRANGE": 1,
-				"LIMIT": false},
+				"CATEGORY": "BLADE",
+				"MAXDUR": 40,
+				"SUBGROUP": false},
 				###############
 				"THKN":{
 				"NAME":"Throwing Knife",
@@ -384,8 +513,9 @@ static func get_wep():
 				"GRAZE": 1,
 				"MINRANGE": 2,
 				"MAXRANGE": 2,
-				"LIMIT": true,
-				"MAXDUR": 10},
+				"CATEGORY": "BLADE",
+				"MAXDUR": 40,
+				"SUBGROUP": "KNIVES"},
 				###############
 				"BK":{
 				"NAME":"Book",
@@ -397,14 +527,44 @@ static func get_wep():
 				"GRAZE": 0,
 				"MINRANGE": 1,
 				"MAXRANGE": 1,
-				"LIMIT": false }
+				"CATEGORY": "BOOK",
+				"MAXDUR": 40,
+				"SUBGROUP": false},
+				###############
+				"PZA":{
+				"NAME":"Pizza",
+				"ICON": load(("res://sprites/gungnir.png")),
+				"CATEGORY": "ITEM",
+				"MAXDUR": 3,
+				"USE": true,
+				"EFFECT": ["Pizza01"] },
+				###############
+				"PWRELIX":{
+				"NAME":"Power Elixir",
+				"ICON": load(("res://sprites/gungnir.png")),
+				"CATEGORY": "ITEM",
+				"MAXDUR": 1,
+				"USE": true,
+				"EFFECT": ["StrBuff01"] }
+				
 				}
-	return wepData
+	return iData
+	
+static func get_item_effects():
+	var iEffects : Dictionary
+	iEffects = {
+		"IHEAL": {
+			"target": "Self",
+			"isPermanent": true,
+			"type": "heal"
+			
+		}
+	}
 	
 static func get_skill_effects():
 	var skillEffects : Dictionary
 	skillEffects = {
-		"EffectGuide": {
+			"EffectGuide": {
 			"Target": "Self", #Self, Target, Global
 			"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
 			"Proc": 99, #Set to -1 to have gaurenteed proc chance
@@ -450,27 +610,55 @@ static func get_skill_effects():
 			"Duration": 2,
 			"Time": true,
 			"TimeFactor": -0.5
-			},"SleepTest": {
+			},
+			"SleepTest": {
 			"Target": "Target", #Self, Target, Global
 			"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
 			"Proc": -1, #Set to -1 to have gaurenteed proc chance
 			"Duration": 1,
 			"Sleep": true,
 			"Curable": true
-			},"Shove1": {
+			},
+			"Shove1": {
 			"Target": "Target", #Self, Target, Global
 			"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
 			"Proc": -1, #Set to -1 to have gaurenteed proc chance
 			"Relocate": true,
 			"MoveType": "Shove", #Warp(pick a hex), Shove(moved X distance); Toss(Placed behind Actor)
 			"RelocRange": 2 #Distance Shoved, or range of valid tiles to warp to. Set to 0 for Toss.
-			},"Toss1": {
+			},
+			"Toss1": {
 			"Target": "Target", #Self, Target, Global
 			"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
 			"Proc": -1, #Set to -1 to have gaurenteed proc chance
 			"Relocate": true,
 			"MoveType": "Toss", #Warp(pick a hex), Shove(moved X distance); Toss(Placed behind Actor)
 			"RelocRange": 0 #Distance Shoved, or range of valid tiles to warp to. Set to 0 for Toss.
+			},
+			"Warp05": {
+			"Target": "Target", #Self, Target, Global
+			"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
+			"Proc": -1, #Set to -1 to have gaurenteed proc chance
+			"Relocate": true,
+			"MoveType": "Warp", #Warp(pick a hex), Shove(moved X distance); Toss(Placed behind Actor)
+			"RelocRange": 5 #Distance Shoved, or range of valid tiles to warp to. Set to 0 for Toss.
+			},
+			"Pizza01": {
+			"Target": "Self",
+			"OnHit": false,
+			"Proc": -1,
+			"Healing": true,
+			"Heal": 2
+			},
+			"StrBuff01": {
+			"Target": "Self", #Self, Target, Global
+			"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
+			"Proc": -1, #Set to -1 to have gaurenteed proc chance
+			"Duration": 0,
+			"Buff": true,
+			"BuffStat": "PWR", #Any core Stat
+			"BuffValue": 2,
+			"Curable": true
 			}
 	}
 	return skillEffects
@@ -487,7 +675,7 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 2,
 		"Cost": 0,
-		"Effect": ["Test1"]
+		"EFFECT": ["Test1"]
 		},
 		"TEST2": {
 		"SkillId": "TEST2",
@@ -499,7 +687,7 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 1,
 		"Cost": 0,
-		"Effect": ["Test2"]
+		"EFFECT": ["Test2"]
 		},
 		"ST05": {
 		"SkillId": "ST05",
@@ -511,7 +699,7 @@ static func get_skills():
 		"RangeMin": 0,
 		"RangeMax": 0,
 		"Cost": 0,
-		"Effect": ["SlowTime05"]
+		"EFFECT": ["SlowTime05"]
 		},
 		"SLP1": {
 		"SkillId": "SLP1",
@@ -523,7 +711,7 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 1,
 		"Cost": 0,
-		"Effect": ["SleepTest"]
+		"EFFECT": ["SleepTest"]
 		},
 		"SHV1": {
 		"SkillId": "SHV1",
@@ -535,7 +723,7 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 1,
 		"Cost": 0,
-		"Effect": ["Shove1"]
+		"EFFECT": ["Shove1"]
 		},
 		"TOSS1": {
 		"SkillId": "TOSS1",
@@ -547,7 +735,19 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 1,
 		"Cost": 0,
-		"Effect": ["Toss1"]
+		"EFFECT": ["Toss1"]
+		},
+		"WARP1": {
+		"SkillId": "WARP1",
+		"SkillName": "Warp Other",
+		"Icon": load(("res://sprites/gungnir.png")),
+		"Target": "Ally", #Enemy, Self, Ally
+		"CanMiss": false,
+		"ACC": 0,
+		"RangeMin": 1,
+		"RangeMax": 1,
+		"Cost": 0,
+		"EFFECT": ["Warp05"]
 		}
 	}
 	return skills

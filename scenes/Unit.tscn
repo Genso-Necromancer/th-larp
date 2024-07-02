@@ -266,8 +266,12 @@ _data = {
 }
 
 [node name="Unit" type="Path2D"]
+z_index = 2
+y_sort_enabled = true
 script = ExtResource("1_torj4")
+faction = "Enemy:100"
 move_speed = 250.0
+genLevel = 0
 
 [node name="PathFollow2D" type="PathFollow2D" parent="."]
 rotates = false
@@ -323,6 +327,7 @@ theme_override_font_sizes/font_size = 22
 text = "(0, 0)"
 
 [node name="Cell2" type="Label" parent="PathFollow2D"]
+visible = false
 offset_left = -33.0
 offset_top = 40.0
 offset_right = 38.0

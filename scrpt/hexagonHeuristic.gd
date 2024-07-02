@@ -45,7 +45,7 @@ func set_solid(solids: Array, units = null):
 	if units != null:
 		unitsList = units
 		
-func is_solid_check(cell: Vector2):
+func is_solid_check(cell: Vector2i):
 	if solidList.has(cell):
 		return true
 	else:
@@ -57,7 +57,7 @@ func is_units_check(cell):
 	else:
 		return false
 
-func find_path(start: Vector2, end: Vector2, moveType: String, attack: bool = false) -> Array:
+func find_path(start: Vector2i, end: Vector2i, moveType: String, attack: bool = false) -> Array:
 	open_list.clear()
 	closed_list.clear()
 	
@@ -109,7 +109,7 @@ func find_path(start: Vector2, end: Vector2, moveType: String, attack: bool = fa
 	
 	return [] # Path not found
 
-func find_all_paths(start: Vector2, max_cost: int, moveType: String = "Foot", terrain: bool = true) -> Array:
+func find_all_paths(start: Vector2i, max_cost: int, moveType: String = "Foot", terrain: bool = true) -> Array:
 #	var visited: Dictionary = {}
 #	visited[start] = { "cost": 0, "paths": [[]] }
 	
@@ -162,13 +162,13 @@ func dict_strip(dict):
 	return strip
 
 
-func get_visited_info(visited: Array, node: Vector2) -> Dictionary:
+func get_visited_info(visited: Array, node: Vector2i) -> Dictionary:
 	for info in visited:
 		if info["node"]== node:
 			return info
 	return {}
 
-func add_to_open_list(node: Vector2, f_cost: float, g_cost: float, h_cost: float, _parent) -> void:
+func add_to_open_list(node: Vector2i, f_cost: float, g_cost: float, h_cost: float, _parent) -> void:
 		var firstNode = {"node" : node, "f_cost": f_cost, "g_cost": g_cost, "h_cost": h_cost, "parent": null}
 		open_list.append(firstNode)
 	
@@ -196,18 +196,18 @@ func get_lowest_f_cost_node():
 			lowest_node = node.duplicate()
 	return lowest_node
 
-func get_closest_node(position: Vector2) -> Node:
-	var closest_node = null
-	var closest_distance = float('inf')
-	
-	for node in grid:
-		var distance = position.distance_to(node)
-		
-		if distance < closest_distance:
-			closest_node = node
-			closest_distance = distance
-	
-	return closest_node
+#func get_closest_node(position: Vector2) -> Node:
+#	var closest_node = null
+#	var closest_distance = float('inf')
+#
+#	for node in grid:
+#		var distance = position.distance_to(node)
+#
+#		if distance < closest_distance:
+#			closest_node = node
+#			closest_distance = distance
+#
+#	return closest_node
 
 func estimate_cost(a, b) -> float:
 	var ac = oddq_to_axial(a)
@@ -215,33 +215,35 @@ func estimate_cost(a, b) -> float:
 	var distance = axial_distance(ac, bc)
 	return distance
 	
-func compute_cost(a: Vector2, b: Vector2, moveType: String, terrain: bool = true) -> float:
+func compute_cost(a: Vector2i, b: Vector2i, moveType: String, terrain: bool = true) -> float:
 	var tileWeight = 1
 	var tileType
 	if terrain:
 		tileType = tilemap.get_movement_cost(b)
 		tileWeight = UnitData.terrainCosts[moveType][tileType]
+
 #	var base_cost = 1.0  # Base cost for moving between tiles
 	var ac = oddq_to_axial(a)
 	var bc = oddq_to_axial(b)
 	var distance = axial_distance(ac, bc)
+	var final = distance * tileWeight
 #	if tileType == "Hill":
 ##		print(distance*tileWeight)
-	return distance * tileWeight
+	return final
 	
 func oddq_to_axial(hex):
 	var x = hex.x
 	var y = hex.y - (hex.x - fposmod(hex.x, 2)) / 2
 #	print(" O2A ", y)
-	return Vector2(x, y)
+	return Vector2i(x, y)
 	
 func axial_to_oddq(hex):
 	var x = hex.x
 	var y = hex.y + (hex.x - fposmod(hex.x, 2)) / 2
-	return Vector2(x, y)
+	return Vector2i(x, y)
 
 func axial_substract(a, b):
-	return Vector2(a.x - b.x, a.y - b.y)
+	return Vector2i(a.x - b.x, a.y - b.y)
 
 func axial_distance(a, b):
 	var vec = axial_substract(a, b)
@@ -261,23 +263,23 @@ func get_neighbor_nodes(hex: Dictionary, attack: bool = false) -> Array:
 		
 #		print("Even")
 		offsets = [
-			Vector2(1, -1),  # Top-Right
-			Vector2(1, 0), # Bottom-Right
-			Vector2(0, 1), # Bottom
-			Vector2(-1, 0), # bottom-Left
-			Vector2(-1, -1), # Top-Left
-			Vector2(0, -1)   # Top
+			Vector2i(1, -1),  # Top-Right
+			Vector2i(1, 0), # Bottom-Right
+			Vector2i(0, 1), # Bottom
+			Vector2i(-1, 0), # bottom-Left
+			Vector2i(-1, -1), # Top-Left
+			Vector2i(0, -1)   # Top
 		]
 	else:
 #		print("Odd")
 	# even row
 		offsets = [
-			Vector2(1, 0),  # Top-Right
-			Vector2(1, 1), # Bottom-Right
-			Vector2(0, 1), # Bottom
-			Vector2(-1, 1), # bottom-Left
-			Vector2(-1, 0),  # Top-Left
-			Vector2(0, -1)   # Top
+			Vector2i(1, 0),  # Top-Right
+			Vector2i(1, 1), # Bottom-Right
+			Vector2i(0, 1), # Bottom
+			Vector2i(-1, 1), # bottom-Left
+			Vector2i(-1, 0),  # Top-Left
+			Vector2i(0, -1)   # Top
 		]
 	
 	# Get the neighboring nodes based on the offsets
@@ -299,7 +301,7 @@ func get_neighbor_nodes(hex: Dictionary, attack: bool = false) -> Array:
 			
 	return neighbors
 	
-func get_BFS_nhbr(hex: Vector2, ignoreSolid: bool = false, justNhbrs = false) -> Array:
+func get_BFS_nhbr(hex: Vector2i, ignoreSolid: bool = false, justNhbrs = false) -> Array:
 #	print("??")
 	var neighbors = []
 	var q = hex.x
@@ -312,22 +314,22 @@ func get_BFS_nhbr(hex: Vector2, ignoreSolid: bool = false, justNhbrs = false) ->
 		
 #		print("Even")
 		offsets = [
-			Vector2(1, -1),  # Top-Right
-			Vector2(1, 0), # Bottom-Right
-			Vector2(0, 1),# Bottom
-			Vector2(-1, 0), # bottom-Left
-			Vector2(-1, -1), # Top-Left
-			Vector2(0, -1)   # Top
+			Vector2i(1, -1),  # Top-Right
+			Vector2i(1, 0), # Bottom-Right
+			Vector2i(0, 1),# Bottom
+			Vector2i(-1, 0), # bottom-Left
+			Vector2i(-1, -1), # Top-Left
+			Vector2i(0, -1)   # Top
 		]
 	else:
 #		print("Odd")
 		offsets = [			
-			Vector2(1, 0),  # Top-Right
-			Vector2(1, 1), # Bottom-Right
-			Vector2(0, 1), # Bottom
-			Vector2(-1, 1), # bottom-Left
-			Vector2(-1, 0),  # Top-Left
-			Vector2(0, -1)   # Top
+			Vector2i(1, 0),  # Top-Right
+			Vector2i(1, 1), # Bottom-Right
+			Vector2i(0, 1), # Bottom
+			Vector2i(-1, 1), # bottom-Left
+			Vector2i(-1, 0),  # Top-Left
+			Vector2i(0, -1)   # Top
 		]
 		
 		
@@ -442,7 +444,7 @@ func is_valid_position(neighbor):
 func oddq_offset_neighbor(hex, direction):
 	var parity = fposmod(hex.x, 2)
 	var dir = oddq_directions[parity][direction]
-	var offsetCoord = Vector2(hex.x + dir[0], hex.y + dir[1])
+	var offsetCoord = Vector2i(hex.x + dir[0], hex.y + dir[1])
 	return offsetCoord
 
 func trim_path(path: Array, invalid: Array):

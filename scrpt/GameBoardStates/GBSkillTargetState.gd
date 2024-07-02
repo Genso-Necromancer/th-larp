@@ -6,6 +6,9 @@ func setup(newSlaves):
 	super.setup(newSlaves)
 	gameBoard = slaves[0]
 
+func mouse_motion(event: InputEvent) -> void:
+	gameBoard.gb_mouse_motion(event)
+
 func _handle_bind(bind):
 	match bind:
 		"invalid": return

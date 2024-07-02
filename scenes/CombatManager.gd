@@ -3,19 +3,21 @@ class_name CombatManager
 signal combat_resolved
 signal time_factor_changed
 signal warp_selected
-var cbtFC : Array
-var cbtUD : Array
-var cbtCL : Array
-var cbtAW : Array
+signal jobs_done_cmbtmnger
+#var fData : Dictionary
+#var cbtUD : Array
+#var cbtCL : Array
+#var cbtAW : Array
 var rng = Global.rng
-var aWep
-var tWep
+var fData = {}
+#var aWep
+#var tWep
 var fateChance = 15
 var deathFlag = false
-var units
 @onready var skillData = UnitData.skillData
 @onready var effectData = UnitData.effectData
-var canReach = false
+@onready var itemData = UnitData.itemData
+#var canReach = false
 var gameBoard
 var aHex
 
@@ -24,124 +26,86 @@ func init_manager():
 	gameBoard = get_parent()
 	aHex = gameBoard.hexStar
 
+func _ready():
+	var parent = get_parent()
+	self.jobs_done_cmbtmnger.connect(parent._on_jobs_done)
+	emit_signal("jobs_done_cmbtmnger", "CmbtMngr", self)
 
 
-func combat_forecast(a: Unit, t: Unit, distance, isSkill = false, skill = null):
-	cbtFC.clear()
-	cbtUD.clear()
-	cbtCL.clear()
-	cbtAW.clear()
-	aWep = a.unitData.EQUIP
-	tWep = t.unitData.EQUIP
-	canReach = false
-	var AtkInv
-	var TarInv
-	match a.faction:
-		"Player": 
-			AtkInv = UnitData.plrInv
-		"Enemy":
-			AtkInv = UnitData.npcInv
-	match t.faction:
-		"Player": 
-			TarInv = UnitData.plrInv
-		"Enemy":
-			TarInv = UnitData.npcInv
-	units = [a, t]
-	cbtFC = [Global.attacker, Global.defender]
-	cbtCL = [a.activeStats.CLIFE, t.activeStats.CLIFE]
-	cbtUD = [a.unitData.Stats, t.unitData.Stats]
-	cbtAW = [AtkInv[aWep], TarInv[tWep]]
-	var i = 0
-	var revI = 1
-	var atkr = 0
-	var trgt = 1
-	var wAcc = [cbtAW[0].ACC, cbtAW[1].ACC]
-	var wDmg = [cbtAW[0].DMG, cbtAW[1].DMG]
-	var wCrt = [cbtAW[0].CRIT, cbtAW[1].CRIT]
-	var wGrz = [cbtAW[0].GRAZE, cbtAW[1].GRAZE]
-#	var wLimit = [cbtAW[0].LIMIT, cbtAW[1].LIMIT]
-	var wType = [cbtAW[0].TYPE, cbtAW[1].TYPE]
-	var wMinReach = [cbtAW[0].MINRANGE, cbtAW[1].MINRANGE]
-	var wMaxReach = [cbtAW[0].MAXRANGE, cbtAW[1].MAXRANGE]
-	if isSkill:
-		if skill.CanMiss:
-			wAcc[0] = skill.ACC
-		for effect in skill.Effect:
-			if  effectData[effect].has("Damaging") and effectData[effect].Damaging == true:
-				wCrt[0] = 0
-				wType[0] = effectData[effect].Type
-				match  effectData[effect].Type: 
-					"Physical": 
-						wDmg[0] += effectData[effect].Damage
-					"Magical": 
-						wDmg[0] += effectData[effect].Damage
-				
-	if distance in range(wMinReach[1], wMaxReach[1]):
+	
+func get_forecast(a: Unit, t: Unit, distance, skill = null):
+	var itemData = UnitData.itemData
+	
+	var aWep = a.unitData.EQUIP
+	var tWep = t.unitData.EQUIP
+	var minR = itemData[tWep.Data].MINRANGE
+	var maxR = itemData[tWep.Data].MAXRANGE
+	if skill != null:
+		pass
+	fData = {a:{},t: {}}
+	fData[a]["clash"] = _evaluate_clash(a, t)
+	fData[t]["clash"] = _evaluate_clash(t, a)
+	fData[t]["reach"] = _distance_check(minR, maxR, distance)
+	return fData
+
+func _distance_check(minR, maxR, distance):
+	var canReach = false
+	if distance >= minR and distance <= maxR: #Not Checked yet
 		canReach = true
+	return canReach
+	
+func _evaluate_clash(a, t):
+	var results = {}
+	var aData = a.combatData
+	var tData = t.combatData
+	var aAct = a.activeStats
+	var tAct = t.activeStats
+	results["ACC"] = aData.ACC - tData.AVOID
+	results.ACC = clampi(results.ACC, 0, 1000)
+	if aData.TYPE == "Physical":
+		results["DMG"] = aData.DMG - tAct.BAR
 		
+	else:
+		results["DMG"] = aData.DMG - tAct.MAG
+	results.DMG = clampi(results.DMG, 0, 1000)
+	results["GRAZE"] = results.DMG - tData.GRAZE
+	results["GRZPRC"] = tData.GRZPRC
+	results["CRIT"] = aData.CRIT - tData.CRTAVD
+	results.CRIT = clampi(results.CRIT, 0, 1000)
+	if aAct.CELE > tAct.CELE + 4:
+		results["FUP"] = true
+	else:
+		results["FUP"] = false
+	results["RLIFE"] = _get_remaining_life(a, results.DMG)
+	return results
 	
-	
-	
-	cbtFC[0].NAME = a.unitData.Profile.UnitName
-	cbtFC[0].Prt = a.unitData.Profile.Prt
-	cbtFC[1].NAME = t.unitData.Profile.UnitName
-	cbtFC[1].Prt = t.unitData.Profile.Prt
-	#factor each unit's solo combat stats based on specific factors
-	while i < cbtFC.size():
-		cbtFC[i].ACC = cbtUD[i].ELEG * 2 + wAcc[i] + (cbtUD[i].CHA)
-		match wType[i]: 
-			"Physical":
-				cbtFC[i].DMG = cbtUD[i].PWR + wDmg[i]
-			"Magical": 
-				cbtFC[i].DMG = cbtUD[i].MAG + wDmg[i]
-		
-		cbtFC[i].AVOID = (cbtUD[i].CELE * 2) + (cbtUD[i].CHA)
-		match wType[revI]:
-			"Physical":
-				cbtFC[i].DEF = cbtUD[i].BAR
-			"Magical":
-				cbtFC[i].DEF = cbtUD[i].MAG
-		cbtFC[i].CRIT = cbtUD[i].ELEG + wCrt[i]
-		cbtFC[i].CAVOID = (cbtUD[i].CHA)
-		cbtFC[i].LIFE = cbtUD[i].LIFE
-		cbtFC[i].CLIFE = cbtCL[i]
-		cbtFC[i].GRAZE = wGrz[i]
-		cbtFC[i].GRZPRC = cbtUD[i].ELEG + cbtUD[i].BAR
-		i += 1
-		revI -= 1
-	i = 0
-	#Formulate the results of the two units fighting
-	while i < cbtFC.size():
-		cbtFC[atkr].ACC = cbtFC[atkr].ACC - cbtFC[trgt].AVOID
-		cbtFC[atkr].ACC = clampi(cbtFC[atkr].ACC, 0, 1000)
-		cbtFC[atkr].DMG = cbtFC[atkr].DMG - cbtFC[trgt].DEF
-		cbtFC[atkr].DMG = clampi(cbtFC[atkr].DMG, 0, 1000)
-		cbtFC[atkr].CRIT = cbtFC[atkr].CRIT - cbtFC[trgt].CAVOID
-		cbtFC[atkr].CRIT = clampi(cbtFC[atkr].CRIT, 0, 1000)
-		if cbtUD[atkr].CELE > cbtUD[trgt].CELE + 4:
-			cbtFC[atkr]["FUP"] = true
-		else:
-			cbtFC[atkr]["FUP"] = false
-		atkr = 1
-		trgt = 0
-		i += 1
-	atkr = 0
-	trgt = 1
-	cbtFC[atkr].RLIFE = cbtFC[atkr].CLIFE - cbtFC[trgt].DMG
-	cbtFC[atkr].RLIFE = clampi(cbtFC[atkr].RLIFE, 0, 1000)
-	cbtFC[trgt].RLIFE = cbtFC[trgt].CLIFE - cbtFC[atkr].DMG
-	cbtFC[trgt].RLIFE = clampi(cbtFC[trgt].RLIFE, 0, 1000)
+func _get_remaining_life(a, dmg):
+	var rLife
+	rLife = a.activeStats.CLIFE - dmg
+	rLife = clampi(rLife, 0, 1000)
+	return rLife
 	
 func start_the_justice(a: Unit, t: Unit):
-	cbtUD = [a.activeStats, t.activeStats]
-	cbtCL = [a.activeStats.CLIFE, t.activeStats.CLIFE]
+	var aActive = a.activeStats
+	var tActive = t.activeStats
+	var aLife = a.activeStats.CLIFE
+	var tLife = t.activeStats.CLIFE
+	
+	var aWep = a.unitData.EQUIP
+	var tWep = t.unitData.EQUIP
+	
+	var canReach = fData.t.reach
+	
 	var hurt = false
-#	var roll
+	
 	var r1 = false
 	var r2 = false
 	var r3 = false
 #	var r4 = false
+
 	deathFlag = false
+	var canRetaliate = true
+	
 	#round 1
 	#check for accuracy
 	#if it's a hit, get the damage
@@ -152,31 +116,35 @@ func start_the_justice(a: Unit, t: Unit):
 	#if it failed, or did 0 dmg. check both units for FUP true
 	#start round 3 for whoever had FUP true, if any
 	#conclude combat
-	var canRetaliate = true
 	
-	if units[1].activeStatus.Sleep.Active or units[1].unitData.EQUIP == "NONE":
+	
+	
+	if t.activeStatus.Sleep.Active or t.unitData.EQUIP == null or !canReach:
 		canRetaliate = false
 	
 	
 	#first round
 	print("Girl's are fighting")
-	print("Round 1 begins: ", cbtFC[0].NAME, " is attacking ", cbtFC[1].NAME)
-	r1 = get_attack(0, 1)
-	if r1 and check_uses(cbtAW[0]) and !deathFlag: 
-			hurt = combat_round(0, 1)
-			
-	if !hurt and check_uses(cbtAW[1]) and !deathFlag and canReach and canRetaliate:
-			print("Round 2 begins: ", cbtFC[1].NAME, " is attacking ", cbtFC[0].NAME)
-			r2 = get_attack(1,0)
+	print("Round 1 begins: ", a.unitName, " is attacking ", t.unitName)
+	r1 = get_attack("a", "t")
+	if r1 and check_uses(aWep) and !deathFlag: 
+			hurt = combat_round("a", "t") #redo forecast dictionary to use unit as keys so dmg can be applied to the unit and unit can be put here instead of these keys
+			_reduce_durability(a, aWep)
+		
+	if !hurt and !deathFlag and canRetaliate and check_uses(tWep):
+			print("Round 2 begins: ", t.unitName, " is attacking ", a.unitName)
+			r2 = get_attack("t","a")
 	if r2:
-		hurt = combat_round(1, 0)
+		hurt = combat_round("t", "a")
+		_reduce_durability(t, tWep)
 	#if retaliation failed, or did 0 dmg, check if attacker can make a second attempt.
-	if !hurt and !deathFlag and cbtFC[0].FUP and check_uses(cbtAW[0]): 
-		print("Round 3 begins: ", cbtFC[0].NAME, " is attacking ", cbtFC[1].NAME)
+	if !hurt and !deathFlag and fData.a.FUP and check_uses(aWep): 
+		print("Round 3 begins: ", a.unitName, " is attacking ", t.unitName)
 		r3 = get_attack(0,1)
 	if r3:
 		hurt = combat_round(0, 1)
-			
+		_reduce_durability(a, aWep)
+		
 	print("Combat has resolved.")
 	emit_signal("combat_resolved")
 	
@@ -187,20 +155,20 @@ func start_the_justice(a: Unit, t: Unit):
 	
 #call to roll crit and damage after hit, returns true if any damage was actually done
 func combat_round(a, t):
-	var crt = get_crit(a,t)
+	var crt = get_crit(a)
 	var dmg = get_dmg(a, t, crt)
 	var hurt = false
 	if dmg != 0:
 			hurt = true
 	return hurt
 	
-func get_crit(a, _t):
+func get_crit(a):
 	#test variable
 	var critRoll
 	var critDmg
 	critRoll = get_roll()
-	print(cbtFC[a].NAME, "'s crit check was ", critRoll, " / ", cbtFC[a].CRIT,)
-	if cbtFC[a].CRIT >= critRoll:
+	#print(cbtFC[a].NAME, "'s crit check was ", critRoll, " / ", cbtFC[a].CRIT,)
+	if fData[a].CRIT >= critRoll:
 		print("Girl's are criting")
 		critDmg = rng.randi_range(10, 20)
 	else:
@@ -213,16 +181,16 @@ func get_dmg(a, t, crt):
 	var roll = get_roll()
 	var graze = 0
 	var dmg = 0
-	if roll <= cbtFC[t].GRZPRC:
-		graze = cbtFC[t].GRAZE
-		print(cbtFC[t].NAME, " Grazed! [-", cbtFC[t].GRAZE, "]")
-	print(cbtFC[t].NAME, "'s LIFE was reduced from ", cbtCL[t])
-	dmg = ((cbtFC[a].DMG + crt) - graze)
-	cbtCL[t] = units[t].apply_dmg(dmg)
-	print(" to ", cbtCL[t], " of which ", crt, " was critical damage!")
-	
-	if cbtCL[t] <= 0:
-		deathFlag = true
+	if roll <= fData[t].GRZPRC:
+		graze = fData[t].GRAZE
+		#print(cbtFC[t].NAME, " Grazed! [-", cbtFC[t].GRAZE, "]")
+	#print(cbtFC[t].NAME, "'s LIFE was reduced from ", cbtCL[t])
+	dmg = ((fData[a].DMG + crt) - graze)
+	#cbtCL[t] = units[t].apply_dmg(dmg)
+	##print(" to ", cbtCL[t], " of which ", crt, " was critical damage!")
+	#
+	#if cbtCL[t] <= 0:
+		#deathFlag = true
 	return dmg
 	
 func get_roll():
@@ -233,9 +201,9 @@ func get_attack(a, t):
 	#test variable
 	var hit = false
 	var roll = get_roll()
-	print(cbtFC[a].NAME, "'s ACC check: ", roll, "/", cbtFC[a].ACC, "
-		", cbtFC[t].NAME,"'s Avoid: ", cbtFC[t].AVOID)
-	if cbtFC[a].ACC >= roll:
+	#print(cbtFC[a].NAME, "'s ACC check: ", roll, "/", cbtFC[a].ACC, "
+		#", cbtFC[t].NAME,"'s Avoid: ", cbtFC[t].AVOID)
+	if fData.a.ACC >= roll:
 		print("This was a hit")
 		hit = true
 	else:
@@ -250,17 +218,36 @@ func get_attack(a, t):
 			
 	return hit
 	
-func check_uses(weapon):
-	if weapon.LIMIT and weapon.DUR != 0:
+func check_uses(weapon): # split durability drop from check
+	var itemData = UnitData.itemData
+	var wepData = itemData[weapon.Data]
+	if weapon.DUR != 0:
 		weapon.DUR -= 1
-		print(weapon.NAME, " uses: ", weapon.DUR,"/",weapon.MAXDUR)
 		return true
-	elif weapon.LIMIT and weapon.DUR == 0:
-		print(weapon, " is out of uses!")
+	elif weapon.DUR == 0:
+		print(wepData.NAME, " is out of uses!")
 		return false
 	else:
 		return true
+
+func use_item(unit, item):
+	run_effects(unit, unit, itemData[item.Data], true, true)
+	_reduce_durability(unit, item)
+	if item.DUR <= 0:
+		_delete_item(unit, item)
+	
+func _reduce_durability(unit, item):
+	item.DUR -= 1
+	if item.DUR <= 0:
+		_delete_item(unit, item)
 		
+func _delete_item(unit, item):
+	var inv = unit.unitData.Inv
+	var eqp = unit.unitData.EQUIP
+	var i = inv.find(item)
+	if eqp == item:
+		unit.unequip()
+	inv.remove_at(i)
 
 #Skills handled here and below#
 func run_skill(actor, target, activeSkill):
@@ -270,16 +257,16 @@ func run_skill(actor, target, activeSkill):
 		"Enemy":
 			skill_combat(actor, target, activeSkill)
 		"Self", "Ally":
-			run_effects(actor, target, activeSkill, true)
+			run_effects(actor, target, activeSkill)
 	# actor.add_composure(skill.Cost) #not an existing function yet
 	return skillResult
 	
-func run_effects(actor, target, activeSkill, hit):
+func run_effects(actor, target, activeSkill, hit = true, isItem = false):
 	var proc
 	var canCrit = false
 	var isSkill = true
 	#Add a check for if the Actor has a passive that enables criticals with skills
-	for effId in activeSkill.Effect:
+	for effId in activeSkill.EFFECT:
 		var effect = effectData[effId]
 		proc = false
 		if effect.OnHit and !hit:
@@ -321,7 +308,7 @@ func run_effects(actor, target, activeSkill, hit):
 							factor_dmg(actor, target, effect, canCrit, isSkill)
 						"Cure": target.cure_status(effect.CureType)
 						"Healing": 
-							factor_healing(actor, target, effect)
+							factor_healing(actor, target, effect, isItem)
 						"Sleep": target.set_status(attribute, effect.Duration, effect.Curable)
 						"Relocate": start_relocation(actor, target, effect.MoveType, effect.RelocRange)
 	
@@ -333,6 +320,8 @@ func skill_combat(actor, target, skill):
 	var defender = Global.defender
 	var check = get_roll()
 	var r1
+	var canReach = fData.t.reach
+	var defWep = defender.unitData.EQUIP
 	print(actor.unitName, " skill: ", skill.SkillId, " ACC: ", attacker.ACC, " check: ", check, "/", defender.AVOID)
 	if check < (attacker.ACC - defender.AVOID):
 		hit = true
@@ -340,7 +329,7 @@ func skill_combat(actor, target, skill):
 	if !skill.CanMiss:
 		hit = true
 	run_effects(actor, target, skill, hit)
-	if !hit and canCounter and canReach and check_uses(cbtAW[1]) and !deathFlag:
+	if !hit and canCounter and canReach and check_uses(defWep) and !deathFlag:
 		r1 = get_attack(1, 0)
 	if r1:
 		combat_round(1, 0)
@@ -374,12 +363,19 @@ func factor_dmg(actor, target, attack, canCrit = false, isSkill = false):
 	print(actor.unitName, "Dealt ", dmgResult, "Target's HP: ", target.activeStats.CLIFE)
 	if tCLife <= 0:
 		deathFlag = true
+		target.killXP = true
 	return dmgResult
 
-func factor_healing(actor, target, effect):
+func factor_healing(actor, target, effect, isItem):
 	var bonusEff = 0
 	#Add checks for bonus effects here
-	var healPower = effect.Heal + actor.activeStats.MAG + bonusEff
+	var statBonus
+	var healPower
+	if isItem:
+		statBonus = 0
+	else:
+		statBonus = actor.activeStats.MAG
+	healPower = effect.Heal + statBonus + bonusEff
 	print("Target Life: ", target.activeStats.CLIFE, " Heal:", healPower)
 	target.apply_heal(healPower)
 	print(target.activeStats.CLIFE)
@@ -389,8 +385,8 @@ func roll_crit(a, _t, attack): #Rework the combat manager, it's a fucking mess a
 	var critRoll
 	var critDmg
 	critRoll = get_roll()
-	print(a.unitName, "'s crit check was ", critRoll, " / ", cbtFC[a].CRIT)
-	if cbtFC[a].CRIT >= critRoll:
+	#print(a.unitName, "'s crit check was ", critRoll, " / ", cbtFC[a].CRIT)
+	if fData[a].clash.CRIT >= critRoll:
 		print("Girl's are criting")
 		critDmg = rng.randi_range(10, 20)
 	else:
@@ -431,5 +427,61 @@ func shove_or_toss_unit(actor, target, range, pivotHex, matchHex):
 	else:
 		target.relocate_unit(shoveResult.Hex)
 		
+func warp_to(target, cell):
+	target.relocate_unit(cell)
 
 	
+
+
+func _on_gui_manager_start_the_justice():
+	pass # Replace with function body.
+
+
+#func combat_forecast(a: Unit, t: Unit, distance, isSkill = false, skill = null):
+	#cbtUD.clear()
+	#cbtCL.clear()
+	#cbtAW.clear()
+	#fData.clear()
+	#aWep = a.unitData.EQUIP
+	#tWep = t.unitData.EQUIP
+	#var aId = aWep.Data
+	#var tId = tWep.Data
+	#canReach = false
+	#var itemData = UnitData.itemData
+	#
+	#
+	#cbtCL = [a.activeStats.CLIFE, t.activeStats.CLIFE]
+	#cbtUD = [a.unitData.Stats, t.unitData.Stats]
+	#cbtAW = [itemData[aId], itemData[tId]]
+	#var i = 0
+	#var revI = 1
+	#var atkr = 0
+	#var trgt = 1
+	#var wAcc = [cbtAW[0].ACC, cbtAW[1].ACC]
+	#var wDmg = [cbtAW[0].DMG, cbtAW[1].DMG]
+	#var wCrt = [cbtAW[0].CRIT, cbtAW[1].CRIT]
+	#var wGrz = [cbtAW[0].GRAZE, cbtAW[1].GRAZE]
+##	var wLimit = [cbtAW[0].LIMIT, cbtAW[1].LIMIT]
+	#var wType = [cbtAW[0].TYPE, cbtAW[1].TYPE]
+	#var minR = cbtAW[1].MINRANGE
+	#var maxR = cbtAW[1].MAXRANGE
+	#
+	#if isSkill: #Not evaluated yet
+		#if skill.CanMiss:
+			#wAcc[0] = skill.ACC
+		#for effect in skill.Effect:
+			#if  effectData[effect].has("Damaging") and effectData[effect].Damaging == true:
+				#wCrt[0] = 0
+				#wType[0] = effectData[effect].Type
+				#match  effectData[effect].Type: 
+					#"Physical": 
+						#wDmg[0] += effectData[effect].Damage
+					#"Magical": 
+						#wDmg[0] += effectData[effect].Damage
+				#
+	#canReach = _distance_check(minR, maxR, distance)
+		#
+	#fData["a"] = _evaluate_clash(a, t)
+	#fData["t"] = _evaluate_clash(t, a)
+	#fData.t["RLIFE"] = _get_remaining_life(t, fData.a)
+	#fData.a["RLIFE"] = _get_remaining_life(a, fData.t)

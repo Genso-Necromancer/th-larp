@@ -12,7 +12,7 @@ var firstLaunch = true
 func _ready():
 	if firstLaunch:
 		var mainCon = get_parent()
-		mainCon.newSlave = self
+		mainCon.newSlave = [yaBoy]
 		mainCon.state = mainCon.GameState.START
 		popUp = sceneMenu.get_popup()
 		popUp.index_pressed.connect(self.on_index_pressed)

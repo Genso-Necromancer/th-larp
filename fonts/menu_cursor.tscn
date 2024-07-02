@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://fonts/menu_cursor.gd" id="1_tms0j"]
 
 [node name="menu_cursor" type="TextureRect"]
+top_level = true
 y_sort_enabled = true
 offset_right = 16.0
 offset_bottom = 16.0

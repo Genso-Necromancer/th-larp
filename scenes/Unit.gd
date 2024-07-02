@@ -6,20 +6,28 @@ signal exp_handled
 signal imdead
 signal deathDone
 signal unit_relocated
+signal exp_gained
+signal leveled_up
 
 #Unit Parameters
+
+@export var preDefined : bool = false
+@export var generate : bool = true
 @export_enum("Enemy", "Player", "NPC") var faction: String = "Enemy"
 @export_enum("Fairy", "Human", "Kappa", "Lunarian", "Oni", "Doll", "Devil", "Yukionna", "Zombie", "Hermit", "Magician", "Spirit") var species: String = "Fairy"
 @export_enum("Trblr", "Thief") var job: String = "Trblr"
-@export var weapon : String = "Skip"
-@export var weapon2: String = "Skip"
-@export var weapon3: String = "Skip"
-@export var weapon4: String = "Skip"
+@export var inventory: Array[String] = []
+
 #Profile
+@export var unitID = "unitID"
 @export var unitName = "Name"
 @export var move_speed := 150.0
-@export var genLevel : int
+@export var genLevel : int = 1
+var deployed : bool = false
+var forced : bool = false
+
 var unitData
+var itemData = UnitData.itemData
 var allUnitData
 var groupKeys = UnitData.groups
 var statKeys = UnitData.stats
@@ -47,15 +55,15 @@ var activeBuffs = {}
 #			await ready
 #		_sprite.texture = value
 
-@export var skin_offset := Vector2.ZERO:
-	set(value):
-		
-		skin_offset = value
-		if not _sprite:
-			await ready
-		_sprite.position = value
+#@export var skin_offset := Vector2i.ZERO:
+#	set(value):
+#
+#		skin_offset = value
+#		if not _sprite:
+#			await ready
+#		_sprite.position = value
 ## Coordinates of the current cell the cursor moved to.
-var cell := Vector2.ZERO:
+var cell := Vector2i.ZERO:
 	set(value):
 		cell = map.cell_clamp(value)
 		
@@ -95,26 +103,35 @@ var walk_directions = [
 var walk_directions_size = float(walk_directions.size())
 
 #test
-var location
+var spawnLoc
 var originLocation
-
 
 func _ready() -> void:
 #	print(statVars)
 #	#print("unit.gd:", unitId)
-	load_stats()
-	load_sprites()
-	if map.get_class() != "TileMap":
-		pass
-	elif !map.mapReady.is_connected(self._on_test_map_map_ready):
-		map.mapReady.connect(self._on_test_map_map_ready)
-	_path_follow.rotates = false
 	_anim_player.play("idle")
-	# We create the curve resource here because creating it in the editor prevents us from
-	# moving the unit.
-	if not Engine.is_editor_hint():
-		curve = Curve2D.new()
+	if preDefined:
+		_load_stats()
+		_load_sprites()
+		if map.get_class() != "TileMap": #may not need in future, too specific to "test map"
+			pass
+		elif !map.mapReady.is_connected(self._on_test_map_map_ready):
+			map.mapReady.connect(self._on_test_map_map_ready)
 		
+		# We create the curve resource here because creating it in the editor prevents us from
+		# moving the unit.
+		if not Engine.is_editor_hint():
+			curve = Curve2D.new()
+	else:
+		if not Engine.is_editor_hint():
+			curve = Curve2D.new()
+	
+	
+func init_player_unit(iD):
+	unitID = iD
+	faction = "Player"
+	_load_stats()
+	_load_sprites()
 	
 
 func _process(delta: float) -> void:
@@ -128,11 +145,9 @@ func _process(delta: float) -> void:
 		var norm_move_vec = current_move_vec.normalized()
 		var direction_id = int(walk_directions_size * (norm_move_vec.rotated(PI / walk_directions_size).angle() + PI) / TAU)
 		_anim_player.play(str(walk_directions[direction_id]))
-	location = cell
-	$PathFollow2D/Cell.set_text(str(location))
 	
 	
-	if _path_follow.progress_ratio >= 1.0:
+	if _path_follow != null && _path_follow.progress_ratio >= 1.0:
 		_is_walking = false
 		# Setting this value to 0.0 causes a Zero Length Interval error
 		_path_follow.progress = 0.00001
@@ -170,16 +185,15 @@ func return_original():
 #	#print(originCell, cell)
 	return cell
 	
-func load_stats():
+func _load_stats():
 	allUnitData = UnitData
 	if faction == "Player":
 		add_to_group("Player")
-		unitData = UnitData.unitData[unitName.get_slice(" ", 0)].duplicate(true)
-		baseStats = unitData.Stats.duplicate(true)
+		unitData = UnitData.unitData[unitID].duplicate(true)
+		baseStats = unitData.Stats
 		unitName = unitData["Profile"]["UnitName"]
 		check_passives()
 		activeStats["CLIFE"] = baseStats["LIFE"]
-		init_wep(true)
 	if faction == "Enemy":
 		add_to_group("Enemy")
 		var unique = false
@@ -190,7 +204,7 @@ func load_stats():
 			print("No Job, Weapon or Species.")
 			return
 		else:
-			var weapons = [weapon4, weapon3, weapon2, weapon]
+			
 			while !unique:
 				ykTag = baseTag + str(counter)
 				if UnitData.unitData.has(ykTag):
@@ -201,16 +215,11 @@ func load_stats():
 			unitData = globalUD[ykTag].duplicate(true)
 			baseStats = unitData.Stats.duplicate(true)
 			activeStats["CLIFE"] = baseStats["LIFE"]
-			unitData["StartInv"] = []
-			for wep in weapons:
-				if wep == null or wep == "Skip" or wep == "":
-					continue
-				else:
-					unitData["StartInv"].append(wep)
 			
-		init_wep(false)
-
-	update_stats()
+			
+		_init_inv()
+	
+	
 #	var groups = get_groups()
 #	print(unitName, " ", groups)
 
@@ -218,18 +227,23 @@ func load_stats():
 		
 #keep track of active de/buffs during gameplay, seperate from actual stats
 func apply_buff(attribute, effId, stat, buff, duration, curable = true, selfCast = false, source = ""):
+	var isBuff = false
+	
 	if effId == null:
 		print("No SkillID found")
 		return
-	activeBuffs[effId] = {}
-	activeBuffs[effId]["Type"] = attribute
-	activeBuffs[effId]["Stat"] = stat
-	activeBuffs[effId]["Mod"] = buff
-	activeBuffs[effId]["Duration"] = duration
-	activeBuffs[effId]["Curable"] = curable
-	#the following are currently not considered worth using. Thought they were needed, but don't see a purpose currently.
-	activeBuffs[effId]["Fresh"] = selfCast
-	activeBuffs[effId]["Source"] = source
+	if duration == 0:
+		unitData.Stats[stat] += buff
+	else:
+		activeBuffs[effId] = {}
+		activeBuffs[effId]["Type"] = attribute
+		activeBuffs[effId]["Stat"] = stat
+		activeBuffs[effId]["Mod"] = buff
+		activeBuffs[effId]["Duration"] = duration
+		activeBuffs[effId]["Curable"] = curable
+		#the following are currently not considered worth using. Thought they were needed, but don't see a purpose currently.
+		activeBuffs[effId]["Fresh"] = selfCast
+		activeBuffs[effId]["Source"] = source
 	update_stats()
 	
 	
@@ -257,55 +271,27 @@ func status_duration_tick():
 #	print(activeBuffs)
 	update_stats()
 	
-func load_sprites():
+func _load_sprites():
 	
 	if faction == "Player":
 		_sprite.texture = unitData["Profile"]["Sprite"]
 		_sprite.self_modulate = Color(1,1,1)
 	if faction == "Enemy":
 		_sprite.self_modulate = Color(1,0,0)
-		
-func init_wep(isPlayer):
-	if unitData.StartInv.size() == 0:
-		unitData.EQUIP = "NONE"
+	_path_follow.rotates = false
+	_anim_player.play("idle")
+	
+func _init_inv():
+	var limit = unitData.MaxInv
+	if inventory.size() < 1:
 		return
-	var equipped = false
-	var uniqueID
-	for wep in unitData.StartInv:
-		uniqueID = UnitData.add_inv(wep, isPlayer, true)
-		unitData.Inv.append(uniqueID)
-		if !equipped:
-			unitData.EQUIP = uniqueID
-			equipped == true
-#	print(unitData.EQUIP)
-#	print(unitData.Inv)
-#	if isPlayer:
-#		print(UnitData.plrInv[uniqueID])
-#		print(UnitData.plrInv)
-#	else:
-#		print(UnitData.npcInv[uniqueID])
-#		print(UnitData.npcInv)
-#func stat_gen():
-#	pass
-
-#func update_stats(newStats):
-#	level = newStats[0]
-#	var hpBump = newStats[1] - maxHp
-#	maxHp = newStats[1]
-#	currHp += hpBump
-#	moveRange = moveRange
-#	uStr = newStats[2]
-#	mag = newStats[3]
-
-#func _on_main_exp_test():
-#	var action = "defeat"
-#	var targLvl = 2
-#	var storage
-#	storage = Leveling.get_experience(action, currExp, targLvl, stats, growths, caps)
-#	currExp = storage[0]
-#	stats = storage[1]
-#	update_stats(stats)
-#	emit_signal("exp_handled")
+	for thing in inventory:
+		if unitData.Inv.size() >= limit:
+			break
+		var dur = itemData[thing].MAXDUR
+		var newItem : Dictionary = {"Data": thing, "DUR": dur}
+		unitData.Inv.append(newItem)
+	set_equipped()
 
 func check_passives():
 	#ATTENTION
@@ -322,23 +308,65 @@ func check_passives():
 			
 		
 
-func set_equipped(weapon):
-	if weapon == null or weapon == "":
-		unitData.EQUIP = "NONE"
+
+func set_equipped(iInv = false): #searches for first valid if false or out of bounds, otherwise pass inv index and will equip if valid
+	var valid = false
+	var invItem
+	var iCat
+	if iInv and iInv < unitData.Inv.size():
+		invItem = unitData.Inv[iInv]
+		valid = check_valid_weapon(invItem)
 	else: 
-		unitData.EQUIP = weapon
-	
-func update_combatdata():
-	var terrainBonus = update_terrain_bonus()
-	var equipped = unitData.EQUIP
-	var wep 
-	var stat = activeStats
-	if faction == "Player" and equipped != "NONE":
-		wep = allUnitData.plrInv[equipped]
-	elif faction!= "Player" and equipped != "NONE":
-		wep = allUnitData.npcInv[equipped]
+		var i = 0
+		for thing in unitData.Inv:
+			if check_valid_weapon(thing):
+				valid = true
+				iInv = i
+				break
+			i += 1
+	if valid:
+		var holder = unitData.Inv.pop_at(iInv)
+		unitData.Inv.push_front(holder)
+		unitData.EQUIP = unitData.Inv[0]
 	else:
-		wep = allUnitData.wepData["NONE"]
+		unitData.EQUIP = null
+	
+func unequip():
+	unitData.EQUIP = null
+	
+func check_valid_weapon(item): #Subweapons not fully implemented, Sub returns true regardless of which sub it is. There is no differentiation yet.
+	var usable: Array = []
+	var wTypes = unitData.Weapons.keys()
+	var i = 0
+	var iCat = itemData[item.Data].CATEGORY
+	if item.DUR == 0:
+		return false
+	for weapon in unitData.Weapons:
+		if unitData.Weapons[weapon]:
+			usable.append(weapon)
+		i += 1
+	if usable.has(iCat):
+		return true
+	else:
+		return false
+			
+func update_combatdata():
+	#no catch for empty inv!!!!! HERE Wait, isn't there one? setting it to Null, and then having null translate to "NONE" when all null instances could just be "NONE" is retarded. Fix this, you god damned retard.
+	var terrainBonus = update_terrain_bonus()
+	var wep
+	if unitData.EQUIP:
+		var equipped = unitData.EQUIP
+		wep = itemData[equipped.Data]
+	else:
+		wep = itemData["NONE"]
+	var stat = activeStats
+	
+#	if faction == "Player" and equipped != "NONE":
+#		wep = allUnitData.plrInv[equipped]
+#	elif faction!= "Player" and equipped != "NONE":
+#		wep = allUnitData.npcInv[equipped]
+#	else:
+#		wep = allUnitData.wepData["NONE"]
 	
 	combatData.TYPE = wep.TYPE
 	if wep.TYPE == "Physical":
@@ -356,7 +384,7 @@ func update_combatdata():
 	combatData.ACCBASE = stat.ELEG * 2 + stat.CHA
 
 func update_stats():
-	if baseStats == null or activeStats == null:
+	if baseStats == null or activeStats == null or lifeBar == null:
 		return
 	lifeBar.max_value = baseStats.LIFE
 	lifeBar.value = activeStats.CLIFE
@@ -403,9 +431,11 @@ func cure_status(statusEff):
 	update_stats()
 
 func _on_test_map_map_ready():
+	var coord = $PathFollow2D/Cell
 	cell = map.local_to_map(position)
 	position = map.map_to_local(cell)
 	originCell = cell
+	coord.set_text(str(cell))
 
 
 #func on_combat_resolved():
@@ -419,7 +449,7 @@ func on_turn_changed():
 func run_death():
 	if faction != "Player":
 		unitData.erase(ykTag)
-	emit_signal("imdead", self)
+#	emit_signal("imdead", self)
 	fade_out(1.0)
 	
 		
@@ -439,7 +469,7 @@ func set_status(status, duration, isCurable): #I wish I could inflict sleep stat
 	activeStatus[status] = {"Active" : true, "Duration" : duration, "Curable" : isCurable}
 	$PathFollow2D/Cell2.set_text(str(activeStatus.Sleep.Active))
 	
-func check_status(status):
+func check_status(status): #FIX find a way to set a generic "disabled" status, regardless of disabling debuff so a specific status isn't necessary to check for.
 	if activeStatus[status].Active:
 		return true
 	else:
@@ -462,10 +492,13 @@ func update_terrain_data(data):
 func update_terrain_bonus():
 #	print(combatData.AVOID)
 	var bonus = 0
-	var i = find_nested(terrainData, Vector2i(cell))
-	if i != -1:
-		bonus = terrainData[i][2]
-	return bonus
+	if deployed:
+		var i = find_nested(terrainData, Vector2i(cell))
+		if i != -1:
+			bonus = terrainData[i][2]
+		return bonus
+	else:
+		return 0
 
 	
 func find_nested(array, value):
@@ -479,14 +512,71 @@ func find_nested(array, value):
 			return i
 	return -1
 
-func relocate_unit(location):
+func relocate_unit(location, gridUpdate = true): 
 	var oldCell = cell
-	var cell = location
+	var coord = $PathFollow2D/Cell
+	cell = location
+	coord.set_text(str(cell)) #not updated when a unit moves normally, oops
 	position = map.map_to_local(cell)
-	emit_signal("unit_relocated", oldCell, cell, self)
+	
+	if gridUpdate:
+		emit_signal("unit_relocated", oldCell, cell, self)
+	
+	cell = map.local_to_map(position)
+	position = map.map_to_local(cell)
 	
 func _on_animation_player_animation_finished(anim_name):
-#	if anim_name == "death":
-#		var oka
 	pass
 	
+	#HERE
+func add_exp(action, target = null):
+	if self.faction != "Player":
+		return
+	var exp = 0
+	var results
+	var oldStats = unitData.Stats.duplicate()
+	var oldLevel = unitData.Profile.Level
+	var targetLevel
+	var oldExp = unitData.Profile.EXP
+	var expSteps = []
+	var portrait = unitData.Profile.Prt
+	var lvlLoops = 0
+	var levelUpReport = {}
+
+	if target != null:
+		targetLevel = target.unitData.Profile.Level
+#	print(unitData.Profile.EXP)
+	match action:
+		"Kill": exp = 150
+		"Support": exp = 60
+		"Generic": exp = 60
+	unitData.Profile.EXP += exp
+	
+#	print(unitData.Profile.EXP)
+	if unitData.Profile.EXP <= 100:
+		expSteps.append(unitData.Profile.Exp) 
+		
+	if unitData.Profile.EXP >= 100 and unitData.Profile.Level < 20:
+		var expBracket = unitData.Profile.EXP
+		while expBracket > 100:
+			expSteps.append(100)
+			expBracket -= 100
+			
+			if expBracket < 100:
+				expSteps.append(expBracket)
+		
+		while unitData.Profile.EXP > 100:	
+			unitData.Profile.EXP = unitData.Profile.EXP - 100
+			lvlLoops += 1
+			
+		results = allUnitData.level_up(unitData, lvlLoops).duplicate()
+		levelUpReport["Results"] = results
+		levelUpReport["Levels"] = lvlLoops
+		levelUpReport["OldStats"] = oldStats
+		levelUpReport.OldStats["LVL"] = oldLevel
+#		print(unitData)
+	emit_signal("exp_gained", oldExp, expSteps, levelUpReport, portrait, unitData.Profile.UnitName)
+
+func map_start_init():
+	originCell = map.local_to_map(position) #BUG GY
+	print(originCell)

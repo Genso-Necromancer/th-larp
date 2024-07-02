@@ -6,20 +6,14 @@ func sort_turns(turns):
 	if turns.size() <= 1:
 		return turns
 	
-	var pivot = []
 	var player_turns = []
 	var enemy_turns = []
-	pivot.append(turns[0])
-	for i in range(1, turns.size()):
-		var turn = turns[i]
-		if turn[0] == false:
-			player_turns.append(turn)
-		else:
-			enemy_turns.append(turn)
-#	player_turns = sort_turns(player_turns)
-#	enemy_turns = sort_turns(enemy_turns)
-	
-	return [pivot[0]] + weave_turns(player_turns, enemy_turns)
+	for turn in turns:
+		match turn:
+			"Player": player_turns.append(turn)
+			"Enemy": enemy_turns.append(turn)
+			
+	return weave_turns(player_turns, enemy_turns)
 	
 func weave_turns(player_turns, enemy_turns):
 	var interleaved_turns = []
@@ -28,6 +22,10 @@ func weave_turns(player_turns, enemy_turns):
 	var enemy_index = 0
 	var player_remaining = player_turns.size()
 	var enemy_remaining = enemy_turns.size()
+	
+	interleaved_turns.append(player_turns[player_index])
+	player_index += 1
+	player_remaining -= 1
 	
 	while player_remaining > 0 || enemy_remaining > 0:
 		if enemy_remaining > 0:

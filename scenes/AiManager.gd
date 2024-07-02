@@ -164,13 +164,14 @@ func find_valid_attacks(aiUnit, path, state):
 	var validAttacks = []
 #	threat = aHex.find_threat(path, ranges)
 	var aiInv = aiUnit.unitData.Inv
-	var wepData = UnitData.npcInv
+	var wepData = UnitData.itemData
 	var targetDef
 	for wep in aiInv:
-		var ranges = [wepData[wep].MINRANGE, wepData[wep].MAXRANGE]
+		var wepID = wep["Data"]
+		var ranges = [wepData[wepID].MINRANGE, wepData[wepID].MAXRANGE]
 		var threat = aHex.find_threat(path, ranges, aiUnit.moveType)
 		for unit in state.player:
-			match wepData[wep].TYPE:
+			match wepData[wepID].TYPE:
 				"Physical":
 					targetDef = "BAR"
 					if (aiUnit.combatData.DMG - unit.unitData.Stats.BAR <= 0):
@@ -264,14 +265,17 @@ func combat_values(aiUnit, attack, targetDef):
 	return value
 	
 func check_safe(aiUnit, target, launch):
+	var wepData = UnitData.itemData
 	var distance = aHex.compute_cost(launch, target.cell, aiUnit.moveType, false)
-	var targetWep = target.unitData.EQUIP
+	var equip = target.unitData.EQUIP
+	var wepID = equip["Data"]
 	var targetReach
 	var safe = false
+	var wep = wepData[wepID]
 	if target.is_in_group("Player"):
-		targetReach = UnitData.plrInv[targetWep].MAXRANGE
+		targetReach = wep.MAXRANGE
 	elif target.is_in_group("Enemy"):
-		targetReach = UnitData.npcInv[targetWep].MAXRANGE
+		targetReach = wep.MAXRANGE
 #	if distance == 3:
 #		print(launch, target.cell)
 	if distance > targetReach:

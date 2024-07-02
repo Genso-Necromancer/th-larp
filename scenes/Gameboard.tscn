@@ -50,16 +50,6 @@ visibility_layer = 2
 z_index = 1
 position = Vector2(288, 156)
 
-[node name="Camera2D" type="Camera2D" parent="Cursor"]
-position_smoothing_enabled = true
-drag_horizontal_enabled = true
-drag_vertical_enabled = true
-drag_left_margin = 0.6
-drag_top_margin = 0.6
-drag_right_margin = 0.6
-drag_bottom_margin = 0.6
-editor_draw_drag_margin = true
-
 [node name="AiManager" type="Node" parent="."]
 script = ExtResource("7_rin0x")
 

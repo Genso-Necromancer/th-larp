@@ -1,20 +1,37 @@
 [gd_scene load_steps=4 format=3 uid="uid://2ggl8hw7vq8n"]
 
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_rcm7k"]
+[ext_resource type="Script" path="res://scenes/action_menu.gd" id="2_mu83r"]
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="4_cpge4"]
-[ext_resource type="PackedScene" uid="uid://cmh8ono4w82cq" path="res://fonts/menu_cursor.tscn" id="5_uyjk8"]
 
 [node name="ActionMenu" type="Control"]
 layout_mode = 3
-anchors_preset = 0
-size_flags_horizontal = 4
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+size_flags_horizontal = 8
+size_flags_vertical = 8
 theme = ExtResource("4_cpge4")
+script = ExtResource("2_mu83r")
 
 [node name="Count" type="MarginContainer" parent="."]
 custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-offset_right = 48.0
-offset_bottom = 47.0
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -315.0
+offset_top = -273.0
+offset_right = -259.0
+offset_bottom = -210.0
+grow_horizontal = 0
+grow_vertical = 0
 theme_override_constants/margin_top = 6
 theme_override_constants/margin_bottom = 6
 
@@ -38,12 +55,13 @@ theme_override_constants/margin_bottom = 4
 layout_mode = 2
 theme = ExtResource("4_cpge4")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Count/ActionBox/CenterContainer"]
+[node name="ActionContainer" type="VBoxContainer" parent="Count/ActionBox/CenterContainer"]
+visible = false
 layout_mode = 2
 theme = ExtResource("4_cpge4")
 theme_override_constants/separation = 0
 
-[node name="AtkBtn" type="Button" parent="Count/ActionBox/CenterContainer/VBoxContainer"]
+[node name="AtkBtn" type="Button" parent="Count/ActionBox/CenterContainer/ActionContainer"]
 layout_mode = 2
 focus_neighbor_top = NodePath("../WaitBtn")
 focus_neighbor_bottom = NodePath("../SklBtn")
@@ -51,7 +69,7 @@ theme = ExtResource("4_cpge4")
 action_mode = 0
 text = "Attack"
 
-[node name="SklBtn" type="Button" parent="Count/ActionBox/CenterContainer/VBoxContainer"]
+[node name="SklBtn" type="Button" parent="Count/ActionBox/CenterContainer/ActionContainer"]
 layout_mode = 2
 focus_neighbor_top = NodePath("../AtkBtn")
 focus_neighbor_bottom = NodePath("../WaitBtn")
@@ -60,7 +78,7 @@ disabled = true
 action_mode = 0
 text = "Skill"
 
-[node name="WaitBtn" type="Button" parent="Count/ActionBox/CenterContainer/VBoxContainer"]
+[node name="WaitBtn" type="Button" parent="Count/ActionBox/CenterContainer/ActionContainer"]
 layout_mode = 2
 focus_neighbor_top = NodePath("../SklBtn")
 focus_neighbor_bottom = NodePath("../AtkBtn")
@@ -68,25 +86,31 @@ theme = ExtResource("4_cpge4")
 action_mode = 0
 text = "Wait"
 
-[node name="EndBtn" type="Button" parent="Count/ActionBox/CenterContainer/VBoxContainer"]
+[node name="GenericContainer" type="VBoxContainer" parent="Count/ActionBox/CenterContainer"]
 visible = false
 layout_mode = 2
-focus_neighbor_top = NodePath("../SklBtn")
-focus_neighbor_bottom = NodePath("../AtkBtn")
+
+[node name="EndBtn" type="Button" parent="Count/ActionBox/CenterContainer/GenericContainer"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../../ActionContainer/SklBtn")
+focus_neighbor_bottom = NodePath("../../ActionContainer/AtkBtn")
 theme = ExtResource("4_cpge4")
 action_mode = 0
 text = "End"
 
 [node name="m" type="PanelContainer" parent="."]
+visible = false
 layout_mode = 1
-anchors_preset = 1
+anchors_preset = 3
 anchor_left = 1.0
+anchor_top = 1.0
 anchor_right = 1.0
+anchor_bottom = 1.0
 offset_left = -32.0
-offset_bottom = 32.0
+offset_top = -32.0
 grow_horizontal = 0
+grow_vertical = 0
 theme = ExtResource("4_cpge4")
-metadata/_edit_use_anchors_ = true
 
 [node name="b" type="NinePatchRect" parent="m"]
 layout_mode = 2
@@ -115,6 +139,4 @@ theme = ExtResource("4_cpge4")
 layout_mode = 2
 theme = ExtResource("4_cpge4")
 
-[node name="menu_cursor" parent="." instance=ExtResource("5_uyjk8")]
-layout_mode = 0
-scale = Vector2(2, 2)
+[connection signal="pressed" from="Count/ActionBox/CenterContainer/GenericContainer/EndBtn" to="." method="_on_end_btn_pressed"]

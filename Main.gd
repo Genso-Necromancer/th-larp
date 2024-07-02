@@ -11,12 +11,15 @@ enum GameState {
 	GB_SKILL_MENU,
 	GB_ROUND_END,
 	GB_WARP,
-	START
+	GB_SETUP,
+	GB_FORMATION,
+	START,
+	ACCEPT_PROMPT
 } #state tags for easy swapping
 
 var gameBoard
-var newSlave
-var activeState
+var newSlave : Array = []
+var activeState : GenericState
 var state:= GameState.LOADING: #when this variable is changed to a valid state tag, it does all the work in properly changing the state to streamline coding. See set_new_state function for more.
 	set(value):
 #		if check_valid_state(value):
@@ -129,6 +132,7 @@ func set_new_state(value): #Value = new State Tag. Call this function, or simply
 
 func _switch_state_get_slaves(value): 
 	var slaves = []
+	
 	match value: #when creating a new state, you must add an entry to this match list
 		GameState.LOADING: 
 			slaves = [] #array of nodes that listen to the state, used to call their functions
@@ -163,9 +167,18 @@ func _switch_state_get_slaves(value):
 		GameState.GB_WARP:
 			slaves = [gameBoard]
 			activeState = GBWarpSelectState.new()
+		GameState.GB_SETUP:
+			slaves = newSlave
+			activeState = GBSetUpState.new()
+		GameState.GB_FORMATION:
+			slaves = newSlave
+			activeState = GBFormationState.new()
 		GameState.START:
-			slaves = [newSlave]
+			slaves = newSlave
 			activeState = StartState.new()
+		GameState.ACCEPT_PROMPT:
+			slaves = newSlave
+			activeState = AcceptState.new()
 	add_child(activeState)
 	return slaves
 
@@ -180,3 +193,5 @@ func set_map(map):
 
 func unload_me(scene):
 	scene.queue_free()
+	
+

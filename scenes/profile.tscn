@@ -1,14 +1,18 @@
-[gd_scene load_steps=4 format=3 uid="uid://cxjo0fdu14w3o"]
+[gd_scene load_steps=5 format=3 uid="uid://cxjo0fdu14w3o"]
 
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_phvm5"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_sedhl"]
+[ext_resource type="Script" path="res://scenes/profile.gd" id="2_wouk2"]
 [ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="3_x6e7x"]
 
 [node name="Profile" type="MarginContainer"]
+top_level = true
 offset_right = 198.0
 offset_bottom = 200.0
 mouse_filter = 0
 theme = ExtResource("1_phvm5")
+script = ExtResource("2_wouk2")
+metadata/_edit_use_anchors_ = true
 
 [node name="BackgroundCenter" type="NinePatchRect" parent="."]
 custom_minimum_size = Vector2(96, 16)
