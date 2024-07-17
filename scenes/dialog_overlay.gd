@@ -16,6 +16,12 @@ var example_dict = {
 	1: {
 		"text": "This was just a test... OK!",
 		"effects": ["portrait-normal"]
+	},
+	2: {
+		"text": "Hey I just ordered a pizz- oh sorry for interrupting.",
+		"speaker": "Pakooli",
+		"title": "magical girl",
+		"portrait": "res://sprites/PatchouliPrt.png",
 	}
 }
 
