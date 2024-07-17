@@ -1,7 +1,6 @@
-[gd_scene load_steps=14 format=3 uid="uid://bnyhiorbaajm"]
+[gd_scene load_steps=13 format=3 uid="uid://bnyhiorbaajm"]
 
 [ext_resource type="Script" path="res://scenes/dialog_overlay.gd" id="1_ik6st"]
-[ext_resource type="Texture2D" uid="uid://dk78ulr1v3fbq" path="res://sprites/SakuyaPrt.png" id="1_u2rhs"]
 [ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="2_5q3ap"]
 [ext_resource type="Texture2D" uid="uid://4lca2aumdu2g" path="res://sprites/testCursor.png" id="4_m3j4u"]
 
@@ -128,14 +127,14 @@ theme_override_constants/separation = 13
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 1
-text = "Sakula"
+text = "XXX"
 label_settings = SubResource("LabelSettings_j828d")
 
 [node name="TitleLabel" type="Label" parent="HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 1
-text = "meido"
+text = "XXX"
 label_settings = SubResource("LabelSettings_o6884")
 vertical_alignment = 1
 
@@ -172,7 +171,6 @@ offset_left = 53.0
 offset_top = 384.0
 offset_right = 168.0
 offset_bottom = 496.0
-texture = ExtResource("1_u2rhs")
 
 [node name="TextStopper" type="TextureRect" parent="."]
 visible = false

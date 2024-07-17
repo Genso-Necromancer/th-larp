@@ -1,42 +1,77 @@
 extends Control
 
-var textlines: Array[String] = ["Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.","Just know, the milady's with me. With that out of the way, how may I be of service?"]
 @export var draw_speed = 1
 var text_count = 0
-var textline_index = 0
+var textline_index = -1
+var text_is_finished = false
+
+var example_dict = {
+	0: {
+		"text": "Just know, the milady's with me. With that out of the way, how may I be of service?",
+		"speaker": "Sakula",
+		"title": "medio",
+		"portrait": "res://sprites/SakuyaPrt.png",
+		"effects": ["portrait-sil"]
+	},
+	1: {
+		"text": "This was just a test... OK!",
+		"effects": ["portrait-normal"]
+	}
+}
 
 
 signal text_finished
 
 
 func _ready():
-	text_finished.connect(_on_text_finished) 
+	text_finished.connect(_on_text_finished)
+	next_textline()
 
 
 func _unhandled_input(event):
 	if event.is_action_released("ui_accept") && !$TextStopper/AnimationPlayer.is_playing():
 		text_finished.emit()
-	elif event.is_action_released("ui_accept"):
-		if textline_index == textlines.size() - 1:
-			pass
-		else:
-			text_count = 0
-			textline_index += 1
-			$TextBody.text = ""
-			$TextStopper.visible = false
-			$TextStopper/AnimationPlayer.stop()
+	elif event.is_action_released("ui_accept") && textline_index < example_dict.size() - 1:
+		next_textline()
+
 
 
 func _physics_process(delta):
 	# This method is a "static text speed" rather than a percentage of visible text!
-	if text_count < textlines[textline_index].length():
-		$TextBody.text += textlines[textline_index].substr(text_count, draw_speed)
+	if text_count < example_dict[textline_index]["text"].length():
+		$TextBody.text += example_dict[textline_index]["text"].substr(text_count, draw_speed)
 		text_count += draw_speed
-	else:
+	elif !text_is_finished:
 		text_finished.emit()
 
 
 func _on_text_finished():
-	$TextBody.text = textlines[textline_index]
+	print("Text finished drawing")
+	text_is_finished = true
+	text_count = example_dict[textline_index]["text"].length()
+	$TextBody.text = example_dict[textline_index]["text"]
 	$TextStopper.visible = true
 	$TextStopper/AnimationPlayer.play("ContinueBobber")
+
+
+func next_textline():
+	text_count = 0
+	text_is_finished = false
+	textline_index += 1
+	$TextBody.text = ""
+	$TextStopper.visible = false
+	$TextStopper/AnimationPlayer.stop()
+	
+	if example_dict[textline_index].has("speaker"):
+		$HBoxContainer/NameLabel.text = example_dict[textline_index]["speaker"]
+	if example_dict[textline_index].has("title"):
+		$HBoxContainer/TitleLabel.text = example_dict[textline_index]["title"]
+	if example_dict[textline_index].has("portrait"):
+		$PortraitRect.texture = load(example_dict[textline_index]["portrait"])
+	
+	if example_dict[textline_index].has("effects"):
+		for effect in example_dict[textline_index]["effects"]:
+			if effect == "portrait-sil":
+				$PortraitRect.modulate = Color(0,0,0)
+			if effect == "portrait-normal":
+				$PortraitRect.modulate = Color(1,1,1)
