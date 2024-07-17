@@ -368,17 +368,32 @@ func _unhandled_input(event: InputEvent) -> void: #for debugging, delete later
 	if event.is_action_pressed("debugHealTest"):
 		for cell in units:
 			units[cell].apply_dmg(2)
+	
+	if event.is_action_pressed("ui_scroll_right") && !isTweening: # The 'X' button for testing
+		isTweening = true
+		cursor.toggle_visibility()
+		cursor.toggle_camera_drag()
+		var local_pos_to_pan_to = currMap.map_to_local(Vector2i(5,4))
+		var tween = create_tween()
+		var duration: float = 3.5 # in seconds
+		tween.tween_property(cursor, "position", local_pos_to_pan_to, duration).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	elif event.is_action_pressed("ui_scroll_right"):
+		toggle_tweening()
 		
 	if unitMoving:
 		return
-			
-			
-func gb_mouse_motion(event):
 
+var isTweening: bool = false
+func toggle_tweening(): # This is just a wait-to-continue test
+	isTweening = false
+	cursor.toggle_visibility()
+	cursor.toggle_camera_drag()
+
+func gb_mouse_motion(event):
+	if isTweening: return
+	
 	var mousePos: Vector2i = currMap.get_local_mouse_position()
 	var toMap = currMap.local_to_map(mousePos)
-#	print(toMap)
-
 	cursorCell = Vector2i(toMap)
 	
 func gb_mouse_pressed():
@@ -1346,6 +1361,8 @@ func _on_gui_manager_formation_toggled():
 			
 			
 func _cursor_toggle(enable, snapLeader = true):
+	if isTweening: return
+	
 	var forcedUnits = forcedDeploy.keys()
 	var leader = forcedUnits[0]
 	var localPos = currMap.map_to_local(unitObjs[leader].cell)

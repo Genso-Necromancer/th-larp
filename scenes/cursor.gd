@@ -19,3 +19,11 @@ func _ready():
 func align_camera():
 	var camera = $Camera2D
 	camera.align()
+
+func toggle_visibility():
+	$Sprite2D.visible = !$Sprite2D.visible
+	$Sprite2D2.visible = $Sprite2D.visible
+
+func toggle_camera_drag():
+	$Camera2D.drag_horizontal_enabled = !$Camera2D.drag_horizontal_enabled
+	$Camera2D.drag_vertical_enabled = $Camera2D.drag_horizontal_enabled
