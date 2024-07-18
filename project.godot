@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 Global="*res://scrpt/Global.gd"
 UnitData="*res://scrpt/UnitData.gd"
+CutsceneManager="*res://scrpt/CutsceneManager.gd"
 
 [display]
 
@@ -29,6 +30,11 @@ window/custom_image=""
 [dotnet]
 
 project/assembly_name="The Crypt"
+
+[editor]
+
+movie_writer/movie_file="C:/Users/alond/Documents/The-Crypt-Movies/Capture.avi"
+movie_writer/fps=30
 
 [editor_plugins]
 

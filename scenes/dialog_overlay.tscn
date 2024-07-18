@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bnyhiorbaajm"]
+[gd_scene load_steps=14 format=3 uid="uid://bnyhiorbaajm"]
 
 [ext_resource type="Script" path="res://scenes/dialog_overlay.gd" id="1_ik6st"]
 [ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="2_5q3ap"]
@@ -32,6 +32,8 @@ shadow_size = 0
 
 [sub_resource type="LabelSettings" id="LabelSettings_kyiig"]
 font = ExtResource("2_5q3ap")
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_gaf50"]
 
 [sub_resource type="Animation" id="Animation_25rj4"]
 resource_name = "ContinueBobber"
@@ -106,6 +108,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+size_flags_horizontal = 4
 script = ExtResource("1_ik6st")
 
 [node name="GradientRect" type="TextureRect" parent="."]
@@ -171,6 +174,7 @@ offset_left = 53.0
 offset_top = 384.0
 offset_right = 168.0
 offset_bottom = 496.0
+texture = SubResource("PlaceholderTexture2D_gaf50")
 
 [node name="TextStopper" type="TextureRect" parent="."]
 visible = false
