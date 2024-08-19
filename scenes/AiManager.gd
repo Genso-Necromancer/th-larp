@@ -133,7 +133,7 @@ func find_best_move(validMoves, unit, state, bestAttack):
 #	var value:float = 0
 	for cell in validMoves:
 		if !state.occupied.has(cell):
-			movePairs.append({"action": "Move","tile":Vector2i(cell), "value": terrainValues[Vector2i(cell)]})
+			movePairs.append({"Action": "Move","tile":Vector2i(cell), "value": terrainValues[Vector2i(cell)]})
 	var bestValue:float = -INF
 	var bestMove
 #	var dmgTaken = 0
@@ -167,7 +167,7 @@ func find_valid_attacks(aiUnit, path, state):
 	var wepData = UnitData.itemData
 	var targetDef
 	for wep in aiInv:
-		var wepID = wep["Data"]
+		var wepID = wep["DATA"]
 		var ranges = [wepData[wepID].MINRANGE, wepData[wepID].MAXRANGE]
 		var threat = aHex.find_threat(path, ranges, aiUnit.moveType)
 		for unit in state.player:
@@ -190,10 +190,10 @@ func find_valid_attacks(aiUnit, path, state):
 					var attack = {}
 					if path.has(cell) and cell != unit.cell and !state.occupied.has(cell):
 						var safe = check_safe(aiUnit, unit, cell)
-						attack = {"action": "Attack", "target" : unit, "launch" : Vector2i(cell), "safe": safe, "weapon": wep}
+						attack = {"Action": "Attack", "target" : unit, "launch" : Vector2i(cell), "safe": safe, "weapon": wep}
 						var value = get_attack_value(aiUnit, attack, targetDef)
 #						print(attack, " ", value)
-						validAttacks.append({"action": "Attack", "weapon": wep, "target" : unit, "launch" : Vector2i(cell), "value": value})
+						validAttacks.append({"Action": "Attack", "weapon": wep, "target" : unit, "launch" : Vector2i(cell), "value": value})
 	return validAttacks
 	
 func get_attack_value(aiUnit, attack, targetDef):
@@ -267,8 +267,8 @@ func combat_values(aiUnit, attack, targetDef):
 func check_safe(aiUnit, target, launch):
 	var wepData = UnitData.itemData
 	var distance = aHex.compute_cost(launch, target.cell, aiUnit.moveType, false)
-	var equip = target.unitData.EQUIP
-	var wepID = equip["Data"]
+	var equip = target.get_equipped_weapon()
+	var wepID = equip["DATA"]
 	var targetReach
 	var safe = false
 	var wep = wepData[wepID]

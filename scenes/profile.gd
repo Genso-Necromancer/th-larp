@@ -20,16 +20,17 @@ func _on_update_prof():
 	var expLbl = $M/G/UnitExp
 	var eqpLabel = $M/G/VB/MC2/VB/BG/MC/Eqp
 	var itemData = UnitData.itemData
-	
-	
-	var unitInv 
+	var equipped = focusUnit.get_equipped_weapon()
 	var combatData
-	var equipped
-	var eqData 
-	
+	var eqStats = itemData[equipped.DATA]
 	var unitData = focusUnit.unitData
 	var unitStats = focusUnit.activeStats
 	var unitBuffs = focusUnit.activeBuffs
+	var unitInv = unitData.Inv
+	var dur : int = equipped.DUR
+	var mDur : int = eqStats.MAXDUR
+	var durString : String
+	
 	if focusUnit.is_in_group("Enemy"):
 		expLbl.set_text("0")
 	elif focusUnit.is_in_group("Player"):
@@ -52,25 +53,28 @@ func _on_update_prof():
 	$M/G/VB/G2/VB/MC2/MC/VB/VStats/UnitGrz.set_text(str(combatData.GRAZE) + " %" + str(combatData.GRZPRC))
 	$M/G/VB/G2/VB/MC2/MC/VB/VStats/UnitCrit.set_text(str(combatData.CRIT))
 	$M/G/VB/G2/VB/MC2/MC/VB/VStats/UnitCritAvd.set_text(str(combatData.CRTAVD))
-	unitInv = unitData.Inv
-	if unitData.EQUIP:
-		equipped = unitData.Inv[0]
-		eqData = itemData[equipped.Data]
-		eqpLabel.set_text(str(eqData.NAME) + " [" + str(equipped.DUR) + "/" + str(eqData.MAXDUR)+"]")
-		eqpLabel.set_meta("data_key", eqData)
-	else:
-		eqData = itemData["NONE"]
-		eqpLabel.set_text(str(eqData.NAME))
-		eqpLabel.set_meta("data_key", "NONE")
 	
+	if dur <= -1 or mDur <= -1:
+		durString = str(" --")
+	else:
+		durString = str(" [" + str(dur) + "/" + str(mDur)+"]")
+	
+	eqpLabel.set_text(str(eqStats.NAME) + durString)
+	eqpLabel.set_meta("data_key", eqStats)
 	
 	for item in unitInv:
 		if item == equipped:
 			continue
-		var iData = itemData[item.Data]
+		var gStats = itemData[item.DATA]
 		var l = Label.new()
-		l.set_text(str(iData.NAME) + " [" + str(item.DUR) + "/" + str(iData.MAXDUR)+"]")
-		l.set_meta("data_key", item.Data)
+		dur = item.DUR
+		mDur = gStats.MAXDUR
+		if dur <= -1 or mDur <= -1:
+			durString = str(" --")
+		else:
+			durString = str(" [" + str(dur) + "/" + str(mDur)+"]")
+		l.set_text(str(gStats.NAME) + durString)
+		l.set_meta("data_key", item.DATA)
 		invPanel.add_child(l)
 		
 

@@ -10,6 +10,7 @@ signal profile_called
 signal formation_toggled
 signal item_used
 signal map_started
+signal action_selected
 
 
 @export var mapCursorPath : NodePath
@@ -25,20 +26,20 @@ signal map_started
 @onready var ActionBox = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer
 @onready var foreCast = $CombatForecast
 
-@onready var AName = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/NAME
-@onready var ALife = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/LIFE
-@onready var AAcc = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/ACC
-@onready var ADmg = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/DMG
-@onready var ACrit = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/CRIT
-@onready var ADef = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/DEF
-@onready var APrt = $CombatForecast/GC/BGA1/MC/AtkFull
-@onready var TPrt = $CombatForecast/GC/BGA2/MC/TrgtFull
-@onready var TName = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/NAME
-@onready var TLife = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/LIFE
-@onready var TAcc = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/ACC
-@onready var TDmg = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/DMG
-@onready var TCrit = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/CRIT
-@onready var TDef = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/DEF
+#@onready var AName = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/NAME
+#@onready var ALife = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/LIFE
+#@onready var AAcc = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/ACC
+#@onready var ADmg = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/DMG
+#@onready var ACrit = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/CRIT
+#@onready var ADef = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/DEF
+#@onready var APrt = $CombatForecast/GC/BGA1/MC/AtkFull
+#@onready var TPrt = $CombatForecast/GC/BGA2/MC/TrgtFull
+#@onready var TName = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/NAME
+#@onready var TLife = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/LIFE
+#@onready var TAcc = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/ACC
+#@onready var TDmg = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/DMG
+#@onready var TCrit = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/CRIT
+#@onready var TDef = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/DEF
 #these too
 @onready var AtkB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/AtkBtn
 @onready var SklB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/SklBtn
@@ -53,7 +54,6 @@ signal map_started
 @onready var GRANDDAD = parent.get_parent()
 @onready var mainCon = GRANDDAD.get_parent()
 @onready var GameState = mainCon.GameState
-@onready var yaBoy = $"."
 @onready var expBar = $EXPgain/PanelContainer/ExpMargin/HC/expBar
 @onready var expText = $EXPgain/PanelContainer/ExpMargin/HC/expL
 
@@ -120,14 +120,9 @@ var windowMode = DisplayServer.window_get_mode()
 #	set(value):
 #		Global.actionMenu = value
 #		Global.actionMenu = value
-var pv = Global.profileMenu:
-	set(value):
-		pv = value
-		Global.profileMenu = value
-var cf = Global.combatForecast:
-	set(value):
-		cf = value
-		Global.combatForecast = value
+
+		
+
 
 
 
@@ -143,6 +138,11 @@ func _ready():
 	menuCursor.visible = false
 	foreCast.visible = false
 	_load_turn_tracker()
+	
+func _change_state(state):
+	mainCon.newSlave = [self]
+	mainCon.previousState = mainCon.state
+	mainCon.state = state
 	
 func _load_turn_tracker():
 	turnTracker = turnTrackerRes.instantiate()
@@ -176,10 +176,10 @@ func reinitialize():
 
 	
 
-func _process(_delta):
-	var _guiSizeAct = $ActionMenu/Count/BackgroundCenter.get_size()
-	var _guiSizeProf = unitProf.get_size()
-	var delayTick = 0
+#func _process(_delta):
+	#var _guiSizeAct = $ActionMenu/Count/BackgroundCenter.get_size()
+	#var _guiSizeProf = unitProf.get_size()
+	#var delayTick = 0
 #	if game_cursor != null:
 ##		if game_cursor.position.x >= 237:
 ###			print("what")
@@ -261,103 +261,6 @@ func _font_color_change(b, style):
 	b.add_theme_color_override("font_hover_color", fColor)
 	b.add_theme_color_override("font_focus_color", fColor)
 	b.add_theme_color_override("font_hover_pressed_color", fColor)
-	
-func _on_atk_btn_pressed(): #Menu doesn't enable properly still, even after the swith_frame. Trace what's happening. Also, the "toggling" of the action menu is dumb as shit. There should be seperate functions for enabling/disabling the action menu, and then for switching frames of the menu.
-	var selection = gameState.GB_ATTACK_TARGETING
-	accept_event()
-	menuCursor.visible= false
-	emit_signal("action_selected", selection)
-	actMenu.switch_frame("Sub")
-
-func _on_skl_btn_pressed():
-	#Establish a skill menu, switch to it when this is selected.
-	
-	accept_event()
-	open_skills()
-	mainCon.previousState = mainCon.state
-	mainCon.state = gameState.GB_SKILL_MENU
-#	_on_gameboard_toggle_action()
-
-
-func _on_wait_btn_pressed():
-	var selection = "Wait"
-	accept_event()
-	_on_gameboard_toggle_action()
-	emit_signal("action_selected", selection)
-	
-func _on_end_btn_pressed():
-	var selection = "End"
-	accept_event()
-	_on_gameboard_toggle_action()
-	emit_signal("action_selected", selection)
-
-
-func _on_gameboard_toggle_action(skillClose = false, genericMenu = false): #HERE!!!! Menu is all kinds of fucked, fix it. The sub toggle is a good idea, but it doesn't actually toggle. This function also is trying to handle opening and closing the entire thing. So when it's being used to toggle the submenues it's also just closing the whole damn thing!!!
-#	print("Size: ", $ActionMenu/Count/BackgroundCenter.get_size(), "Offset: ", $ActionMenu/Count/BackgroundCenter.get_size().x / 2)
-	var actionList = actMenu.get_options_menu()
-	var actor = Global.activeUnit
-	var aBtn = actMenu.aBtn
-	var sBtn = actMenu.sBtn
-	var wBtn = actMenu.wBtn
-	var eBtn = actMenu.eBtn
-	if actMenu.visible == false or skillClose:
-		
-#		_snap_to_cursor(actMenu)
-		actMenu.visible = true
-		actMenu.switch_frame("Action")
-		Global.actionMenu = actMenu.visible
-		
-		
-#		check_connect()
-		
-		if actor != null and actor.unitData.EQUIP == null:
-			aBtn.disabled = true
-		else:
-			aBtn.disabled = false
-		
-		if actor != null and actor.unitData.Skills.size() != null and actor.unitData.Skills.size() > 0:
-			sBtn.disabled = false
-		else: 
-			sBtn.disabled = true
-			
-		if actor != null and actor.check_status("Sleep"):
-			aBtn.disabled = true
-			sBtn.disabled = true
-			
-			
-		if genericMenu == true:
-			aBtn.visible = false
-			sBtn.visible = false
-			wBtn.visible = false 
-			eBtn.visible = true
-#			print(eBtn.get_global_position())
-#			print(aBtn.get_global_position())
-			
-		else:
-			aBtn.visible = true
-			sBtn.visible = true
-			wBtn.visible = true
-			eBtn.visible = false
-		menuCursor.visible = true
-		_resignal_menuCursor(actionList)
-		
-#		print(windowMode)
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		
-	else:
-		sBtn.disabled = true
-		#actMenu.visible= false
-		Global.actionMenu = actMenu.visible
-		
-		menuCursor.visible= false
-		#actMenu.toggle_frame("Sub", false)
-		aBtn.visible = true
-		sBtn.visible = true
-		wBtn.visible = true
-		eBtn.visible = true
-#		emit_signal("gui_closed")
-		Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
-	return
 
 func _snap_to_cursor(node): #bug gy save for later
 	var cursorPos = mapCursor.to_local(mapCursor.position)
@@ -372,16 +275,7 @@ func _snap_to_cursor(node): #bug gy save for later
 	print("Node " + str(node.global_position))
 	
 
-#func check_connect():
-#	var atkB = actMenu.aBtn
-#	if !atkB.mouse_entered.is_connected(menuCursor._on_mouse_entered):
-#		atkB.mouse_entered.connect(menuCursor._on_mouse_entered.bind(0))
-#	if !SklB.mouse_entered.is_connected(menuCursor._on_mouse_entered):
-#		SklB.mouse_entered.connect(menuCursor._on_mouse_entered.bind(1))
-#	if !WaitB.mouse_entered.is_connected(menuCursor._on_mouse_entered):
-#		WaitB.mouse_entered.connect(menuCursor._on_mouse_entered.bind(2))
-#	if !EndB.mouse_entered.is_connected(menuCursor._on_mouse_entered):
-#		EndB.mouse_entered.connect(menuCursor._on_mouse_entered.bind(3))
+
 
 func _on_gameboard_toggle_prof(): #Needs filtering for while in set-up menu. Perhaps a filter function should be called first.
 #	print("GUI",state, unitId)
@@ -404,89 +298,12 @@ func _on_gameboard_toggle_prof(): #Needs filtering for while in set-up menu. Per
 func update_prof():
 	emit_signal("profile_called")
 		
-func _on_gameboard_target_focused(foreCast, distance: int = 0):
-	
-	if !cf:
-		cf = true
-		foreCast.visible = cf
-		open_weapons(distance)
-		update_forecast(foreCast)
-#		TDef.set_text(str(target.DEF))
-		
-	else:
-		open_weapons()
-		menuCursor.visible= false
-		cf = false
-		foreCast.visible = cf
-		
-		
-func update_forecast(foreCast):
-	var keys = foreCast.keys()
-	var a = keys[0]
-	var t = keys[1]
-	var active = foreCast[a].clash
-	var target = foreCast[t].clash
-	AName.set_text(t.unitName)
-	APrt.set_texture(t.unitData.Profile.Prt)
-	ALife.set_text("%d/%d [[color=#FF2400]%d[/color]]" % [a.activeStats.CLIFE, a.baseStats.LIFE, active.RLIFE])
-	AAcc.set_text(str(active.ACC))
-	ADmg.set_text(str(active.DMG))
-	ACrit.set_text(str(active.CRIT))
-#		ADef.set_text(str(active.DEF))
-	TName.set_text(t.unitName)
-	TPrt.set_texture(t.unitData.Profile.Prt)
-	TLife.set_text("%d/%d [[color=#FF2400]%d[/color]]" % [t.activeStats.CLIFE, t.baseStats.LIFE, target.RLIFE])
-	TAcc.set_text(str(target.ACC))
-	TDmg.set_text(str(target.DMG))
-	TCrit.set_text(str(target.CRIT))
+func _on_gameboard_target_focused(cmbData, distance: int = 0):
+	var fc = $CombatForecast
+	fc.update_fc(cmbData)
+	fc.show_fc()
+	actMenu.open_weapons(distance)
 
-func open_weapons(distance: int = 0):
-	#Still need conversion to unique IDs
-	if !weaponBox.visible:
-		var first: Button = null
-		var unitData
-		var inv
-		var activeUnit = Global.activeUnit
-		var itemData = UnitData.itemData
-		unitData = activeUnit.unitData
-		inv = unitData.Inv
-		
-		for wep in inv:
-			var b = Button.new()
-			var wepData = itemData[wep.Data]
-			var wepName = itemData[wep.Data].NAME
-			if wepData.CATEGORY == "ITEM":
-				continue
-			b.set_text(str(wepName) + " [" + str(wep.DUR) + "/" + str(wepData.MAXDUR)+"]")
-			
-			if distance > wepData.MAXRANGE or distance < wepData.MINRANGE:
-				b.set_disabled(true)
-			b.set_meta("weaponIndex", wep)
-			b.set_button_icon(wepData.ICON)
-			b.set_expand_icon(false)
-			weaponFrame.add_child(b)
-			b.button_down.connect(self.weapon_selected.bind(b.get_meta("weaponIndex")))
-			#b.mouse_entered.connect(menuCursor._on_mouse_entered.bind(i))
-			
-			
-			if first == null and !b.is_disabled():
-				first = b
-				
-		_resignal_menuCursor(weaponFrame)
-		ActionBox.visible = false
-		weaponBox.visible = true
-		menuCursor.menu_parent = $ActionMenu/m/m/c/v
-		menuCursor.update_cursor(first)
-#		await get_tree().create_timer(0.1).timeout
-		menuCursor.visible = true
-		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	elif weaponBox.visible:
-		clearInventoryButtons()
-		menuCursor.menu_parent = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer
-		menuCursor.state = 0
-		weaponBox.visible = false
-		ActionBox.visible = true
-		Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
 		
 func weapon_selected(index):
 	var wepData 
@@ -530,7 +347,7 @@ func open_skills():
 				
 		weaponBox.visible = true
 		menuCursor.menu_parent = $ActionMenu/m/m/c/v
-		menuCursor.update_cursor(0)
+		menuCursor.set_cursor(first)
 #		await get_tree().create_timer(0.1).timeout
 		menuCursor.state = 2
 		menuCursor.visible= true
@@ -543,29 +360,17 @@ func open_skills():
 		weaponBox.visible = false
 		Global.skillMenu = false
 		
-func _on_gameboard_toggle_skills():
-	accept_event()
-	open_skills()
-	_on_gameboard_toggle_action(true)
+
 	
 		
 func skill_selected(index):
-#	var wep = Global.activeUnit.unitData.EQUIP
-#	var wepData = UnitData.wepData
+
 	var skillData = UnitData.skillData
 	var skill = skillData[index]
 	var selection = gameState.GB_SKILL_TARGETING
 	accept_event()
 	emit_signal("action_selected", selection, skill)
 	open_skills()
-	_on_gameboard_toggle_action()
-#	if wepData[wep].LIMIT:
-#		if wepData[wep].USES == 0:
-#			return
-#		else:
-#			emit_signal("startTheJustice")
-#	else:
-#		emit_signal("startTheJustice")
 
 
 func clearInventoryButtons():
@@ -594,8 +399,7 @@ func _on_gameboard_exp_display(oldExp, expSteps, results, unitPrt, unitName):
 	var portrait = $EXPgain/MC/MC/UnitPrt
 	var isLeveled = 0
 	tween = get_tree().create_tween()
-	mainCon.newSlave = [yaBoy]
-	mainCon.state = gameState.ACCEPT_PROMPT
+	_change_state(gameState.ACCEPT_PROMPT)
 	portrait.set_texture(unitPrt)
 	expBar.value = oldExp
 	expText.set_text(str(expBar.value))
@@ -765,7 +569,8 @@ func _open_unit_menu():
 				b.set_meta("forced", false)
 				b.set_meta("deployed", false)
 				_font_color_change(b, "Undeployed")
-			b.set_action_mode(0)
+			b.set_action_mode(BaseButton.ACTION_MODE_BUTTON_PRESS)
+			b.set_mouse_filter(Control.MOUSE_FILTER_PASS)
 			b.set_meta("unit", unitObjs[unit])
 			b.set_button_icon(unitData[unit].Profile.Prt)
 			b.set_expand_icon(false)
@@ -889,15 +694,11 @@ func _resignal_menuCursor(p, strip = true, oldP = menuCursor.menu_parent):
 		if btns.size() < i:
 			break
 	
-	#btns[i].grab_focus()
-	btns[i].call_deferred("grab_focus")
-	
+	btns[i].grab_focus()
+	#btns[i].call_deferred("grab_focus")
+	menuCursor.call_deferred("set_cursor", btns[i])
 	#print("resignal: ")
 	#print("-Button: " + str(btns[i].get_global_position()))
-	
-	
-	
-	#menuCursor.update_cursor(btns[i])
 	
 	
 func _connect_btn_to_cursor(b):
@@ -945,7 +746,6 @@ func _on_gameboard_formation_closed():
 	#after revamping menuCursor code, make sure setup is it's parent
 	sState = sStates.HOME
 	emit_signal("formation_toggled")
-	menuCursor.update_cursor(1)
 	homeBtns[1].grab_focus()
 	mainCon.newSlave = [self]
 	mainCon.state = GameState.GB_SETUP
@@ -957,8 +757,8 @@ func _on_mng_btn_pressed():
 	
 func _open_unit_options(b):
 	var unit = b.get_meta("unit")
-	var mngCont = $SetUpMain/PanelContainer
-	var mngPnl = $SetUpMain/PanelContainer/MngOptPnl
+	var mngCont = $SetUpMain/MngOptPnl
+	var mngPnl = $SetUpMain/MngOptPnl
 	var unitData = unit.unitData
 	var btns = mngPnl.get_buttons()
 	var menu = mngPnl.get_menu()
@@ -984,7 +784,7 @@ func _return_roster_focus():
 	_resignal_menuCursor(grdRost)
 
 func _close_unit_options():
-	var mngPnl = $SetUpMain/PanelContainer
+	var mngPnl = $SetUpMain/MngOptPnl
 	mngPnl.visible = false
 	match sState:
 		sStates.TRDSEEK: _return_roster_focus()
@@ -1017,12 +817,12 @@ func _open_trade_menu(b):
 func _on_item_selected(b):
 	var cursorDest = tradeScn.find_cursor_destionation(b)
 	_font_color_change(b, "Selected")
-	menuCursor.update_cursor(cursorDest)
+	menuCursor.set_cursor(cursorDest)
 	
 func _on_item_deselected(b, snap = false):
 	_font_color_change(b, "Default")
 	if snap:
-		menuCursor.update_cursor(b)
+		menuCursor.set_cursor(b)
 	
 
 func _on_trade_closed():
@@ -1049,7 +849,7 @@ func _on_tab_selected(p):
 	if kidCount1 > 0:
 		_resignal_menuCursor(p[1], false)
 	else:
-		menuCursor.update_cursor(focus)
+		menuCursor.set_cursor(focus)
 	
 
 
@@ -1084,20 +884,46 @@ func _on_begin_btn_pressed():
 
 #Action/Generic options menu functions
 
-
-func _on_gameboard_cell_selected(_cell): #cell is sent by signal for general use, but the specific cell selected is not currently needed
-	var p = actMenu.open_generic_menu()
-	_resignal_menuCursor(p)
-
-func _on_action_menu_action_selected(selection):
-	match selection:
-		"End": _strip_menuCursor()
-
-func _on_gameboard_unit_move_ended(unit):
-	var p = actMenu.open_action_menu(unit)
-	_resignal_menuCursor(p)
-	
-
-func _on_gameboard_unit_deselected():
+func _close_act_menu():
+	foreCast.hide_fc()
 	actMenu.close_menu()
 	_strip_menuCursor()
+
+func _on_gameboard_cell_selected(_cell): #cell is sent by signal for general use, but the specific cell selected is not currently needed
+	actMenu.open_generic_menu()
+	
+
+func _on_action_menu_action_selected(selection):
+	_strip_menuCursor()
+	emit_signal("action_selected", selection)
+			
+			
+			
+func _on_gameboard_unit_move_ended(unit):
+	actMenu.open_action_menu(unit)
+	
+func _on_gameboard_unit_deselected():
+	_close_act_menu()
+
+func _on_gameboard_menu_canceled():
+	_close_act_menu()
+
+func _on_action_menu_menu_opened(container):
+	_resignal_menuCursor(container)
+	
+func _on_weapon_selected(button):
+	foreCast.hide_fc()
+	_strip_menuCursor()
+	emit_signal("startTheJustice", button)
+
+
+#func _on_action_menu_weapon_changed(weapon):
+	#pass # Replace with function body.
+
+func _on_gameboard_player_lost():
+	var failScreen = $FailScreen
+	failScreen.fade_in_failure()
+
+func _on_gameboard_player_win():
+	var winScreen = $WinScreen
+	winScreen.fade_in_win()

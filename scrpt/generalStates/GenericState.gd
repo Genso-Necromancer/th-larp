@@ -2,7 +2,7 @@ extends Node
 class_name GenericState
 
 var slaves = []
-var keyBinds = ["ui_accept", "ui_info", "ui_return"]
+var keyBinds = ["ui_accept", "ui_info", "ui_return", "debugKillLady", "debugHealTest"]
 var heldBinds =["ui_scroll_left", "ui_scroll_right", "ui_right", "ui_up", "ui_left", "ui_down"]
 var uiCooldown = 0.2
 var timer
@@ -33,7 +33,7 @@ func mouse_pressed(event: InputEvent) -> void:
 	bind = _find_key_bind(event)
 	_handle_bind(bind)
 	
-func event_key(event: InputEvent) -> void:
+func event_key(event: InputEventKey) -> void: #Figure out how, if it's even possible, to use InputEventAction instead
 	var bind
 	bind = _find_key_bind(event)
 	if _handle_held_key(event, bind) == false:
@@ -78,3 +78,5 @@ func _handle_bind(bind):
 		"ui_up": pass
 		"ui_left": pass
 		"ui_down": pass
+		"debugHealTest": pass
+		"debugKillLady": pass

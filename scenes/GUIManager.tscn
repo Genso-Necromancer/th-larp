@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://r6wtvva5qput"]
+[gd_scene load_steps=19 format=3 uid="uid://r6wtvva5qput"]
 
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_2n2uh"]
 [ext_resource type="Script" path="res://scenes/GUIManager.gd" id="1_d2r44"]
@@ -11,6 +11,13 @@
 [ext_resource type="Script" path="res://scenes/MngOptPnl.gd" id="9_k1i1t"]
 [ext_resource type="PackedScene" uid="uid://cmh8ono4w82cq" path="res://fonts/menu_cursor.tscn" id="10_qxe1h"]
 [ext_resource type="PackedScene" uid="uid://dsqet8mutarh6" path="res://scenes/trade_screen.tscn" id="11_qfsbm"]
+[ext_resource type="Script" path="res://scenes/FailScreen.gd" id="12_jkf6w"]
+[ext_resource type="Script" path="res://scenes/WinScreen.gd" id="13_jghgq"]
+[ext_resource type="Script" path="res://scenes/StateDebug.gd" id="14_xciqv"]
+[ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="15_5mgdm"]
+[ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="16_nw8x6"]
+[ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="17_a06i1"]
+[ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="18_18bf3"]
 
 [node name="GUIManager" type="Control"]
 layout_mode = 3
@@ -26,11 +33,18 @@ theme = ExtResource("1_2n2uh")
 script = ExtResource("1_d2r44")
 metadata/_edit_use_anchors_ = true
 
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 1
+
 [node name="DEBUG" type="Control" parent="."]
 visible = false
 anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
+mouse_filter = 1
 
 [node name="timeBox" type="VBoxContainer" parent="DEBUG"]
 layout_mode = 0
@@ -43,29 +57,22 @@ layout_mode = 2
 [node name="timeFactor" type="Label" parent="DEBUG/timeBox"]
 layout_mode = 2
 
-[node name="ActionMenu" parent="." instance=ExtResource("4_o6laq")]
-visible = false
-layout_mode = 1
-
-[node name="Count" parent="ActionMenu" index="0"]
-offset_top = 136.0
-
-[node name="m" parent="ActionMenu" index="1"]
-y_sort_enabled = true
-
 [node name="CombatForecast" parent="." instance=ExtResource("6_kojdq")]
 visible = false
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -320.0
-offset_right = 320.0
-grow_horizontal = 2
+anchors_preset = -1
+anchor_top = 0.0930556
+anchor_bottom = 0.0930556
+offset_top = 24.0
+offset_bottom = 384.0
 
 [node name="Margin" parent="CombatForecast/GC/HBC/Labels" index="1"]
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_right = 8
+
+[node name="ActionMenu" parent="." instance=ExtResource("4_o6laq")]
+visible = false
+layout_mode = 1
 
 [node name="HUD" parent="." instance=ExtResource("6_odogd")]
 layout_mode = 1
@@ -75,6 +82,7 @@ anchor_right = 0.5
 offset_top = 31.0
 offset_bottom = 31.0
 grow_horizontal = 2
+mouse_filter = 1
 
 [node name="Profile" parent="." instance=ExtResource("3_14h0a")]
 visible = false
@@ -90,6 +98,7 @@ offset_right = 201.0
 offset_bottom = 144.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="Eqp" parent="Profile/M/G/VB/MC2/VB/BG/MC" index="0"]
 visible_characters = -1
@@ -124,6 +133,7 @@ columns = 3
 
 [node name="SetUpPnl1" type="PanelContainer" parent="SetUpMain/SetUpGrid"]
 layout_mode = 2
+mouse_filter = 1
 
 [node name="BackgroundCenter" type="NinePatchRect" parent="SetUpMain/SetUpGrid/SetUpPnl1"]
 layout_mode = 2
@@ -145,18 +155,22 @@ layout_mode = 2
 
 [node name="BTNDeploy" type="Button" parent="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet"]
 layout_mode = 2
+mouse_filter = 1
 text = "Deploy"
 
 [node name="FrmBtn" type="Button" parent="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet"]
 layout_mode = 2
+mouse_filter = 1
 text = "Formation"
 
 [node name="MngBtn" type="Button" parent="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet"]
 layout_mode = 2
+mouse_filter = 1
 text = "Manage"
 
 [node name="BeginBtn" type="Button" parent="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet"]
 layout_mode = 2
+mouse_filter = 1
 text = "Begin"
 
 [node name="GRDRost" type="GridContainer" parent="SetUpMain/SetUpGrid/SetUpPnl1/M"]
@@ -169,6 +183,7 @@ visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
+mouse_filter = 1
 
 [node name="BackgroundCenter" type="NinePatchRect" parent="SetUpMain/SetUpGrid/SetUpPnl2"]
 layout_mode = 2
@@ -188,29 +203,19 @@ theme_override_constants/margin_bottom = 8
 [node name="DLmtLbl" type="Label" parent="SetUpMain/SetUpGrid/SetUpPnl2/M"]
 layout_mode = 2
 
-[node name="PanelContainer" type="PanelContainer" parent="SetUpMain"]
+[node name="MngOptPnl" type="PanelContainer" parent="SetUpMain"]
 visible = false
-custom_minimum_size = Vector2(500, 500)
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -250.0
-offset_right = 250.0
-offset_bottom = 250.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="MngOptPnl" type="PanelContainer" parent="SetUpMain/PanelContainer"]
 layout_mode = 2
+offset_left = 835.0
+offset_top = 547.0
+offset_right = 890.0
+offset_bottom = 610.0
 size_flags_horizontal = 8
 size_flags_vertical = 8
+mouse_filter = 1
 script = ExtResource("9_k1i1t")
 
-[node name="BackgroundCenter" type="NinePatchRect" parent="SetUpMain/PanelContainer/MngOptPnl"]
+[node name="BackgroundCenter" type="NinePatchRect" parent="SetUpMain/MngOptPnl"]
 layout_mode = 2
 texture = ExtResource("7_llyu2")
 patch_margin_left = 16
@@ -218,33 +223,37 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="M" type="MarginContainer" parent="SetUpMain/PanelContainer/MngOptPnl"]
+[node name="M" type="MarginContainer" parent="SetUpMain/MngOptPnl"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="VBMng" type="VBoxContainer" parent="SetUpMain/PanelContainer/MngOptPnl/M"]
+[node name="VBMng" type="VBoxContainer" parent="SetUpMain/MngOptPnl/M"]
 layout_mode = 2
 alignment = 1
 
-[node name="tradeLb" type="Button" parent="SetUpMain/PanelContainer/MngOptPnl/M/VBMng"]
+[node name="tradeLb" type="Button" parent="SetUpMain/MngOptPnl/M/VBMng"]
 layout_mode = 2
+mouse_filter = 1
 theme = ExtResource("1_2n2uh")
 text = "Trade"
 
-[node name="supplyLb" type="Button" parent="SetUpMain/PanelContainer/MngOptPnl/M/VBMng"]
+[node name="supplyLb" type="Button" parent="SetUpMain/MngOptPnl/M/VBMng"]
 layout_mode = 2
+mouse_filter = 1
 text = "Supply"
 
-[node name="equipLb" type="Button" parent="SetUpMain/PanelContainer/MngOptPnl/M/VBMng"]
+[node name="equipLb" type="Button" parent="SetUpMain/MngOptPnl/M/VBMng"]
 visible = false
 layout_mode = 2
+mouse_filter = 1
 text = "Equip"
 
-[node name="useLb" type="Button" parent="SetUpMain/PanelContainer/MngOptPnl/M/VBMng"]
+[node name="useLb" type="Button" parent="SetUpMain/MngOptPnl/M/VBMng"]
 layout_mode = 2
+mouse_filter = 1
 text = "Manage"
 
 [node name="menu_cursor" parent="." instance=ExtResource("10_qxe1h")]
@@ -257,17 +266,390 @@ cursor_offset = Vector2(25, 0)
 visible = false
 layout_mode = 1
 
+[node name="FailScreen" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("12_jkf6w")
+
+[node name="ColorRect" type="ColorRect" parent="FailScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Label" type="Label" parent="FailScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -6.125
+offset_right = 20.0
+offset_bottom = 6.125
+grow_horizontal = 2
+grow_vertical = 2
+text = "lmao you fucked up kiddo"
+
+[node name="WinScreen" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("13_jghgq")
+
+[node name="ColorRect" type="ColorRect" parent="WinScreen"]
+self_modulate = Color(1, 1, 1, 0.278431)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Label" type="Label" parent="WinScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -6.125
+offset_right = 20.0
+offset_bottom = 6.125
+grow_horizontal = 2
+grow_vertical = 2
+text = "winrar"
+
+[node name="StateDebug" type="Label" parent="."]
+layout_mode = 0
+offset_left = 88.0
+offset_top = 48.0
+offset_right = 128.0
+offset_bottom = 60.25
+script = ExtResource("14_xciqv")
+
+[node name="EXPgain" type="HBoxContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.37
+anchor_top = 0.65
+anchor_right = 0.37
+anchor_bottom = 0.66
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 0
+
+[node name="MC" type="MarginContainer" parent="EXPgain"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="SpriteBG" type="NinePatchRect" parent="EXPgain/MC"]
+custom_minimum_size = Vector2(56, 56)
+layout_mode = 2
+texture = ExtResource("7_llyu2")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MC" type="MarginContainer" parent="EXPgain/MC"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="UnitPrt" type="TextureRect" parent="EXPgain/MC/MC"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture = ExtResource("15_5mgdm")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="PanelContainer" type="PanelContainer" parent="EXPgain"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 1
+
+[node name="BG" type="NinePatchRect" parent="EXPgain/PanelContainer"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+texture = ExtResource("7_llyu2")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="LvUpMargin" type="MarginContainer" parent="EXPgain/PanelContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+metadata/_edit_use_anchors_ = true
+
+[node name="Vbox" type="VBoxContainer" parent="EXPgain/PanelContainer/LvUpMargin"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Header" type="HBoxContainer" parent="EXPgain/PanelContainer/LvUpMargin/Vbox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="UnitLevelTag" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Header"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_2n2uh")
+text = "Level:"
+
+[node name="UnitLevel" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Header"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+text = "0"
+
+[node name="Increase" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Header"]
+custom_minimum_size = Vector2(15, 0)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
+
+[node name="UnitName" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Header"]
+layout_mode = 2
+text = "Test Name"
+
+[node name="HPCmpBox" type="HBoxContainer" parent="EXPgain/PanelContainer/LvUpMargin/Vbox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="UnitHpTag2" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+focus_neighbor_bottom = NodePath("../../Stats/UnitStrTag")
+theme = ExtResource("1_2n2uh")
+text = "Health:"
+
+[node name="UnitHp" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_2n2uh")
+text = "60"
+horizontal_alignment = 2
+
+[node name="IncreaseHP" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
+custom_minimum_size = Vector2(15, 0)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
+
+[node name="UnitCmpTag" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+focus_neighbor_bottom = NodePath("../../Stats/UnitStrTag")
+theme = ExtResource("1_2n2uh")
+text = "Composure:"
+
+[node name="UnitCmp" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_2n2uh")
+text = "60"
+horizontal_alignment = 2
+
+[node name="IncreaseCmp" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
+custom_minimum_size = Vector2(15, 0)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+theme_override_colors/font_color = Color(0.788235, 0.682353, 0.0627451, 1)
+
+[node name="HSeparator" type="HSeparator" parent="EXPgain/PanelContainer/LvUpMargin/Vbox"]
+layout_mode = 2
+
+[node name="Stats" type="GridContainer" parent="EXPgain/PanelContainer/LvUpMargin/Vbox"]
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 9
+
+[node name="UnitStrTag" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+layout_mode = 2
+size_flags_horizontal = 0
+focus_neighbor_bottom = NodePath("../UnitMagTag")
+theme = ExtResource("1_2n2uh")
+text = "Power:"
+
+[node name="UnitStr" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+theme = ExtResource("1_2n2uh")
+text = "0"
+
+[node name="Increase" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+custom_minimum_size = Vector2(15, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+theme = ExtResource("1_2n2uh")
+theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
+
+[node name="UnitMagTag" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = ExtResource("1_2n2uh")
+text = "Magic:"
+
+[node name="UnitMag" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+theme = ExtResource("1_2n2uh")
+text = "0"
+
+[node name="Increase2" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+custom_minimum_size = Vector2(15, 0)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
+
+[node name="UnitElegTag2" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme = ExtResource("1_2n2uh")
+text = "Elegance:"
+
+[node name="UnitEle" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+text = "0"
+
+[node name="Increase3" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+custom_minimum_size = Vector2(15, 0)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
+
+[node name="UnitCeleTag3" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_2n2uh")
+text = "Celerity:"
+
+[node name="UnitCele" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+text = "0"
+
+[node name="Increase4" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+custom_minimum_size = Vector2(15, 0)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
+
+[node name="UnitBarTag4" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_2n2uh")
+text = "Barrier:"
+
+[node name="UnitBar" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+text = "0"
+
+[node name="Increase5" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+custom_minimum_size = Vector2(15, 0)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
+
+[node name="UnitChaTag5" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("1_2n2uh")
+text = "Charisma:"
+
+[node name="UnitCha" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+text = "0"
+
+[node name="Increase6" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+custom_minimum_size = Vector2(15, 0)
+layout_mode = 2
+theme = ExtResource("1_2n2uh")
+theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
+
+[node name="ExpMargin" type="MarginContainer" parent="EXPgain/PanelContainer"]
+custom_minimum_size = Vector2(180, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+
+[node name="HC" type="HBoxContainer" parent="EXPgain/PanelContainer/ExpMargin"]
+layout_mode = 2
+
+[node name="expL" type="Label" parent="EXPgain/PanelContainer/ExpMargin/HC"]
+layout_mode = 2
+text = "test"
+vertical_alignment = 1
+
+[node name="expBar" type="TextureProgressBar" parent="EXPgain/PanelContainer/ExpMargin/HC"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+nine_patch_stretch = true
+stretch_margin_left = 4
+stretch_margin_top = 4
+stretch_margin_right = 4
+stretch_margin_bottom = 4
+texture_under = ExtResource("16_nw8x6")
+texture_over = ExtResource("17_a06i1")
+texture_progress = ExtResource("18_18bf3")
+
 [connection signal="action_selected" from="ActionMenu" to="." method="_on_action_menu_action_selected"]
+[connection signal="menu_opened" from="ActionMenu" to="." method="_on_action_menu_menu_opened"]
 [connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/BTNDeploy" to="." method="_on_btn_deploy_pressed"]
 [connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/FrmBtn" to="." method="_on_frm_btn_pressed"]
 [connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/MngBtn" to="." method="_on_mng_btn_pressed"]
 [connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/BeginBtn" to="." method="_on_begin_btn_pressed"]
-[connection signal="pressed" from="SetUpMain/PanelContainer/MngOptPnl/M/VBMng/tradeLb" to="." method="_on_trade_lb_pressed"]
-[connection signal="pressed" from="SetUpMain/PanelContainer/MngOptPnl/M/VBMng/supplyLb" to="." method="_on_supply_lb_pressed"]
-[connection signal="pressed" from="SetUpMain/PanelContainer/MngOptPnl/M/VBMng/equipLb" to="." method="_on_equip_lb_pressed"]
-[connection signal="pressed" from="SetUpMain/PanelContainer/MngOptPnl/M/VBMng/useLb" to="." method="_on_use_lb_pressed"]
+[connection signal="pressed" from="SetUpMain/MngOptPnl/M/VBMng/tradeLb" to="." method="_on_trade_lb_pressed"]
+[connection signal="pressed" from="SetUpMain/MngOptPnl/M/VBMng/supplyLb" to="." method="_on_supply_lb_pressed"]
+[connection signal="pressed" from="SetUpMain/MngOptPnl/M/VBMng/equipLb" to="." method="_on_equip_lb_pressed"]
+[connection signal="pressed" from="SetUpMain/MngOptPnl/M/VBMng/useLb" to="." method="_on_use_lb_pressed"]
 
-[editable path="ActionMenu"]
 [editable path="CombatForecast"]
+[editable path="ActionMenu"]
 [editable path="HUD"]
 [editable path="Profile"]

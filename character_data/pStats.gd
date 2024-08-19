@@ -58,8 +58,7 @@ static func get_named_unit_data(unitInd):
 					"CHA": 20
 					},
 				"MaxInv": 6,
-				"Inv":[{"Data":"GNG", "DUR":40}],
-				"EQUIP": {"Data":"GNG", "DUR":40},
+				"Inv":[{"DATA":"GNG", "EQUIP":true, "DUR":40}],
 				"Passive":{"Vampire": true,
 					"Fate": true,
 					"SunWeak": true,
@@ -124,8 +123,7 @@ static func get_named_unit_data(unitInd):
 					"CHA": 20
 					},
 				"MaxInv": 6,
-				"Inv":[{"Data":"SLVKNF", "DUR":40}, {"Data":"PWRELIX", "DUR":1}],
-				"EQUIP": {"Data":"SLVKNF", "DUR":40},
+				"Inv":[{"DATA":"SLVKNF", "EQUIP":true, "DUR":40}, {"DATA":"PWRELIX", "EQUIP":false, "DUR":1}, {"DATA":"DGR", "EQUIP":false, "DUR": 30}, {"DATA":"TESTACC", "EQUIP":false, "DUR": -1}],
 				"Passive":{},
 				"Skills":["ST05"],
 				"Weapons": {
@@ -186,8 +184,7 @@ static func get_named_unit_data(unitInd):
 					"CHA": 20
 					},
 				"MaxInv": 6,
-				"Inv":[{"Data":"BK", "DUR":40}],
-				"EQUIP": {"Data":"BK", "DUR":40},
+				"Inv":[{"DATA":"BK", "EQUIP":true, "DUR":40}, {"DATA":"PZA", "EQUIP":false, "DUR":3}],
 				"Passive":{},
 				"Skills":[],
 				"Weapons": {
@@ -249,8 +246,7 @@ static func get_named_unit_data(unitInd):
 					"CHA": 20
 					},
 				"MaxInv": 6,
-				"Inv":[{"Data":"CLB", "DUR":40}, {"Data":"CLB", "DUR":40}],
-				"EQUIP": {"Data":"CLB", "DUR":40},
+				"Inv":[{"DATA":"CLB", "EQUIP":true, "DUR":40}, {"DATA":"CLB", "EQUIP":false, "DUR":40}],
 				"Passive":{},
 				"Skills":[],
 				"Weapons": {
@@ -419,17 +415,16 @@ static func get_art(prtName):
 	return artData
 
 static func get_terrain_costs():
-	var terrainCost : Dictionary
-	terrainCost["Foot"] = {
-			"Flat" = 1,
-	"Fort" = 2,
-	"Hill" = 3
-	}
-	terrainCost["Fly"] = {
-			"Flat" = 1,
-	"Fort" = 1,
-	"Hill" = 1
-	}
+	var terrainCost : Dictionary = {
+		"Foot": 
+			{"Flat": 1,
+			"Fort": 2,
+			"Hill": 3},
+		"Fly":
+			{"Flat": 1,
+			"Fort": 1,
+			"Hill": 1}
+		}
 	return terrainCost
 	
 static func get_items():
@@ -444,7 +439,8 @@ static func get_items():
 				"MINRANGE": 0,
 				"MAXRANGE": 0,
 				"CATEGORY": "NONE",
-				"MAXDUR": 40,
+				"MAXDUR": -1,
+				"EQUIP":true,
 				"SUBGROUP": false},
 				##################
 				"GNG":{
@@ -459,13 +455,14 @@ static func get_items():
 				"MAXRANGE": 2,
 				"CATEGORY": "STICK",
 				"MAXDUR": 40,
+				"EQUIP":true,
 				"SUBGROUP": false},
 				###############
 				"SLVKNF":{
 				"NAME":"Silver Knife",
 				"ICON": load(("res://sprites/gungnir.png")),
 				"TYPE": "Physical",
-				"DMG": 20,
+				"DMG": 40,
 				"ACC": 90,
 				"CRIT": 100,
 				"GRAZE": 2,
@@ -473,6 +470,7 @@ static func get_items():
 				"MAXRANGE": 2,
 				"CATEGORY": "BLADE",
 				"MAXDUR": 40,
+				"EQUIP":true,
 				"SUBGROUP": "KNIVES"},
 				###############
 				"CLB": {
@@ -487,6 +485,7 @@ static func get_items():
 				"MAXRANGE": 1,
 				"CATEGORY": "BLUNT",
 				"MAXDUR": 40,
+				"EQUIP":true,
 				"SUBGROUP": false},
 				###############
 				"DGR": {
@@ -494,13 +493,14 @@ static func get_items():
 				"ICON": load(("res://sprites/gungnir.png")),
 				"TYPE": "Physical",
 				"DMG": 4,
-				"ACC": 0,
+				"ACC": 85,
 				"CRIT": 0,
 				"GRAZE": 1,
 				"MINRANGE": 1,
 				"MAXRANGE": 1,
 				"CATEGORY": "BLADE",
 				"MAXDUR": 40,
+				"EQUIP":true,
 				"SUBGROUP": false},
 				###############
 				"THKN":{
@@ -515,6 +515,7 @@ static func get_items():
 				"MAXRANGE": 2,
 				"CATEGORY": "BLADE",
 				"MAXDUR": 40,
+				"EQUIP":true,
 				"SUBGROUP": "KNIVES"},
 				###############
 				"BK":{
@@ -529,6 +530,7 @@ static func get_items():
 				"MAXRANGE": 1,
 				"CATEGORY": "BOOK",
 				"MAXDUR": 40,
+				"EQUIP":true,
 				"SUBGROUP": false},
 				###############
 				"PZA":{
@@ -545,6 +547,13 @@ static func get_items():
 				"CATEGORY": "ITEM",
 				"MAXDUR": 1,
 				"USE": true,
+				"EFFECT": ["StrBuff01"] },
+				###############
+				"TESTACC":{
+				"NAME": "STR Ring",
+				"ICON": load(("res://sprites/gungnir.png")),
+				"CATEGORY": "ACC",
+				"EQUIP": true,
 				"EFFECT": ["StrBuff01"] }
 				
 				}
@@ -560,6 +569,7 @@ static func get_item_effects():
 			
 		}
 	}
+	return iEffects
 	
 static func get_skill_effects():
 	var skillEffects : Dictionary
@@ -657,8 +667,7 @@ static func get_skill_effects():
 			"Duration": 0,
 			"Buff": true,
 			"BuffStat": "PWR", #Any core Stat
-			"BuffValue": 2,
-			"Curable": true
+			"BuffValue": 2
 			}
 	}
 	return skillEffects

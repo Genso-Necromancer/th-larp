@@ -13,7 +13,7 @@ var fData = {}
 #var aWep
 #var tWep
 var fateChance = 15
-var deathFlag = false
+
 @onready var skillData = UnitData.skillData
 @onready var effectData = UnitData.effectData
 @onready var itemData = UnitData.itemData
@@ -33,18 +33,17 @@ func _ready():
 
 
 	
-func get_forecast(a: Unit, t: Unit, distance, skill = null):
+func get_forecast(a: Unit, t: Unit, distance, skill = null): #Skill not reimplimented yet
 	var itemData = UnitData.itemData
-	
-	var aWep = a.unitData.EQUIP
-	var tWep = t.unitData.EQUIP
-	var minR = itemData[tWep.Data].MINRANGE
-	var maxR = itemData[tWep.Data].MAXRANGE
+	var aWep = a.get_equipped_weapon()
+	var tWep = t.get_equipped_weapon()
+	var minR = itemData[tWep.DATA].MINRANGE
+	var maxR = itemData[tWep.DATA].MAXRANGE
 	if skill != null:
 		pass
 	fData = {a:{},t: {}}
-	fData[a]["clash"] = _evaluate_clash(a, t)
-	fData[t]["clash"] = _evaluate_clash(t, a)
+	fData[a] = _evaluate_clash(a, t)
+	fData[t] = _evaluate_clash(t, a)
 	fData[t]["reach"] = _distance_check(minR, maxR, distance)
 	return fData
 
@@ -91,19 +90,18 @@ func start_the_justice(a: Unit, t: Unit):
 	var aLife = a.activeStats.CLIFE
 	var tLife = t.activeStats.CLIFE
 	
-	var aWep = a.unitData.EQUIP
-	var tWep = t.unitData.EQUIP
+	var aWep = a.get_equipped_weapon()
+	var tWep = t.get_equipped_weapon()
 	
-	var canReach = fData.t.reach
+	var canReach = fData[t].reach
 	
 	var hurt = false
-	
+	var dmg = 0
 	var r1 = false
 	var r2 = false
 	var r3 = false
 #	var r4 = false
-
-	deathFlag = false
+	var deathFlag = false
 	var canRetaliate = true
 	
 	#round 1
@@ -119,32 +117,48 @@ func start_the_justice(a: Unit, t: Unit):
 	
 	
 	
-	if t.activeStatus.Sleep.Active or t.unitData.EQUIP == null or !canReach:
+	if t.activeStatus.Sleep.Active or tWep.DATA == "NONE" or !canReach:
 		canRetaliate = false
 	
 	
 	#first round
 	print("Girl's are fighting")
 	print("Round 1 begins: ", a.unitName, " is attacking ", t.unitName)
-	r1 = get_attack("a", "t")
+	r1 = get_attack(a, t)
 	if r1 and check_uses(aWep) and !deathFlag: 
-			hurt = combat_round("a", "t") #redo forecast dictionary to use unit as keys so dmg can be applied to the unit and unit can be put here instead of these keys
-			_reduce_durability(a, aWep)
-		
-	if !hurt and !deathFlag and canRetaliate and check_uses(tWep):
-			print("Round 2 begins: ", t.unitName, " is attacking ", a.unitName)
-			r2 = get_attack("t","a")
-	if r2:
-		hurt = combat_round("t", "a")
-		_reduce_durability(t, tWep)
-	#if retaliation failed, or did 0 dmg, check if attacker can make a second attempt.
-	if !hurt and !deathFlag and fData.a.FUP and check_uses(aWep): 
-		print("Round 3 begins: ", a.unitName, " is attacking ", t.unitName)
-		r3 = get_attack(0,1)
-	if r3:
-		hurt = combat_round(0, 1)
+		dmg = combat_round(a, t) #redo forecast dictionary to use unit as keys so dmg can be applied to the unit and unit can be put here instead of these keys
 		_reduce_durability(a, aWep)
-		
+		if dmg != 0:
+			t.apply_dmg(dmg)
+			hurt = true
+		if t.activeStats.CLIFE <= 0:
+			deathFlag = true
+		#if deathFlag and t.faction == "Player":
+			#t.killXP = true
+			
+			
+	if !hurt and !deathFlag and canRetaliate and check_uses(tWep):
+		print("Round 2 begins: ", t.unitName, " is attacking ", a.unitName)
+		r2 = get_attack(t,a)
+	if r2:
+		dmg = combat_round(t, a)
+		_reduce_durability(t, tWep)
+		if dmg != 0:
+			t.apply_dmg(dmg)
+			hurt = true
+		if t.activeStats.CLIFE <= 0:
+			deathFlag = true
+		#if deathFlag and t.faction == "Player":
+			#t.killXP = true
+	#if retaliation failed, or did 0 dmg, check if attacker can make a second attempt.
+	if !hurt and !deathFlag and fData[a].FUP and check_uses(aWep): 
+		print("Round 3 begins: ", a.unitName, " is attacking ", t.unitName)
+		r3 = get_attack(a,t)
+	if r3:
+		hurt = combat_round(a, t)
+		_reduce_durability(a, aWep)
+		if dmg != 0:
+			t.apply_dmg(dmg)
 	print("Combat has resolved.")
 	emit_signal("combat_resolved")
 	
@@ -155,14 +169,11 @@ func start_the_justice(a: Unit, t: Unit):
 	
 #call to roll crit and damage after hit, returns true if any damage was actually done
 func combat_round(a, t):
-	var crt = get_crit(a)
-	var dmg = get_dmg(a, t, crt)
-	var hurt = false
-	if dmg != 0:
-			hurt = true
-	return hurt
+	var crt = _get_crit(a)
+	var dmg = _get_dmg(a, t, crt)
+	return dmg
 	
-func get_crit(a):
+func _get_crit(a):
 	#test variable
 	var critRoll
 	var critDmg
@@ -177,7 +188,7 @@ func get_crit(a):
 	return critDmg
 	
 
-func get_dmg(a, t, crt):
+func _get_dmg(a, t, crt):
 	var roll = get_roll()
 	var graze = 0
 	var dmg = 0
@@ -203,7 +214,7 @@ func get_attack(a, t):
 	var roll = get_roll()
 	#print(cbtFC[a].NAME, "'s ACC check: ", roll, "/", cbtFC[a].ACC, "
 		#", cbtFC[t].NAME,"'s Avoid: ", cbtFC[t].AVOID)
-	if fData.a.ACC >= roll:
+	if fData[a].ACC >= roll:
 		print("This was a hit")
 		hit = true
 	else:
@@ -219,31 +230,30 @@ func get_attack(a, t):
 	return hit
 	
 func check_uses(weapon): # split durability drop from check
-	var itemData = UnitData.itemData
-	var wepData = itemData[weapon.Data]
 	if weapon.DUR != 0:
-		weapon.DUR -= 1
 		return true
 	elif weapon.DUR == 0:
-		print(wepData.NAME, " is out of uses!")
+		#print("out of uses!")
 		return false
-	else:
-		return true
 
 func use_item(unit, item):
-	run_effects(unit, unit, itemData[item.Data], true, true)
+	run_effects(unit, unit, itemData[item.DATA], true, true)
 	_reduce_durability(unit, item)
 	if item.DUR <= 0:
 		_delete_item(unit, item)
 	
 func _reduce_durability(unit, item):
-	item.DUR -= 1
-	if item.DUR <= 0:
+	var reduc = -1
+	if item.DUR == -1:
+		return
+	item.DUR -= reduc
+	clampi(item.DUR, 0, 99)
+	if item.DUR == 0:
 		_delete_item(unit, item)
 		
 func _delete_item(unit, item):
 	var inv = unit.unitData.Inv
-	var eqp = unit.unitData.EQUIP
+	var eqp = unit.get_equipped_weapon()
 	var i = inv.find(item)
 	if eqp == item:
 		unit.unequip()
@@ -252,7 +262,7 @@ func _delete_item(unit, item):
 #Skills handled here and below#
 func run_skill(actor, target, activeSkill):
 	var skillResult = {}
-	deathFlag = false
+	var deathFlag = false
 	match activeSkill.Target:
 		"Enemy":
 			skill_combat(actor, target, activeSkill)
@@ -320,8 +330,9 @@ func skill_combat(actor, target, skill):
 	var defender = Global.defender
 	var check = get_roll()
 	var r1
-	var canReach = fData.t.reach
-	var defWep = defender.unitData.EQUIP
+	var canReach = fData[target].reach
+	var defWep = defender.get_equipped_weapon()
+	var deathFlag = false
 	print(actor.unitName, " skill: ", skill.SkillId, " ACC: ", attacker.ACC, " check: ", check, "/", defender.AVOID)
 	if check < (attacker.ACC - defender.AVOID):
 		hit = true
@@ -344,6 +355,7 @@ func factor_dmg(actor, target, attack, canCrit = false, isSkill = false):
 	var tReduc = 0
 	var aTotalDmg = 0
 	var critDmg = 0
+	var deathFlag = false
 #	if canCrit:
 #		critDmg = roll_crit(actor, target, attack)
 	if isSkill:
@@ -361,7 +373,7 @@ func factor_dmg(actor, target, attack, canCrit = false, isSkill = false):
 	var dmgResult = aTotalDmg - tReduc
 	var tCLife = target.apply_dmg(dmgResult)
 	print(actor.unitName, "Dealt ", dmgResult, "Target's HP: ", target.activeStats.CLIFE)
-	if tCLife <= 0:
+	if target.activeStats.CLIFE <= 0:
 		deathFlag = true
 		target.killXP = true
 	return dmgResult
@@ -430,9 +442,6 @@ func shove_or_toss_unit(actor, target, range, pivotHex, matchHex):
 func warp_to(target, cell):
 	target.relocate_unit(cell)
 
-	
-
-
 func _on_gui_manager_start_the_justice():
 	pass # Replace with function body.
 
@@ -444,8 +453,8 @@ func _on_gui_manager_start_the_justice():
 	#fData.clear()
 	#aWep = a.unitData.EQUIP
 	#tWep = t.unitData.EQUIP
-	#var aId = aWep.Data
-	#var tId = tWep.Data
+	#var aId = aWep.DATA
+	#var tId = tWep.DATA
 	#canReach = false
 	#var itemData = UnitData.itemData
 	#
@@ -481,7 +490,7 @@ func _on_gui_manager_start_the_justice():
 				#
 	#canReach = _distance_check(minR, maxR, distance)
 		#
-	#fData["a"] = _evaluate_clash(a, t)
-	#fData["t"] = _evaluate_clash(t, a)
+	#fData[a] = _evaluate_clash(a, t)
+	#fData[t] = _evaluate_clash(t, a)
 	#fData.t["RLIFE"] = _get_remaining_life(t, fData.a)
 	#fData.a["RLIFE"] = _get_remaining_life(a, fData.t)

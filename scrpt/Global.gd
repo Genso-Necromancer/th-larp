@@ -2,10 +2,9 @@ extends Node
 
 
 
-var profileMenu = false
 
-var skillMenu = false
-var combatForecast = false
+
+
 var focusUnit : Unit
 var activeUnit : Unit
 var day: bool = true
@@ -15,6 +14,7 @@ var trueTimeFactor = 1
 var rotationFactor = 15
 var rng
 var unitObjs : Dictionary
+var flags : Dictionary
 
 
 
@@ -30,5 +30,20 @@ func _init():
 	gameTime = 0
 	rng = RandomNumberGenerator.new()
 	randomize()
-
+	_init_flags()
+	
+func set_flags(flags):
+	pass
+	
+func _init_flags():
+	flags = {
+		"gameOver": false,
+		"victory": false,
+		"activeUnit": false,
+		"focusUnit": false,
+		"gameTime": 0,
+		"timeFactor": 1,
+		"trueTimeFactor": 1,
+		"rotationFactor": 15
+	}
 

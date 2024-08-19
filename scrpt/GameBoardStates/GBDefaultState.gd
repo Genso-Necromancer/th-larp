@@ -29,3 +29,4 @@ func _handle_bind(bind):
 		"ui_down": 
 			direction = Vector2.DOWN
 			gameBoard.on_directional_press(direction)
+		"debugKillLady": gameBoard._kill_lady()

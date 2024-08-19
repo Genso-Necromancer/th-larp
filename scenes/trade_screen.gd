@@ -107,7 +107,7 @@ func open_supply_menu(unit):
 	var nameLb = $VBoxContainer/TradeBox1/NamePnl1/MarginContainer/NameLb1
 	var list = $VBoxContainer/TradeBox1/TradePnl1/MarginContainer/ItemList1
 	var supplyBox = $VBoxContainer/ConvoyPnl
-	var supplyList = $VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/VBoxContainer
+	#var supplyList = $VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/VBoxContainer
 	firstUnit = unit
 	self.visible = true
 	box.visible = true
@@ -162,7 +162,7 @@ func _close_supply_options():
 	supplyPnl.visible = false
 	
 func open_use_menu(unit):
-	var container = $VBoxContainer
+	#var container = $VBoxContainer
 	var box = $VBoxContainer/TradeBox1
 	var sprite = $VBoxContainer/TradeBox1/PrtPnl1/MarginContainer/UnitPrt1
 	var nameLb = $VBoxContainer/TradeBox1/NamePnl1/MarginContainer/NameLb1
@@ -206,9 +206,16 @@ func _fill_item_list(list, unit):
 	var inv = unit.unitData.Inv
 	var i = 0
 	for item in inv:
-		var itemData = UnitData.itemData[item.Data]
+		var itemData = UnitData.itemData[item.DATA]
 		var b = Button.new()
-		b.set_text(str(itemData.NAME) + " " + str(item.DUR) + "/" + str(itemData.MAXDUR))
+		var dur = item.DUR
+		var mDur = itemData.MAXDUR
+		var durString
+		if dur == -1 or mDur == -1:
+			durString = str(" --")
+		else:
+			durString = str(" [" + str(dur) + "/" + str(mDur)+"]")
+		b.set_text(str(itemData.NAME) + durString)
 		b.add_theme_font_size_override("font_size", iFSize)
 		b.set_meta("item", item)
 		b.set_meta("unit", unit)
@@ -216,7 +223,9 @@ func _fill_item_list(list, unit):
 		i += 1
 		b.set_button_icon(itemData.ICON)
 		b.set_expand_icon(false)
-		b.set_action_mode(0)
+		b.set_action_mode(BaseButton.ACTION_MODE_BUTTON_PRESS)
+		b.set_focus_neighbor(SIDE_LEFT, b.get_path_to(b))
+		b.set_focus_neighbor(SIDE_RIGHT, b.get_path_to(b))
 		list.add_child(b)
 		_connect_item(b)
 		b.add_to_group("unitInv")
@@ -227,21 +236,28 @@ func _fill_supply_list(s):
 	var supply = UnitData.supply[tabKeys[s]]
 	var i = 0
 	for item in supply:
-		var itemData = UnitData.itemData[item.Data]
+		var itemData = UnitData.itemData[item.DATA]
 		var b = Button.new()
-		b.set_text(str(itemData.NAME) + " " + str(item.DUR) + "/" + str(itemData.MAXDUR))
+		var dur = item.DUR
+		var mDur = itemData.MAXDUR
+		var durString
+		if dur == -1 or mDur == -1:
+			durString = str(" --")
+		else:
+			durString = str(" [" + str(dur) + "/" + str(mDur)+"]")
+		b.set_text(str(itemData.NAME) + durString)
 		b.add_theme_font_size_override("font_size", iFSize)
 		b.set_meta("item", item)
 		b.set_meta("unit", "supply")
 		b.set_meta("index", i)
 		b.set_button_icon(itemData.ICON)
 		b.set_expand_icon(false)
-		b.set_action_mode(0)
+		b.set_action_mode(BaseButton.ACTION_MODE_BUTTON_PRESS)
 		list.add_child(b)
 		_connect_item(b)
 		b.add_to_group("convoyInv")
 		if tState == tStates.GIVE:
-			b.set_mouse_filter(2)
+			b.set_mouse_filter(Control.MOUSE_FILTER_PASS)
 		
 func _clear_item_list(list):
 	var btns = list.get_children()
@@ -266,6 +282,7 @@ func increment_tabs(isIncrease, inc = 1):
 		newTab = 0
 	elif newTab < 0:
 		newTab = tabSize
+	
 	openTab = newTab
 		
 
@@ -281,7 +298,6 @@ func _change_tab(s):
 		emit_signal("tab_selected", parents)
 
 func _connect_item(b):
-	var parent = get_parent()
 	if b.button_down.is_connected(self._item_selected.bind(b)):
 		b.button_down.disconnect(self._item_selected.bind(b))
 	b.button_down.connect(self._item_selected.bind(b))
@@ -306,10 +322,8 @@ func _check_full_unit_inv(unit):
 func _check_empty_supply():
 	var supply = UnitData.supply
 	var allTabs = UnitData.supply.keys()
-	var currentTab
 	var noItems = true
 	for tab in allTabs:
-		currentTab = tab
 		var count = supply[tab].size()
 		if count > 0:
 			noItems = false
@@ -329,7 +343,7 @@ func _check_usable_inv(unit):
 	
 func _check_usable(item):
 	var itemData = UnitData.itemData
-	var iData = itemData[item.Data]
+	var iData = itemData[item.DATA]
 	if iData.USE:
 		return true
 	else:
@@ -403,7 +417,7 @@ func _trade_select(b):
 func _give_select(b): 
 	var unit = b.get_meta("unit")
 	var item = b.get_meta("item")
-	var iData = UnitData.itemData[item.Data]
+	var iData = UnitData.itemData[item.DATA]
 	var iType = iData.CATEGORY
 	var iInd = b.get_meta("index")
 	var inv = unit.unitData.Inv
@@ -428,7 +442,7 @@ func _give_select(b):
 	iInd = b.get_meta("index")
 	_assign_vertical_neighbors(list)
 	_sort_supply()
-	if item == unit.unitData.EQUIP:
+	if item == unit.get_equipped_weapon():
 		unit.set_equipped()
 	if _check_empty_unit_inv(unit):
 		_end_store()
@@ -439,7 +453,7 @@ func _give_select(b):
 func _take_select(b): 
 	var unit = firstUnit
 	var item = b.get_meta("item")
-	var iData = UnitData.itemData[item.Data]
+	var iData = UnitData.itemData[item.DATA]
 	var iType = iData.CATEGORY
 	var iInd = b.get_meta("index")
 	var inv = unit.unitData.Inv
@@ -464,7 +478,7 @@ func _take_select(b):
 	iInd = b.get_meta("index")
 #	_assign_vertical_neighbors(list)
 	_sort_supply()
-	if unit.unitData.EQUIP == null:
+	if unit.get_equipped_weapon() == null:
 		unit.set_equipped()
 	if btns.size() == 0: #not really functioning right yet. place holder
 		increment_tabs(true)
@@ -530,7 +544,7 @@ func _add_empty(unit, list):
 	b.set_meta("item", false)
 	b.set_meta("unit", unit)
 	b.set_meta("index", i)
-	b.set_action_mode(0)
+	b.set_action_mode(BaseButton.ACTION_MODE_BUTTON_PRESS)
 	list.add_child(b)
 	_connect_item(b)
 	_assign_neighbors(get_trade_list(1), get_trade_list(2))
@@ -650,14 +664,11 @@ func _swap_items(b1, b2):
 	var i2 = b2.get_meta("index")
 	var inv2 = unit2.unitData.Inv
 	var list2 = get_trade_list(2)
-	var btns2 = get_trade_list(2).get_children()
+	#var btns2 = get_trade_list(2).get_children()
 	var home
 	var destination
 	
-	if item1 == unit1.unitData.EQUIP:
-		unit1.set_equipped()
-	if item2 == unit2.unitData.EQUIP:
-		unit2.set_equipped()
+	
 	
 	if btns1.has(b1):
 		home = list1
@@ -685,11 +696,16 @@ func _swap_items(b1, b2):
 		inv2.append(item1.duplicate())
 		inv1.remove_at(i1)
 		
+	if item1 and item1 == unit1.get_equipped_weapon():
+		unit1.set_equipped()
+	if item2 and item2 == unit2.get_equipped_weapon():
+		unit2.set_equipped()
+		
 	_remove_empty()
 	
 	
-	print(str(inv1) + "
-	" + str(inv2))
+	#print("Inv1: " + str(inv1) + "
+	#Inv2: " + str(inv2))
 
 
 func _sort_supply():
@@ -702,8 +718,8 @@ func _sort_supply():
 	
 func _sort_items(a, b):
 	var itemData = UnitData.itemData
-	var aName = itemData[a.Data].NAME
-	var bName = itemData[b.Data].NAME
+	var aName = itemData[a.DATA].NAME
+	var bName = itemData[b.DATA].NAME
 	var aDur = a.DUR
 	var bDur = b.DUR
 	var checkDur = false
@@ -731,7 +747,7 @@ func _end_retrieve():
 func _toggle_group_filter(group, enable = false):
 	var nodes = get_tree().get_nodes_in_group(group)
 	for node in nodes:
-		var mode = node.get_mouse_filter()
+		#var mode = node.get_mouse_filter()
 		if enable:
 			node.set_mouse_filter(0)
 		else: 
@@ -769,7 +785,7 @@ func _assign_tab_neighbor():
 	if lKidCount == 0:
 		hasItems = false
 	for tab in tabs:
-		var isValid = false
+		#var isValid = false
 		if !tab.get_meta("NeedNeighbor"):
 			continue
 		if hasItems:
@@ -829,9 +845,9 @@ func _on_equip_btn_pressed():
 	var isEquipped = false
 	var unequip = false
 	var list = get_trade_list(1)
-	if firstUnit.unitData.EQUIP != null:
+	if firstUnit.get_equipped_weapon() != null:
 		isEquipped = true
-	if isEquipped and item == firstUnit.unitData.EQUIP:
+	if isEquipped and item == firstUnit.get_equipped_weapon():
 		unequip = true
 	if !unequip:
 		firstUnit.set_equipped(i)

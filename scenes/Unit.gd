@@ -3,8 +3,7 @@ class_name Unit
 extends Path2D
 signal walk_finished
 signal exp_handled
-signal imdead
-signal deathDone
+signal death_done
 signal unit_relocated
 signal exp_gained
 signal leveled_up
@@ -19,25 +18,29 @@ signal leveled_up
 @export var inventory: Array[String] = []
 
 #Profile
-@export var unitID = "unitID"
+@export var unitId = "unitID"
 @export var unitName = "Name"
 @export var move_speed := 150.0
 @export var genLevel : int = 1
 var deployed : bool = false
 var forced : bool = false
-
 var unitData
 var itemData = UnitData.itemData
 var allUnitData
 var groupKeys = UnitData.groups
-var statKeys = UnitData.stats
+#var statKeys = UnitData.stats
 var ykTag
 var acted = false
 var moveType = "Foot"
 var needDeath = false
 var terrainData
+
+#equip variables
+var unarmed = {"DATA": "NONE", "EQUIP": true, "DUR": -1}
+var tempSet : bool = false
 #status effects
 var activeStatus = {"Sleep" : {"Active": false}}
+
 
 
 #Call for pre-formualted combat stats
@@ -48,6 +51,7 @@ var baseStats = {}
 var activeStats = {}
 #de/buffs applied to unit
 var activeBuffs = {}
+var activeEffects = []
 #var skin = UnitData.playerUnits[unitName]["Sprite"]:
 #	set(value):
 #		skin = value
@@ -128,7 +132,7 @@ func _ready() -> void:
 	
 	
 func init_player_unit(iD):
-	unitID = iD
+	unitId = iD
 	faction = "Player"
 	_load_stats()
 	_load_sprites()
@@ -189,7 +193,7 @@ func _load_stats():
 	allUnitData = UnitData
 	if faction == "Player":
 		add_to_group("Player")
-		unitData = UnitData.unitData[unitID].duplicate(true)
+		unitData = UnitData.unitData[unitId].duplicate(true)
 		baseStats = unitData.Stats
 		unitName = unitData["Profile"]["UnitName"]
 		check_passives()
@@ -216,7 +220,7 @@ func _load_stats():
 			baseStats = unitData.Stats.duplicate(true)
 			activeStats["CLIFE"] = baseStats["LIFE"]
 			
-			
+		update_stats()
 		_init_inv()
 	
 	
@@ -227,7 +231,7 @@ func _load_stats():
 		
 #keep track of active de/buffs during gameplay, seperate from actual stats
 func apply_buff(attribute, effId, stat, buff, duration, curable = true, selfCast = false, source = ""):
-	var isBuff = false
+	var _isBuff = false
 	
 	if effId == null:
 		print("No SkillID found")
@@ -289,7 +293,7 @@ func _init_inv():
 		if unitData.Inv.size() >= limit:
 			break
 		var dur = itemData[thing].MAXDUR
-		var newItem : Dictionary = {"Data": thing, "DUR": dur}
+		var newItem : Dictionary = {"DATA": thing, "EQUIP": false, "DUR": dur}
 		unitData.Inv.append(newItem)
 	set_equipped()
 
@@ -297,7 +301,7 @@ func check_passives():
 	#ATTENTION
 	#Terrible, garbage, what the fuck. Cheap imitation of how it should be.
 	#will remake this
-	var passives = unitData["Passive"]
+	var _passives = unitData["Passive"]
 #	if passives.has("Fly"):
 #		moveType = "Fly"
 #		unitData.Stats.MOVE = baseMove+1
@@ -307,45 +311,141 @@ func check_passives():
 		
 			
 		
-
-
+	
+func restore_equip():
+	var i = 0
+	for item in unitData.Inv:
+		if tempSet and get_icat(item) != "ACC" and item.EQUIP:
+			unitData.Inv[i].EQUIP = false
+			unitData.Inv[0].EQUIP = true
+		i += 1
+	
+	tempSet = false
+	
+func set_temp_equip(i):
+	var tempWep = unitData.Inv[i]
+	if check_valid_equip(tempWep) and get_icat(tempWep) != "ACC":
+		unitData.Inv[0].EQUIP = false
+		tempWep.EQUIP = true
+	tempSet = true
+	update_combatdata()
+	
 func set_equipped(iInv = false): #searches for first valid if false or out of bounds, otherwise pass inv index and will equip if valid
 	var valid = false
 	var invItem
-	var iCat
-	if iInv and iInv < unitData.Inv.size():
+		
+	if iInv and iInv < unitData.Inv.size() and iInv > -1:
 		invItem = unitData.Inv[iInv]
-		valid = check_valid_weapon(invItem)
+		valid = check_valid_equip(invItem)
 	else: 
 		var i = 0
 		for thing in unitData.Inv:
-			if check_valid_weapon(thing):
+			if check_valid_equip(thing) and get_icat(thing) != "ACC":
 				valid = true
 				iInv = i
 				break
 			i += 1
-	if valid:
-		var holder = unitData.Inv.pop_at(iInv)
-		unitData.Inv.push_front(holder)
-		unitData.EQUIP = unitData.Inv[0]
-	else:
-		unitData.EQUIP = null
+	if valid and invItem and get_icat(invItem) == "ACC":
+		_equip_acc(iInv)
+	elif valid:
+		_equip_weapon(iInv)
+	tempSet = false
+	update_combatdata()
 	
-func unequip():
-	unitData.EQUIP = null
+func get_equipped_weapon(): #returns the currently equipped weapon within inventory. use .DATA to find global statistics. Return generic "unarmed" if there is none.
+	var found
+	var wep
+	for item in unitData.Inv:
+		if item.EQUIP and check_valid_equip(item, 1):
+			wep = item
+			found = true
+			break
+	if !found:
+		wep = unarmed
+	return wep
 	
-func check_valid_weapon(item): #Subweapons not fully implemented, Sub returns true regardless of which sub it is. There is no differentiation yet.
-	var usable: Array = []
-	var wTypes = unitData.Weapons.keys()
-	var i = 0
-	var iCat = itemData[item.Data].CATEGORY
+func get_equipped_acc(): #returns the currently equipped accessories within inventory. use .DATA to find global statistics. Return false if none.
+	
+	var acc : Array = []
+	for item in unitData.Inv:
+		if item.EQUIP and check_valid_equip(item, 2):
+			acc.append(item)
+	if acc.size() == 0:
+		return false
+	return acc
+	
+func unequip(slot = 0):
+	var item = unitData.Inv[slot]
+	while !item.EQUIP:
+		slot += 1
+		if slot >= unitData.Inv.size():
+			return
+		item = unitData.Inv[slot]
+		
+	_remove_equip_effects(item)
+	item.EQUIP = false
+	
+
+func _equip_acc(i : int):
+	var acc = unitData.Inv[i]
+	var limit : int = 2
+	var c : int = 0
+	var first : int
+	for item in unitData.Inv:
+		var type : String = get_icat(acc)
+		if type == "ACC" and acc.EQUIP and !first:
+			c += 1
+			first = unitData.Inv.find(item)
+		elif type == "ACC" and acc.EQUIP:
+			c += 1
+	if c >= limit:
+		unequip(first)
+	acc.EQUIP = true
+	
+	_add_equip_effects(acc)
+
+func _equip_weapon(index):
+	var wep = unitData.Inv.pop_at(index)
+	
+	for item in unitData.Inv:
+		var type : String = get_icat(wep)
+		if type != "ACC" and wep.EQUIP:
+			var i = unitData.Inv.find(wep)
+			unequip(i)
+		
+	_add_equip_effects(wep)
+	unitData.Inv.push_front(wep)
+	unitData.Inv[0].EQUIP = true
+	
+func _add_equip_effects(item):
+	var iData = UnitData.itemData[item.DATA]
+	if iData.EFFECT and iData.EFFECT.size() > 0:
+		for effect in iData.EFFECT:
+			_add_effect(effect)
+		print(activeEffects)
+		
+func _remove_equip_effects(item):
+	var iData = UnitData.itemData[item.DATA]
+	if iData.has("EFFECT"):
+		for effect in iData.EFFECT:
+			var i = activeEffects.find(effect)
+			activeEffects.remove_at(i)
+	print(activeEffects)
+	
+func get_icat(item):
+	var iCat = itemData[item.DATA].CATEGORY
+	return iCat
+
+	
+func check_valid_equip(item : Dictionary, mode : int = 0): #Subweapons not fully implemented, Sub returns true regardless of which sub it is. There is no differentiation yet. 0 = Any, 1 = Weapon; 2 = Accessory
+	var iCat = get_icat(item) 
 	if item.DUR == 0:
 		return false
-	for weapon in unitData.Weapons:
-		if unitData.Weapons[weapon]:
-			usable.append(weapon)
-		i += 1
-	if usable.has(iCat):
+	if mode < 2 and unitData.Weapons.has(iCat):
+		return true
+	elif mode == 0 and iCat == "ACC":
+		return true
+	elif mode == 2 and iCat == "ACC":
 		return true
 	else:
 		return false
@@ -353,20 +453,9 @@ func check_valid_weapon(item): #Subweapons not fully implemented, Sub returns tr
 func update_combatdata():
 	#no catch for empty inv!!!!! HERE Wait, isn't there one? setting it to Null, and then having null translate to "NONE" when all null instances could just be "NONE" is retarded. Fix this, you god damned retard.
 	var terrainBonus = update_terrain_bonus()
-	var wep
-	if unitData.EQUIP:
-		var equipped = unitData.EQUIP
-		wep = itemData[equipped.Data]
-	else:
-		wep = itemData["NONE"]
+	var equipped = get_equipped_weapon()
 	var stat = activeStats
-	
-#	if faction == "Player" and equipped != "NONE":
-#		wep = allUnitData.plrInv[equipped]
-#	elif faction!= "Player" and equipped != "NONE":
-#		wep = allUnitData.npcInv[equipped]
-#	else:
-#		wep = allUnitData.wepData["NONE"]
+	var wep = itemData[equipped.DATA]
 	
 	combatData.TYPE = wep.TYPE
 	if wep.TYPE == "Physical":
@@ -458,7 +547,7 @@ func fade_out(duration: float):
 	_anim_player.play("death")
 	await get_tree().create_timer(duration).timeout
 	$PathFollow2D/HPbar.visible = false
-	emit_signal("deathDone")
+	emit_signal("death_done", self)
 	
 	
 
@@ -525,32 +614,31 @@ func relocate_unit(location, gridUpdate = true):
 	cell = map.local_to_map(position)
 	position = map.map_to_local(cell)
 	
-func _on_animation_player_animation_finished(anim_name):
+func _on_animation_player_animation_finished(_animName):
 	pass
-	
 	#HERE
-func add_exp(action, target = null):
+func add_exp(action, _target = null): ##Adds exp if a unit is a place, as well as returning 'true', returns 'false' if not a player unit.
 	if self.faction != "Player":
-		return
-	var exp = 0
+		return false
+	var xpVal = 0
 	var results
 	var oldStats = unitData.Stats.duplicate()
 	var oldLevel = unitData.Profile.Level
-	var targetLevel
+	#var targetLevel
 	var oldExp = unitData.Profile.EXP
 	var expSteps = []
 	var portrait = unitData.Profile.Prt
 	var lvlLoops = 0
 	var levelUpReport = {}
 
-	if target != null:
-		targetLevel = target.unitData.Profile.Level
+	#if target != null:
+		#targetLevel = target.unitData.Profile.Level
 #	print(unitData.Profile.EXP)
 	match action:
-		"Kill": exp = 150
-		"Support": exp = 60
-		"Generic": exp = 60
-	unitData.Profile.EXP += exp
+		"Kill": xpVal = 150
+		"Support": xpVal = 60
+		"Generic": xpVal = 60
+	unitData.Profile.EXP += xpVal
 	
 #	print(unitData.Profile.EXP)
 	if unitData.Profile.EXP <= 100:
@@ -576,7 +664,28 @@ func add_exp(action, target = null):
 		levelUpReport.OldStats["LVL"] = oldLevel
 #		print(unitData)
 	emit_signal("exp_gained", oldExp, expSteps, levelUpReport, portrait, unitData.Profile.UnitName)
+	return true
 
 func map_start_init():
 	originCell = map.local_to_map(position) #BUG GY
-	print(originCell)
+	#print(originCell)
+	
+func _add_effect(effect):
+	activeEffects.append(effect)
+		
+func _remove_effect(effect):
+	var i = activeEffects.find(effect)
+	activeEffects.remove_at(i)
+
+#func get_equipped_items(): #returns Array of equipped items, stored in dictionaries: Item ID, Inventory Index; item category [{"ITEM":id, "INDEX": i, "CAT": c}]
+	#var inv = unitData.Inv
+	#var i : int = 0
+	#var equipment : Array = [] 
+	#for item in inv:
+		#if item.EQUIP == true:
+			#var p : Dictionary = {}
+			#var c = get_icat(item)
+			#p["ID"] = item.DATA
+			#
+			
+			

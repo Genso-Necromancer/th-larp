@@ -7,14 +7,18 @@ class_name GameBoard
 extends Node2D
 
 #signals sent from here
-signal toggle_action
-
+signal menu_canceled
+signal player_lost
+signal player_win
 signal cell_selected
 signal unit_selected(unit)
 signal unit_move_ended(unit)
 signal unit_deselected
-
+signal cmbData_updated(cmbData)
 signal walk_complete
+
+
+
 signal toggle_prof
 signal toggle_skills
 signal target_focused
@@ -58,9 +62,9 @@ var mapSize
 var mapCellSize
 var mapRect
 var terrainData = []
-var conditions: Array
 var lastSkill
 var warpTarget
+var deathList = []
 
 #Units by UnitID
 var unitObjs : Dictionary = Global.unitObjs
@@ -70,7 +74,7 @@ var unitObjs : Dictionary = Global.unitObjs
 
 #states
 @onready var GameState = mainCon.GameState
-var previousState
+
 
 #input Global.state
 #var Global.state : int = 0
@@ -93,6 +97,9 @@ var turnCounter = 0
 var aiTurn = false
 var maxTurns = 0
 var earlyEnd = false
+
+#Process variables
+var turnComplete : bool = false
 
 #Global effects
 var globalEffects = {}
@@ -120,6 +127,7 @@ var cursor: Cursor
 @export var uiCooldown := 0.2
 @onready var gameCamera = $Cursor/Camera2D
 @onready var ai = $AiManager
+
 #@onready var cTimer: Timer = $Cursor/Timer
 
 
@@ -141,14 +149,27 @@ var cursorCell := Vector2i.ZERO:
 func _ready() -> void:
 	pass
 	
+func _process(delta):
+	if mainCon.state != GameState.ACCEPT_PROMPT:
+		_check_flags()
+	if deathList.size() >= 0:
+		_wipe_dead()
+	if mainCon.state == GameState.ACCEPT_PROMPT:
+		pass
+	elif mainCon.state == GameState.FAIL_STATE:
+		pass
+	elif mainCon.state == GameState.WIN_STATE:
+		pass
+	elif turnComplete and deathList.size() == 0:
+		turnComplete = false
+		turn_change()
+	
 func _on_jobs_done(id, node):
 	match id:
 		"Cursor": 
 			cursor = node
 		"CmbMng":
 			combatManager = node
-			
-			
 
 func load_new_map(map):
 	
@@ -186,7 +207,7 @@ func _initialize_hexstar():
 	mapRect = currMap.get_used_rect() #initializing hexStar
 	mapSize = mapRect.size
 	mapCellSize = currMap.tileSize
-	conditions = currMap.lossConditions
+	
 	#start up pathfinder
 	hexStar = AHexGrid2D.new(currMap)
 	hexStar.tileSize = mapCellSize
@@ -237,11 +258,11 @@ func _load_units(): #merge with store enemy units
 		if isPlayable: #filter out Player units
 			var unitID = roster[i]
 			unit.init_player_unit(unitID)
-			unitObjs[unit.unitID] = unit
+			unitObjs[unit.unitId] = unit
 			i += 1
-		if isPlayable and forcedDeploy.has(unit.unitID):
+		if isPlayable and forcedDeploy.has(unit.unitId):
 			unit.forced = true
-			_deploy_unit(unit, true, forcedDeploy[unit.unitID])
+			_deploy_unit(unit, true, forcedDeploy[unit.unitId])
 		elif isPlayable and filledSlots < deploymentCells.size():
 			_deploy_unit(unit)
 		elif isPlayable and filledSlots >= deploymentCells.size():
@@ -260,8 +281,8 @@ func _load_units(): #merge with store enemy units
 func _connect_unit_signals(unit):
 #	if !combatManager.combat_resolved.is_connected(unit.on_combat_resolved):
 #		combatManager.combat_resolved.connect(unit.on_combat_resolved)
-	if !unit.imdead.is_connected(self.on_imdead):
-		unit.imdead.connect(self.on_imdead)
+	if !unit.death_done.is_connected(self.on_death_done):
+		unit.death_done.connect(self.on_death_done)
 	if !self.turn_changed.is_connected(unit.on_turn_changed): 
 		self.turn_changed.connect(unit.on_turn_changed)
 	if !unit.unit_relocated.is_connected(self.on_unit_relocated): 
@@ -352,7 +373,7 @@ func checkSun():
 func _init_gamestate():
 	boardState.update_map_data(terrainData)
 	boardState.update_unit_data(units)
-	boardState.set_win(conditions)
+	
 	
 func _update_unit_terrain(unit):
 	unit.update_terrain_data(terrainData)
@@ -362,12 +383,6 @@ func _unhandled_input(event: InputEvent) -> void: #for debugging, delete later
 	#T key: Passes current turn for debugging, preventing from doing this if a unit is actively moving or it is not the player turn
 	if aiTurn:
 		return
-	if event.is_action_pressed("debug"):
-		turn_change()
-		
-	if event.is_action_pressed("debugHealTest"):
-		for cell in units:
-			units[cell].apply_dmg(2)
 		
 	if unitMoving:
 		return
@@ -413,7 +428,7 @@ func init_hexStar_terrain(attack: bool = false):
 	#units are split between factions, then it's opposing faction is considered "solid"
 	##Plans to allow for flying units to go 'over' opposing units in the future possibly, not currently implemented
 	var team = null
-	if !aiTurn:
+	if !mainCon.state == GameState.GB_AI_TURN:
 		if activeUnit.is_in_group("Player"):
 			team = "Player"
 		if activeUnit.is_in_group("Enemy"):
@@ -530,6 +545,7 @@ func _select_unit(cell: Vector2i) -> void:
 #	print(cell)
 	if units.has(cell):
 		activeUnit = units[cell]
+		#activeUnit.save_equip()
 		activeUnit.is_selected = true
 		walkableCells = get_walkable_cells(activeUnit)
 		walkable_rect = get_region_rect(walkableCells)
@@ -550,6 +566,7 @@ func _deselect_active_unit(confirm) -> void:
 			units.erase(activeUnit.cell)
 			var new_cell = activeUnit.return_original()
 			units[new_cell] = activeUnit
+			activeUnit.restore_equip()
 			
 		else:
 			var new_cell = activeUnit.cell
@@ -558,6 +575,7 @@ func _deselect_active_unit(confirm) -> void:
 			boardState.add_acted(activeUnit)
 			activeUnit.set_acted(true)
 	#	#print(units)
+		
 		activeUnit.is_selected = false
 	_clear_active_unit()
 	unitOverlay.clear()
@@ -581,7 +599,9 @@ func grab_target(cell, skillState = false, skill = null):
 	
 	if !skillState:
 		foreCast = combatManager.get_forecast(activeUnit, targetUnit, distance)
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		emit_signal("target_focused", foreCast, distance)
+		
 	elif skillState:
 		print("Skill Manager")
 		combatManager.get_forecast(activeUnit, targetUnit, distance, skill)
@@ -601,12 +621,12 @@ func select_destination(): #SELECTED STATE
 	var isOccupied = is_occupied(cursorCell)
 	var isWalkable = walkableCells.has(cursorCell)
 	if !isOccupied and isWalkable:
-		mainCon.previousState = mainCon.state
-		mainCon.state = GameState.GB_ACTION_MENU
+		_change_state(GameState.GB_ACTION_MENU)
+
 		_move_active_unit(cursorCell)
 	elif cursorCell == activeUnit.cell:
-		mainCon.previousState = mainCon.state
-		mainCon.state = GameState.GB_ACTION_MENU
+		_change_state(GameState.GB_ACTION_MENU)
+
 		emit_signal("unit_move_ended", activeUnit)
 
 func select_formation_cell():
@@ -668,18 +688,21 @@ func request_deselect():
 	wipe_region()
 	emit_signal("unit_deselected")
 	unitOverlay.clear()
-	mainCon.state = GameState.GB_DEFAULT
+	_change_state(GameState.GB_DEFAULT)
 	_deselect_active_unit(false)
 
+func end_targeting():
+	_change_state(GameState.GB_ACTION_MENU)
+	wipe_region()
+	unitOverlay.clear()
+	cursorCell = activeUnit.cell
+	emit_signal("unit_move_ended", activeUnit)
+
 func menu_step_back():
-	match mainCon.previousState:
-		GameState.GB_ACTION_MENU:
-			if mainCon.state == GameState.GB_SKILL_MENU:
-				emit_signal("toggle_skills")
-			elif mainCon.state == GameState.GB_ATTACK_TARGETING:
-				emit_signal("toggle_action")
-			mainCon.previousState = mainCon.state
-			mainCon.state = GameState.GB_ACTION_MENU
+	match mainCon.state:
+		GameState.GB_COMBAT_FORECAST:
+			emit_signal("action_called", activeUnit)
+			_change_state(GameState.GB_ACTION_MENU)
 			wipe_region()
 			cursorCell = activeUnit.cell
 	
@@ -741,10 +764,15 @@ func skill_target_selected(): #find way to simplify and merge with attack target
 				grab_target(cursorCell, true, activeSkill)
 
 func return_targeting():
-	emit_signal("target_focused")
-	_on_action_selected(mainCon.previousState, lastSkill)
+	var s
+	emit_signal("menu_canceled")
+	match mainCon.previousState:
+		GameState.GB_ATTACK_TARGETING: 
+			s = "Attack"
+			activeUnit.restore_equip()
+			attack_targeting(activeUnit)
 			
-func cursor_accept_pressed(cell: Vector2i) -> void:
+func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMORE???
 	# Controls what happens when an element is selected by the player based on input Global.state
 	#Includes: Selecting Unit, Destinations; Targets
 	#Currently also checks if selection is valid
@@ -888,14 +916,15 @@ func attack_targeting(unit: Unit, usingSkill = false, skill = null, rangeOnly = 
 	var minRange = 1000
 	var wepData = UnitData.itemData
 	var skillData = UnitData.skillData
+	_change_state(GameState.GB_ATTACK_TARGETING)
 	activeSkill = skill
 	
 	if !usingSkill:
 		for wep in unit.unitData.Inv:
 			if wep.DUR == 0:
 				continue
-			maxRange = max(maxRange, wepData[wep.Data].MAXRANGE, maxRange)
-			minRange = min(minRange, wepData[wep.Data].MINRANGE, minRange)
+			maxRange = max(maxRange, wepData[wep.DATA].MAXRANGE, maxRange)
+			minRange = min(minRange, wepData[wep.DATA].MINRANGE, minRange)
 	elif usingSkill:
 		maxRange = skill.RangeMax
 		minRange = skill.RangeMin
@@ -939,50 +968,16 @@ func combat_sequence(a,t, scenario = null):
 	a.update_stats()
 	t.update_stats()
 	if a.needDeath:
-		addingExp = true
-		wipeUnit = a
-		await a.deathDone
-		t.add_exp("Kill", a)
+		
+		await a.death_done
+		addingExp = t.add_exp("Kill", a)
 	if t.needDeath:
-		addingExp = true
-		wipeUnit = t
-		await t.deathDone
-		a.add_exp("Kill", t)
+		
+		await t.death_done
+		addingExp = a.add_exp("Kill", t)
 	if addingExp:
-		await self.continue_turn 
-		#CURRENT PROBLEM
-		#EXPECTED PATH IS COMBAT FINISHED>IS KILL>REMOVE UNIT>WAIT FOR EXP TO END TURN>[ADD EXP>DISPLAY>RESUME ENDING TURN]
-		#ACTUAL PATH IS COMBAT FINISHED>IS KILL>[ADD EXP>DISPLAY EXP>RESUME TURN]>WAIT FOR EXP TO END TURN
-		#ISSUE: ADDING EXP REQUIRES REFERENCE TO TARGET, SO MUST OCCUR BEFORE REMOVING THE TARGET. EXP ROUTINES ARE PACKAGED TOGETHER AND KILL ROUTINES ARE PACKAGED TOGETHER.
-		addingExp = false
-	if wipeUnit != null:
-		on_imdead(wipeUnit)
-	turn_change()
-
-func _on_action_selected(selection, skill = null):
-	#Controls what to do based on the action selected, GUIManager passes that information via Signal
-#	var cell = cursor.cell
-	lastSkill = skill
-	match selection:
-		GameState.GB_ATTACK_TARGETING: 
-			mainCon.previousState = mainCon.state
-			mainCon.state = GameState.GB_ATTACK_TARGETING
-			attack_targeting(activeUnit)
-		GameState.GB_SKILL_TARGETING: 
-			mainCon.previousState = mainCon.state
-			mainCon.state = GameState.GB_SKILL_TARGETING
-			attack_targeting(activeUnit, true, skill)
-		"Wait": 
-			mainCon.previousState = mainCon.state
-			mainCon.state = GameState.GB_DEFAULT
-			_deselect_active_unit(true)
-			turn_change()
-#			Input.warp_mouse(currMap.map_to_local(activeUnit.position))
-		"End":
-			mainCon.state = GameState.GB_ROUND_END
-			earlyEnd = true
-			turn_change()
-			
+		await self.continue_turn
+	turnComplete = true
 
 func toggle_extra_info():
 	#Toggles HP bars
@@ -1052,28 +1047,34 @@ func find_next_best_cell(currentCell, nextCell): #it's still pretty jank, but at
 #	if combatManager.rng != null:
 #		combatManager.rng.qeue_free()
 		
-func on_imdead(unit: Unit):
-	#When Unit signals that it has died, this removes it from units and free's it's coordinates
+func on_death_done(unit: Unit):
+	
 	#Plan to alter this down the line for Seiga fight, where fallen units will be cached instead of completely removed
 	#Intention would be for Seiga to "reanimate" fallen units as part of her "danmaku"
-	var remove = unit.cell
-	units.erase(remove)
-	unit.queue_free()
+	deathList.append(unit)
+	currMap.check_event("death", unit)
+	
+	
 #	var filterDick = []
 #	for entry in units:
 #		filterDick.append(entry)
 #	units = filterDick
 #	print(units)
+func _wipe_dead():
+	for dead in deathList:
+		_clear_unit(dead)
+	deathList.clear()
 
+func _clear_unit(unit):
+	var remove = unit.cell
+	units.erase(remove)
+	unit.queue_free()
+	
 func _remove_from_grid(unit: Unit):
 	var remove = unit.cell
 	if units.has(remove):
 		units.erase(remove)
-
-func _on_menu_cursor_wep_updated():
-	#required for updating combat forecast as the player hovers weapon selection before combat. Signal is sent from /menu_cursor class
-	var distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.moveType, false)
-	combatManager.get_forecast(activeUnit, targetUnit, distance)
+	
 	
 	
 func turn_change():
@@ -1109,17 +1110,13 @@ func turn_change():
 	_progress_time()
 	checkSun()
 	
-	if aiTurn:
-		await get_tree().create_timer(0.5).timeout
-		mainCon.newSlave = [yaBoy]
-		mainCon.state = GameState.ACCEPT_PROMPT
-		start_ai_turn()
+		
+		
 	emit_signal("turn_changed")
 	if !aiTurn and earlyEnd:
-		mainCon.newSlave = [yaBoy]
-		mainCon.state = GameState.ACCEPT_PROMPT
+		_change_state(GameState.ACCEPT_PROMPT)
 		set_next_acted()
-		turn_change()
+		turnComplete = true
 	emit_signal("turn_order_updated", turnOrder)
 	
 func round_change():
@@ -1167,10 +1164,10 @@ func start_ai_turn():
 		var result = ai.get_move(boardState)
 		
 		
-		match result["Best Move"]["action"]:
+		match result["Best Move"]["Action"]:
 			"Attack": ai_attack(result)
 			"Move": ai_move(result)
-	else: turn_change()
+	else: turnComplete = true
 		
 	
 #The next three functions process the AI's decided action based on which one is taken
@@ -1210,7 +1207,7 @@ func ai_move(result):
 	boardState.add_acted(actor)
 	actor.set_acted(true)
 	_deselect_active_unit(true)
-	turn_change()
+	turnComplete = true
 	
 func ai_wait(result):
 	var actor = result["Unit"]
@@ -1218,17 +1215,16 @@ func ai_wait(result):
 	boardState.add_acted(actor)
 	activeUnit.set_acted(true)
 	_deselect_active_unit(true)
-	turn_change()
+	turnComplete = true
 	
 
-func _on_gui_manager_start_the_justice():
-	#Called via Singal from GUIManager when player initiaties combat
-	#Sends necessary data to the combat manager, then initiates the visual representation after results are returned
-	#Currently does not return the results, nor pass them due to having no implemented visual representation
-	#next step to this will be implementing an ingame text read out of combat to set up framework without need for actual animations yet
-	mainCon.state = GameState.LOADING
-	combatManager.start_the_justice(activeUnit, focusUnit)
-	emit_signal("target_focused")
+func _on_gui_manager_start_the_justice(button):
+	
+	var i = button.get_meta("index")
+	activeUnit.set_equipped(i)
+	_change_state(GameState.LOADING)
+	combatManager.start_the_justice(activeUnit, focusUnit) #Why is durability going down by 2??
+	#emit_signal("target_focused")
 	boardState.add_acted(activeUnit)
 	activeUnit.set_acted(true)
 	combat_sequence(activeUnit, focusUnit)
@@ -1279,11 +1275,10 @@ func _on_combat_manager_warp_selected(actor, target, range):
 	warp_targeting(actor, range)
 
 func on_exp_gained(oldExp, expSteps, results, portrait, unitName):
-	previousState = mainCon.state
 	emit_signal("exp_display", oldExp, expSteps, results, portrait, unitName)
 
 func _on_gui_manager_exp_finished():
-	mainCon.state = previousState
+	_change_state(GameState.LOADING)
 	emit_signal("continue_turn")
 
 func _on_gui_manager_deploy_toggled(unit, deployed):
@@ -1370,9 +1365,12 @@ func _on_gui_manager_item_used(unit, item):
 	combatManager.use_item(unit, item)
 
 func _change_state(state):
+	var newState = state
 	mainCon.newSlave = [self]
+	if state == mainCon.state:
+		return
 	mainCon.previousState = mainCon.state
-	mainCon.state = state
+	mainCon.state = newState
 
 func _on_gui_manager_map_started():
 	for unit in units:
@@ -1386,18 +1384,68 @@ func _on_gui_manager_map_started():
 func _on_action_menu_action_selected(selection, skill = null):
 	lastSkill = skill
 	match selection:
-		GameState.GB_ATTACK_TARGETING: 
+		"Attack": 
 			_change_state(GameState.GB_ATTACK_TARGETING)
 			attack_targeting(activeUnit)
-		GameState.GB_SKILL_TARGETING: 
+		"Skill": 
 			_change_state(GameState.GB_SKILL_TARGETING)
 			attack_targeting(activeUnit, true, skill)
 		"Wait": 
 			_change_state(GameState.GB_DEFAULT)
 			_deselect_active_unit(true)
-			turn_change()
+			turnComplete = true
 #			Input.warp_mouse(currMap.map_to_local(activeUnit.position))
 		"End":
 			_change_state(GameState.GB_ROUND_END)
 			earlyEnd = true
-			turn_change()
+			turnComplete = true
+
+func _on_action_menu_weapon_changed(button):
+	var i = button.get_meta("index")
+	var distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.moveType, false)
+	var cmbData
+	activeUnit.set_temp_equip(i)
+	cmbData = combatManager.get_forecast(activeUnit, targetUnit, distance)
+	emit_signal("cmbData_updated", cmbData)
+	
+	
+
+#Objective related code
+func _check_flags():
+	var flags = Global.flags
+	
+	if flags.gameOver: #consider saving reason for loss in later versions
+		emit_signal("player_lost")
+		_change_state(GameState.FAIL_STATE)
+	if flags.victory:
+		emit_signal("player_win")
+		_change_state(GameState.WIN_STATE)
+	
+	
+#Victory flag is set
+#Gameboard sees this and signals the player wins
+#turns are halted
+#display win scene & save player data
+#unload map and transition to next scene after player input
+#load next map
+	
+#"cut-scene" related code
+#func _check_for_scene():
+	##inject scene shit here
+	#_change_state(GameState.SCENE_ACTIVE)
+	#_on_scene_complete()
+	#
+#func _on_scene_complete():
+	#_change_state(GameState.WIN_STATE)
+	
+	
+#Debug Functions
+func _kill_lady():
+	var lady = unitObjs["Remilia"]
+	lady.apply_dmg(9999)
+
+
+
+
+
+

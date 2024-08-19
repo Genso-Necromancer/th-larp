@@ -147,7 +147,7 @@ sources/5 = SubResource("TileSetAtlasSource_bco8r")
 sources/0 = SubResource("TileSetAtlasSource_qmxju")
 sources/1 = SubResource("TileSetAtlasSource_bkpol")
 
-[node name="TestMap" type="TileMap"]
+[node name="TestMap" type="TileMap" node_paths=PackedStringArray("winKill")]
 z_index = -2
 y_sort_enabled = true
 tile_set = SubResource("1")
@@ -163,6 +163,7 @@ layer_2/name = "triggers"
 layer_2/y_sort_enabled = true
 layer_2/tile_data = PackedInt32Array(524290, 0, 0, 524291, 0, 0, 589826, 1, 0)
 script = ExtResource("2_4gcnm")
+winKill = [NodePath("Fairy2")]
 
 [node name="Control" type="Control" parent="."]
 layout_mode = 3
@@ -186,12 +187,14 @@ position = Vector2(196, 202)
 preDefined = true
 faction = "Enemy"
 inventory = Array[String](["CLB"])
+unitId = null
 
 [node name="Fairy3" parent="." instance=ExtResource("3_ysf1k")]
 position = Vector2(682, 248)
 preDefined = true
 faction = "Enemy"
 inventory = Array[String](["CLB"])
+unitId = null
 
 [node name="AnimationPlayer" parent="Fairy3/PathFollow2D/Sprite" index="0"]
 root_node = NodePath("../../../../Fairy3")
@@ -201,6 +204,7 @@ position = Vector2(440, 294)
 preDefined = true
 faction = "Enemy"
 inventory = Array[String](["CLB"])
+unitId = null
 
 [node name="177635" type="Timer" parent="Fairy2/PathFollow2D" index="4"]
 wait_time = 0.2

@@ -14,7 +14,7 @@ func _handle_bind(bind):
 		"invalid": return
 		"ui_accept": gameBoard.attack_target_selected()
 		"ui_info": gameBoard.toggle_unit_profile()
-		"ui_return": gameBoard.menu_step_back()
+		"ui_return": gameBoard.end_targeting()
 		"ui_scroll_left": pass
 		"ui_scroll_right": pass
 		"ui_right": 

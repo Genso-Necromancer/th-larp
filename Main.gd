@@ -13,8 +13,12 @@ enum GameState {
 	GB_WARP,
 	GB_SETUP,
 	GB_FORMATION,
+	GB_AI_TURN,
 	START,
-	ACCEPT_PROMPT
+	ACCEPT_PROMPT,
+	FAIL_STATE,
+	WIN_STATE,
+	SCENE_ACTIVE
 } #state tags for easy swapping
 
 var gameBoard
@@ -121,14 +125,7 @@ func change_state(value): #This is necessary for the 1 tick delay on state chang
 func set_new_state(value): #Value = new State Tag. Call this function, or simply changing the "state" variable from anywhere to change the state properly.
 	state = value
 
-#func delayed_state(value): #actually changes the state
-#	var oldState
-#	var slaves = []
-#	if activeState != null:
-#		oldState = activeState
-#		oldState.queue_free() 
-#	slaves = _switch_state_get_slaves(value)
-#	activeState.setup(slaves)
+
 
 func _switch_state_get_slaves(value): 
 	var slaves = []
@@ -173,10 +170,22 @@ func _switch_state_get_slaves(value):
 		GameState.GB_FORMATION:
 			slaves = newSlave
 			activeState = GBFormationState.new()
+		GameState.GB_AI_TURN:
+			slaves = newSlave
+			activeState = AcceptState.new()
 		GameState.START:
 			slaves = newSlave
 			activeState = StartState.new()
 		GameState.ACCEPT_PROMPT:
+			slaves = newSlave
+			activeState = AcceptState.new()
+		GameState.FAIL_STATE:
+			slaves = newSlave
+			activeState = FailState.new()
+		GameState.WIN_STATE:
+			slaves = newSlave
+			activeState = AcceptState.new()
+		GameState.SCENE_ACTIVE:
 			slaves = newSlave
 			activeState = AcceptState.new()
 	add_child(activeState)

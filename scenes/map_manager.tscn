@@ -1,17 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://dtt1es8lctsrv"]
+[gd_scene load_steps=3 format=3 uid="uid://dtt1es8lctsrv"]
 
-[ext_resource type="Script" path="res://scenes/map_manager.gd" id="1_0qoli"]
 [ext_resource type="PackedScene" uid="uid://cmvmjk0jj7dam" path="res://scenes/Gameboard.tscn" id="1_1o3kx"]
 [ext_resource type="PackedScene" uid="uid://r6wtvva5qput" path="res://scenes/GUIManager.tscn" id="2_3ng14"]
-[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_vdsei"]
-[ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="4_3tvs0"]
-[ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="4_hl56q"]
-[ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="5_6ib6s"]
-[ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="6_gjfti"]
-[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="8_8h4nf"]
 
 [node name="mapManager" type="Node"]
-script = ExtResource("1_0qoli")
 
 [node name="Gameboard" parent="." instance=ExtResource("1_1o3kx")]
 
@@ -24,320 +16,24 @@ follow_viewport_scale = 0.001
 [node name="GUIManager" parent="CanvasLayer" instance=ExtResource("2_3ng14")]
 mapCursorPath = NodePath("../../Gameboard/Cursor")
 
-[node name="Count" parent="CanvasLayer/GUIManager/ActionMenu" index="0"]
-visible = true
-
-[node name="M" parent="CanvasLayer/GUIManager/SetUpMain/PanelContainer/MngOptPnl" index="1"]
-visible = false
-
-[node name="EXPgain" type="HBoxContainer" parent="CanvasLayer/GUIManager"]
-visible = false
-layout_mode = 1
-anchors_preset = -1
-anchor_left = 0.37
-anchor_top = 0.65
-anchor_right = 0.37
-anchor_bottom = 0.66
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_constants/separation = 0
-
-[node name="MC" type="MarginContainer" parent="CanvasLayer/GUIManager/EXPgain"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 0
-metadata/_edit_use_anchors_ = true
-
-[node name="SpriteBG" type="NinePatchRect" parent="CanvasLayer/GUIManager/EXPgain/MC"]
-custom_minimum_size = Vector2(56, 56)
-layout_mode = 2
-texture = ExtResource("3_vdsei")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="MC" type="MarginContainer" parent="CanvasLayer/GUIManager/EXPgain/MC"]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="UnitPrt" type="TextureRect" parent="CanvasLayer/GUIManager/EXPgain/MC/MC"]
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-texture = ExtResource("4_hl56q")
-expand_mode = 1
-stretch_mode = 4
-
-[node name="PanelContainer" type="PanelContainer" parent="CanvasLayer/GUIManager/EXPgain"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-
-[node name="BG" type="NinePatchRect" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer"]
-custom_minimum_size = Vector2(180, 0)
-layout_mode = 2
-texture = ExtResource("3_vdsei")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="LvUpMargin" type="MarginContainer" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-metadata/_edit_use_anchors_ = true
-
-[node name="Vbox" type="VBoxContainer" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin"]
-layout_mode = 2
-theme_override_constants/separation = 2
-
-[node name="Header" type="HBoxContainer" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="UnitLevelTag" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Header"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("8_8h4nf")
-text = "Level:"
-
-[node name="UnitLevel" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Header"]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-text = "0"
-
-[node name="Increase" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Header"]
-custom_minimum_size = Vector2(15, 0)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
-
-[node name="UnitName" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Header"]
-layout_mode = 2
-text = "Test Name"
-
-[node name="HPCmpBox" type="HBoxContainer" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox"]
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="UnitHpTag2" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
-layout_mode = 2
-size_flags_horizontal = 4
-focus_neighbor_bottom = NodePath("../../Stats/UnitStrTag")
-theme = ExtResource("8_8h4nf")
-text = "Health:"
-
-[node name="UnitHp" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("8_8h4nf")
-text = "60"
-horizontal_alignment = 2
-
-[node name="IncreaseHP" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
-custom_minimum_size = Vector2(15, 0)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
-
-[node name="UnitCmpTag" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
-layout_mode = 2
-size_flags_horizontal = 4
-focus_neighbor_bottom = NodePath("../../Stats/UnitStrTag")
-theme = ExtResource("8_8h4nf")
-text = "Composure:"
-
-[node name="UnitCmp" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("8_8h4nf")
-text = "60"
-horizontal_alignment = 2
-
-[node name="IncreaseCmp" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
-custom_minimum_size = Vector2(15, 0)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-theme_override_colors/font_color = Color(0.788235, 0.682353, 0.0627451, 1)
-
-[node name="HSeparator" type="HSeparator" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox"]
-layout_mode = 2
-
-[node name="Stats" type="GridContainer" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox"]
-layout_mode = 2
-theme_override_constants/h_separation = 4
-theme_override_constants/v_separation = 4
-columns = 9
-
-[node name="UnitStrTag" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-layout_mode = 2
-size_flags_horizontal = 0
-focus_neighbor_bottom = NodePath("../UnitMagTag")
-theme = ExtResource("8_8h4nf")
-text = "Power:"
-
-[node name="UnitStr" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-size_flags_horizontal = 0
-theme = ExtResource("8_8h4nf")
-text = "0"
-
-[node name="Increase" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-custom_minimum_size = Vector2(15, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-theme = ExtResource("8_8h4nf")
-theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
-
-[node name="UnitMagTag" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-layout_mode = 2
-size_flags_horizontal = 0
-theme = ExtResource("8_8h4nf")
-text = "Magic:"
-
-[node name="UnitMag" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-size_flags_horizontal = 0
-theme = ExtResource("8_8h4nf")
-text = "0"
-
-[node name="Increase2" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-custom_minimum_size = Vector2(15, 0)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
-
-[node name="UnitElegTag2" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-layout_mode = 2
-size_flags_horizontal = 0
-theme = ExtResource("8_8h4nf")
-text = "Elegance:"
-
-[node name="UnitEle" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-text = "0"
-
-[node name="Increase3" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-custom_minimum_size = Vector2(15, 0)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
-
-[node name="UnitCeleTag3" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("8_8h4nf")
-text = "Celerity:"
-
-[node name="UnitCele" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-text = "0"
-
-[node name="Increase4" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-custom_minimum_size = Vector2(15, 0)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
-
-[node name="UnitBarTag4" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("8_8h4nf")
-text = "Barrier:"
-
-[node name="UnitBar" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-text = "0"
-
-[node name="Increase5" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-custom_minimum_size = Vector2(15, 0)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
-
-[node name="UnitChaTag5" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("8_8h4nf")
-text = "Charisma:"
-
-[node name="UnitCha" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-text = "0"
-
-[node name="Increase6" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
-custom_minimum_size = Vector2(15, 0)
-layout_mode = 2
-theme = ExtResource("8_8h4nf")
-theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
-
-[node name="ExpMargin" type="MarginContainer" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer"]
-custom_minimum_size = Vector2(180, 0)
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_right = 20
-
-[node name="HC" type="HBoxContainer" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/ExpMargin"]
-layout_mode = 2
-
-[node name="expL" type="Label" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/ExpMargin/HC"]
-layout_mode = 2
-text = "test"
-vertical_alignment = 1
-
-[node name="expBar" type="TextureProgressBar" parent="CanvasLayer/GUIManager/EXPgain/PanelContainer/ExpMargin/HC"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 4
-nine_patch_stretch = true
-stretch_margin_left = 4
-stretch_margin_top = 4
-stretch_margin_right = 4
-stretch_margin_bottom = 4
-texture_under = ExtResource("4_3tvs0")
-texture_over = ExtResource("5_6ib6s")
-texture_progress = ExtResource("6_gjfti")
-
 [connection signal="call_setup" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_call_setup"]
 [connection signal="cell_selected" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_cell_selected"]
+[connection signal="cmbData_updated" from="Gameboard" to="CanvasLayer/GUIManager/CombatForecast" method="_on_gameboard_cmb_data_updated"]
 [connection signal="deploy_toggled" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_deploy_toggled"]
 [connection signal="exp_display" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_exp_display"]
 [connection signal="formation_closed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_formation_closed"]
 [connection signal="gb_ready" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_gb_ready"]
+[connection signal="menu_canceled" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_menu_canceled"]
+[connection signal="player_lost" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_player_lost"]
+[connection signal="player_win" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_player_win"]
 [connection signal="target_focused" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_target_focused"]
-[connection signal="toggle_action" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_action"]
 [connection signal="toggle_prof" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_prof"]
 [connection signal="toggle_skills" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_skills"]
 [connection signal="turn_changed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_turn_changed"]
 [connection signal="turn_order_updated" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_turn_order_updated"]
 [connection signal="unit_deselected" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_unit_deselected"]
 [connection signal="unit_move_ended" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_unit_move_ended"]
+[connection signal="unit_selected" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_unit_selected"]
 [connection signal="walk_complete" from="Gameboard" to="." method="_on_gameboard_walk_complete"]
 [connection signal="combat_resolved" from="Gameboard/CombatManager" to="Gameboard" method="_on_combat_manager_combat_resolved"]
 [connection signal="time_factor_changed" from="Gameboard/CombatManager" to="Gameboard" method="_on_combat_manager_time_factor_changed"]
@@ -349,10 +45,12 @@ texture_progress = ExtResource("6_gjfti")
 [connection signal="map_started" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_map_started"]
 [connection signal="startTheJustice" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_start_the_justice"]
 [connection signal="action_selected" from="CanvasLayer/GUIManager/ActionMenu" to="Gameboard" method="_on_action_menu_action_selected"]
+[connection signal="weapon_changed" from="CanvasLayer/GUIManager/ActionMenu" to="Gameboard" method="_on_action_menu_weapon_changed"]
+[connection signal="weapon_changed" from="CanvasLayer/GUIManager/ActionMenu" to="CanvasLayer/GUIManager" method="_on_action_menu_weapon_changed"]
 
 [editable path="Gameboard"]
 [editable path="CanvasLayer/GUIManager"]
-[editable path="CanvasLayer/GUIManager/ActionMenu"]
 [editable path="CanvasLayer/GUIManager/CombatForecast"]
+[editable path="CanvasLayer/GUIManager/ActionMenu"]
 [editable path="CanvasLayer/GUIManager/HUD"]
 [editable path="CanvasLayer/GUIManager/Profile"]

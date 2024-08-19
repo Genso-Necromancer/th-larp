@@ -62,7 +62,8 @@ func _load_items():
 		"MAXDUR":1,
 		"SUBGROUP":false,
 		"USE":false,
-		"EFFECTS":{}
+		"EQUIP":false,
+		"EFFECT":{}
 		}
 
 		var innerKeys = rawData[key].keys()
@@ -99,7 +100,6 @@ func stat_gen(tag : String = "Null", level : int = 1, spec : String = "Null", jo
 	unitData[tag]["CLIFE"] = unitData[tag]["Stats"]["LIFE"]
 	unitData[tag]["MaxInv"] = 6
 	unitData[tag]["Inv"] = []
-	unitData[tag]["EQUIP"] = null
 	unitData[tag]["Passive"] = combinePassives
 	unitData[tag]["Weapons"] = jData.Weapons
 #	scale_unit(tag, level)
@@ -198,8 +198,8 @@ func init_roster():
 
 func init_supply():
 	supply = {
-		"BLADE":[{"Data":"SLVKNF", "DUR":40}],
-		"BLUNT":[{"Data":"CLB", "DUR":40}],
+		"BLADE":[{"DATA":"SLVKNF", "DUR":40}],
+		"BLUNT":[{"DATA":"CLB", "DUR":40}],
 		"STICK":[],
 		"GOHEI":[],
 		"BOOK":[],
