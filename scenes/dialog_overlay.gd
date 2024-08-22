@@ -2,7 +2,7 @@ extends Control
 
 @onready var portrait_origin = $PortraitRect.position
 
-@export var draw_speed = 1
+@export var draw_speed = 30
 
 var text_count = 0
 var textline_index = -1
@@ -59,10 +59,15 @@ func _unhandled_input(event):
 			toggle_dialog()
 
 
+var delta_speed = 0.0
 func _physics_process(delta):
 	if text_count < example_dict[textline_index]["text"].length():
-		$TextBody.text += example_dict[textline_index]["text"].substr(text_count, draw_speed)
-		text_count += draw_speed
+		if $TextBody.text.ends_with("?") or $TextBody.text.ends_with("."):
+			delta_speed *= 0.505
+		delta_speed += delta * draw_speed
+		$TextBody.text += example_dict[textline_index]["text"].substr(text_count, int(delta_speed))
+		text_count += int(delta_speed)
+		delta_speed -= int(delta_speed)
 	elif !text_is_finished:
 		text_finished.emit()
 
