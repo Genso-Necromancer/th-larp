@@ -16,6 +16,7 @@ signal unit_move_ended(unit)
 signal unit_deselected
 signal cmbData_updated(cmbData)
 signal walk_complete
+signal map_loaded
 
 
 
@@ -76,8 +77,7 @@ var unitObjs : Dictionary = Global.unitObjs
 @onready var GameState = mainCon.GameState
 
 
-#input Global.state
-#var Global.state : int = 0
+
 
 #ready() is the gayest fucking shit ever
 var defineUnits = false
@@ -100,6 +100,7 @@ var earlyEnd = false
 
 #Process variables
 var turnComplete : bool = false
+
 
 #Global effects
 var globalEffects = {}
@@ -143,11 +144,6 @@ var cursorCell := Vector2i.ZERO:
 		_on_cursor_moved(cursorCell)
 #		cTimer.start()
 
-
-
-
-func _ready() -> void:
-	pass
 	
 func _process(delta):
 	if mainCon.state != GameState.ACCEPT_PROMPT:
@@ -163,6 +159,9 @@ func _process(delta):
 	elif turnComplete and deathList.size() == 0:
 		turnComplete = false
 		turn_change()
+		
+func _toggle_pause():
+	get_tree().paused = !get_tree().paused
 	
 func _on_jobs_done(id, node):
 	match id:
@@ -170,11 +169,48 @@ func _on_jobs_done(id, node):
 			cursor = node
 		"CmbMng":
 			combatManager = node
-
-func load_new_map(map):
+			
+#Map Functions
+func _get_current_map():
+	for mapChild in get_children(): #mapchild
+		var map := mapChild as GameMap
+		if not map:
+			continue
+		return map
+		
 	
+func _change_state(state):
+	var newState = state
+	mainCon.newSlave = [self]
+	if state == mainCon.state:
+		return
+	mainCon.previousState = mainCon.state
+	mainCon.state = newState
+	
+
+	
+func change_map(map):
+	_reset_map_flags()
+	turnComplete = false # find a better place to reinitialize this and above value HERE
+	if currMap:
+		currMap.queue_free()
+		await currMap.tree_exited
+	self.call_deferred("_load_new_map", map)
+		
+func _load_new_map(map):
+	var newMap = map.instantiate()
+	add_child(newMap)
+	
+func on_map_ready():
+	emit_signal("map_loaded")
+	self.call_deferred("_initialize_new_map")
+	
+#func on_map_gone():
+	#self.call_deferred("_initialize_new_map")
+	
+	
+func _initialize_new_map():
 	_connect_general_signals()
-	add_child(map)
 	currMap = _get_current_map()
 	_initialize_terrain_data()
 	_initialize_hexstar()
@@ -187,15 +223,6 @@ func load_new_map(map):
 	ai.init_ai()
 	_cursor_toggle(true)
 	_cursor_toggle(false)
-	
-	
-	
-func _get_current_map():
-	for mapChild in get_children(): #mapchild
-		var map := mapChild as GameMap
-		if not map:
-			continue
-		return map
 
 func _initialize_terrain_data():
 	terrainData.clear()
@@ -213,6 +240,7 @@ func _initialize_hexstar():
 	hexStar.tileSize = mapCellSize
 	
 func _store_enemy_units():
+	units.clear()
 	for child in currMap.get_children(): #grab enemy unit locations
 		var unit := child as Unit
 		if not unit:
@@ -273,6 +301,7 @@ func _load_units(): #merge with store enemy units
 			unitObjs[unit.ykTag] = unit
 			
 		_update_unit_terrain(unit)
+		unit.set_process(true)
 	_update_roster_label()
 	emit_signal("call_setup", depCount, forcedUnits)
 
@@ -1099,19 +1128,13 @@ func turn_change():
 		mainCon.state = GameState.LOADING
 #		aiTurn = true
 		print("NPC Turn")
-		_cursor_toggle(false)
-		
+		_cursor_toggle(false)	
 #	print(turnCounter, " ", turnOrder[0], " aiTurn:", aiTurn, "
 #	", turnOrder)
 	round_duration_tick()
 	boardState.update_remaining_turns(turnOrder)
-	
-	
 	_progress_time()
 	checkSun()
-	
-		
-		
 	emit_signal("turn_changed")
 	if !aiTurn and earlyEnd:
 		_change_state(GameState.ACCEPT_PROMPT)
@@ -1122,7 +1145,6 @@ func turn_change():
 func round_change():
 	#Changes the round and reloads the "turn order" magazine
 	earlyEnd = false
-	turnOrder.clear()
 	_initialize_turns()
 	boardState.clear_acted()
 #	print(units)
@@ -1130,6 +1152,7 @@ func round_change():
 	
 func _initialize_turns():
 	var groups = ["Player", "Enemy", "NPC"]
+	turnOrder.clear()
 	for cell in units: #grab unit locations
 		var unit = units[cell]
 		unit.set_acted(false)
@@ -1218,17 +1241,7 @@ func ai_wait(result):
 	turnComplete = true
 	
 
-func _on_gui_manager_start_the_justice(button):
-	
-	var i = button.get_meta("index")
-	activeUnit.set_equipped(i)
-	_change_state(GameState.LOADING)
-	combatManager.start_the_justice(activeUnit, focusUnit) #Why is durability going down by 2??
-	#emit_signal("target_focused")
-	boardState.add_acted(activeUnit)
-	activeUnit.set_acted(true)
-	combat_sequence(activeUnit, focusUnit)
-#	mainCon.state = GameState.GB_DEFAULT
+
 
 
 func _on_combat_manager_combat_resolved():
@@ -1277,16 +1290,7 @@ func _on_combat_manager_warp_selected(actor, target, range):
 func on_exp_gained(oldExp, expSteps, results, portrait, unitName):
 	emit_signal("exp_display", oldExp, expSteps, results, portrait, unitName)
 
-func _on_gui_manager_exp_finished():
-	_change_state(GameState.LOADING)
-	emit_signal("continue_turn")
-
-func _on_gui_manager_deploy_toggled(unit, deployed):
-#	var unit = unitObjs[unitId]
-	if deployed:
-		_undeploy_unit(unit)
-	else:
-		_deploy_unit(unit)
+	
 	
 
 func _first_available_dep_cell():
@@ -1324,23 +1328,12 @@ func _undeploy_unit(unit, ini = false):
 		filledSlots -= 1
 		_update_roster_label()
 
-
-	
 func _update_roster_label():
 	emit_signal("deploy_toggled", filledSlots, deploymentCells.size())
 
-
-func _on_gui_manager_formation_toggled():
-	match mainCon.state:
-		GameState.GB_SETUP:
-			_cursor_toggle(true, true)
-			mainCon.newSlave = [self]
-			mainCon.state = GameState.GB_FORMATION
-		GameState.GB_FORMATION:
-			_cursor_toggle(false)
 			
 			
-func _cursor_toggle(enable, snapLeader = true):
+func _cursor_toggle(enable, snapLeader = true): #lmao gay retard fix HERE
 	var forcedUnits = forcedDeploy.keys()
 	var leader = forcedUnits[0]
 	var localPos = currMap.map_to_local(unitObjs[leader].cell)
@@ -1358,19 +1351,48 @@ func _cursor_toggle(enable, snapLeader = true):
 		var cameraPos = currMap.map_to_local(cursorCell)
 		cursor.align_camera()
 #		get_viewport().warp_mouse(globalPos)
-		
-	
 
+#GUI Signal Functions
+func _on_exp_gain_exp_finished():
+	_change_state(GameState.LOADING)
+	emit_signal("continue_turn")
+
+	
+func _on_gui_manager_start_the_justice(button):
+	var i = button.get_meta("index")
+	activeUnit.set_equipped(i)
+	_change_state(GameState.LOADING)
+	combatManager.start_the_justice(activeUnit, focusUnit) #Why is durability going down by 2??
+	#emit_signal("target_focused")
+	boardState.add_acted(activeUnit)
+	activeUnit.set_acted(true)
+	combat_sequence(activeUnit, focusUnit)
+#	mainCon.state = GameState.GB_DEFAULT
+
+func _on_win_screen_win_finished():
+	_change_state(GameState.LOADING)
+	change_map(currMap.next_map)
+	#currMap.progress_next_map()
+	#self.call_deferred("_load_next_map")
+	
+func _on_gui_manager_deploy_toggled(unit, deployed):
+#	var unit = unitObjs[unitId]
+	if deployed:
+		_undeploy_unit(unit)
+	else:
+		_deploy_unit(unit)
+
+func _on_gui_manager_formation_toggled():
+	match mainCon.state:
+		GameState.GB_SETUP:
+			_cursor_toggle(true, true)
+			mainCon.newSlave = [self]
+			mainCon.state = GameState.GB_FORMATION
+		GameState.GB_FORMATION:
+			_cursor_toggle(false)
+	
 func _on_gui_manager_item_used(unit, item):
 	combatManager.use_item(unit, item)
-
-func _change_state(state):
-	var newState = state
-	mainCon.newSlave = [self]
-	if state == mainCon.state:
-		return
-	mainCon.previousState = mainCon.state
-	mainCon.state = newState
 
 func _on_gui_manager_map_started():
 	for unit in units:
@@ -1416,36 +1438,17 @@ func _check_flags():
 	
 	if flags.gameOver: #consider saving reason for loss in later versions
 		emit_signal("player_lost")
-		_change_state(GameState.FAIL_STATE)
+		
 	if flags.victory:
 		emit_signal("player_win")
-		_change_state(GameState.WIN_STATE)
-	
-	
-#Victory flag is set
-#Gameboard sees this and signals the player wins
-#turns are halted
-#display win scene & save player data
-#unload map and transition to next scene after player input
-#load next map
-	
-#"cut-scene" related code
-#func _check_for_scene():
-	##inject scene shit here
-	#_change_state(GameState.SCENE_ACTIVE)
-	#_on_scene_complete()
-	#
-#func _on_scene_complete():
-	#_change_state(GameState.WIN_STATE)
+		
+func _reset_map_flags():
+	Global.flags.gameOver = false
+	Global.flags.victory = false
 	
 	
 #Debug Functions
 func _kill_lady():
 	var lady = unitObjs["Remilia"]
 	lady.apply_dmg(9999)
-
-
-
-
-
 

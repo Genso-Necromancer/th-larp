@@ -1,0 +1,145 @@
+[gd_resource type="TileSet" load_steps=13 format=3 uid="uid://bkx2tgo0cxpaa"]
+
+[ext_resource type="Texture2D" uid="uid://cwrqpj7en2cof" path="res://sprites/tiles/deployment.png" id="1_afv8v"]
+[ext_resource type="Texture2D" uid="uid://b3kybcmn08s6d" path="res://sprites/tiles/forcedDeployment.png" id="2_s2j5n"]
+[ext_resource type="Texture2D" uid="uid://d4gcf4n0wyrk" path="res://sprites/tiles/fort.png" id="3_c8ek4"]
+[ext_resource type="Texture2D" uid="uid://0l5h5gtuuhdi" path="res://sprites/tiles/hill.png" id="4_emmec"]
+[ext_resource type="Texture2D" uid="uid://l2mr4yng7kji" path="res://backgrounds/FE1Map.png" id="5_fc2po"]
+[ext_resource type="Texture2D" uid="uid://djt1ybodu04tp" path="res://sprites/tiles/grass.png" id="6_t8s5p"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qmxju"]
+texture = ExtResource("1_afv8v")
+texture_region_size = Vector2i(160, 48)
+0:0/0 = 0
+0:0/0/custom_data_2 = &"deployCell"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bkpol"]
+texture = ExtResource("2_s2j5n")
+texture_region_size = Vector2i(160, 48)
+0:0/0 = 0
+0:0/0/custom_data_2 = &"forcedCell"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fatm7"]
+texture = ExtResource("3_c8ek4")
+margins = Vector2i(16, 18)
+texture_region_size = Vector2i(192, 111)
+0:0/0 = 0
+0:0/0/custom_data_0 = &"Fort"
+0:0/0/custom_data_1 = 20
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_d410y"]
+texture = ExtResource("4_emmec")
+margins = Vector2i(15, 71)
+texture_region_size = Vector2i(192, 56)
+0:0/0 = 0
+0:0/0/custom_data_0 = &"Hill"
+0:0/0/custom_data_1 = 10
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mysh1"]
+texture = ExtResource("5_fc2po")
+margins = Vector2i(3, 3)
+separation = Vector2i(3, 3)
+4:0/0 = 0
+0:0/0 = 0
+1:0/0 = 0
+2:0/0 = 0
+3:0/0 = 0
+11:0/0 = 0
+10:0/0 = 0
+9:0/0 = 0
+8:0/0 = 0
+7:0/0 = 0
+6:0/0 = 0
+5:0/0 = 0
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+13:0/0 = 0
+12:0/0 = 0
+14:0/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+2:4/0 = 0
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+0:6/0 = 0
+1:6/0 = 0
+2:6/0 = 0
+0:7/0 = 0
+1:7/0 = 0
+2:7/0 = 0
+0:8/0 = 0
+1:8/0 = 0
+2:8/0 = 0
+0:9/0 = 0
+1:9/0 = 0
+2:9/0 = 0
+0:10/0 = 0
+1:10/0 = 0
+2:10/0 = 0
+0:11/0 = 0
+1:11/0 = 0
+2:11/0 = 0
+0:12/0 = 0
+1:12/0 = 0
+2:12/0 = 0
+0:13/0 = 0
+1:13/0 = 0
+2:13/0 = 0
+0:14/0 = 0
+1:14/0 = 0
+2:14/0 = 0
+0:15/0 = 0
+1:15/0 = 0
+2:15/0 = 0
+0:16/0 = 0
+1:16/0 = 0
+2:16/0 = 0
+0:17/0 = 0
+1:17/0 = 0
+2:17/0 = 0
+0:18/0 = 0
+1:18/0 = 0
+2:18/0 = 0
+0:19/0 = 0
+1:19/0 = 0
+2:19/0 = 0
+0:20/0 = 0
+1:20/0 = 0
+2:20/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bco8r"]
+texture = ExtResource("6_t8s5p")
+margins = Vector2i(2, 1)
+texture_region_size = Vector2i(160, 48)
+0:0/0 = 0
+0:0/0/custom_data_0 = &"Flat"
+
+[resource]
+tile_shape = 3
+tile_offset_axis = 1
+tile_size = Vector2i(160, 48)
+navigation_layer_0/layers = 1
+custom_data_layer_0/name = "terrainType"
+custom_data_layer_0/type = 21
+custom_data_layer_1/name = "terrainBonus"
+custom_data_layer_1/type = 2
+custom_data_layer_2/name = "trigger"
+custom_data_layer_2/type = 21
+sources/4 = SubResource("TileSetAtlasSource_mysh1")
+sources/2 = SubResource("TileSetAtlasSource_fatm7")
+sources/3 = SubResource("TileSetAtlasSource_d410y")
+sources/5 = SubResource("TileSetAtlasSource_bco8r")
+sources/0 = SubResource("TileSetAtlasSource_qmxju")
+sources/1 = SubResource("TileSetAtlasSource_bkpol")

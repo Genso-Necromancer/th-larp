@@ -198,7 +198,7 @@ func on_load_map_manager(map):
 	
 func set_map(map):
 	gameBoard = $mapManager/Gameboard
-	gameBoard.load_new_map(map)
+	gameBoard.change_map(map)
 
 func unload_me(scene):
 	scene.queue_free()

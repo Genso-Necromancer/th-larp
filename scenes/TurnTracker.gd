@@ -11,10 +11,8 @@ func _ready():
 	self.visible = false
 	
 	
-
-	
 func display_turns(turnOrder):
-	_free_tokens()
+	free_tokens()
 	for team in turnOrder:
 		var token
 		token = _instantiate_token(team)
@@ -30,7 +28,7 @@ func _instantiate_token(team):
 	token.set_texture(texture)
 	return token
 
-func _free_tokens():
+func free_tokens():
 	var tokens = turnBar.get_children()
 	for token in tokens:
 		token.queue_free()

@@ -4,7 +4,6 @@ class_name GUIManager
 signal gui_closed
 signal startTheJustice
 signal guiReady
-signal exp_finished
 signal deploy_toggled(unitID, depStatus)
 signal profile_called
 signal formation_toggled
@@ -26,36 +25,18 @@ signal action_selected
 @onready var ActionBox = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer
 @onready var foreCast = $CombatForecast
 
-#@onready var AName = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/NAME
-#@onready var ALife = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/LIFE
-#@onready var AAcc = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/ACC
-#@onready var ADmg = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/DMG
-#@onready var ACrit = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/CRIT
-#@onready var ADef = $CombatForecast/GC/HBC/AtkPanel/AMa/AVB/DEF
-#@onready var APrt = $CombatForecast/GC/BGA1/MC/AtkFull
-#@onready var TPrt = $CombatForecast/GC/BGA2/MC/TrgtFull
-#@onready var TName = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/NAME
-#@onready var TLife = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/LIFE
-#@onready var TAcc = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/ACC
-#@onready var TDmg = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/DMG
-#@onready var TCrit = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/CRIT
-#@onready var TDef = $CombatForecast/GC/HBC/TargetPanel/TMa/TVB/DEF
 #these too
 @onready var AtkB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/AtkBtn
 @onready var SklB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/SklBtn
 @onready var WaitB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/WaitBtn
 @onready var EndB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/EndBtn
-#@onready var sunDial = $HUD/SunDial
-#@onready var clockLabel = $HUD/Clock
-#@onready var timeLb = $DEBUG/timeBox/time
-#@onready var timeFactorLb = $DEBUG/timeBox/timeFactor
-@onready var expContainer = $EXPgain
+
+
 @onready var parent = get_parent()
 @onready var GRANDDAD = parent.get_parent()
 @onready var mainCon = GRANDDAD.get_parent()
 @onready var GameState = mainCon.GameState
-@onready var expBar = $EXPgain/PanelContainer/ExpMargin/HC/expBar
-@onready var expText = $EXPgain/PanelContainer/ExpMargin/HC/expL
+
 
 var opWepX
 var opWepY
@@ -76,12 +57,7 @@ var timer : Timer
 var tween : Tween
 var menuCursor : Control
 
-#exp variables
-var growExp = false
-var expLimit = 0
-var expGrowSpeed = 1
-var expAdded = 0
-var lvlResults
+
 
 #roster variables
 var rosterData = UnitData.rosterData
@@ -231,13 +207,19 @@ func _relocate_child(child, newParent):
 	
 		
 func accept_skip():
-	if tween and growExp:
-		tween.custom_step(10000)
-		tween.kill()
-		growExp = false
-	else:
-		expContainer.visible = false
-		emit_signal("exp_finished")
+	var failScreen : Control = $FailScreen
+	var winScreen : Control = $WinScreen
+	var expContainer : Control = $ExpGain
+	match true:
+		expContainer.visible:
+			expContainer.animation_skip()
+			
+		failScreen.visible:
+			pass
+		winScreen.visible:
+			winScreen.close_win_screen()
+		
+		
 
 func regress_menu():
 	match sState:
@@ -396,122 +378,10 @@ func _on_gameboard_gb_ready(_state):
 
 #HERE
 func _on_gameboard_exp_display(oldExp, expSteps, results, unitPrt, unitName):
-	var portrait = $EXPgain/MC/MC/UnitPrt
-	var isLeveled = 0
-	tween = get_tree().create_tween()
+	var expContainer : Control = $ExpGain
 	_change_state(gameState.ACCEPT_PROMPT)
-	portrait.set_texture(unitPrt)
-	expBar.value = oldExp
-	expText.set_text(str(expBar.value))
-#	tween.tween_property(expBar, "value", finalExp, 1)
-	expContainer.visible = true
-	growExp = true
-	lvlResults = results
-	for expStep in expSteps:
-		tween.tween_method(_increase_exp, oldExp, expStep, 0.5).set_trans(Tween.TRANS_LINEAR)
-		isLeveled += 1
-	if isLeveled >= 2:
-		_display_levelup(results, unitName)
-	tween.tween_callback(_kill_tween)
-	
-func _increase_exp(expStep):
-	expBar.value = expStep
-	expText.text = str(expStep)
-	
-func _display_levelup(report, unitName): #requires actual level up display
-	var stats = report.Results.keys()
-	var oldStats = report.OldStats
-	var i = 0
-	var increases = {}
-	tween.tween_method(_toggle_lv_panel, true, false, 0.3).set_trans(Tween.TRANS_LINEAR) #Toggle off
-	tween.tween_method(_toggle_exp_margin, true, false, 0.1).set_trans(Tween.TRANS_LINEAR)#Toggle off
-	tween.tween_method(_toggle_lv_margin.bind(report, unitName), false, true, 0.1).set_trans(Tween.TRANS_LINEAR)#Toggle off
-	tween.tween_method(_toggle_lv_panel, false, true, 0.3).set_trans(Tween.TRANS_LINEAR) #Toggle On
-	
-	for stat in stats:
-		if report.Results[stat] > 0:
-			increases[stat] = report.Results[stat]
-	
-	tween.tween_method(_increase_stat.bind(report, increases), 0, (increases.size() - 1), 2).set_trans(Tween.TRANS_LINEAR)
-	
-
-	
-	
-	
-	
-	
-	
-func _toggle_lv_panel(status):
-	$EXPgain/PanelContainer.visible = status
-		
-func _toggle_exp_margin(status):
-
-	$EXPgain/PanelContainer/ExpMargin.visible = status
-
-		
-func _toggle_lv_margin(status, results, unitName):
-	var oldStats = results.OldStats
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Header/UnitName.text = unitName
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Header/UnitLevel.text = str(oldStats.LVL)
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox/UnitHp.text = str(oldStats.LIFE)
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox/UnitCmp.text = str(oldStats.COMP)
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/UnitStr.text = str(oldStats.PWR)
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/UnitMag.text = str(oldStats.MAG)
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/UnitEle.text = str(oldStats.ELEG)
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/UnitCele.text = str(oldStats.CELE)
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/UnitBar.text = str(oldStats.BAR)
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/UnitCha.text = str(oldStats.CHA)
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Header/Increase.text = ""
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox/IncreaseHP.text = ""
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox/IncreaseCmp.text = ""
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/Increase.text = ""
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/Increase2.text = ""
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/Increase3.text = ""
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/Increase4.text = ""
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/Increase5.text = ""
-	$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/Increase6.text = ""
-	
-	$EXPgain/PanelContainer/LvUpMargin.visible = status
-	
-	
-func _increase_stat(index, report, increases):
-	var stats = increases.keys()
-	var stat = stats[index]
-	var statUp = report.OldStats[stat] + increases[stat]
-	
-	match stat:
-		"LVL":
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Header/UnitLevel.text = str(statUp)
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Header/Increase.text = ("+" + str(increases[stat]))
-		"LIFE":
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox/UnitHp.text = str(statUp)
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox/IncreaseHP.text = ("+" + str(increases[stat]))
-		"COMP":
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox/UnitCmp.text = str(statUp)
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox/IncreaseCmp.text = ("+" + str(increases[stat]))
-		"PWR":
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/UnitStr.text = str(statUp)
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/Increase.text = ("+" + str(increases[stat]))
-		"MAG":
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/UnitMag.text = str(statUp)
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/Increase2.text = ("+" + str(increases[stat]))
-		"ELEG":
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/UnitEle.text = str(statUp)
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/Increase3.text = ("+" + str(increases[stat]))
-		"CELE":
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/UnitCele.text = str(statUp)
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/Increase4.text = ("+" + str(increases[stat]))
-		"BAR":
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/UnitBar.text = str(statUp)
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/Increase5.text = ("+" + str(increases[stat]))
-		"CHA":
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/UnitCha.text = str(statUp)
-			$EXPgain/PanelContainer/LvUpMargin/Vbox/Stats/Increase6.text = ("+" + str(increases[stat]))
-
-	
-func _kill_tween():
-	growExp = false
-	tween.kill()
+	expContainer.init_exp_display(oldExp, expSteps, results, unitPrt, unitName)
+	expContainer.toggle_visibility()
 
 func _on_gameboard_call_setup(dLimit, forced):
 	var setUpWin = $SetUpMain
@@ -524,8 +394,7 @@ func _on_gameboard_call_setup(dLimit, forced):
 	depLimit = dLimit
 	setUpWin.visible = true
 	homeMenu.visible = true
-	mainCon.newSlave = [self]
-	mainCon.state = gameState.GB_SETUP
+	_change_state(gameState.GB_SETUP)
 	infoPanel.visible = false
 	_resignal_menuCursor(homeMenu)
 	
@@ -920,10 +789,28 @@ func _on_weapon_selected(button):
 #func _on_action_menu_weapon_changed(weapon):
 	#pass # Replace with function body.
 
+#Game State transitions
+
+func _start_load_screen():
+	pass
+
+func _end_load_screen():
+	pass
+
 func _on_gameboard_player_lost():
 	var failScreen = $FailScreen
 	failScreen.fade_in_failure()
+	_change_state(GameState.FAIL_STATE)
 
 func _on_gameboard_player_win():
 	var winScreen = $WinScreen
 	winScreen.fade_in_win()
+	_change_state(GameState.WIN_STATE)
+
+func _on_win_screen_win_finished():
+	_start_load_screen()
+	turnTracker.free_tokens()
+
+func _on_gameboard_map_loaded():
+	_end_load_screen()
+	

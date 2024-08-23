@@ -113,14 +113,15 @@ var originLocation
 func _ready() -> void:
 #	print(statVars)
 #	#print("unit.gd:", unitId)
+	set_process(false)
 	_anim_player.play("idle")
 	if preDefined:
 		_load_stats()
 		_load_sprites()
 		if map.get_class() != "TileMap": #may not need in future, too specific to "test map"
 			pass
-		elif !map.mapReady.is_connected(self._on_test_map_map_ready):
-			map.mapReady.connect(self._on_test_map_map_ready)
+		elif !map.map_ready.is_connected(self._on_test_map_map_ready):
+			map.map_ready.connect(self._on_test_map_map_ready)
 		
 		# We create the curve resource here because creating it in the editor prevents us from
 		# moving the unit.
@@ -159,7 +160,7 @@ func _process(delta: float) -> void:
 		curve.clear_points()
 		_anim_player.play("idle")
 		emit_signal("walk_finished")
-		
+	
 	update_stats()
 
 ## Starts walking along the `path`.
@@ -183,6 +184,7 @@ func walk_along(path: PackedVector2Array) -> void:
 	_is_walking = true
 #	print("unit cell: ", cell)
 #	print("unit position: ", position)
+
 func return_original():
 	position = map.map_to_local(originCell)
 	cell = originCell

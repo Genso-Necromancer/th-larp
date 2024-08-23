@@ -29,7 +29,7 @@ func _on_load_button_pressed():
 	var scenes
 	match itemId:
 		0: 
-			var map = preload("res://scenes/TestMap.tscn").instantiate()
+			var map = preload("res://scenes/maps/TestMap.tscn")
 			emit_signal("loadMapManager", map)
 			emit_signal("unloadMe", yaBoy)
 

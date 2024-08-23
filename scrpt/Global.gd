@@ -17,7 +17,6 @@ var unitObjs : Dictionary
 var flags : Dictionary
 
 
-
 var slamage = 5
 #combat variables
 var attacker = {
@@ -44,6 +43,7 @@ func _init_flags():
 		"gameTime": 0,
 		"timeFactor": 1,
 		"trueTimeFactor": 1,
-		"rotationFactor": 15
+		"rotationFactor": 15,
+		"currentMap": 0
 	}
 

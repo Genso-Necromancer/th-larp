@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://b6wc3gwlhw2b3"]
+
+[ext_resource type="PackedScene" uid="uid://b5m6jpfwxh05i" path="res://scenes/NewGameMap.tscn" id="1_jmj38"]
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/Unit.tscn" id="2_3050b"]
+
+[node name="TestMap02" node_paths=PackedStringArray("winKill") instance=ExtResource("1_jmj38")]
+layer_0/tile_data = PackedInt32Array(131073, 5, 0, 196609, 5, 0, 262145, 5, 0, 327681, 5, 0, 393217, 5, 0, 458753, 5, 0, 524289, 5, 0, 589825, 5, 0, 655361, 5, 0, 720898, 5, 0, 655363, 5, 0, 720900, 5, 0, 655365, 5, 0, 589829, 5, 0, 524293, 5, 0, 458757, 5, 0, 393221, 5, 0, 327685, 5, 0, 262149, 5, 0, 196613, 5, 0, 131077, 5, 0, 65541, 5, 0, 5, 5, 0, 65540, 5, 0, 3, 5, 0, 2, 5, 0, 65538, 5, 0, 1, 5, 0, 65537, 5, 0, 131074, 5, 0, 65539, 5, 0, 131076, 5, 0, 131075, 5, 0, 196610, 5, 0, 196612, 5, 0, 196611, 5, 0, 262146, 5, 0, 262148, 5, 0, 262147, 5, 0, 327682, 5, 0, 327684, 5, 0, 327683, 5, 0, 393220, 5, 0, 393219, 5, 0, 393218, 5, 0, 458754, 5, 0, 458755, 5, 0, 458756, 5, 0, 524292, 5, 0, 589828, 5, 0, 655364, 5, 0, 589827, 5, 0, 524291, 5, 0, 524290, 5, 0, 589826, 5, 0, 655362, 5, 0)
+layer_1/tile_data = PackedInt32Array(131075, 3, 0, 131076, 3, 0, 65539, 2, 0, 131074, 3, 0)
+layer_2/tile_data = PackedInt32Array(524291, 1, 0, 524290, 0, 0, 458755, 0, 0, 524292, 0, 0, 589828, 0, 0)
+winKill = [NodePath("Fairy04")]
+
+[node name="Fairy04" parent="." index="0" instance=ExtResource("2_3050b")]
+position = Vector2(440, 104)
+preDefined = true
+faction = "Enemy"
+inventory = Array[String](["DGR"])
+unitName = "Fairy"
+genLevel = 1

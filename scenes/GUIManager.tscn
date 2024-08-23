@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://r6wtvva5qput"]
+[gd_scene load_steps=20 format=3 uid="uid://r6wtvva5qput"]
 
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_2n2uh"]
 [ext_resource type="Script" path="res://scenes/GUIManager.gd" id="1_d2r44"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://scenes/WinScreen.gd" id="13_jghgq"]
 [ext_resource type="Script" path="res://scenes/StateDebug.gd" id="14_xciqv"]
 [ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="15_5mgdm"]
+[ext_resource type="Script" path="res://scenes/expgain.gd" id="15_w87l3"]
 [ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="16_nw8x6"]
 [ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="17_a06i1"]
 [ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="18_18bf3"]
@@ -274,6 +275,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 script = ExtResource("12_jkf6w")
 
 [node name="ColorRect" type="ColorRect" parent="FailScreen"]
@@ -308,6 +310,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 script = ExtResource("13_jghgq")
 
 [node name="ColorRect" type="ColorRect" parent="WinScreen"]
@@ -318,6 +321,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 color = Color(0, 0, 0, 1)
 
 [node name="Label" type="Label" parent="WinScreen"]
@@ -343,7 +347,7 @@ offset_right = 128.0
 offset_bottom = 60.25
 script = ExtResource("14_xciqv")
 
-[node name="EXPgain" type="HBoxContainer" parent="."]
+[node name="ExpGain" type="HBoxContainer" parent="."]
 visible = false
 layout_mode = 1
 anchors_preset = -1
@@ -354,14 +358,15 @@ anchor_bottom = 0.66
 size_flags_horizontal = 4
 size_flags_vertical = 4
 theme_override_constants/separation = 0
+script = ExtResource("15_w87l3")
 
-[node name="MC" type="MarginContainer" parent="EXPgain"]
+[node name="MC" type="MarginContainer" parent="ExpGain"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 metadata/_edit_use_anchors_ = true
 
-[node name="SpriteBG" type="NinePatchRect" parent="EXPgain/MC"]
+[node name="SpriteBG" type="NinePatchRect" parent="ExpGain/MC"]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 texture = ExtResource("7_llyu2")
@@ -370,14 +375,14 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="MC" type="MarginContainer" parent="EXPgain/MC"]
+[node name="MC" type="MarginContainer" parent="ExpGain/MC"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="UnitPrt" type="TextureRect" parent="EXPgain/MC/MC"]
+[node name="UnitPrt" type="TextureRect" parent="ExpGain/MC/MC"]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -386,13 +391,13 @@ texture = ExtResource("15_5mgdm")
 expand_mode = 1
 stretch_mode = 4
 
-[node name="PanelContainer" type="PanelContainer" parent="EXPgain"]
+[node name="PanelContainer" type="PanelContainer" parent="ExpGain"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 1
 
-[node name="BG" type="NinePatchRect" parent="EXPgain/PanelContainer"]
+[node name="BG" type="NinePatchRect" parent="ExpGain/PanelContainer"]
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 texture = ExtResource("7_llyu2")
@@ -401,7 +406,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="LvUpMargin" type="MarginContainer" parent="EXPgain/PanelContainer"]
+[node name="LvUpMargin" type="MarginContainer" parent="ExpGain/PanelContainer"]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 4
@@ -412,48 +417,48 @@ theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 metadata/_edit_use_anchors_ = true
 
-[node name="Vbox" type="VBoxContainer" parent="EXPgain/PanelContainer/LvUpMargin"]
+[node name="Vbox" type="VBoxContainer" parent="ExpGain/PanelContainer/LvUpMargin"]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="Header" type="HBoxContainer" parent="EXPgain/PanelContainer/LvUpMargin/Vbox"]
+[node name="Header" type="HBoxContainer" parent="ExpGain/PanelContainer/LvUpMargin/Vbox"]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="UnitLevelTag" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Header"]
+[node name="UnitLevelTag" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Header"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("1_2n2uh")
 text = "Level:"
 
-[node name="UnitLevel" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Header"]
+[node name="UnitLevel" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Header"]
 custom_minimum_size = Vector2(10, 0)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 text = "0"
 
-[node name="Increase" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Header"]
+[node name="Increase" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Header"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
-[node name="UnitName" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Header"]
+[node name="UnitName" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Header"]
 layout_mode = 2
 text = "Test Name"
 
-[node name="HPCmpBox" type="HBoxContainer" parent="EXPgain/PanelContainer/LvUpMargin/Vbox"]
+[node name="HPCmpBox" type="HBoxContainer" parent="ExpGain/PanelContainer/LvUpMargin/Vbox"]
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="UnitHpTag2" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
+[node name="UnitHpTag2" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
 layout_mode = 2
 size_flags_horizontal = 4
 focus_neighbor_bottom = NodePath("../../Stats/UnitStrTag")
 theme = ExtResource("1_2n2uh")
 text = "Health:"
 
-[node name="UnitHp" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
+[node name="UnitHp" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -461,20 +466,20 @@ theme = ExtResource("1_2n2uh")
 text = "60"
 horizontal_alignment = 2
 
-[node name="IncreaseHP" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
+[node name="IncreaseHP" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
-[node name="UnitCmpTag" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
+[node name="UnitCmpTag" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
 layout_mode = 2
 size_flags_horizontal = 4
 focus_neighbor_bottom = NodePath("../../Stats/UnitStrTag")
 theme = ExtResource("1_2n2uh")
 text = "Composure:"
 
-[node name="UnitCmp" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
+[node name="UnitCmp" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -482,134 +487,134 @@ theme = ExtResource("1_2n2uh")
 text = "60"
 horizontal_alignment = 2
 
-[node name="IncreaseCmp" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
+[node name="IncreaseCmp" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 theme_override_colors/font_color = Color(0.788235, 0.682353, 0.0627451, 1)
 
-[node name="HSeparator" type="HSeparator" parent="EXPgain/PanelContainer/LvUpMargin/Vbox"]
+[node name="HSeparator" type="HSeparator" parent="ExpGain/PanelContainer/LvUpMargin/Vbox"]
 layout_mode = 2
 
-[node name="Stats" type="GridContainer" parent="EXPgain/PanelContainer/LvUpMargin/Vbox"]
+[node name="Stats" type="GridContainer" parent="ExpGain/PanelContainer/LvUpMargin/Vbox"]
 layout_mode = 2
 theme_override_constants/h_separation = 4
 theme_override_constants/v_separation = 4
 columns = 9
 
-[node name="UnitStrTag" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="UnitStrTag" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 layout_mode = 2
 size_flags_horizontal = 0
 focus_neighbor_bottom = NodePath("../UnitMagTag")
 theme = ExtResource("1_2n2uh")
 text = "Power:"
 
-[node name="UnitStr" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="UnitStr" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 size_flags_horizontal = 0
 theme = ExtResource("1_2n2uh")
 text = "0"
 
-[node name="Increase" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="Increase" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 theme = ExtResource("1_2n2uh")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
-[node name="UnitMagTag" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="UnitMagTag" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 layout_mode = 2
 size_flags_horizontal = 0
 theme = ExtResource("1_2n2uh")
 text = "Magic:"
 
-[node name="UnitMag" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="UnitMag" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 size_flags_horizontal = 0
 theme = ExtResource("1_2n2uh")
 text = "0"
 
-[node name="Increase2" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="Increase2" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
-[node name="UnitElegTag2" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="UnitElegTag2" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 layout_mode = 2
 size_flags_horizontal = 0
 theme = ExtResource("1_2n2uh")
 text = "Elegance:"
 
-[node name="UnitEle" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="UnitEle" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 text = "0"
 
-[node name="Increase3" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="Increase3" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
-[node name="UnitCeleTag3" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="UnitCeleTag3" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("1_2n2uh")
 text = "Celerity:"
 
-[node name="UnitCele" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="UnitCele" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 text = "0"
 
-[node name="Increase4" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="Increase4" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
-[node name="UnitBarTag4" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="UnitBarTag4" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("1_2n2uh")
 text = "Barrier:"
 
-[node name="UnitBar" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="UnitBar" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 text = "0"
 
-[node name="Increase5" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="Increase5" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
-[node name="UnitChaTag5" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="UnitChaTag5" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("1_2n2uh")
 text = "Charisma:"
 
-[node name="UnitCha" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="UnitCha" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 text = "0"
 
-[node name="Increase6" type="Label" parent="EXPgain/PanelContainer/LvUpMargin/Vbox/Stats"]
+[node name="Increase6" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
 theme = ExtResource("1_2n2uh")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
-[node name="ExpMargin" type="MarginContainer" parent="EXPgain/PanelContainer"]
+[node name="ExpMargin" type="MarginContainer" parent="ExpGain/PanelContainer"]
 custom_minimum_size = Vector2(180, 0)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -617,15 +622,15 @@ size_flags_vertical = 4
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_right = 20
 
-[node name="HC" type="HBoxContainer" parent="EXPgain/PanelContainer/ExpMargin"]
+[node name="HC" type="HBoxContainer" parent="ExpGain/PanelContainer/ExpMargin"]
 layout_mode = 2
 
-[node name="expL" type="Label" parent="EXPgain/PanelContainer/ExpMargin/HC"]
+[node name="expL" type="Label" parent="ExpGain/PanelContainer/ExpMargin/HC"]
 layout_mode = 2
 text = "test"
 vertical_alignment = 1
 
-[node name="expBar" type="TextureProgressBar" parent="EXPgain/PanelContainer/ExpMargin/HC"]
+[node name="expBar" type="TextureProgressBar" parent="ExpGain/PanelContainer/ExpMargin/HC"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
