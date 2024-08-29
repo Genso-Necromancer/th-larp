@@ -1,8 +1,8 @@
-[gd_scene load_steps=14 format=3 uid="uid://bnyhiorbaajm"]
+[gd_scene load_steps=15 format=3 uid="uid://bnyhiorbaajm"]
 
 [ext_resource type="Script" path="res://scenes/dialog_overlay.gd" id="1_ik6st"]
 [ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="2_5q3ap"]
-[ext_resource type="PackedScene" uid="uid://d3fuiykqjxb5h" path="res://speaker_portrait.tscn" id="3_mj8x4"]
+[ext_resource type="Script" path="res://scenes/PortraitRect.gd" id="3_7b2ok"]
 [ext_resource type="Texture2D" uid="uid://4lca2aumdu2g" path="res://sprites/testCursor.png" id="4_m3j4u"]
 
 [sub_resource type="Gradient" id="Gradient_oxt7h"]
@@ -35,6 +35,8 @@ shadow_size = 0
 line_spacing = 12.0
 font = ExtResource("2_5q3ap")
 font_size = 24
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_gaf50"]
 
 [sub_resource type="Animation" id="Animation_25rj4"]
 resource_name = "ContinueBobber"
@@ -192,10 +194,14 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SpeakerPortrait" parent="PortraitsNode" instance=ExtResource("3_mj8x4")]
-visible = false
+[node name="PortraitRect" type="TextureRect" parent="PortraitsNode"]
 layout_mode = 0
-anchors_preset = 0
+offset_left = 64.0
+offset_top = 400.0
+offset_right = 179.0
+offset_bottom = 512.0
+texture = SubResource("PlaceholderTexture2D_gaf50")
+script = ExtResource("3_7b2ok")
 
 [node name="TextStopper" type="TextureRect" parent="."]
 visible = false
