@@ -57,7 +57,7 @@ func is_units_check(cell):
 	else:
 		return false
 
-func find_path(start: Vector2i, end: Vector2i, moveType: String, attack: bool = false) -> Array:
+func find_path(start: Vector2i, end: Vector2i, moveType: int, attack: bool = false) -> Array:
 	open_list.clear()
 	closed_list.clear()
 	
@@ -109,7 +109,7 @@ func find_path(start: Vector2i, end: Vector2i, moveType: String, attack: bool = 
 	
 	return [] # Path not found
 
-func find_all_paths(start: Vector2i, max_cost: int, moveType: String = "Foot", terrain: bool = true) -> Array:
+func find_all_paths(start: Vector2i, max_cost: int, moveType: int = Enums.MOVE_TYPE.FOOT, terrain: bool = true) -> Array:
 #	var visited: Dictionary = {}
 #	visited[start] = { "cost": 0, "paths": [[]] }
 	
@@ -215,7 +215,7 @@ func estimate_cost(a, b) -> float:
 	var distance = axial_distance(ac, bc)
 	return distance
 	
-func compute_cost(a: Vector2i, b: Vector2i, moveType: String, terrain: bool = true) -> float:
+func compute_cost(a: Vector2i, b: Vector2i, moveType: int, terrain: bool = true) -> float:
 	var tileWeight = 1
 	var tileType
 	if terrain:
@@ -497,7 +497,7 @@ func find_threat(walkable, unitRange, moveType = "Flat"):
 				filteredThreatRange.append(tile)
 	return filteredThreatRange
 
-func find_closest(_atkrCell, dfndCell, atkrWalkable, moveType: String):
+func find_closest(_atkrCell, dfndCell, atkrWalkable, moveType: int):
 	var closestCell = null
 	var minDist = 1000
 	for cell in atkrWalkable:
@@ -507,7 +507,7 @@ func find_closest(_atkrCell, dfndCell, atkrWalkable, moveType: String):
 			minDist = path.size()
 	return closestCell
 
-func find_distance(start, target, moveType: String = "Foot", attack:bool = false):
+func find_distance(start, target, moveType: int = Enums.MOVE_TYPE.FOOT, attack:bool = false):
 	var path = find_path(start, target, moveType, attack)
 	path.pop_back()
 	return path.size()

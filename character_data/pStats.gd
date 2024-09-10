@@ -1,13 +1,13 @@
 
-enum UNIT_ID {Remilia, Sakuya, Patchy, China}
+const UNIT_ID := Enums.UNIT_ID
 
 #these three are used in combination to create the data on a single enemy unit.
-
-enum SPEC_ID {Fairy}
+const MOVE_TYPE = Enums.MOVE_TYPE
+const SPEC_ID = Enums.SPEC_ID
 #, Human, Kappa, Lunarian, Oni, Doll, Devil, Yukionna, Zombie, Hermit, Magician, Spirit
-enum JOB_ID {Trblr}
+const JOB_ID = Enums.JOB_ID
 
-enum WEP_ID {Spear, Knife}
+const WEP_ID = Enums.WEP_ID
 
 
 static func get_named_unit_data(unitInd):
@@ -21,7 +21,6 @@ static func get_named_unit_data(unitInd):
 					"Sprite": load(("res://sprites/RemiliaTest.png")),
 					"Level": 1,
 					"EXP": 0,
-					"CurCOMP": 0,
 					"Class": "Lady"
 					},
 				"Stats": {
@@ -58,7 +57,7 @@ static func get_named_unit_data(unitInd):
 					"CHA": 20
 					},
 				"MaxInv": 6,
-				"Inv":[{"DATA":"GNG", "EQUIP":true, "DUR":40}],
+				"Inv":[{"ID":"GNG", "EQUIP":true, "DUR":40}],
 				"Passive":{"Vampire": true,
 					"Fate": true,
 					"SunWeak": true,
@@ -73,9 +72,8 @@ static func get_named_unit_data(unitInd):
 					"FAN": false,
 					"BOW": false,
 					"GUN": false,
-					"SUB": false
-					
-				}
+					"SUB": false},
+				"MoveType": MOVE_TYPE.FLY
 			}
 		}
 		UNIT_ID.Sakuya: 
@@ -86,7 +84,7 @@ static func get_named_unit_data(unitInd):
 					"Sprite": load(("res://sprites/SakuyaTest.png")),
 					"Level": 1,
 					"EXP": 0,
-					"CurCOMP": 0,
+					
 					"Class": "Maid"
 					},
 				"Stats": {
@@ -123,7 +121,7 @@ static func get_named_unit_data(unitInd):
 					"CHA": 20
 					},
 				"MaxInv": 6,
-				"Inv":[{"DATA":"SLVKNF", "EQUIP":true, "DUR":40}, {"DATA":"PWRELIX", "EQUIP":false, "DUR":1}, {"DATA":"DGR", "EQUIP":false, "DUR": 30}, {"DATA":"TESTACC", "EQUIP":false, "DUR": -1}],
+				"Inv":[{"ID":"SLVKNF", "EQUIP":true, "DUR":40}, {"ID":"PWRELIX", "EQUIP":false, "DUR":1}, {"ID":"DGR", "EQUIP":false, "DUR": 30}, {"ID":"TESTACC", "EQUIP":false, "DUR": -1}],
 				"Passive":{},
 				"Skills":["ST05"],
 				"Weapons": {
@@ -135,8 +133,8 @@ static func get_named_unit_data(unitInd):
 					"FAN": false,
 					"BOW": false,
 					"GUN": false,
-					"SUB": ("KNIFE")
-				}
+					"SUB": ("KNIFE")},
+				"MoveType": MOVE_TYPE.FOOT
 			}
 		}
 		UNIT_ID.Patchy: 
@@ -147,7 +145,7 @@ static func get_named_unit_data(unitInd):
 					"Sprite": load(("res://sprites/RemiliaTest.png")),
 					"Level": 1,
 					"EXP": 0,
-					"CurCOMP": 0,
+					
 					"Class": "Mage"
 					},
 				"Stats": {
@@ -184,7 +182,7 @@ static func get_named_unit_data(unitInd):
 					"CHA": 20
 					},
 				"MaxInv": 6,
-				"Inv":[{"DATA":"BK", "EQUIP":true, "DUR":40}, {"DATA":"PZA", "EQUIP":false, "DUR":3}],
+				"Inv":[{"ID":"BK", "EQUIP":true, "DUR":40}, {"ID":"PZA", "EQUIP":false, "DUR":3}],
 				"Passive":{},
 				"Skills":[],
 				"Weapons": {
@@ -196,9 +194,8 @@ static func get_named_unit_data(unitInd):
 					"FAN": false,
 					"BOW": false,
 					"GUN": false,
-					"SUB": false
-					
-				}
+					"SUB": false},
+				"MoveType": MOVE_TYPE.FOOT
 			}
 		}
 		UNIT_ID.China: 
@@ -209,7 +206,7 @@ static func get_named_unit_data(unitInd):
 					"Sprite": load(("res://sprites/RemiliaTest.png")),
 					"Level": 1,
 					"EXP": 0,
-					"CurCOMP": 0,
+					
 					"Class": "Guard"
 					},
 				"Stats": {
@@ -246,7 +243,7 @@ static func get_named_unit_data(unitInd):
 					"CHA": 20
 					},
 				"MaxInv": 6,
-				"Inv":[{"DATA":"CLB", "EQUIP":true, "DUR":40}, {"DATA":"CLB", "EQUIP":false, "DUR":40}],
+				"Inv":[{"ID":"CLB", "EQUIP":true, "DUR":40}, {"ID":"CLB", "EQUIP":false, "DUR":40}],
 				"Passive":{},
 				"Skills":[],
 				"Weapons": {
@@ -258,18 +255,19 @@ static func get_named_unit_data(unitInd):
 					"FAN": false,
 					"BOW": false,
 					"GUN": false,
-					"SUB": ("NATURAL")
-					
-				}
+					"SUB": ("NATURAL")},
+				"MoveType": MOVE_TYPE.FOOT
 			}
 		}
 	return unitData
 
 static func get_spec(specInd):
-	var specData
+
 	match specInd:
-		SPEC_ID.Fairy: 
-			specData = {"Fairy": {"Spec": "Fairy",
+		SPEC_ID.FAIRY: 
+			return {
+			"Spec": "Fairy",
+			"StatGroups":{
 				"Stats": {
 					"MOVE": 4,
 					"LIFE": 0,
@@ -302,17 +300,18 @@ static func get_spec(specInd):
 					"CELE": 0,
 					"BAR": 0,
 					"CHA": 0
+					}
 					},
-				"Passive":{"Test": true}
+			"Passive":{"Test": true},
+			"MoveType": MOVE_TYPE.FLY
 				}
-				}
-	return specData
 	
 static func get_job(jobInd):
-	var jobData
 	match jobInd:
-		JOB_ID.Trblr: 
-			jobData = {"Trblr": {"Role": "Troublemaker",
+		JOB_ID.TRBLR: 
+			return {
+			"Role": "Troublemaker",
+			"StatGroups":{
 				"Stats": {
 					"MOVE": 0,
 					"LIFE": 20,
@@ -345,6 +344,7 @@ static func get_job(jobInd):
 					"CELE": 20,
 					"BAR": 20,
 					"CHA": 20
+					}
 					},
 				"Passive":{"Test2": true},
 				"Weapons": {
@@ -357,8 +357,10 @@ static func get_job(jobInd):
 					"BOW": false,
 					"GUN": false
 				}
-				},
-			"Thief": {"Role": "Cointaker",
+				}
+		JOB_ID.THIEF: return {
+			"Role": "Cointaker",
+			"StatGroups":{
 				"Stats": {
 					"MOVE": 1,
 					"LIFE": 14,
@@ -377,7 +379,7 @@ static func get_job(jobInd):
 					"PWR": 0.3,
 					"MAG": -0.1,
 					"ELEG": 0.2,
-					"CELE": 0.0,
+					"CELE": 0.45,
 					"BAR": 0.2,
 					"CHA": 0.0
 					},
@@ -391,6 +393,7 @@ static func get_job(jobInd):
 					"CELE": 20,
 					"BAR": 20,
 					"CHA": 20
+					}
 					},
 				"Passive":{"Test3": true},
 				"Weapons": {
@@ -403,24 +406,28 @@ static func get_job(jobInd):
 					"BOW": false,
 					"GUN": false,
 					"SUB": ("KNIFE")
+					}
 				}
-				}
-			}
-	return jobData
 
 static func get_art(prtName):
-	var artData
-	artData = {"Prt": load(("res://sprites/%sPrt.png" % [prtName]))}
-#	artData = {"Prt": load(("res://sprites/%sSprite.png" % [prtName]))}
-	return artData
+	var p = {"Prt":load(("res://sprites/%sPrt.png" % [prtName]))}
+	return p
+	
+static func load_generated_sprite(species, job):
+	var specKeys : Array = SPEC_ID.keys()
+	var specPath : String = specKeys[species]
+	var jobKeys : Array = JOB_ID.keys()
+	var jobPath : String = jobKeys[job]
+	var s = load(("res://sprites/%s/%sSpr.png" % [specPath, jobPath]))
+	return s
 
 static func get_terrain_costs():
 	var terrainCost : Dictionary = {
-		"Foot": 
+		Enums.MOVE_TYPE.FOOT: 
 			{"Flat": 1,
 			"Fort": 2,
 			"Hill": 3},
-		"Fly":
+		Enums.MOVE_TYPE.FLY:
 			{"Flat": 1,
 			"Fort": 1,
 			"Hill": 1}
@@ -429,12 +436,12 @@ static func get_terrain_costs():
 	
 static func get_items():
 	var iData = {"NONE":{
-				"NAME":"--",
-				"ICON": load(("res://sprites/gungnir.png")),
-				"TYPE": "Physical",
-				"DMG": 0,
+				"Name":"--",
+				"Icon": load(("res://sprites/gungnir.png")),
+				"Type": Enums.DAMAGE_TYPE.PHYS,
+				"Dmg": 0,
 				"ACC": 0,
-				"CRIT": 0,
+				"Crit": 0,
 				"GRAZE": 0,
 				"MINRANGE": 0,
 				"MAXRANGE": 0,
@@ -444,12 +451,12 @@ static func get_items():
 				"SUBGROUP": false},
 				##################
 				"GNG":{
-				"NAME":"Gungnir",
-				"ICON": load(("res://sprites/gungnir.png")),
-				"TYPE": "Physical",
-				"DMG": 5,
+				"Name":"Gungnir",
+				"Icon": load(("res://sprites/gungnir.png")),
+				"Type": Enums.DAMAGE_TYPE.PHYS,
+				"Dmg": 5,
 				"ACC": 90,
-				"CRIT": 100,
+				"Crit": 100,
 				"GRAZE": 3,
 				"MINRANGE": 1,
 				"MAXRANGE": 2,
@@ -459,12 +466,12 @@ static func get_items():
 				"SUBGROUP": false},
 				###############
 				"SLVKNF":{
-				"NAME":"Silver Knife",
-				"ICON": load(("res://sprites/gungnir.png")),
-				"TYPE": "Physical",
-				"DMG": 40,
+				"Name":"Silver Knife",
+				"Icon": load(("res://sprites/gungnir.png")),
+				"Type": Enums.DAMAGE_TYPE.PHYS,
+				"Dmg": 40,
 				"ACC": 90,
-				"CRIT": 100,
+				"Crit": 100,
 				"GRAZE": 2,
 				"MINRANGE": 1,
 				"MAXRANGE": 2,
@@ -474,12 +481,12 @@ static func get_items():
 				"SUBGROUP": "KNIVES"},
 				###############
 				"CLB": {
-				"NAME":"Club",
-				"ICON": load(("res://sprites/gungnir.png")),
-				"TYPE": "Physical",
-				"DMG": 7,
+				"Name":"Club",
+				"Icon": load(("res://sprites/gungnir.png")),
+				"Type": Enums.DAMAGE_TYPE.PHYS,
+				"Dmg": 7,
 				"ACC": 0,
-				"CRIT": 0,
+				"Crit": 0,
 				"GRAZE": 4,
 				"MINRANGE": 1,
 				"MAXRANGE": 1,
@@ -489,12 +496,12 @@ static func get_items():
 				"SUBGROUP": false},
 				###############
 				"DGR": {
-				"NAME":"Dagger",
-				"ICON": load(("res://sprites/gungnir.png")),
-				"TYPE": "Physical",
-				"DMG": 4,
+				"Name":"Dagger",
+				"Icon": load(("res://sprites/gungnir.png")),
+				"Type": Enums.DAMAGE_TYPE.PHYS,
+				"Dmg": 4,
 				"ACC": 85,
-				"CRIT": 0,
+				"Crit": 0,
 				"GRAZE": 1,
 				"MINRANGE": 1,
 				"MAXRANGE": 1,
@@ -504,12 +511,12 @@ static func get_items():
 				"SUBGROUP": false},
 				###############
 				"THKN":{
-				"NAME":"Throwing Knife",
-				"ICON": load(("res://sprites/gungnir.png")),
-				"TYPE": "Physical",
-				"DMG": 3,
+				"Name":"Throwing Knife",
+				"Icon": load(("res://sprites/gungnir.png")),
+				"Type": Enums.DAMAGE_TYPE.PHYS,
+				"Dmg": 3,
 				"ACC": 0,
-				"CRIT": 5,
+				"Crit": 5,
 				"GRAZE": 1,
 				"MINRANGE": 2,
 				"MAXRANGE": 2,
@@ -519,12 +526,12 @@ static func get_items():
 				"SUBGROUP": "KNIVES"},
 				###############
 				"BK":{
-				"NAME":"Book",
-				"ICON": load(("res://sprites/gungnir.png")),
-				"TYPE": "Physical",
-				"DMG": 1,
+				"Name":"Book",
+				"Icon": load(("res://sprites/gungnir.png")),
+				"Type": Enums.DAMAGE_TYPE.PHYS,
+				"Dmg": 1,
 				"ACC": 70,
-				"CRIT": 0,
+				"Crit": 0,
 				"GRAZE": 0,
 				"MINRANGE": 1,
 				"MAXRANGE": 1,
@@ -534,84 +541,82 @@ static func get_items():
 				"SUBGROUP": false},
 				###############
 				"PZA":{
-				"NAME":"Pizza",
-				"ICON": load(("res://sprites/gungnir.png")),
+				"Name":"Pizza",
+				"Icon": load(("res://sprites/gungnir.png")),
 				"CATEGORY": "ITEM",
 				"MAXDUR": 3,
 				"USE": true,
-				"EFFECT": ["Pizza01"] },
+				"Effect": ["Pizza01"] },
 				###############
 				"PWRELIX":{
-				"NAME":"Power Elixir",
-				"ICON": load(("res://sprites/gungnir.png")),
+				"Name":"Power Elixir",
+				"Icon": load(("res://sprites/gungnir.png")),
 				"CATEGORY": "ITEM",
 				"MAXDUR": 1,
 				"USE": true,
-				"EFFECT": ["StrBuff01"] },
+				"Effect": ["StrBuff01"] },
 				###############
 				"TESTACC":{
-				"NAME": "STR Ring",
-				"ICON": load(("res://sprites/gungnir.png")),
+				"Name": "STR Ring",
+				"Icon": load(("res://sprites/gungnir.png")),
 				"CATEGORY": "ACC",
 				"EQUIP": true,
-				"EFFECT": ["StrBuff01"] }
+				"Effect": ["StrBuff01"] }
 				
 				}
 	return iData
 	
-static func get_item_effects():
-	var iEffects : Dictionary
-	iEffects = {
-		"IHEAL": {
-			"target": "Self",
-			"isPermanent": true,
-			"type": "heal"
-			
-		}
-	}
-	return iEffects
 	
 static func get_skill_effects():
 	var skillEffects : Dictionary
 	skillEffects = {
 			"EffectGuide": {
-			"Target": "Self", #Self, Target, Global
+			"Type": Enums.EFFECT_TYPE,
+			"Target": Enums.EFFECT_TARGET.SELF, #Self, Target, Global
 			"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
-			"Proc": 99, #Set to -1 to have gaurenteed proc chance
-			"Duration": 0,
-			"Time": false,
+			"Proc": -1, #Set to -1 to have gaurenteed proc chance
+			"Duration": 0, #Unit turns the effect lasts, -1 causes the effect to be permanent. Duration is ignored entirely for on-equip effects of items.
+			"Stack": false, #True for infinite stacking, soft limit by duration Not necessary for permanent effects. Ignored for on-equip effects.
+			#Effect specific Parameters
+			#Effect: Time
 			"TimeFactor": 0,
-			"Curable": true, #For status effects, buffs/debuffs. Dictates if effects can remove them.
-			"Buff": false,
-			"Debuff": false,
-			"BuffStat": "PWR", #Any core Stat
+			#Effect: Buff/Debuff
+			"BuffStat": Enums.CORE_STAT, #Any core Stat
 			"BuffValue": 0,
-			"Damaging": false,
-			"Type": "Physical", #Physical, Magic
-			"Damage": 0,
-			"Cure": false,
-			"CureType": "all", #Sleep, or All. This is because Sleep is the only status atm. As new status are added, this parameter does not need to be updated.
-			"Healing": false,
-			"Heal": 0,
-			"Sleep": false,
-			"Relocate": false,
-			"MoveType": "Toss", #Warp(pick a hex), Shove(moved X distance); Toss(Placed behind Actor)
-			"RelocRange": 0 #Distance Shoved, or range of valid tiles to warp to. Set to 0 for Toss.
-			},
+			#Effect: Status
+			"Status": Enums.STATUS_EFFECT, #Assign with string of valid Status conditions, Refer to Unit class for list.
+			#Effect STATUS/BUFF/DEBUFF
+			"Curable": true, #For buffs/debuffs. Dictates if effects can remove them.
+			#Effect: DAMAGE
+			"Dmg": 0, #set an int damage value
+			"DmgType": Enums.DAMAGE_TYPE.PHYS, #use enum types
+			#Effect: HEAL
+			"Heal": 0, #set an int heal value
+			#Effect: CURE
+			"CureType": Enums.STATUS_EFFECT, #Sleep, or All. This is because Sleep is the only status atm. As new status are added, this parameter does not need to be updated.
+			#effect: TOSS/SHOVE/WARP/DASH
+			"RelocRange": 0, #Distance Shoved, or range of valid tiles to warp to. Set to 0 for Toss.
+			"Hostile": false, #If movement should be treated as "hostile"
+			#Effect: ADD_SKILL
+			"Skill": "", #Not used yet. Temporarily adds skills via on-equip effects
+			#Effect: ADD_PASSIVE
+			"Passive": "",
+			#Effect: ADD_PASSIVE/ADD_SKILL
+			"Permanent": false,
+			#RULE TYPES. YET TO BE IMPLEMENTED!!!!
+},
 			"Test1": {
 			"Target": "Target",
 			"OnHit": true,
 			"Proc": -1,
-			"Damaging": true,
-			"Type": "Physical",
-			"Damage": 5
+			"Dmg": 5,
+			"Type": Enums.DAMAGE_TYPE.PHYS
 			},
 			"Test2": {
 			"Target": "Target",
 			"OnHit": false,
 			"Proc": -1,
-			"Healing": true,
-			"Heal": 2,
+			"Heal": 2
 			},
 			"SlowTime05": {
 			"Target": "Global",
@@ -623,10 +628,10 @@ static func get_skill_effects():
 			},
 			"SleepTest": {
 			"Target": "Target", #Self, Target, Global
-			"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
-			"Proc": -1, #Set to -1 to have gaurenteed proc chance
+			"OnHit": true, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
+			"Proc": 100, #Set to -1 to have gaurenteed proc chance
 			"Duration": 1,
-			"Sleep": true,
+			"Status": "Sleep",
 			"Curable": true
 			},
 			"Shove1": {
@@ -664,7 +669,7 @@ static func get_skill_effects():
 			"Target": "Self", #Self, Target, Global
 			"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
 			"Proc": -1, #Set to -1 to have gaurenteed proc chance
-			"Duration": 0,
+			"Duration": -1,
 			"Buff": true,
 			"BuffStat": "PWR", #Any core Stat
 			"BuffValue": 2
@@ -676,15 +681,18 @@ static func get_skills():
 	skills = {
 		"TEST1": {
 		"SkillId": "TEST1",
-		"SkillName": "Test Skill",
+		"SkillName": "Example",
 		"Icon": load(("res://sprites/gungnir.png")),
 		"Target": "Enemy", #Enemy, Self, Ally, Self+(This is Self and Ally), Other(Enemy or Ally, not Self)
-		"CanMiss": true,
-		"ACC": 99,
-		"RangeMin": 1,
-		"RangeMax": 2,
+		"CanMiss": true, #default true
+		"ACC": 0, #Int only. negative values acceptable for ACC penalties to the skill
+		"Dmg": false, #set an int value for damage
+		"Crit": false, #set an int value for crit bonus
+		"Type": Enums.DAMAGE_TYPE.PHYS, #use enum types
+		"RangeMin": 0,
+		"RangeMax": 0,
 		"Cost": 0,
-		"EFFECT": ["Test1"]
+		"Effect": []
 		},
 		"TEST2": {
 		"SkillId": "TEST2",
@@ -696,7 +704,7 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 1,
 		"Cost": 0,
-		"EFFECT": ["Test2"]
+		"Effect": ["Test2"]
 		},
 		"ST05": {
 		"SkillId": "ST05",
@@ -708,19 +716,19 @@ static func get_skills():
 		"RangeMin": 0,
 		"RangeMax": 0,
 		"Cost": 0,
-		"EFFECT": ["SlowTime05"]
+		"Effect": ["SlowTime05"]
 		},
 		"SLP1": {
 		"SkillId": "SLP1",
 		"SkillName": "Sleep",
 		"Icon": load(("res://sprites/gungnir.png")),
-		"Target": "Ally", #Enemy, Self, Ally
+		"Target": "Enemy", #Enemy, Self, Ally
 		"CanMiss": false,
-		"ACC": 0,
+		"ACC": 60,
 		"RangeMin": 1,
-		"RangeMax": 1,
+		"RangeMax": 2,
 		"Cost": 0,
-		"EFFECT": ["SleepTest"]
+		"Effect": ["SleepTest"]
 		},
 		"SHV1": {
 		"SkillId": "SHV1",
@@ -732,7 +740,7 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 1,
 		"Cost": 0,
-		"EFFECT": ["Shove1"]
+		"Effect": ["Shove1"]
 		},
 		"TOSS1": {
 		"SkillId": "TOSS1",
@@ -744,7 +752,7 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 1,
 		"Cost": 0,
-		"EFFECT": ["Toss1"]
+		"Effect": ["Toss1"]
 		},
 		"WARP1": {
 		"SkillId": "WARP1",
@@ -756,7 +764,7 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 1,
 		"Cost": 0,
-		"EFFECT": ["Warp05"]
+		"Effect": ["Warp05"]
 		}
 	}
 	return skills

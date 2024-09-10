@@ -30,143 +30,20 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="G" type="GridContainer" parent="M"]
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-theme_override_constants/h_separation = 5
-columns = 3
-
-[node name="UnitExpTag" type="Label" parent="M/G"]
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "EXP:"
-
-[node name="UnitExp" type="Label" parent="M/G"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "0
-"
-visible_characters = 3
-visible_ratio = 1.5
-
-[node name="UnitName" type="Label" parent="M/G"]
-custom_minimum_size = Vector2(60, 10)
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
-theme = ExtResource("1_phvm5")
-text = "unitName"
-
-[node name="VTags" type="VBoxContainer" parent="M/G"]
+[node name="HBoxContainer" type="HBoxContainer" parent="M"]
 layout_mode = 2
 
-[node name="UnitLevelTag" type="Label" parent="M/G/VTags"]
+[node name="PortraitBox" type="VBoxContainer" parent="M/HBoxContainer"]
 layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "Level:"
+theme_override_constants/separation = -6
 
-[node name="UnitHpTag" type="Label" parent="M/G/VTags"]
-layout_mode = 2
-focus_neighbor_bottom = NodePath("../UnitStrTag")
-theme = ExtResource("1_phvm5")
-text = "Health:"
-
-[node name="UnitStrTag" type="Label" parent="M/G/VTags"]
-layout_mode = 2
-focus_neighbor_bottom = NodePath("../UnitMagTag")
-theme = ExtResource("1_phvm5")
-text = "Power:"
-
-[node name="UnitMagTag" type="Label" parent="M/G/VTags"]
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "Magic:"
-
-[node name="UnitElegTag2" type="Label" parent="M/G/VTags"]
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "Elegance:"
-
-[node name="UnitCeleTag3" type="Label" parent="M/G/VTags"]
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "Celerity:"
-
-[node name="UnitBarTag4" type="Label" parent="M/G/VTags"]
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "Barrier:"
-
-[node name="UnitChaTag5" type="Label" parent="M/G/VTags"]
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "Charisma:"
-
-[node name="VStats" type="VBoxContainer" parent="M/G"]
-layout_mode = 2
-
-[node name="UnitLevel" type="Label" parent="M/G/VStats"]
-custom_minimum_size = Vector2(10, 0)
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "0"
-
-[node name="UnitHp" type="Label" parent="M/G/VStats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("1_phvm5")
-text = "60/60"
-horizontal_alignment = 2
-
-[node name="UnitStr" type="Label" parent="M/G/VStats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "0"
-
-[node name="UnitMag" type="Label" parent="M/G/VStats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "0"
-
-[node name="UnitEle" type="Label" parent="M/G/VStats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "0"
-
-[node name="UnitCele" type="Label" parent="M/G/VStats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "0"
-
-[node name="UnitBar" type="Label" parent="M/G/VStats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "0"
-
-[node name="UnitCha" type="Label" parent="M/G/VStats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "0"
-
-[node name="VB" type="GridContainer" parent="M/G"]
-layout_mode = 2
-size_flags_horizontal = 3
-columns = 2
-
-[node name="MC" type="MarginContainer" parent="M/G/VB"]
+[node name="MC" type="MarginContainer" parent="M/HBoxContainer/PortraitBox"]
+custom_minimum_size = Vector2(136, 440)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 
-[node name="SpriteBG" type="NinePatchRect" parent="M/G/VB/MC"]
+[node name="SpriteBG" type="NinePatchRect" parent="M/HBoxContainer/PortraitBox/MC"]
 custom_minimum_size = Vector2(56, 56)
 layout_mode = 2
 texture = ExtResource("2_sedhl")
@@ -175,14 +52,14 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="MC" type="MarginContainer" parent="M/G/VB/MC"]
+[node name="MC" type="MarginContainer" parent="M/HBoxContainer/PortraitBox/MC"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 8
 
-[node name="UnitPrt" type="TextureRect" parent="M/G/VB/MC/MC"]
+[node name="UnitPrt" type="TextureRect" parent="M/HBoxContainer/PortraitBox/MC/MC"]
 custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -191,21 +68,13 @@ texture = ExtResource("3_x6e7x")
 expand_mode = 1
 stretch_mode = 4
 
-[node name="G2" type="GridContainer" parent="M/G/VB"]
+[node name="MC3" type="MarginContainer" parent="M/HBoxContainer/PortraitBox"]
 layout_mode = 2
-size_flags_horizontal = 8
-theme = ExtResource("1_phvm5")
-theme_override_constants/h_separation = 5
-columns = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
 
-[node name="VB" type="VBoxContainer" parent="M/G/VB/G2"]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="MC2" type="MarginContainer" parent="M/G/VB/G2/VB"]
-layout_mode = 2
-
-[node name="bg2" type="NinePatchRect" parent="M/G/VB/G2/VB/MC2"]
+[node name="SpriteBG" type="NinePatchRect" parent="M/HBoxContainer/PortraitBox/MC3"]
+custom_minimum_size = Vector2(108, 8)
 layout_mode = 2
 texture = ExtResource("2_sedhl")
 patch_margin_left = 16
@@ -213,97 +82,238 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="MC" type="MarginContainer" parent="M/G/VB/G2/VB/MC2"]
-custom_minimum_size = Vector2(120, 120)
+[node name="MC" type="MarginContainer" parent="M/HBoxContainer/PortraitBox/MC3"]
 layout_mode = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_bottom = 8
 
-[node name="VB" type="GridContainer" parent="M/G/VB/G2/VB/MC2/MC"]
+[node name="StatusGrid" type="GridContainer" parent="M/HBoxContainer/PortraitBox/MC3/MC"]
 layout_mode = 2
-columns = 2
+columns = 6
 
-[node name="VTags" type="VBoxContainer" parent="M/G/VB/G2/VB/MC2/MC/VB"]
-layout_mode = 2
-
-[node name="UnitAcc" type="Label" parent="M/G/VB/G2/VB/MC2/MC/VB/VTags"]
+[node name="G" type="GridContainer" parent="M/HBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_phvm5")
-text = "ACC:"
+theme_override_constants/h_separation = 5
 
-[node name="UnitAVD" type="Label" parent="M/G/VB/G2/VB/MC2/MC/VB/VTags"]
+[node name="NameBox" type="AspectRatioContainer" parent="M/HBoxContainer/G"]
 layout_mode = 2
-focus_neighbor_bottom = NodePath("../UnitDmg")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="M/HBoxContainer/G/NameBox"]
+layout_mode = 2
+
+[node name="UnitName" type="Label" parent="M/HBoxContainer/G/NameBox/VBoxContainer"]
+custom_minimum_size = Vector2(60, 10)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
 theme = ExtResource("1_phvm5")
-text = "AVD:"
+theme_override_font_sizes/font_size = 16
+text = "unitName"
 
-[node name="UnitDmg" type="Label" parent="M/G/VB/G2/VB/MC2/MC/VB/VTags"]
+[node name="HBoxContainer" type="HBoxContainer" parent="M/HBoxContainer/G/NameBox/VBoxContainer"]
 layout_mode = 2
-focus_neighbor_bottom = NodePath("../UnitGrz")
+
+[node name="UnitSpec" type="Label" parent="M/HBoxContainer/G/NameBox/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(60, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
 theme = ExtResource("1_phvm5")
-text = "DMG:"
+text = "unitSpec"
 
-[node name="UnitGrz" type="Label" parent="M/G/VB/G2/VB/MC2/MC/VB/VTags"]
+[node name="UnitJob" type="Label" parent="M/HBoxContainer/G/NameBox/VBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(60, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme = ExtResource("1_phvm5")
+text = "Unemployed"
+
+[node name="StatBox" type="AspectRatioContainer" parent="M/HBoxContainer/G"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="M/HBoxContainer/G/StatBox"]
+layout_mode = 2
+
+[node name="LevelBox" type="HBoxContainer" parent="M/HBoxContainer/G/StatBox/VBoxContainer"]
+layout_mode = 2
+
+[node name="VTags" type="VBoxContainer" parent="M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox"]
+layout_mode = 2
+
+[node name="UnitLevelTag" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VTags"]
 layout_mode = 2
 theme = ExtResource("1_phvm5")
-text = "GRAZE:"
+text = "Level:"
 
-[node name="UnitCrit" type="Label" parent="M/G/VB/G2/VB/MC2/MC/VB/VTags"]
+[node name="UnitExpTag" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VTags"]
 layout_mode = 2
 theme = ExtResource("1_phvm5")
-text = "CRIT:"
+text = "EXP:"
 
-[node name="UnitCrtAvd" type="Label" parent="M/G/VB/G2/VB/MC2/MC/VB/VTags"]
+[node name="UnitHpTag" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VTags"]
 layout_mode = 2
 theme = ExtResource("1_phvm5")
-text = "CRITAVD:"
+text = "Health:"
 
-[node name="VStats" type="VBoxContainer" parent="M/G/VB/G2/VB/MC2/MC/VB"]
+[node name="UnitCmpTag" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "Composure:"
+
+[node name="VStats" type="VBoxContainer" parent="M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox"]
 layout_mode = 2
 
-[node name="UnitAcc" type="Label" parent="M/G/VB/G2/VB/MC2/MC/VB/VStats"]
+[node name="UnitLevel" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats"]
 custom_minimum_size = Vector2(10, 0)
 layout_mode = 2
 theme = ExtResource("1_phvm5")
-text = "0"
+text = "00"
 
-[node name="UnitAvd" type="Label" parent="M/G/VB/G2/VB/MC2/MC/VB/VStats"]
-custom_minimum_size = Vector2(10, 0)
+[node name="UnitExp" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats"]
+custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 theme = ExtResource("1_phvm5")
-text = "0"
+text = "00/100
+"
+visible_ratio = -0.142857
 
-[node name="UnitDmg" type="Label" parent="M/G/VB/G2/VB/MC2/MC/VB/VStats"]
+[node name="UnitHp" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+theme = ExtResource("1_phvm5")
+text = "60/60"
+
+[node name="UnitCmp" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+theme = ExtResource("1_phvm5")
+text = "100/100"
+
+[node name="StatBox" type="HBoxContainer" parent="M/HBoxContainer/G/StatBox/VBoxContainer"]
+layout_mode = 2
+
+[node name="VTags" type="VBoxContainer" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox"]
+layout_mode = 2
+
+[node name="UnitStrTag" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VTags"]
+layout_mode = 2
+focus_neighbor_bottom = NodePath("../UnitMagTag")
+theme = ExtResource("1_phvm5")
+text = "Power:"
+
+[node name="UnitMagTag" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "Magic:"
+
+[node name="UnitElegTag2" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "Elegance:"
+
+[node name="UnitCeleTag3" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "Celerity:"
+
+[node name="UnitBarTag4" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "Barrier:"
+
+[node name="UnitChaTag5" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "Charisma:"
+
+[node name="VStats" type="VBoxContainer" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox"]
+layout_mode = 2
+
+[node name="UnitStr" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 theme = ExtResource("1_phvm5")
 text = "0"
 
-[node name="UnitGrz" type="Label" parent="M/G/VB/G2/VB/MC2/MC/VB/VStats"]
-custom_minimum_size = Vector2(10, 10)
-layout_mode = 2
-theme = ExtResource("1_phvm5")
-text = "0 (0%)"
-
-[node name="UnitCrit" type="Label" parent="M/G/VB/G2/VB/MC2/MC/VB/VStats"]
+[node name="UnitMag" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 theme = ExtResource("1_phvm5")
 text = "0"
 
-[node name="UnitCritAvd" type="Label" parent="M/G/VB/G2/VB/MC2/MC/VB/VStats"]
+[node name="UnitEle" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 theme = ExtResource("1_phvm5")
 text = "0"
 
-[node name="MC2" type="MarginContainer" parent="M/G/VB"]
+[node name="UnitCele" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitBar" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitCha" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="VBonus" type="VBoxContainer" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox"]
+visible = false
+layout_mode = 2
+
+[node name="UnitStr" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VBonus"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+theme_override_colors/font_color = Color(0, 0.839216, 0, 1)
+text = "+2"
+
+[node name="UnitMag" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VBonus"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+theme_override_colors/font_color = Color(0.823529, 0, 0, 1)
+text = "-5"
+
+[node name="UnitEle" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VBonus"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+
+[node name="UnitCele" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VBonus"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+
+[node name="UnitBar" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VBonus"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+
+[node name="UnitCha" type="Label" parent="M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VBonus"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+
+[node name="MC2" type="MarginContainer" parent="M/HBoxContainer/G"]
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 
-[node name="bg2" type="NinePatchRect" parent="M/G/VB/MC2"]
+[node name="bg2" type="NinePatchRect" parent="M/HBoxContainer/G/MC2"]
 layout_mode = 2
 texture = ExtResource("2_sedhl")
 patch_margin_left = 16
@@ -311,7 +321,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="MC" type="MarginContainer" parent="M/G/VB/MC2"]
+[node name="MC" type="MarginContainer" parent="M/HBoxContainer/G/MC2"]
 custom_minimum_size = Vector2(120, 120)
 layout_mode = 2
 theme_override_constants/margin_left = 8
@@ -319,34 +329,34 @@ theme_override_constants/margin_top = 36
 theme_override_constants/margin_right = 8
 theme_override_constants/margin_bottom = 4
 
-[node name="VB" type="GridContainer" parent="M/G/VB/MC2/MC"]
+[node name="VB" type="GridContainer" parent="M/HBoxContainer/G/MC2/MC"]
 layout_mode = 2
 
-[node name="Wep1" type="Label" parent="M/G/VB/MC2/MC/VB"]
-layout_mode = 2
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="Wep2" type="Label" parent="M/G/VB/MC2/MC/VB"]
+[node name="Skill1" type="Label" parent="M/HBoxContainer/G/MC2/MC/VB"]
 layout_mode = 2
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Wep3" type="Label" parent="M/G/VB/MC2/MC/VB"]
+[node name="Skill2" type="Label" parent="M/HBoxContainer/G/MC2/MC/VB"]
 layout_mode = 2
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Wep4" type="Label" parent="M/G/VB/MC2/MC/VB"]
+[node name="Skill3" type="Label" parent="M/HBoxContainer/G/MC2/MC/VB"]
 layout_mode = 2
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="VB" type="VBoxContainer" parent="M/G/VB/MC2"]
+[node name="Skill4" type="Label" parent="M/HBoxContainer/G/MC2/MC/VB"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VB" type="VBoxContainer" parent="M/HBoxContainer/G/MC2"]
 layout_mode = 2
 size_flags_vertical = 0
 
-[node name="BG" type="NinePatchRect" parent="M/G/VB/MC2/VB"]
+[node name="BG" type="NinePatchRect" parent="M/HBoxContainer/G/MC2/VB"]
 layout_mode = 2
 size_flags_vertical = 4
 texture = ExtResource("2_sedhl")
@@ -355,7 +365,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="MC" type="MarginContainer" parent="M/G/VB/MC2/VB/BG"]
+[node name="MC" type="MarginContainer" parent="M/HBoxContainer/G/MC2/VB/BG"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -371,7 +381,310 @@ grow_vertical = 2
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_right = 8
 
-[node name="Eqp" type="Label" parent="M/G/VB/MC2/VB/BG/MC"]
+[node name="SkillLbl" type="Label" parent="M/HBoxContainer/G/MC2/VB/BG/MC"]
+layout_mode = 2
+text = "Skills"
+horizontal_alignment = 1
+vertical_alignment = 1
+visible_ratio = -0.166667
+
+[node name="MC3" type="MarginContainer" parent="M/HBoxContainer/G"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+
+[node name="bg2" type="NinePatchRect" parent="M/HBoxContainer/G/MC3"]
+layout_mode = 2
+texture = ExtResource("2_sedhl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MC" type="MarginContainer" parent="M/HBoxContainer/G/MC3"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 36
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="VB" type="GridContainer" parent="M/HBoxContainer/G/MC3/MC"]
+layout_mode = 2
+
+[node name="Pass1" type="Label" parent="M/HBoxContainer/G/MC3/MC/VB"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Pass2" type="Label" parent="M/HBoxContainer/G/MC3/MC/VB"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Pass3" type="Label" parent="M/HBoxContainer/G/MC3/MC/VB"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Pass4" type="Label" parent="M/HBoxContainer/G/MC3/MC/VB"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VB" type="VBoxContainer" parent="M/HBoxContainer/G/MC3"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="BG" type="NinePatchRect" parent="M/HBoxContainer/G/MC3/VB"]
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("2_sedhl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MC" type="MarginContainer" parent="M/HBoxContainer/G/MC3/VB/BG"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -17.0
+offset_top = -6.0
+offset_right = 17.0
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="PassLbl" type="Label" parent="M/HBoxContainer/G/MC3/VB/BG/MC"]
+layout_mode = 2
+text = "Passives"
+horizontal_alignment = 1
+vertical_alignment = 1
+visible_ratio = -0.125
+
+[node name="InventoryBox" type="GridContainer" parent="M/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 2
+
+[node name="G2" type="GridContainer" parent="M/HBoxContainer/InventoryBox"]
+layout_mode = 2
+size_flags_horizontal = 8
+theme = ExtResource("1_phvm5")
+theme_override_constants/h_separation = 5
+columns = 2
+
+[node name="VB" type="VBoxContainer" parent="M/HBoxContainer/InventoryBox/G2"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MC2" type="MarginContainer" parent="M/HBoxContainer/InventoryBox/G2/VB"]
+layout_mode = 2
+
+[node name="bg2" type="NinePatchRect" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2"]
+layout_mode = 2
+texture = ExtResource("2_sedhl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MC" type="MarginContainer" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="VB" type="GridContainer" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC"]
+layout_mode = 2
+columns = 2
+
+[node name="VTags" type="VBoxContainer" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB"]
+layout_mode = 2
+
+[node name="UnitAcc" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "ACC:"
+
+[node name="UnitAVD" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VTags"]
+layout_mode = 2
+focus_neighbor_bottom = NodePath("../UnitDmg")
+theme = ExtResource("1_phvm5")
+text = "AVD:"
+
+[node name="UnitDmg" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VTags"]
+layout_mode = 2
+focus_neighbor_bottom = NodePath("../UnitGrz")
+theme = ExtResource("1_phvm5")
+text = "DMG:"
+
+[node name="UnitGrz" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "GRAZE:"
+
+[node name="UnitCrit" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "CRIT:"
+
+[node name="UnitCrtAvd" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "CRITAVD:"
+
+[node name="UnitEffAcc" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "EFFBNS:"
+
+[node name="UnitRes" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VTags"]
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "RESIST:"
+
+[node name="VStats" type="VBoxContainer" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB"]
+layout_mode = 2
+
+[node name="UnitAcc" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitAvd" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitDmg" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitGrz" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "-0 (0%)"
+
+[node name="UnitCrit" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitCritAvd" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="UnitEffAcc" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "+0"
+
+[node name="UnitRes" type="Label" parent="M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats"]
+custom_minimum_size = Vector2(10, 10)
+layout_mode = 2
+theme = ExtResource("1_phvm5")
+text = "0"
+
+[node name="MC2" type="MarginContainer" parent="M/HBoxContainer/InventoryBox"]
+custom_minimum_size = Vector2(160, 0)
+layout_mode = 2
+
+[node name="bg2" type="NinePatchRect" parent="M/HBoxContainer/InventoryBox/MC2"]
+layout_mode = 2
+texture = ExtResource("2_sedhl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MC" type="MarginContainer" parent="M/HBoxContainer/InventoryBox/MC2"]
+custom_minimum_size = Vector2(120, 120)
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 36
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 4
+
+[node name="InvGrid" type="GridContainer" parent="M/HBoxContainer/InventoryBox/MC2/MC"]
+layout_mode = 2
+
+[node name="Wep1" type="Label" parent="M/HBoxContainer/InventoryBox/MC2/MC/InvGrid"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Wep2" type="Label" parent="M/HBoxContainer/InventoryBox/MC2/MC/InvGrid"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Wep3" type="Label" parent="M/HBoxContainer/InventoryBox/MC2/MC/InvGrid"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Wep4" type="Label" parent="M/HBoxContainer/InventoryBox/MC2/MC/InvGrid"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Wep5" type="Label" parent="M/HBoxContainer/InventoryBox/MC2/MC/InvGrid"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Wep6" type="Label" parent="M/HBoxContainer/InventoryBox/MC2/MC/InvGrid"]
+layout_mode = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VB" type="VBoxContainer" parent="M/HBoxContainer/InventoryBox/MC2"]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="BG" type="NinePatchRect" parent="M/HBoxContainer/InventoryBox/MC2/VB"]
+layout_mode = 2
+size_flags_vertical = 4
+texture = ExtResource("2_sedhl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MC" type="MarginContainer" parent="M/HBoxContainer/InventoryBox/MC2/VB/BG"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -17.0
+offset_top = -6.0
+offset_right = 17.0
+offset_bottom = 6.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="Eqp" type="Label" parent="M/HBoxContainer/InventoryBox/MC2/VB/BG/MC"]
 layout_mode = 2
 text = "Test"
 horizontal_alignment = 1

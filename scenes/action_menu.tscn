@@ -150,6 +150,12 @@ layout_direction = 2
 layout_mode = 2
 theme = ExtResource("4_cpge4")
 
+[node name="SkillContainer" type="VBoxContainer" parent="VFlowContainer/ActComCon/Count/ActionBox"]
+visible = false
+layout_direction = 2
+layout_mode = 2
+theme = ExtResource("4_cpge4")
+
 [node name="ItmComCon" type="AspectRatioContainer" parent="VFlowContainer"]
 visible = false
 layout_mode = 2
@@ -223,6 +229,7 @@ action_mode = 0
 text = "Use"
 
 [connection signal="pressed" from="VFlowContainer/ActComCon/Count/ActionBox/ActionContainer/AtkBtn" to="." method="_on_atk_btn_pressed"]
+[connection signal="pressed" from="VFlowContainer/ActComCon/Count/ActionBox/ActionContainer/SklBtn" to="." method="_on_skl_btn_pressed"]
 [connection signal="pressed" from="VFlowContainer/ActComCon/Count/ActionBox/ActionContainer/ItmBtn" to="." method="_on_itm_btn_pressed"]
 [connection signal="pressed" from="VFlowContainer/ActComCon/Count/ActionBox/ActionContainer/TrdBtn" to="." method="_on_trd_btn_pressed"]
 [connection signal="pressed" from="VFlowContainer/ActComCon/Count/ActionBox/ActionContainer/WaitBtn" to="." method="_on_wait_btn_pressed"]

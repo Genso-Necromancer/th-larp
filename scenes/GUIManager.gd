@@ -280,11 +280,14 @@ func _on_gameboard_toggle_prof(): #Needs filtering for while in set-up menu. Per
 func update_prof():
 	emit_signal("profile_called")
 		
-func _on_gameboard_target_focused(cmbData, distance: int = 0):
+func _on_gameboard_target_focused(cmbData : Dictionary, mode : int, distance: int = 0):
 	var fc = $CombatForecast
 	fc.update_fc(cmbData)
 	fc.show_fc()
-	actMenu.open_weapons(distance)
+	match mode:
+		0: actMenu.open_weapons(distance)
+		1: pass
+	
 
 		
 func weapon_selected(index):
@@ -342,23 +345,9 @@ func open_skills():
 		weaponBox.visible = false
 		Global.skillMenu = false
 		
-
-	
-		
-func skill_selected(index):
-
-	var skillData = UnitData.skillData
-	var skill = skillData[index]
-	var selection = gameState.GB_SKILL_TARGETING
-	accept_event()
-	emit_signal("action_selected", selection, skill)
-	open_skills()
-
-
 func clearInventoryButtons():
 	for button in weaponFrame.get_children():
 		button.queue_free()
-
 
 func _on_gameboard_turn_changed():
 #	var sunMod = 0
@@ -756,6 +745,8 @@ func _on_begin_btn_pressed():
 func _close_act_menu():
 	foreCast.hide_fc()
 	actMenu.close_menu()
+	
+func _on_action_menu_menu_closed():
 	_strip_menuCursor()
 
 func _on_gameboard_cell_selected(_cell): #cell is sent by signal for general use, but the specific cell selected is not currently needed
@@ -776,6 +767,10 @@ func _on_gameboard_unit_deselected():
 
 func _on_gameboard_menu_canceled():
 	_close_act_menu()
+	
+
+func _on_gameboard_skill_target_canceled():
+	actMenu.open_skill_menu()
 
 func _on_action_menu_menu_opened(container):
 	_resignal_menuCursor(container)
@@ -814,3 +809,8 @@ func _on_win_screen_win_finished():
 func _on_gameboard_map_loaded():
 	_end_load_screen()
 	
+
+
+
+
+

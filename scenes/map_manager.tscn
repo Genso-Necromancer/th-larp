@@ -18,7 +18,7 @@ mapCursorPath = NodePath("../../Gameboard/Cursor")
 
 [connection signal="call_setup" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_call_setup"]
 [connection signal="cell_selected" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_cell_selected"]
-[connection signal="cmbData_updated" from="Gameboard" to="CanvasLayer/GUIManager/CombatForecast" method="_on_gameboard_cmb_data_updated"]
+[connection signal="cmbData_updated" from="Gameboard" to="CanvasLayer/GUIManager/CombatForecast" method="_on_gameboard_cmbData_updated"]
 [connection signal="deploy_toggled" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_deploy_toggled"]
 [connection signal="exp_display" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_exp_display"]
 [connection signal="formation_closed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_formation_closed"]
@@ -27,6 +27,7 @@ mapCursorPath = NodePath("../../Gameboard/Cursor")
 [connection signal="menu_canceled" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_menu_canceled"]
 [connection signal="player_lost" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_player_lost"]
 [connection signal="player_win" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_player_win"]
+[connection signal="skill_target_canceled" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_skill_target_canceled"]
 [connection signal="target_focused" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_target_focused"]
 [connection signal="toggle_prof" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_prof"]
 [connection signal="toggle_skills" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_skills"]

@@ -17,7 +17,7 @@ signal unit_deselected
 signal cmbData_updated(cmbData)
 signal walk_complete
 signal map_loaded
-
+signal skill_target_canceled
 
 
 signal toggle_prof
@@ -33,7 +33,7 @@ signal formation_closed
 signal gb_ready
 signal turn_order_updated
 
-
+enum ACTION_TYPE {ATTACK, SKILL, WAIT, END}
 
 @onready var yaBoy = $"."
 # units is used to map units to it's hex coordinate
@@ -62,7 +62,7 @@ var currMap: GameMap
 var mapSize
 var mapCellSize
 var mapRect
-var terrainData = []
+var terrainData := []
 var lastSkill
 var warpTarget
 var deathList = []
@@ -130,7 +130,7 @@ var cursor: Cursor
 @onready var ai = $AiManager
 
 #@onready var cTimer: Timer = $Cursor/Timer
-
+var unitScn := preload("res://scenes/Unit.tscn")
 
 #cursor location
 var cursorCell := Vector2i.ZERO:
@@ -145,7 +145,7 @@ var cursorCell := Vector2i.ZERO:
 #		cTimer.start()
 
 	
-func _process(delta):
+func _process(_delta):
 	if mainCon.state != GameState.ACCEPT_PROMPT:
 		_check_flags()
 	if deathList.size() >= 0:
@@ -260,34 +260,31 @@ func _store_enemy_units():
 		_update_unit_terrain(unit) #update terrain data
 		
 func _load_units(): #merge with store enemy units
-	var i = 0
+	
 	var roster = UnitData.rosterData
-	var spawnLoc
+	#var spawnLoc
 	filledSlots = 0
 	deploymentCells = currMap.get_deployment_cells()
 	var depCount = deploymentCells.size()
 	forcedDeploy = currMap.get_forced_deploy()
 	var forcedUnits = forcedDeploy.keys()
-	var rosterList = UnitData.rosterData.size()
-	var unitScn = preload("res://scenes/Unit.tscn")
-	for char in rosterList:
-		var newUnit = unitScn.instantiate()
-		currMap.add_child(newUnit)
-		
-		newUnit.faction = "Player"
-		newUnit.add_to_group("Player")
 	
+	
+	for unit in roster:
+		var newUnit = unitScn.instantiate().init_unit(true, Enums.FACTION_ID.PLAYER, unit)
+		currMap.add_child(newUnit)
+		#newUnit.add_to_group("Player")
+		unitObjs[newUnit.unitId] = newUnit
 	for child in currMap.get_children(): #grab unit children
 		var unit := child as Unit
 		if not unit:
 			continue
 		_connect_unit_signals(unit)
-		var isPlayable = unit.is_in_group("Player")
-		if isPlayable: #filter out Player units
-			var unitID = roster[i]
-			unit.init_player_unit(unitID)
-			unitObjs[unit.unitId] = unit
-			i += 1
+		var isPlayable : bool
+		if unit.FACTION_ID == Enums.FACTION_ID.PLAYER:
+			isPlayable = true
+		else:
+			isPlayable = false
 		if isPlayable and forcedDeploy.has(unit.unitId):
 			unit.forced = true
 			_deploy_unit(unit, true, forcedDeploy[unit.unitId])
@@ -296,9 +293,10 @@ func _load_units(): #merge with store enemy units
 		elif isPlayable and filledSlots >= deploymentCells.size():
 			_undeploy_unit(unit, true)
 	
-		if !unit.is_in_group("Player"):
+		if !isPlayable:
+			unit.init_unit()
 			units[unit.cell] = unit
-			unitObjs[unit.ykTag] = unit
+			unitObjs[unit.unitId] = unit
 			
 		_update_unit_terrain(unit)
 		unit.set_process(true)
@@ -316,8 +314,11 @@ func _connect_unit_signals(unit):
 		self.turn_changed.connect(unit.on_turn_changed)
 	if !unit.unit_relocated.is_connected(self.on_unit_relocated): 
 		unit.unit_relocated.connect(self.on_unit_relocated)
-	if !unit.exp_gained.is_connected(self.on_exp_gained) and unit.faction == "Player":
+	if !unit.exp_gained.is_connected(self.on_exp_gained) and unit.FACTION_ID == Enums.FACTION_ID.PLAYER:
 		unit.exp_gained.connect(self.on_exp_gained)
+	if !self.turn_order_updated.is_connected(unit.on_turn_order_updated):
+		self.turn_order_updated.connect(unit.on_turn_order_updated)
+	
 		
 func _set_game_time():
 	Global.gameTime = currMap.gameTime #setting game time
@@ -408,7 +409,7 @@ func _update_unit_terrain(unit):
 	unit.update_terrain_data(terrainData)
 	
 	
-func _unhandled_input(event: InputEvent) -> void: #for debugging, delete later
+func _unhandled_input(_event: InputEvent) -> void: #for debugging, delete later
 	#T key: Passes current turn for debugging, preventing from doing this if a unit is actively moving or it is not the player turn
 	if aiTurn:
 		return
@@ -417,8 +418,7 @@ func _unhandled_input(event: InputEvent) -> void: #for debugging, delete later
 		return
 			
 			
-func gb_mouse_motion(event):
-
+func gb_mouse_motion(_event):
 	var mousePos: Vector2i = currMap.get_local_mouse_position()
 	var toMap = currMap.local_to_map(mousePos)
 #	print(toMap)
@@ -488,16 +488,16 @@ func init_hexStar_terrain(attack: bool = false):
 func get_walkable_cells(unit: Unit) -> Array:
 	#Possibly unnecessary. 
 	#It's convienent to just call using only unit variable and let the function split the necessary info
-	return _flood_fill(unit.cell, unit.activeStats.MOVE, unit.moveType)
+	return _flood_fill(unit.cell, unit.activeStats.MOVE, unit.unitData.MoveType)
 
-func _flood_fill(cell: Vector2i, max_distance: int, moveType : String, terrain: bool = true, attack: bool = false) -> Array:
+func _flood_fill(cell: Vector2i, max_distance: int, moveType : int, terrain: bool = true, attack: bool = false) -> Array:
 	#initializes pathfinder, calls floodfill pathfind and visual displays it all at once
 	init_hexStar_terrain(attack)
 #	print(moveType)
 	var path = hexStar.find_all_paths(cell, max_distance, moveType, terrain)
 	return path
 
-func get_path_to_cell(cell, current, moveType: String):
+func get_path_to_cell(cell, current, moveType: int = Enums.MOVE_TYPE.FOOT):
 	#this might be a bit unnecessary after changes. does not have convience of "get_walkable_cells"
 	return hexStar.find_path(cell, current, moveType)
 
@@ -515,27 +515,13 @@ func is_within_bounds(cell_coordinates: Vector2i) -> bool:
 
 
 func select_cell(): #DEFAULT STATE: If a cell has a valid unit, selects it
-	#if !activeUnit and is_occupied(cursorCell) and focusUnit.is_in_group("Player") and !focusUnit.acted:
-		#_select_unit(cursorCell)
-		#mainCon.previousState = mainCon.state
-		#mainCon.state = GameState.GB_SELECTED
-	#else: 
-		#mainCon.previousState = mainCon.state
-		#mainCon.state = GameState.GB_ACTION_MENU
-		#emit_signal("toggle_action", false, true)
-		
-	var faction = "None"
 	var occupied = is_occupied(cursorCell)
-	if occupied:
-		faction = units[cursorCell].faction
-		
-	else:
+	if !occupied:
 		_change_state(GameState.GB_ACTION_MENU)
 		emit_signal("cell_selected", cursorCell)
-		
-	if occupied and faction == "Player":
+	elif units[cursorCell].FACTION_ID == Enums.FACTION_ID.PLAYER:
 		_select_unit(cursorCell)
-	elif occupied:
+	else:
 		pass #TO-DO: seperate selection that just toggles a unit's movement and reach
 		
 
@@ -616,27 +602,30 @@ func on_unit_relocated(oldCell, newCell, unit): #updates unit locations with it'
 	units[newCell] = unit
 	
 
-func grab_target(cell, skillState = false, skill = null):
+func grab_target(cell, skillId = false):
 	#Called to assign values based on unit at cursor's coordinate
-	var distance
-	var foreCast
+	var distance : float
+	var foreCast : Dictionary
+	var mode : int
 	if not units.has(cell):
 		print("oops")
 		return
 	targetUnit = units[cell]
-	distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.moveType, false)
-	
-	if !skillState:
+	distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.unitData.MoveType, false)
+	if !skillId:
 		foreCast = combatManager.get_forecast(activeUnit, targetUnit, distance)
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		emit_signal("target_focused", foreCast, distance)
-		
-	elif skillState:
-		print("Skill Manager")
-		combatManager.get_forecast(activeUnit, targetUnit, distance, skill)
-		combatManager.run_skill(activeUnit, targetUnit, skill)
-		if warpTarget == null:
-			combat_sequence(activeUnit, targetUnit)
+		mode = 0
+	else:
+		foreCast = combatManager.get_forecast(activeUnit, targetUnit, distance, skillId)
+		mode = 1
+	emit_signal("target_focused", foreCast, mode, distance)
+			
+func _activate_skill():
+	#print("Skill Manager")
+	combatManager.run_skill(activeUnit, targetUnit, activeSkill)
+	if warpTarget == null:
+		combat_sequence(activeUnit, targetUnit)
 		
 func _clear_active_unit() -> void:
 	# Clears the reference to the activeUnit and the corresponding walkable cells
@@ -673,7 +662,7 @@ func select_formation_cell():
 		#swap function
 		
 func _deploy_swap(start, end):
-	var defValue = Vector2i(-1,-1)
+	#var defValue = Vector2i(-1,-1)
 	var swap = false
 	if end is Unit:
 		swap = true
@@ -719,6 +708,14 @@ func request_deselect():
 	unitOverlay.clear()
 	_change_state(GameState.GB_DEFAULT)
 	_deselect_active_unit(false)
+	
+func skill_target_cancel():
+	wipe_region()
+	unitOverlay.clear()
+	_change_state(GameState.GB_ACTION_MENU)
+	_snap_cursor(activeUnit.cell)
+	emit_signal("skill_target_canceled")
+	
 
 func end_targeting():
 	_change_state(GameState.GB_ACTION_MENU)
@@ -751,55 +748,45 @@ func attack_target_selected():
 #				$Cursor.visible = false
 		grab_target(cursorCell)
 		
-func skill_target_selected(): #find way to simplify and merge with attack targeting. See your notes, you fucking schizo
-	var friendly = false
-	var team = null
-	var targeting = activeSkill.Target
-	if activeUnit.is_in_group("Player"):
-		team = "Player"
-	if activeUnit.is_in_group("Enemy"):
-		team = "Enemy"
-	match targeting:
+func skill_target_selected():
+	if !UnitData.skillData.has(activeSkill):
+		print("No Valid SkillID")
+		return
+	var friendly := false
+	var valid := false
+	var skill = UnitData.skillData[activeSkill]
+	if focusUnit.FACTION_ID == activeUnit.FACTION_ID or focusUnit.FACTION_ID == Enums.FACTION_ID.NPC:
+		friendly = true
+	match skill.Target:
 		"Self":
 			if is_occupied(cursorCell) and activeUnit == focusUnit:
-				mainCon.state = GameState.GB_COMBAT_FORECAST
-#						$Cursor.visible = false
-				grab_target(cursorCell, true, activeSkill)
+				valid = true
 		"Enemy":
-			if focusUnit.is_in_group(team):
-				friendly = true
 			if is_occupied(cursorCell) and !friendly:
-				mainCon.state = GameState.GB_COMBAT_FORECAST
-#						$Cursor.visible = false
-				grab_target(cursorCell, true, activeSkill)
+				valid = true
 		"Ally":
-			if focusUnit.is_in_group(team):
-				friendly = true
 			if is_occupied(cursorCell) and friendly and activeUnit != focusUnit:
-				mainCon.state = GameState.GB_COMBAT_FORECAST
-#						$Cursor.visible = false
-				grab_target(cursorCell, true, activeSkill)
+				valid = true
 		"Self+":
-			if focusUnit.is_in_group(team):
-				friendly = true
 			if is_occupied(cursorCell) and friendly:
-				mainCon.state = GameState.GB_COMBAT_FORECAST
-#						$Cursor.visible = false
-				grab_target(cursorCell, true, activeSkill)
+				valid = true
 		"Other":
 			if is_occupied(cursorCell) and activeUnit != focusUnit:
-				mainCon.state = GameState.GB_COMBAT_FORECAST
-#						$Cursor.visible = false
-				grab_target(cursorCell, true, activeSkill)
+				valid = true
+	if valid:
+		_change_state(GameState.GB_COMBAT_FORECAST)
+		grab_target(cursorCell, activeSkill)
 
 func return_targeting():
-	var s
+	#var s
 	emit_signal("menu_canceled")
 	match mainCon.previousState:
 		GameState.GB_ATTACK_TARGETING: 
-			s = "Attack"
+			#s = "Attack"
 			activeUnit.restore_equip()
 			attack_targeting(activeUnit)
+		GameState.GB_SKILL_TARGETING:
+			attack_targeting(activeUnit, activeSkill)
 			
 func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMORE???
 	# Controls what happens when an element is selected by the player based on input Global.state
@@ -811,7 +798,7 @@ func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMO
 #	print(cell, activeUnit)
 	match mainCon.state:
 		GameState.GB_DEFAULT: 
-			if !activeUnit and is_occupied(cell) and focusUnit.is_in_group("Player") and !focusUnit.acted:
+			if !activeUnit and is_occupied(cell) and focusUnit.is_in_group("Player") and !focusUnit.status.Acted:
 				
 				mainCon.state = GameState.GB_SELECTED
 				_select_unit(cell)
@@ -848,10 +835,7 @@ func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMO
 			else: return
 		GameState.GB_COMBAT_FORECAST:
 			return
-#			Global.state = 0
-#			combatManager.start_the_justice(activeUnit, focusUnit)
-#			emit_signal("target_focused")
-#			combat_sequence(activeUnit, focusUnit)
+
 		GameState.GB_SKILL_TARGETING: 
 			var friendly = false
 			var team = null
@@ -865,33 +849,33 @@ func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMO
 					if is_occupied(cell) and activeUnit == focusUnit:
 						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
-						grab_target(cell, true, activeSkill)
+						grab_target(cell, activeSkill)
 				"Enemy":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and !friendly:
 						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
-						grab_target(cell, true, activeSkill)
+						grab_target(cell, activeSkill)
 				"Ally":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and friendly and activeUnit != focusUnit:
 						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
-						grab_target(cell, true, activeSkill)
+						grab_target(cell, activeSkill)
 				"Self+":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and friendly:
 						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
-						grab_target(cell, true, activeSkill)
+						grab_target(cell, activeSkill)
 				"Other":
 					if is_occupied(cell) and activeUnit != focusUnit:
 						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
-						grab_target(cell, true, activeSkill)
+						grab_target(cell, activeSkill)
 	
 
 
@@ -916,7 +900,7 @@ func _on_cursor_moved(new_cell: Vector2i) -> void:
 	elif new_cell == activeUnit.cell:
 		unitPath.clear()
 	else:
-		var path = get_path_to_cell(activeUnit.cell, new_cell, activeUnit.moveType)
+		var path = get_path_to_cell(activeUnit.cell, new_cell, activeUnit.unitData.MoveType)
 		unitPath.draw(path)
 #	match mainCon.state:
 #		mainCon.GameState.GB_SELECTED:
@@ -925,7 +909,7 @@ func _on_cursor_moved(new_cell: Vector2i) -> void:
 #			if activeUnit and activeUnit.is_selected:
 #				if !walkableCells.has(new_cell):
 #					return
-#				var path = get_path_to_cell(activeUnit.cell, new_cell, activeUnit.moveType)
+#				var path = get_path_to_cell(activeUnit.cell, new_cell, activeUnit.unitData.MoveType)
 #				unitPath.draw(path)
 
 func on_directional_press(direction: Vector2i):
@@ -939,59 +923,57 @@ func on_directional_press(direction: Vector2i):
 
 
 
-func attack_targeting(unit: Unit, usingSkill = false, skill = null, rangeOnly = false, rangeOverwrite = 0):
-	#draws a visual representation of a unit's attack range, and binds the cursor within this space(snapPath)
-	var maxRange = 0
-	var minRange = 1000
-	var wepData = UnitData.itemData
-	var skillData = UnitData.skillData
-	_change_state(GameState.GB_ATTACK_TARGETING)
-	activeSkill = skill
-	
-	if !usingSkill:
+func attack_targeting(unit: Unit, skillId := ""): 
+	var maxRange := 0
+	var minRange := 1000
+	var wepData :Dictionary = UnitData.itemData
+			
+	if skillId != "":
+		var skillData = UnitData.skillData[skillId]
+		activeSkill = skillId
+		maxRange = skillData.RangeMax
+		minRange = skillData.RangeMin
+		_change_state(GameState.GB_SKILL_TARGETING)
+	else:
 		for wep in unit.unitData.Inv:
 			if wep.DUR == 0:
 				continue
-			maxRange = max(maxRange, wepData[wep.DATA].MAXRANGE, maxRange)
-			minRange = min(minRange, wepData[wep.DATA].MINRANGE, minRange)
-	elif usingSkill:
-		maxRange = skill.RangeMax
-		minRange = skill.RangeMin
-	elif rangeOnly:
-		maxRange = rangeOverwrite
-		minRange = 1
-	var path = _flood_fill(unit.cell, maxRange, unit.moveType, false, true)
-	minRange = minRange - 1
-	minRange = clampi(minRange, 0, 1000)
-	var invalid = _flood_fill(unit.cell, minRange, unit.moveType, false, true)
-	if path.size() != 1:
+			maxRange = max(maxRange, wepData[wep.ID].MAXRANGE, maxRange)
+			minRange = min(minRange, wepData[wep.ID].MINRANGE, minRange)
+		_change_state(GameState.GB_ATTACK_TARGETING)
+			
+	_draw_range(unit, maxRange, minRange)
+	
+func warp_targeting(unit, wRange):
+	_draw_range(unit, wRange)
+	_change_state(GameState.GB_WARP)
+	
+func _draw_range(unit : Unit, maxRange : int, minRange := 0):
+	#draws a visual representation of a unit's attack range, and binds the cursor within this space(snapPath)
+	var path = _flood_fill(unit.cell, maxRange, unit.unitData.MoveType, false, true)
+	
+	if path.size() != 1 and minRange > 0:
+		minRange = minRange - 1
+		minRange = clampi(minRange, 0, 1000)
+		var invalid = _flood_fill(unit.cell, minRange, unit.unitData.MoveType, false, true)
 		path = hexStar.trim_path(path, invalid)
 	snapPath = path
 	bump_cursor()
 	unitOverlay.draw_attack(path)
 	unitPath.stop()
 	
-func warp_targeting(unit, wRange):
-	#draws a visual representation of a unit's attack range, and binds the cursor within this space(snapPath)
-	var path = _flood_fill(unit.cell, wRange, unit.moveType, false, true)
-	snapPath = path
-	bump_cursor()
-	unitOverlay.draw_attack(path)
-	unitPath.stop()
-	mainCon.state = GameState.GB_WARP
-	
 func initiate_warp():
-	var friendly = false
+	#var friendly = false
 #	var team = null
 	if !is_occupied(cursorCell) and !solidsArray.has(cursorCell) and snapPath.has(cursorCell):
 		combatManager.warp_to(warpTarget, cursorCell)
 		combat_sequence(activeUnit, warpTarget, "warp")
 		warpTarget = null
 
-func combat_sequence(a,t, scenario = null):
+func combat_sequence(a,t, _scenario = null):
 	#Place holder for when combat has a visual component, currently handles end of combat duties that would occur right after
 	var addingExp = false
-	var wipeUnit = null
+	
 	wipe_region()
 	_deselect_active_unit(true)
 	a.update_stats()
@@ -1043,7 +1025,7 @@ func bump_cursor():
 		seek = true
 	if seek:
 		for cell in snapPath:
-			var distance = hexStar.find_distance(cursorCell, cell, "Foot", true)
+			var distance = hexStar.find_distance(cursorCell, cell, Enums.MOVE_TYPE.FOOT, true)
 			if units.has(cell) and distance < shortest:
 				bumpTo = cell
 				shortest = distance
@@ -1059,8 +1041,8 @@ func find_next_best_cell(currentCell, nextCell): #it's still pretty jank, but at
 	var shortestCurrent = 1000
 	var nextBest
 	for cell in snapPath:
-		var distanceNext = hexStar.find_distance(nextCell, cell, "Foot", true)
-		var distanceCurrent= hexStar.find_distance(currentCell, cell, "Foot", true)
+		var distanceNext = hexStar.find_distance(nextCell, cell, Enums.MOVE_TYPE.FOOT, true)
+		var distanceCurrent= hexStar.find_distance(currentCell, cell, Enums.MOVE_TYPE.FOOT, true)
 		if distanceNext <= shortestNext and distanceCurrent <= shortestCurrent and cell != currentCell:
 			shortestNext = distanceNext
 			shortestCurrent = distanceCurrent
@@ -1098,6 +1080,7 @@ func _clear_unit(unit):
 	var remove = unit.cell
 	units.erase(remove)
 	unit.queue_free()
+	#clear non-player units from unitData HERE!!!
 	
 func _remove_from_grid(unit: Unit):
 	var remove = unit.cell
@@ -1175,7 +1158,7 @@ func _initialize_turns():
 
 func set_next_acted():
 	for cell in units:
-		if !units[cell].acted and units[cell].faction == "Player":
+		if !units[cell].status.Acted and units[cursorCell].FACTION_ID == Enums.FACTION_ID.PLAYER:
 			units[cell].set_acted(true)
 			return
 	
@@ -1283,9 +1266,9 @@ func _on_combat_manager_time_factor_changed(effId, factor, duration, type):
 	set_time_factor(effId, factor, duration, type)
 
 
-func _on_combat_manager_warp_selected(actor, target, range):
+func _on_combat_manager_warp_selected(actor, target, reach):
 	warpTarget = target
-	warp_targeting(actor, range)
+	warp_targeting(actor, reach)
 
 func on_exp_gained(oldExp, expSteps, results, portrait, unitName):
 	emit_signal("exp_display", oldExp, expSteps, results, portrait, unitName)
@@ -1336,21 +1319,20 @@ func _update_roster_label():
 func _cursor_toggle(enable, snapLeader = true): #lmao gay retard fix HERE
 	var forcedUnits = forcedDeploy.keys()
 	var leader = forcedUnits[0]
-	var localPos = currMap.map_to_local(unitObjs[leader].cell)
-	var globalPos = to_global(localPos)
+	
+	
 	
 	
 	if enable:
 		cursor.visible = true
 	else:
 		cursor.visible = false
-	if enable and snapLeader:
-		
-		pass
-		cursorCell = unitObjs[leader].cell
-		var cameraPos = currMap.map_to_local(cursorCell)
-		cursor.align_camera()
-#		get_viewport().warp_mouse(globalPos)
+	if snapLeader:
+		_snap_cursor()
+
+func _snap_cursor(cell: Vector2i = unitObjs[forcedDeploy.keys()[0]].cell):
+	cursorCell = cell
+	cursor.align_camera()
 
 #GUI Signal Functions
 func _on_exp_gain_exp_finished():
@@ -1363,7 +1345,6 @@ func _on_gui_manager_start_the_justice(button):
 	activeUnit.set_equipped(i)
 	_change_state(GameState.LOADING)
 	combatManager.start_the_justice(activeUnit, focusUnit) #Why is durability going down by 2??
-	#emit_signal("target_focused")
 	boardState.add_acted(activeUnit)
 	activeUnit.set_acted(true)
 	combat_sequence(activeUnit, focusUnit)
@@ -1403,15 +1384,15 @@ func _on_gui_manager_map_started():
 	_initialize_turns()
 	
 
-func _on_action_menu_action_selected(selection, skill = null):
-	lastSkill = skill
+func _on_action_menu_action_selected(selection, skillId = null):
+	lastSkill = skillId #lastSkill?????????????????
 	match selection:
 		"Attack": 
-			_change_state(GameState.GB_ATTACK_TARGETING)
+			
 			attack_targeting(activeUnit)
 		"Skill": 
-			_change_state(GameState.GB_SKILL_TARGETING)
-			attack_targeting(activeUnit, true, skill)
+			
+			attack_targeting(activeUnit, skillId)
 		"Wait": 
 			_change_state(GameState.GB_DEFAULT)
 			_deselect_active_unit(true)
@@ -1424,7 +1405,7 @@ func _on_action_menu_action_selected(selection, skill = null):
 
 func _on_action_menu_weapon_changed(button):
 	var i = button.get_meta("index")
-	var distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.moveType, false)
+	var distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.unitData.MoveType, false)
 	var cmbData
 	activeUnit.set_temp_equip(i)
 	cmbData = combatManager.get_forecast(activeUnit, targetUnit, distance)

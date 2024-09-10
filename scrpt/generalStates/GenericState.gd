@@ -33,6 +33,7 @@ func mouse_pressed(event: InputEvent) -> void:
 	bind = _find_key_bind(event)
 	_handle_bind(bind)
 	
+	
 func event_key(event: InputEventKey) -> void: #Figure out how, if it's even possible, to use InputEventAction instead
 	var bind
 	bind = _find_key_bind(event)
@@ -80,3 +81,4 @@ func _handle_bind(bind):
 		"ui_down": pass
 		"debugHealTest": pass
 		"debugKillLady": pass
+	

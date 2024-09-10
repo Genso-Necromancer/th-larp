@@ -101,9 +101,17 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="Eqp" parent="Profile/M/G/VB/MC2/VB/BG/MC" index="0"]
-visible_characters = -1
-visible_ratio = 1.0
+[node name="UnitExp" parent="Profile/M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats" index="1"]
+visible_characters = 0
+visible_ratio = 0.0
+
+[node name="SkillLbl" parent="Profile/M/HBoxContainer/G/MC2/VB/BG/MC" index="0"]
+visible_characters = 0
+visible_ratio = 0.0
+
+[node name="PassLbl" parent="Profile/M/HBoxContainer/G/MC3/VB/BG/MC" index="0"]
+visible_characters = 0
+visible_ratio = 0.0
 
 [node name="SetUpMain" type="Control" parent="."]
 custom_minimum_size = Vector2(500, 500)
@@ -644,6 +652,7 @@ texture_over = ExtResource("17_a06i1")
 texture_progress = ExtResource("18_18bf3")
 
 [connection signal="action_selected" from="ActionMenu" to="." method="_on_action_menu_action_selected"]
+[connection signal="menu_closed" from="ActionMenu" to="." method="_on_action_menu_menu_closed"]
 [connection signal="menu_opened" from="ActionMenu" to="." method="_on_action_menu_menu_opened"]
 [connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/BTNDeploy" to="." method="_on_btn_deploy_pressed"]
 [connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/FrmBtn" to="." method="_on_frm_btn_pressed"]

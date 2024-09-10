@@ -16,16 +16,12 @@ var rng
 var unitObjs : Dictionary
 var flags : Dictionary
 
+var language
 
 var slamage = 5
 #combat variables
-var attacker = {
-	"NAME" : "Null", "ACC": 0, "DMG": 0, "AVOID": 0, "DEF": 0,
-	"CRIT": 0, "CAVD": 0, "LIFE": 0, "CLIFE": 0, "RLIFE":0}
-var defender = {
-	"NAME" : "Null", "ACC": 0, "DMG": 0, "AVOID": 0, "DEF": 0,
-	"CRIT": 0, "CAVD": 0, "LIFE": 0, "CLIFE": 0, "RLIFE":0}
 func _init():
+	language = Enums.LANGUAGE.AMERICAN
 	gameTime = 0
 	rng = RandomNumberGenerator.new()
 	randomize()

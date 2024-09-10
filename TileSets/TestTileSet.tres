@@ -1,26 +1,26 @@
 [gd_resource type="TileSet" load_steps=13 format=3 uid="uid://bkx2tgo0cxpaa"]
 
-[ext_resource type="Texture2D" uid="uid://cwrqpj7en2cof" path="res://sprites/tiles/deployment.png" id="1_afv8v"]
-[ext_resource type="Texture2D" uid="uid://b3kybcmn08s6d" path="res://sprites/tiles/forcedDeployment.png" id="2_s2j5n"]
-[ext_resource type="Texture2D" uid="uid://d4gcf4n0wyrk" path="res://sprites/tiles/fort.png" id="3_c8ek4"]
-[ext_resource type="Texture2D" uid="uid://0l5h5gtuuhdi" path="res://sprites/tiles/hill.png" id="4_emmec"]
+[ext_resource type="Texture2D" uid="uid://cwrqpj7en2cof" path="res://sprites/tiles/deployment.png" id="1_rv4un"]
+[ext_resource type="Texture2D" uid="uid://b3kybcmn08s6d" path="res://sprites/tiles/forcedDeployment.png" id="2_wdrue"]
+[ext_resource type="Texture2D" uid="uid://d4gcf4n0wyrk" path="res://sprites/tiles/fort.png" id="3_y5vh3"]
+[ext_resource type="Texture2D" uid="uid://0l5h5gtuuhdi" path="res://sprites/tiles/hill.png" id="4_nuwhh"]
 [ext_resource type="Texture2D" uid="uid://l2mr4yng7kji" path="res://backgrounds/FE1Map.png" id="5_fc2po"]
-[ext_resource type="Texture2D" uid="uid://djt1ybodu04tp" path="res://sprites/tiles/grass.png" id="6_t8s5p"]
+[ext_resource type="Texture2D" uid="uid://djt1ybodu04tp" path="res://sprites/tiles/grass.png" id="6_8o5ne"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qmxju"]
-texture = ExtResource("1_afv8v")
+texture = ExtResource("1_rv4un")
 texture_region_size = Vector2i(160, 48)
 0:0/0 = 0
 0:0/0/custom_data_2 = &"deployCell"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bkpol"]
-texture = ExtResource("2_s2j5n")
+texture = ExtResource("2_wdrue")
 texture_region_size = Vector2i(160, 48)
 0:0/0 = 0
 0:0/0/custom_data_2 = &"forcedCell"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fatm7"]
-texture = ExtResource("3_c8ek4")
+texture = ExtResource("3_y5vh3")
 margins = Vector2i(16, 18)
 texture_region_size = Vector2i(192, 111)
 0:0/0 = 0
@@ -28,7 +28,7 @@ texture_region_size = Vector2i(192, 111)
 0:0/0/custom_data_1 = 20
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_d410y"]
-texture = ExtResource("4_emmec")
+texture = ExtResource("4_nuwhh")
 margins = Vector2i(15, 71)
 texture_region_size = Vector2i(192, 56)
 0:0/0 = 0
@@ -120,7 +120,7 @@ separation = Vector2i(3, 3)
 2:20/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bco8r"]
-texture = ExtResource("6_t8s5p")
+texture = ExtResource("6_8o5ne")
 margins = Vector2i(2, 1)
 texture_region_size = Vector2i(160, 48)
 0:0/0 = 0

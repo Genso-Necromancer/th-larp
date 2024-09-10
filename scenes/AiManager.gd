@@ -167,18 +167,18 @@ func find_valid_attacks(aiUnit, path, state):
 	var wepData = UnitData.itemData
 	var targetDef
 	for wep in aiInv:
-		var wepID = wep["DATA"]
+		var wepID = wep["ID"]
 		var ranges = [wepData[wepID].MINRANGE, wepData[wepID].MAXRANGE]
 		var threat = aHex.find_threat(path, ranges, aiUnit.moveType)
 		for unit in state.player:
-			match wepData[wepID].TYPE:
+			match wepData[wepID].Type:
 				"Physical":
 					targetDef = "BAR"
-					if (aiUnit.combatData.DMG - unit.unitData.Stats.BAR <= 0):
+					if (aiUnit.combatData.Dmg - unit.unitData.Stats.BAR <= 0):
 						continue
 				"Magic":
 					targetDef = "RES"
-					if (aiUnit.combatData.DMG - unit.unitData.Stats.MAG <= 0):
+					if (aiUnit.combatData.Dmg - unit.unitData.Stats.MAG <= 0):
 						continue
 			
 			if threat.has(unit.cell):
@@ -222,7 +222,7 @@ func combat_values(aiUnit, attack, targetDef):
 	
 	var value: float
 	var target = attack.target
-	var dmgDealt = aiUnit.combatData.DMG - target.unitData.Stats[targetDef]
+	var dmgDealt = aiUnit.combatData.Dmg - target.unitData.Stats[targetDef]
 	var remHP = attack.target.unitData.CLIFE - dmgDealt
 	remHP = clampf(remHP, 0, 1000)
 	var dmgTaken = 0
@@ -254,11 +254,11 @@ func combat_values(aiUnit, attack, targetDef):
 		value -= 10
 	
 			
-	match target.combatData.TYPE:
+	match target.combatData.Type:
 		"Physical":
-			dmgTaken = target.combatData.DMG - aiUnit.unitData.Stats.BAR
+			dmgTaken = target.combatData.Dmg - aiUnit.unitData.Stats.BAR
 		"Magic":
-			dmgTaken = target.combatData.DMG - aiUnit.unitData.Stats.MAG
+			dmgTaken = target.combatData.Dmg - aiUnit.unitData.Stats.MAG
 			
 	if aiUnit.unitData.CLIFE - dmgTaken <= 0 and target.unitData.CLIFE - dmgDealt > 0:
 		value = value * survWeight
@@ -268,7 +268,7 @@ func check_safe(aiUnit, target, launch):
 	var wepData = UnitData.itemData
 	var distance = aHex.compute_cost(launch, target.cell, aiUnit.moveType, false)
 	var equip = target.get_equipped_weapon()
-	var wepID = equip["DATA"]
+	var wepID = equip["ID"]
 	var targetReach
 	var safe = false
 	var wep = wepData[wepID]

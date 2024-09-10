@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+	<language id = "CHINA">
+		<tools>
+			<entry id = "effect_chance"><![CDATA[CHING CHONG]]></entry>
+			<entry id = "name_sleep"><![CDATA[[color=#5F9EA0]STEAL BABY ORGANS[/color]]]></entry>
+		</tools>
+	</language>
+	<language id = "AMERICAN">
+		<tools>
+			<entry id = "effect_chance"><![CDATA[%s (%d%%)]]></entry>
+			<entry id = "name_sleep"><![CDATA[[color=#5F9EA0]Sleep[/color]]]></entry>
+		</tools>
+	</language>
+</root>

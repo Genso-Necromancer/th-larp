@@ -1,10 +1,10 @@
 [gd_scene load_steps=18 format=3 uid="uid://x6dmleipd452"]
 
 [ext_resource type="Script" path="res://scenes/Unit.gd" id="1_torj4"]
-[ext_resource type="Texture2D" uid="uid://cgpfsnkngi2ow" path="res://sprites/RemiliaTest.png" id="3_g8xu6"]
-[ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="4_t1roa"]
-[ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="5_aeeqq"]
-[ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="6_2s8il"]
+[ext_resource type="Texture2D" uid="uid://bix6u63iahalq" path="res://sprites/Fairy/TRBLRSpr.png" id="2_gvlpp"]
+[ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="3_57a4v"]
+[ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="4_qp4n5"]
+[ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="5_nwi43"]
 [ext_resource type="Script" path="res://scenes/HPbar.gd" id="7_x5rnn"]
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="8_y1qcc"]
 
@@ -269,9 +269,8 @@ _data = {
 z_index = 2
 y_sort_enabled = true
 script = ExtResource("1_torj4")
-faction = "Enemy:100"
+unitId = "yk0"
 move_speed = 250.0
-genLevel = 0
 
 [node name="PathFollow2D" type="PathFollow2D" parent="."]
 rotates = false
@@ -281,7 +280,7 @@ loop = false
 self_modulate = Color(1, 0, 0, 1)
 position = Vector2(-1, -36)
 scale = Vector2(4, 4)
-texture = ExtResource("3_g8xu6")
+texture = ExtResource("2_gvlpp")
 hframes = 12
 region_rect = Rect2(0.0799732, -0.0518999, 17.0268, 24.8617)
 
@@ -304,16 +303,16 @@ grow_vertical = 2
 scale = Vector2(4, 4)
 size_flags_horizontal = 4
 size_flags_vertical = 4
-max_value = 60.0
-value = 60.0
+max_value = 20.0
+value = 20.0
 nine_patch_stretch = true
 stretch_margin_left = 2
 stretch_margin_top = 2
 stretch_margin_right = 2
 stretch_margin_bottom = 2
-texture_under = ExtResource("4_t1roa")
-texture_over = ExtResource("5_aeeqq")
-texture_progress = ExtResource("6_2s8il")
+texture_under = ExtResource("3_57a4v")
+texture_over = ExtResource("4_qp4n5")
+texture_progress = ExtResource("5_nwi43")
 script = ExtResource("7_x5rnn")
 
 [node name="Cell" type="Label" parent="PathFollow2D"]

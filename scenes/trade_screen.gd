@@ -206,7 +206,7 @@ func _fill_item_list(list, unit):
 	var inv = unit.unitData.Inv
 	var i = 0
 	for item in inv:
-		var itemData = UnitData.itemData[item.DATA]
+		var itemData = UnitData.itemData[item.ID]
 		var b = Button.new()
 		var dur = item.DUR
 		var mDur = itemData.MAXDUR
@@ -215,13 +215,13 @@ func _fill_item_list(list, unit):
 			durString = str(" --")
 		else:
 			durString = str(" [" + str(dur) + "/" + str(mDur)+"]")
-		b.set_text(str(itemData.NAME) + durString)
+		b.set_text(str(itemData.Name) + durString)
 		b.add_theme_font_size_override("font_size", iFSize)
 		b.set_meta("item", item)
 		b.set_meta("unit", unit)
 		b.set_meta("index", i)
 		i += 1
-		b.set_button_icon(itemData.ICON)
+		b.set_button_icon(itemData.Icon)
 		b.set_expand_icon(false)
 		b.set_action_mode(BaseButton.ACTION_MODE_BUTTON_PRESS)
 		b.set_focus_neighbor(SIDE_LEFT, b.get_path_to(b))
@@ -236,7 +236,7 @@ func _fill_supply_list(s):
 	var supply = UnitData.supply[tabKeys[s]]
 	var i = 0
 	for item in supply:
-		var itemData = UnitData.itemData[item.DATA]
+		var itemData = UnitData.itemData[item.ID]
 		var b = Button.new()
 		var dur = item.DUR
 		var mDur = itemData.MAXDUR
@@ -245,12 +245,12 @@ func _fill_supply_list(s):
 			durString = str(" --")
 		else:
 			durString = str(" [" + str(dur) + "/" + str(mDur)+"]")
-		b.set_text(str(itemData.NAME) + durString)
+		b.set_text(str(itemData.Name) + durString)
 		b.add_theme_font_size_override("font_size", iFSize)
 		b.set_meta("item", item)
 		b.set_meta("unit", "supply")
 		b.set_meta("index", i)
-		b.set_button_icon(itemData.ICON)
+		b.set_button_icon(itemData.Icon)
 		b.set_expand_icon(false)
 		b.set_action_mode(BaseButton.ACTION_MODE_BUTTON_PRESS)
 		list.add_child(b)
@@ -343,7 +343,7 @@ func _check_usable_inv(unit):
 	
 func _check_usable(item):
 	var itemData = UnitData.itemData
-	var iData = itemData[item.DATA]
+	var iData = itemData[item.ID]
 	if iData.USE:
 		return true
 	else:
@@ -417,7 +417,7 @@ func _trade_select(b):
 func _give_select(b): 
 	var unit = b.get_meta("unit")
 	var item = b.get_meta("item")
-	var iData = UnitData.itemData[item.DATA]
+	var iData = UnitData.itemData[item.ID]
 	var iType = iData.CATEGORY
 	var iInd = b.get_meta("index")
 	var inv = unit.unitData.Inv
@@ -453,7 +453,7 @@ func _give_select(b):
 func _take_select(b): 
 	var unit = firstUnit
 	var item = b.get_meta("item")
-	var iData = UnitData.itemData[item.DATA]
+	var iData = UnitData.itemData[item.ID]
 	var iType = iData.CATEGORY
 	var iInd = b.get_meta("index")
 	var inv = unit.unitData.Inv
@@ -718,8 +718,8 @@ func _sort_supply():
 	
 func _sort_items(a, b):
 	var itemData = UnitData.itemData
-	var aName = itemData[a.DATA].NAME
-	var bName = itemData[b.DATA].NAME
+	var aName = itemData[a.ID].Name
+	var bName = itemData[b.ID].Name
 	var aDur = a.DUR
 	var bDur = b.DUR
 	var checkDur = false

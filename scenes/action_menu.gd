@@ -9,12 +9,13 @@ signal item_pressed
 signal trade_pressed
 signal item_used
 signal denied
+signal menu_closed
 
 @onready var actFrame = $VFlowContainer/ActComCon/Count
 @onready var subFrame = $m
 @onready var frames = [actFrame, subFrame]
 
-enum MENU_STATES {ACTION, ITEM_OPEN, AUX_OPEN}
+enum MENU_STATES {ACTION, ITEM_OPEN, AUX_OPEN, SKILL_OPEN}
 var state = MENU_STATES.ACTION
 var prevState = []
 var activeItem = null
@@ -40,42 +41,59 @@ func _gui_input(event: InputEvent) -> void:
 func _open_menu():
 	state = MENU_STATES.ACTION
 	self.visible = true
+	#print(state)
 	
 func close_menu():
-	var generic = $VFlowContainer/ActComCon/Count/ActionBox/GenericContainer
-	var action = $VFlowContainer/ActComCon/Count/ActionBox/ActionContainer
-	var item = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
+	
 	var aUnit = Global.activeUnit
 	
 	match state:
 		MENU_STATES.ACTION:
-			self.visible = false
-			generic.visible = false
-			action.visible = false
-			item.visible = false
-			prevState = []
-			_clear_items()
+			_close_all()
 		MENU_STATES.ITEM_OPEN:
-			_close_items()
+			_close_sub()
 			open_action_menu(aUnit)
 		MENU_STATES.AUX_OPEN:
+			var item = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
 			_close_aux()
 			emit_signal("menu_opened", item)
+		MENU_STATES.SKILL_OPEN:
+			_close_sub()
+			open_action_menu(aUnit)
+			
+func _close_all():
+	var generic = $VFlowContainer/ActComCon/Count/ActionBox/GenericContainer
+	var action = $VFlowContainer/ActComCon/Count/ActionBox/ActionContainer
+	var item = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
+	var skill = $VFlowContainer/ActComCon/Count/ActionBox/SkillContainer
+	_close_sub()
+	_close_aux()
+	prevState.clear()
+	self.visible = false
+	generic.visible = false
+	action.visible = false
+	item.visible = false
+	skill.visible = false
+	prevState.clear()
+	_clear_items()
+	_clear_skills()
+	emit_signal("menu_closed")
 	
 func open_generic_menu():
 	var container = $VFlowContainer/ActComCon/Count/ActionBox/GenericContainer
-	_close_all_others(0)
+	_open_sub_menu(container)
+	#_close_all_others(container)
 	_open_menu()
-	container.visible = true
-	#container.set_deferred("visible", true)
-	emit_signal("menu_opened", container)
+	#container.visible = true
+	##container.set_deferred("visible", true)
+	#emit_signal("menu_opened", container)
 	
 func open_action_menu(unit):
 	var action = $VFlowContainer/ActComCon/Count/ActionBox/ActionContainer
 	var aBtn = $VFlowContainer/ActComCon/Count/ActionBox/ActionContainer/AtkBtn
 	var sBtn = $VFlowContainer/ActComCon/Count/ActionBox/ActionContainer/SklBtn
 	#var wBtn = $VFlowContainer/ActComCon/Count/ActionBox/ActionContainer/WaitBtn
-	_close_all_others(1)
+	_close_all_others(action)
 	var uInv = unit.unitData.Inv
 	if unit != null:
 		for item in uInv:
@@ -90,16 +108,23 @@ func open_action_menu(unit):
 	else: 
 		sBtn.disabled = true
 			
-	if unit != null and unit.check_status("Sleep"):
+	if unit != null and unit.check_status("SLEEP"):
 		aBtn.disabled = true
 		sBtn.disabled = true
 	#print("open_menu:")
 	#print("Button: " + str(aBtn.get_global_position()))
 	_open_menu()
 	action.visible = true
+	_fill_items()
+	_fill_skills()
 	emit_signal("menu_opened", action)
 	
-	
+func open_skill_menu():
+	var skills = $VFlowContainer/ActComCon/Count/ActionBox/SkillContainer
+	_open_menu()
+	_fill_skills()
+	_open_sub_menu(skills)
+	_progress_state(MENU_STATES.SKILL_OPEN)
 
 func _on_end_btn_pressed():
 	var selection = "End"
@@ -113,15 +138,22 @@ func _on_atk_btn_pressed():
 	accept_event()
 	close_menu()
 	emit_signal("action_selected", selection)
+	
+func _on_skill_pressed(b):
+	var selection = "Skill"
+	var skillId = b.get_meta("skill")
+	accept_event()
+	_close_all()
+	emit_signal("action_selected", selection, skillId)
 
 func _close_all_others(menu):
 	var generic = $VFlowContainer/ActComCon/Count/ActionBox/GenericContainer
 	var action = $VFlowContainer/ActComCon/Count/ActionBox/ActionContainer
 	var item = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
-	var menuMatch = {0:generic, 1:action, 2:item}
-	var containers = [generic, action, item]
+	var skill = $VFlowContainer/ActComCon/Count/ActionBox/SkillContainer
+	var containers = [generic, action, item, skill]
 	for c in containers:
-		if c != menuMatch[menu]:
+		if c != menu:
 			c.visible = false
 
 func _on_wait_btn_pressed():
@@ -133,7 +165,7 @@ func _on_wait_btn_pressed():
 
 func open_weapons(distance: int = -1): #Don't pass a distance value to open in "item mode" for use/equip.
 	var itemFrame = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
-	_close_all_others(2)
+	_close_all_others(itemFrame)
 	_open_menu()
 	itemFrame.visible = true
 	#itemFrame.set_deferred("visible", true)
@@ -142,7 +174,11 @@ func open_weapons(distance: int = -1): #Don't pass a distance value to open in "
 		_progress_state(MENU_STATES.ITEM_OPEN)
 	emit_signal("menu_opened", itemFrame)
 
-
+func _open_sub_menu(menu: Control):
+	_close_all_others(menu)
+	#_open_menu()
+	menu.visible = true
+	emit_signal("menu_opened", menu)
 
 func _fill_items(d: int = -1):
 	var itemFrame = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
@@ -158,8 +194,8 @@ func _fill_items(d: int = -1):
 	inv = unitData.Inv
 	for wep in inv: #needs "weapon selected" signal
 		var b : Button
-		var wepData = itemData[wep.DATA]
-		var wepName = itemData[wep.DATA].NAME
+		var wepData = itemData[wep.ID]
+		var wepName = itemData[wep.ID].Name
 		var disable = false
 		var dur = wep.DUR
 		var mDur = wepData.MAXDUR
@@ -184,7 +220,7 @@ func _fill_items(d: int = -1):
 			durString = str(" [" + str(dur) + "/" + str(mDur)+"]")
 		b = Button.new()
 		b.set_text(str(wepName) + durString)
-		b.set_button_icon(wepData.ICON)
+		b.set_button_icon(wepData.Icon)
 		b.set_expand_icon(false)
 		b.set_meta("weapon", wep)
 		b.set_meta("index", i)
@@ -201,12 +237,41 @@ func _fill_items(d: int = -1):
 		else:
 			b.pressed.connect(self._on_item_pressed.bind(b))
 		itemFrame.add_child(b)
+		
+func _fill_skills():
+	var p = $VFlowContainer/ActComCon/Count/ActionBox/SkillContainer
+	var aUnit = Global.activeUnit
+	var skills = aUnit.unitData.Skills
+	for skill in skills:
+		var b : Button
+		var cost := str(UnitData.skillData[skill].Cost)
+		var sName : String = UnitData.skillData[skill].SkillName
+		b = Button.new()
+		b.set_text(str(sName) + " " + cost)
+		b.set_button_icon(UnitData.skillData[skill].Icon)
+		b.set_expand_icon(false)
+		b.set_meta("skill", skill)
+		#b.set_meta("index", i)
+		b.set_mouse_filter(Control.MOUSE_FILTER_PASS)
+		b.set_focus_neighbor(SIDE_LEFT, b.get_path_to(b))
+		b.set_focus_neighbor(SIDE_RIGHT, b.get_path_to(b))
+		p.add_child(b)
+		b.pressed.connect(self._on_skill_pressed.bind(b))
+	#print("Skills filled")
+	
 
 func _clear_items():
 	var itemFrame = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
 	for button in itemFrame.get_children():
 		button.queue_free()
+	
 
+func _clear_skills():
+	var skillFrame = $VFlowContainer/ActComCon/Count/ActionBox/SkillContainer
+	for button in skillFrame.get_children():
+		button.queue_free()
+	#print("Skills cleared")
+		
 func _on_weapon_pressed(b):
 	close_menu()
 	emit_signal("weapon_selected", b)
@@ -215,7 +280,15 @@ func _on_weapon_hovered(b):
 	emit_signal("weapon_changed", b)
 
 func _on_itm_btn_pressed():
+	var items = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
 	open_weapons()
+	_open_sub_menu(items)
+	
+	
+func _on_skl_btn_pressed():
+	var skills = $VFlowContainer/ActComCon/Count/ActionBox/SkillContainer
+	_open_sub_menu(skills)
+	_progress_state(MENU_STATES.SKILL_OPEN)
 
 func _on_trd_btn_pressed():
 	pass # Replace with function body.
@@ -229,7 +302,7 @@ func _on_item_pressed(button):
 	var iData = UnitData.itemData
 	var item = button.get_meta("weapon")
 	var index = button.get_meta("index")
-	var wData = iData[item.DATA]
+	var wData = iData[item.ID]
 	var aUnit = Global.activeUnit
 	var valid : bool = false
 	
@@ -256,9 +329,10 @@ func _on_item_pressed(button):
 	activeItem = item
 	emit_signal("menu_opened", auxList)
 
-func _close_items():
+func _close_sub():
 	_regress_state()
 	_clear_items()
+	_clear_skills()
 
 func _close_aux():
 	var auxMenu = $VFlowContainer/ItmComCon
@@ -293,13 +367,19 @@ func _on_use_btn_pressed():
 	var btn = $VFlowContainer/ItmComCon/MarginContainer/MarginContainer/AuxContainer/UseBtn
 	var i = btn.get_meta("index")
 	emit_signal("item_used", aUnit, i)
-	close_menu()
+	_close_all()
 	
 	
 func _progress_state(newState):
 	prevState.append(state)
 	state = newState
+	#print(state)
 
 func _regress_state():
 	var returnState = prevState.pop_back()
 	state = returnState
+
+
+
+	
+	

@@ -14,7 +14,7 @@ func _handle_bind(bind):
 		"invalid": return
 		"ui_accept": gameBoard.skill_target_selected()
 		"ui_info": gameBoard.toggle_unit_profile()
-		"ui_return": gameBoard.request_deselect()
+		"ui_return": gameBoard.skill_target_cancel()
 		"ui_scroll_left": pass
 		"ui_scroll_right": pass
 		"ui_right": 

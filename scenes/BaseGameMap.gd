@@ -1,3 +1,4 @@
+@tool
 extends TileMap
 class_name BaseGameMap
 signal map_ready

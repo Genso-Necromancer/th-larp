@@ -50,4 +50,4 @@ MarginContainer/constants/margin_right = 4
 MarginContainer/constants/margin_top = 4
 Panel/styles/panel = SubResource("StyleBoxEmpty_y8ifr")
 PanelContainer/styles/panel = SubResource("StyleBoxEmpty_63pdl")
-RichTextLabel/font_sizes/normal_font_size = 8
+RichTextLabel/font_sizes/normal_font_size = 12

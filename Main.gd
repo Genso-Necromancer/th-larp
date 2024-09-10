@@ -50,7 +50,6 @@ func _ready():
 #	gui.queue_free()
 	load_scene(startScene)
 	
-
 	
 func load_scene(scene):
 	add_child(scene)
@@ -64,6 +63,8 @@ func _init(): #Occurs when game first launches, sets to loading state
 func _unhandled_input(event: InputEvent) -> void: #Main picks up the inputs, then directs them to the currently active state for processing.
 	if event.is_action_pressed("ui_snap"):
 		take_screenshot()
+	if event.is_action_pressed("xml_debug"):
+		StringGetter.mash_test()
 #	var test = event.action
 #
 #	print(test)
