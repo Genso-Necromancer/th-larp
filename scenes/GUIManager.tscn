@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://r6wtvva5qput"]
+[gd_scene load_steps=13 format=3 uid="uid://r6wtvva5qput"]
 
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_2n2uh"]
 [ext_resource type="Script" path="res://scenes/GUIManager.gd" id="1_d2r44"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" path="res://scenes/MngOptPnl.gd" id="9_k1i1t"]
 [ext_resource type="PackedScene" uid="uid://cmh8ono4w82cq" path="res://fonts/menu_cursor.tscn" id="10_qxe1h"]
 [ext_resource type="PackedScene" uid="uid://dsqet8mutarh6" path="res://scenes/trade_screen.tscn" id="11_qfsbm"]
+[ext_resource type="PackedScene" uid="uid://bnyhiorbaajm" path="res://scenes/dialog_overlay.tscn" id="12_1fd6v"]
 
 [node name="GUIManager" type="Control"]
 layout_mode = 3
@@ -254,6 +255,10 @@ scale = Vector2(2, 2)
 cursor_offset = Vector2(25, 0)
 
 [node name="trade_screen" parent="." instance=ExtResource("11_qfsbm")]
+visible = false
+layout_mode = 1
+
+[node name="DialogOverlay" parent="." instance=ExtResource("12_1fd6v")]
 visible = false
 layout_mode = 1
 

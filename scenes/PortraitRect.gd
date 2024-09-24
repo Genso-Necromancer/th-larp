@@ -2,7 +2,7 @@ extends Control
 
 var speaker_name = ""
 var speaker_title = ""
-var starting_pos = Vector2(64,400)
+var starting_pos = Vector2(55,270) #Vector2(64,400)
 
 # Might use these...
 signal anim_finished
@@ -21,14 +21,14 @@ func _unhandled_input(_event):
 
 func slide(screen_percent: float):
 	var tween = create_tween()
-	var destination = Vector2((1280*screen_percent)-(size.x/2),400)
+	var destination = Vector2((1280*screen_percent)-(size.x/2),starting_pos.y)
 	tween.tween_property(self, "position", destination, 0.5).set_ease(Tween.EASE_IN_OUT)\
 	.finished.connect(func(): anim_finished.emit())
 
 
 func shake():
 	const TWEEN_DURATION = 0.05
-	const max_shake = 10
+	const max_shake = 20
 	var start_pos = position
 	var tween = create_tween()
 	tween.tween_property(self, "position", Vector2(start_pos.x - max_shake, position.y), TWEEN_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)

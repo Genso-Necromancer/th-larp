@@ -84,7 +84,12 @@ var speaker_setup = [
 	{
 		"name": "Pakooli",
 		"title": "magical girl",
-		"portrait": "res://sprites/PatchouliPrt.png"
+		"portrait": "res://sprites/th2.png" #"res://sprites/PatchouliPrt.png"
+	},
+	{
+		"name": "remi",
+		"title": "just racist",
+		"portrait": "res://sprites/th1.png"
 	}
 ]
 
@@ -98,7 +103,10 @@ func _ready():
 	prepare_new_dialogue(example_dict)
 
 
-func _unhandled_input(event):		
+func _unhandled_input(event):
+	if event.is_action_released("ui_return"):
+		toggle_dialog()
+	
 	if not visible: return
 	
 	if event.is_action_released("ui_accept"):

@@ -1,12 +1,14 @@
-[gd_scene load_steps=14 format=3 uid="uid://bnyhiorbaajm"]
+[gd_scene load_steps=15 format=3 uid="uid://bnyhiorbaajm"]
 
 [ext_resource type="Script" path="res://scenes/dialog_overlay.gd" id="1_ik6st"]
 [ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="2_5q3ap"]
+[ext_resource type="Texture2D" uid="uid://b7opcordyfcep" path="res://sprites/th2.png" id="3_50bpu"]
 [ext_resource type="PackedScene" uid="uid://d3fuiykqjxb5h" path="res://speaker_portrait.tscn" id="3_mj8x4"]
 [ext_resource type="Texture2D" uid="uid://4lca2aumdu2g" path="res://sprites/testCursor.png" id="4_m3j4u"]
 
 [sub_resource type="Gradient" id="Gradient_oxt7h"]
-colors = PackedColorArray(0.235294, 0.235294, 0.294118, 1, 0, 0, 0, 0)
+offsets = PackedFloat32Array(0.0714286, 0.577922, 1)
+colors = PackedColorArray(0.235294, 0.235294, 0.294118, 1, 0.235294, 0.235294, 0.294118, 0.784314, 0, 0, 0, 0)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_2trx7"]
 gradient = SubResource("Gradient_oxt7h")
@@ -112,6 +114,30 @@ grow_vertical = 2
 size_flags_horizontal = 4
 script = ExtResource("1_ik6st")
 
+[node name="PortraitsNode" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SpeakerPortrait" parent="PortraitsNode" instance=ExtResource("3_mj8x4")]
+visible = false
+layout_mode = 0
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 55.0
+offset_top = 270.0
+offset_right = 311.0
+offset_bottom = 526.0
+grow_horizontal = 1
+grow_vertical = 1
+texture = ExtResource("3_50bpu")
+
 [node name="ForegroundElements" type="Control" parent="."]
 anchors_preset = 0
 offset_right = 40.0
@@ -119,9 +145,10 @@ offset_bottom = 40.0
 
 [node name="GradientRect" type="TextureRect" parent="ForegroundElements"]
 layout_mode = 0
-offset_top = 360.0
+offset_top = 437.0
 offset_right = 1280.0
-offset_bottom = 720.0
+offset_bottom = 1085.0
+scale = Vector2(1, 0.440001)
 texture = SubResource("GradientTexture2D_2trx7")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="ForegroundElements"]
@@ -188,29 +215,6 @@ XYZ"
 label_settings = SubResource("LabelSettings_kyiig")
 autowrap_mode = 1
 clip_text = true
-
-[node name="PortraitsNode" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="SpeakerPortrait" parent="PortraitsNode" instance=ExtResource("3_mj8x4")]
-visible = false
-layout_mode = 0
-anchors_preset = 0
-anchor_left = 0.0
-anchor_top = 0.0
-anchor_right = 0.0
-anchor_bottom = 0.0
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 115.0
-offset_bottom = 112.0
-grow_horizontal = 1
-grow_vertical = 1
 
 [node name="TextStopper" type="TextureRect" parent="."]
 visible = false
