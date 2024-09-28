@@ -1,7 +1,7 @@
 extends Label
 
 
-func _process(delta):
+func _process(_delta):
 	var daddy = get_parent()
 	var main = daddy.mainCon
 	var state = main.state

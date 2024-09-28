@@ -67,14 +67,14 @@ func _toggle_lv_margin(status, results, unitName):
 	var oldStats = results.OldStats
 	$PanelContainer/LvUpMargin/Vbox/Header/UnitName.text = unitName
 	$PanelContainer/LvUpMargin/Vbox/Header/UnitLevel.text = str(oldStats.LVL)
-	$PanelContainer/LvUpMargin/Vbox/HPCmpBox/UnitHp.text = str(oldStats.LIFE)
-	$PanelContainer/LvUpMargin/Vbox/HPCmpBox/UnitCmp.text = str(oldStats.COMP)
-	$PanelContainer/LvUpMargin/Vbox/Stats/UnitStr.text = str(oldStats.PWR)
-	$PanelContainer/LvUpMargin/Vbox/Stats/UnitMag.text = str(oldStats.MAG)
-	$PanelContainer/LvUpMargin/Vbox/Stats/UnitEle.text = str(oldStats.ELEG)
-	$PanelContainer/LvUpMargin/Vbox/Stats/UnitCele.text = str(oldStats.CELE)
-	$PanelContainer/LvUpMargin/Vbox/Stats/UnitBar.text = str(oldStats.BAR)
-	$PanelContainer/LvUpMargin/Vbox/Stats/UnitCha.text = str(oldStats.CHA)
+	$PanelContainer/LvUpMargin/Vbox/HPCmpBox/UnitHp.text = str(oldStats.Life)
+	$PanelContainer/LvUpMargin/Vbox/HPCmpBox/UnitCmp.text = str(oldStats.Comp)
+	$PanelContainer/LvUpMargin/Vbox/Stats/UnitStr.text = str(oldStats.Pwr)
+	$PanelContainer/LvUpMargin/Vbox/Stats/UnitMag.text = str(oldStats.Mag)
+	$PanelContainer/LvUpMargin/Vbox/Stats/UnitEle.text = str(oldStats.Eleg)
+	$PanelContainer/LvUpMargin/Vbox/Stats/UnitCele.text = str(oldStats.Cele)
+	$PanelContainer/LvUpMargin/Vbox/Stats/UnitBar.text = str(oldStats.Bar)
+	$PanelContainer/LvUpMargin/Vbox/Stats/UnitCha.text = str(oldStats.Cha)
 	$PanelContainer/LvUpMargin/Vbox/Header/Increase.text = ""
 	$PanelContainer/LvUpMargin/Vbox/HPCmpBox/IncreaseHP.text = ""
 	$PanelContainer/LvUpMargin/Vbox/HPCmpBox/IncreaseCmp.text = ""
@@ -96,28 +96,28 @@ func _increase_stat(index, report, increases):
 		"LVL":
 			$PanelContainer/LvUpMargin/Vbox/Header/UnitLevel.text = str(statUp)
 			$PanelContainer/LvUpMargin/Vbox/Header/Increase.text = ("+" + str(increases[stat]))
-		"LIFE":
+		"Life":
 			$PanelContainer/LvUpMargin/Vbox/HPCmpBox/UnitHp.text = str(statUp)
 			$PanelContainer/LvUpMargin/Vbox/HPCmpBox/IncreaseHP.text = ("+" + str(increases[stat]))
-		"COMP":
+		"Comp":
 			$PanelContainer/LvUpMargin/Vbox/HPCmpBox/UnitCmp.text = str(statUp)
 			$PanelContainer/LvUpMargin/Vbox/HPCmpBox/IncreaseCmp.text = ("+" + str(increases[stat]))
-		"PWR":
+		"Pwr":
 			$PanelContainer/LvUpMargin/Vbox/Stats/UnitStr.text = str(statUp)
 			$PanelContainer/LvUpMargin/Vbox/Stats/Increase.text = ("+" + str(increases[stat]))
-		"MAG":
+		"Mag":
 			$PanelContainer/LvUpMargin/Vbox/Stats/UnitMag.text = str(statUp)
 			$PanelContainer/LvUpMargin/Vbox/Stats/Increase2.text = ("+" + str(increases[stat]))
-		"ELEG":
+		"Eleg":
 			$PanelContainer/LvUpMargin/Vbox/Stats/UnitEle.text = str(statUp)
 			$PanelContainer/LvUpMargin/Vbox/Stats/Increase3.text = ("+" + str(increases[stat]))
-		"CELE":
+		"Cele":
 			$PanelContainer/LvUpMargin/Vbox/Stats/UnitCele.text = str(statUp)
 			$PanelContainer/LvUpMargin/Vbox/Stats/Increase4.text = ("+" + str(increases[stat]))
-		"BAR":
+		"Bar":
 			$PanelContainer/LvUpMargin/Vbox/Stats/UnitBar.text = str(statUp)
 			$PanelContainer/LvUpMargin/Vbox/Stats/Increase5.text = ("+" + str(increases[stat]))
-		"CHA":
+		"Cha":
 			$PanelContainer/LvUpMargin/Vbox/Stats/UnitCha.text = str(statUp)
 			$PanelContainer/LvUpMargin/Vbox/Stats/Increase6.text = ("+" + str(increases[stat]))
 

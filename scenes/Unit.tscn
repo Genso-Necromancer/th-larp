@@ -1,8 +1,9 @@
-[gd_scene load_steps=18 format=3 uid="uid://x6dmleipd452"]
+[gd_scene load_steps=20 format=3 uid="uid://x6dmleipd452"]
 
 [ext_resource type="Script" path="res://scenes/Unit.gd" id="1_torj4"]
-[ext_resource type="Texture2D" uid="uid://bix6u63iahalq" path="res://sprites/Fairy/TRBLRSpr.png" id="2_gvlpp"]
+[ext_resource type="Texture2D" uid="uid://bix6u63iahalq" path="res://sprites/FAIRY/TRBLRSpr.png" id="2_gvlpp"]
 [ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="3_57a4v"]
+[ext_resource type="Script" path="res://scenes/UnitArea.gd" id="3_mqts7"]
 [ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="4_qp4n5"]
 [ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="5_nwi43"]
 [ext_resource type="Script" path="res://scenes/HPbar.gd" id="7_x5rnn"]
@@ -265,6 +266,9 @@ _data = {
 "walk_up": SubResource("Animation_xsrlv")
 }
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_51pth"]
+size = Vector2(84, 37.5)
+
 [node name="Unit" type="Path2D"]
 z_index = 2
 y_sort_enabled = true
@@ -289,6 +293,17 @@ root_node = NodePath("../../..")
 libraries = {
 "": SubResource("AnimationLibrary_u5bc7")
 }
+
+[node name="UnitArea" type="Area2D" parent="PathFollow2D/Sprite"]
+position = Vector2(0, 8)
+scale = Vector2(0.25, 0.25)
+collision_layer = 2
+collision_mask = 5
+script = ExtResource("3_mqts7")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PathFollow2D/Sprite/UnitArea"]
+position = Vector2(0, 0.75)
+shape = SubResource("RectangleShape2D_51pth")
 
 [node name="HPbar" type="TextureProgressBar" parent="PathFollow2D" groups=["HPBar"]]
 anchors_preset = -1

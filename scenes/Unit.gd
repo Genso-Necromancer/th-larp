@@ -14,12 +14,9 @@ signal leveled_up
 #Profile
 								# Consider getting rid of one of these, or both. 
 @export var unitId := "unitID" #Should be automated in the system
-@export var unitName := "" #Presented strings will eventually be taken from a seperate file
-
+var unitName := "" #Presented strings will eventually be taken from a seperate file
 @export var FACTION_ID := Enums.FACTION_ID.ENEMY
-
 @export var SPEC_ID := Enums.SPEC_ID.FAIRY 
-
 @export var JOB_ID := Enums.JOB_ID.TRBLR
 @export var genLevel : int = 1
 @export var inventory: Array[String] = [] #revisit this for ease of selection
@@ -29,10 +26,7 @@ signal leveled_up
 
 var deployed : bool = false
 var forced : bool = false
-
 var itemData = UnitData.itemData
-
-
 
 var needDeath := false
 var terrainData : Array
@@ -40,68 +34,58 @@ var statsLoaded := false
 
 #equip variables
 const unarmed : Dictionary = UnitData.unarmed
+var natural  = false
 var tempSet : bool = false
+
 #status effects
-@export var status : Dictionary = {"ACTED":false, "SLEEP":false}
+@export var status : Dictionary = {"Acted":false, "Sleep":false}
 var sParam : Dictionary = {}
 
+#unit status
 var unitData : Dictionary
 #Call for pre-formualted combat stats
-var combatData := {"Dmg": 0, "HIT": 0, "AVOID": 0, "GRAZE": 0, "GRZPRC": 0, "Crit": 0, "CRTAVD": 0, "RESIST": 0, "EFFACC":0, "Type":"Physical"}
+var combatData := {"Dmg": 0, "Hit": 0, "Avoid": 0, "Graze": 0, "GrzPrc": 0, "Crit": 0, "CrtAvd": 0, "Resist": 0, "EffHit":0, "Bar": 0, "Type":Enums.DAMAGE_TYPE.PHYS, "TrueHit": false}
 #base stats of the unit
 var baseStats := {}
+#aura owned by unit
+var unitAuras := {}
 #combination of base stats and buffs
 var activeStats := {}
 #de/buffs applied to unit
 var activeBuffs := {}
+var activeDebuffs := {}
 var activeEffects := []
-#var skin = UnitData.playerUnits[unitName]["Sprite"]:
-#	set(value):
-#		skin = value
-#		if not _sprite:
-#			await ready
-#		_sprite.texture = value
+var activeAuras := {}
 
-#@export var skin_offset := Vector2i.ZERO:
-#	set(value):
-#
-#		skin_offset = value
-#		if not _sprite:
-#			await ready
-#		_sprite.position = value
+
+
 ## Coordinates of the current cell the cursor moved to.
 var cell := Vector2i.ZERO:
 	set(value):
 		cell = map.cell_clamp(value)
-		
+var last_glb_position := Vector2.ZERO
+var originCell
+
 # Toggles the "selected" animation on the unit.
 var is_selected := false:
 	set(value):
 		is_selected = value
 		if is_selected:
 			_animPlayer.play("selected")
-		elif status.ACTED == false:
+		elif status.Acted == false:
 			_animPlayer.play("idle")
-		elif status.ACTED == true:
+		elif status.Acted == true:
 			_animPlayer.play("disabled")
 
 var _is_walking := false:
 	set(value):
 		_is_walking = value
-#		set_process(_is_walking)
-#var position := Vector2.ZERO:
-#	set(value):
-#		position = map.hex_centered(value)
 
 @onready var _sprite: Sprite2D = $PathFollow2D/Sprite
 @onready var _animPlayer: AnimationPlayer = $PathFollow2D/Sprite/AnimationPlayer
 @onready var _pathFollow: PathFollow2D = $PathFollow2D
 @onready var map = get_parent()
 @onready var lifeBar = $PathFollow2D/HPbar
-
-
-var last_glb_position := Vector2.ZERO
-var originCell
 
 var walk_directions := [
 	"walk_left",
@@ -116,6 +100,7 @@ var spawnLoc
 var originLocation
 
 func _ready() -> void:
+	var hitBox = $PathFollow2D/Sprite/UnitArea
 #	print(statVars)
 #	#print("unit.gd:", unitId)
 	set_process(false)
@@ -123,6 +108,10 @@ func _ready() -> void:
 	_generate_id()
 	_load_stats()
 	_load_sprites()
+	_validate_skills()
+	hitBox.set_master(self)
+	hitBox.area_entered.connect(self._on_aura_entered)
+	hitBox.area_exited.connect(self._on_aura_exited)
 	if map.get_class() != "TileMap": #may not need in future, too specific to "test map"
 		pass
 	elif !map.map_ready.is_connected(self._on_test_map_map_ready):
@@ -136,7 +125,7 @@ func _ready() -> void:
 	#var testKey = UnitData.MOVE_TYPE.keys()[unitData.MoveType]
 	#print(str(unitName) + " Move Type: " + str(testKey))
 	
-	
+
 func init_unit(unique:bool = !generate, newFaction := FACTION_ID, iD : String = "none"):
 	FACTION_ID = newFaction
 	if iD != "none":
@@ -146,7 +135,8 @@ func init_unit(unique:bool = !generate, newFaction := FACTION_ID, iD : String = 
 	return self
 	#_load_stats()
 	#_load_sprites()
-	
+
+
 func _generate_id():
 	var u := false
 	var c := 0
@@ -160,6 +150,7 @@ func _generate_id():
 			UnitData.unitData[unitId] = {}
 			u = true
 
+
 func _process(delta: float) -> void:
 	if needDeath:
 		return
@@ -170,8 +161,12 @@ func _process(delta: float) -> void:
 	#	#print(last_glb_position)
 		var norm_move_vec = current_move_vec.normalized()
 		var direction_id = int(walk_directions_size * (norm_move_vec.rotated(PI / walk_directions_size).angle() + PI) / TAU)
+		#print(_animPlayer.get_current_animation())
 		_animPlayer.play(str(walk_directions[direction_id]))
+		#print(_animPlayer.get_current_animation())
+		#print(_pathFollow.progress_ratio)
 	if _pathFollow != null && _pathFollow.progress_ratio >= 1.0:
+		#print("SHOULDN'T SEE BELOW 1.0 ",_pathFollow.progress_ratio)
 		_is_walking = false
 		# Setting this value to 0.0 causes a Zero Length Interval error
 		_pathFollow.progress = 0.00001
@@ -181,6 +176,7 @@ func _process(delta: float) -> void:
 		emit_signal("walk_finished")
 	if statsLoaded:
 		update_stats()
+
 
 ## Starts walking along the `path`.
 ## `path` is an array of grid coordinates that the function converts to map coordinates.
@@ -204,13 +200,17 @@ func walk_along(path: PackedVector2Array) -> void:
 #	print("unit cell: ", cell)
 #	print("unit position: ", position)
 
+
 func return_original():
 	position = map.map_to_local(originCell)
 	cell = originCell
 #	#print(originCell, cell)
 	return cell
 	
+
 func _load_stats():
+	var specKeys := Enums.SPEC_ID.keys()
+	var path : String
 	if generate:
 		UnitData.stat_gen(JOB_ID, unitId, SPEC_ID)
 	unitData = UnitData.unitData[unitId]
@@ -221,50 +221,71 @@ func _load_stats():
 			add_to_group("Enemy")
 		Enums.FACTION_ID.NPC:
 			add_to_group("NPC")
-	if unitName == "":
-		unitName = unitData["Profile"]["UnitName"]
+	if unitName == "" and !generate:
+		path = "unit_name_%s" % [unitId.to_snake_case()]
+		unitName = StringGetter.get_string(path)
+	elif unitName == "" and generate:
+		var strings : Array = []
+		var template : String = StringGetter.get_template("unit_name")
+		strings.append(StringGetter.get_string("species_name_%s" % [specKeys[unitData.Profile.Species].to_snake_case()]))
+		strings.append(StringGetter.get_string("role_name_%s" % [unitData.Profile.Role.to_snake_case()]))
+		unitName = StringGetter.mash_string(template, strings)
+		
 		
 	if generate and genLevel > 1:
 		UnitData.level_up(unitData, genLevel-1)
 	
 	baseStats = unitData.Stats.duplicate(true)
-	activeStats["CLIFE"] = baseStats.LIFE
-	activeStats["CCOMP"] = baseStats.COMP
+	activeStats["CurLife"] = baseStats.Life
+	activeStats["CurComp"] = baseStats.Comp
 	update_stats()
 	_init_inv()
 	check_passives()
 	statsLoaded = true
-	
-	
-#	var groups = get_groups()
-#	print(unitName, " ", groups)
 
-
+func _validate_skills():
+	if !unitData.has("Skills"):
+		return
+	for skillId in unitData.Skills:
+		if !UnitData.skillData.has(skillId):
+			unitData.skills.erase(skillId)
+			print(str(unitName) + ": Invalid SkillId. Removed.")
 		
+
 #keep track of active de/buffs during gameplay, seperate from actual stats
 #re-evaluate the variable names, and if so many are necessary. VOODOO WARNING HERE
 func set_buff(effId, effect):
 	var statKeys : Array = Enums.CORE_STAT.keys()
+	var type = effect.Type
+	var buffs
+	match type:
+		Enums.EFFECT_TYPE.BUFF: buffs = activeBuffs
+		Enums.EFFECT_TYPE.DEBUFF: buffs = activeDebuffs
 	if effId == null:
 		print("No effId found")
 		return
 	if effect.Stack:
 		var i = 0
 		var newId = effId + str(i)
-		while activeBuffs.has(newId):
+		while buffs.has(newId):
 			i += 1
 			newId = effId + str(i)
 		effId = newId
 	if effect.duration == -1:
-		var stat : String = statKeys[effect.BuffStat]
-		unitData.Stats[stat] += effect.BuffValue
+		var stat : String = statKeys[effect.SubType]
+		unitData.Stats[stat] += effect.Value
 	else:
-		activeBuffs[effId] = effect.duplicate(true)
+		buffs[effId] = effect.duplicate(true)
 	update_stats()
 	
+	
 func remove_buff(effId):
-	activeBuffs.erase(effId)
+	if activeBuffs.has(effId):
+		activeBuffs.erase(effId)
+	elif activeDebuffs.has(effId):
+		activeDebuffs.erase(effId)
 	update_stats()
+	
 	
 #tracks duration of effects, then removes them when reaching 0
 func status_duration_tick():
@@ -291,9 +312,10 @@ func status_duration_tick():
 				status[key] = false
 				sParam.erase(key)
 			
-	$PathFollow2D/Cell2.set_text(str(status.SLEEP))
+	$PathFollow2D/Cell2.set_text(str(status.Sleep))
 #	print(activeBuffs)
 	update_stats()
+	
 	
 func _load_sprites():
 	if !generate: 
@@ -305,6 +327,7 @@ func _load_sprites():
 	_pathFollow.rotates = false
 	_animPlayer.play("idle")
 	
+	
 func _init_inv():
 	var limit = unitData.MaxInv
 	if inventory.size() < 1:
@@ -312,42 +335,128 @@ func _init_inv():
 	for thing in inventory:
 		if unitData.Inv.size() >= limit:
 			break
-		var dur = itemData[thing].MAXDUR
-		var newItem : Dictionary = {"ID": thing, "EQUIP": false, "DUR": dur}
-		unitData.Inv.append(newItem)
+		var dur = itemData[thing].MaxDur
+		var newItem : Dictionary = {"ID": thing, "Equip": false, "DUR": dur, }
+		if itemData.has(thing):
+			unitData.Inv.append(newItem)
+		else:
+			print("Invalid item ID: " + str(thing))
+	#print(unitName + ": " + str(unitData.Inv))
 	set_equipped()
 
+func get_condition() -> Dictionary: #maybe expand this in the future, for now that's all
+	var c: Dictionary = {}
+	c["Hp%"] = (activeStats.CurLife / activeStats.Life) * 100
+	c["Comp"] = activeStats.CurComp
+	c["Status"] = status.duplicate(true)
+	return c
+
+func can_act() -> bool:
+	if activeStats.CurLife <= 0 or status.Sleep or get_equipped_weapon() == unarmed:
+		return false
+	return true
+
+
+#Passive Functions
 func check_passives():
-	#ATTENTION
-	#Terrible, garbage, what the fuck. Cheap imitation of how it should be.
-	#will remake this
-	var _passives = unitData["Passive"]
-#	if passives.has("Fly"):
-#		moveType = "Fly"
-#		unitData.Stats.MOVE = baseMove+1
-#	if passives.has("SunWeak") and Global.day == true:
-#		moveType = "Foot"
-#		unitData.Stats.Move = baseMove
-		
-			
-		
+	var passives = unitData.Passives
+	var pData = UnitData.passiveData
+	var valid = []
 	
+	for id in passives:
+		var p = pData[id]
+		match p.Type:
+			Enums.PASSIVE_TYPE.AURA:
+				var aura = p.Aura
+				if p.IsTimeSens: aura = p[Global.timeOfDay]
+				valid.append(aura)
+				load_aura(aura)
+	validate_auras(valid)
+
+
+func search_passive_id(type):
+	var highest = 0
+	var found = false
+	for passive in unitData.Passives:
+		var p = UnitData.passiveData[passive]
+		if p.Type == type and p.Value > highest:
+			highest = p.Value
+			found = passive
+	return found
+
+##Aura Functions
+func validate_auras(valid:Array):
+	for a in unitAuras:
+		if !valid.has(a):
+			remove_aura(a)
+
+
+func remove_aura(a):
+	if unitAuras.has(a):
+		unitAuras[a].queue_free()
+		unitAuras.erase(a)
+
+
+func load_aura(id):
+	if unitAuras.has(id):
+		return
+	var auData = UnitData.auraData
+	var a = auData[id]
+	var auraArea = preload("res://scenes/aura_collision.tscn").instantiate()
+	var pathFollow = $PathFollow2D
+	
+	pathFollow.add_child(auraArea)
+	auraArea.set_aura(self, a)
+	unitAuras[id] = auraArea
+	
+	
+func get_visual_aura_range() -> int:
+	var auData = UnitData.auraData
+	var pData = UnitData.passiveData
+	var highest := 0
+	for p in unitAuras:
+		var a = auData[pData[p].Aura]
+		if a.Range > highest:
+			highest = a.Range
+	return highest
+		
+
+func _on_aura_entered(area):
+	print("Aura Entered: ", area)
+	if area.aura.IsFriendly and area.master.FACTION_ID != FACTION_ID:
+		return
+	elif !area.aura.IsFriendly and area.master.FACTION_ID == FACTION_ID:
+		return
+	elif !activeAuras.has(area):
+		activeAuras[area] = area.aura.Effects
+		print("Active Aura Effects: ", activeAuras)
+	update_stats()
+	
+	
+func _on_aura_exited(area):
+	print("Aura Exited: ", area)
+	if activeAuras.has(area):
+		activeAuras.erase(area)
+		print("Active Aura Effects: ", activeAuras)
+	update_stats()
+
+##Equipment functions
 func restore_equip():
 	var i = 0
 	for item in unitData.Inv:
-		if tempSet and get_icat(item) != "ACC" and item.EQUIP:
-			unitData.Inv[i].EQUIP = false
-			unitData.Inv[0].EQUIP = true
+		if tempSet and get_icat(item).Main != "ACC" and item.Equip:
+			unitData.Inv[i].Equip = false
+			unitData.Inv[0].Equip = true
 		i += 1
 	tempSet = false
 	
 func set_temp_equip(i):
 	var tempWep = unitData.Inv[i]
-	if check_valid_equip(tempWep) and get_icat(tempWep) != "ACC":
-		unitData.Inv[0].EQUIP = false
-		tempWep.EQUIP = true
+	if check_valid_equip(tempWep) and get_icat(tempWep).Main != "ACC":
+		unitData.Inv[0].Equip = false
+		tempWep.Equip = true
 	tempSet = true
-	update_combatdata()
+	update_stats()
 	
 func set_equipped(iInv = false): #searches for first valid if false or out of bounds, otherwise pass inv index and will equip if valid
 	var valid = false
@@ -358,36 +467,40 @@ func set_equipped(iInv = false): #searches for first valid if false or out of bo
 		valid = check_valid_equip(invItem)
 	else: 
 		var i = 0
+		#print("sorting starting Inv....")
 		for thing in unitData.Inv:
-			if check_valid_equip(thing) and get_icat(thing) != "ACC":
+			#print("checking: ", str(thing))
+			if check_valid_equip(thing) and get_icat(thing).Main != "ACC":
+				#print(str(thing), "Validated")
 				valid = true
 				iInv = i
 				break
 			i += 1
-	if valid and invItem and get_icat(invItem) == "ACC":
+	if valid and invItem and get_icat(invItem).Main == "ACC":
 		_equip_acc(iInv)
 	elif valid:
 		_equip_weapon(iInv)
 	tempSet = false
-	update_combatdata()
+	update_stats()
 	
-func get_equipped_weapon(): #returns the currently equipped weapon within inventory. use .ID to find global statistics. Return generic "unarmed" if there is none.
+func get_equipped_weapon(): #returns the currently equipped weapon within inventory. use .ID to find global statistics. Returns generic "unarmed" if there is none.
 	var found
 	var wep
 	for item in unitData.Inv:
-		if item.EQUIP and check_valid_equip(item, 1):
+		if item.Equip and check_valid_equip(item, 1):
 			wep = item
 			found = true
 			break
-	if !found:
+	if !found and unitData.Weapons.has("NATURAL") and natural:
+		wep = natural
+	elif !found:
 		wep = unarmed
 	return wep
 	
 func get_equipped_acc(): #returns the currently equipped accessories within inventory. use .ID to find global statistics. Return false if none.
-	
 	var acc : Array = []
 	for item in unitData.Inv:
-		if item.EQUIP and check_valid_equip(item, 2):
+		if item.Equip and check_valid_equip(item, 2):
 			acc.append(item)
 	if acc.size() == 0:
 		return false
@@ -395,15 +508,14 @@ func get_equipped_acc(): #returns the currently equipped accessories within inve
 	
 func unequip(slot = 0):
 	var item = unitData.Inv[slot]
-	while !item.EQUIP:
+	while !item.Equip:
 		slot += 1
 		if slot >= unitData.Inv.size():
 			return
 		item = unitData.Inv[slot]
-		
 	_remove_equip_effects(item)
-	item.EQUIP = false
-	
+	item.Equip = false
+
 
 func _equip_acc(i : int):
 	var acc = unitData.Inv[i]
@@ -411,15 +523,15 @@ func _equip_acc(i : int):
 	var c : int = 0
 	var first : int
 	for item in unitData.Inv:
-		var type : String = get_icat(acc)
-		if type == "ACC" and acc.EQUIP and !first:
+		var type : String = get_icat(acc).Main
+		if type == "ACC" and acc.Equip and !first:
 			c += 1
 			first = unitData.Inv.find(item)
-		elif type == "ACC" and acc.EQUIP:
+		elif type == "ACC" and acc.Equip:
 			c += 1
 	if c >= limit:
 		unequip(first)
-	acc.EQUIP = true
+	acc.Equip = true
 	
 	_add_equip_effects(acc)
 
@@ -427,21 +539,23 @@ func _equip_weapon(index):
 	var wep = unitData.Inv.pop_at(index)
 	
 	for item in unitData.Inv:
-		var type : String = get_icat(wep)
-		if type != "ACC" and wep.EQUIP:
+		var type : String = get_icat(wep).Main
+		if type != "ACC" and wep.Equip:
 			var i = unitData.Inv.find(wep)
 			unequip(i)
 		
 	_add_equip_effects(wep)
 	unitData.Inv.push_front(wep)
-	unitData.Inv[0].EQUIP = true
+	unitData.Inv[0].Equip = true
 	
 func _add_equip_effects(item):
 	var iData = UnitData.itemData[item.ID]
+	var effData = UnitData.effectData
 	
 	if iData.Effect and iData.Effect.size() > 0:
 		for effId in iData.Effect:
-			_add_effect(effId)
+			if effData[effId].Target == Enums.EFFECT_TARGET.EQUIPPED:
+				_add_effect(effId)
 	#print(activeEffects)
 		
 func _remove_equip_effects(item):
@@ -459,116 +573,312 @@ func _remove_effect(effId):
 	var i = activeEffects.find(effId)
 	activeEffects.remove_at(i)
 	
-func get_icat(item):
-	var iCat = itemData[item.ID].CATEGORY
+func get_effects(key, value, falseRule = false):
+	var effData = UnitData.effectData
+	var matched := []
+	for effId in activeEffects:
+		if !falseRule and effData[effId].has(key) and effData[effId][key] == value:
+			matched.append(effId)
+		elif effData[effId].has(key) and effData[effId][key] != value:
+			matched.append(effId)
+	if matched.size() <= 0:
+		return false
+	return matched
+
+
+func get_multi_swing():
+	var swings : int = 0
+	for effId in activeEffects:
+		if UnitData.effectData[effId].Type == Enums.EFFECT_TYPE.MULTI_SWING and UnitData.effectData[effId].Value > swings:
+			swings = UnitData.effectData[effId].Value
+	if swings == 0:
+		return false
+	else:
+		return swings
+
+
+func get_multi_round():
+	var rounds : int = 0
+	for effId in activeEffects:
+		if UnitData.effectData[effId].Type == Enums.EFFECT_TYPE.MULTI_ROUND and UnitData.effectData[effId].Value > rounds:
+			rounds = UnitData.effectData[effId].Value
+	if rounds == 0:
+		return false
+	else:
+		return rounds
+
+
+func get_crit_dmg_effects():
+	var data = UnitData.effectData
+	var effects : Dictionary = {"CritDmg": false, "CritMulti": false}
+	var highest := 0
+	var dmgStack := [0, 0]
+	
+	for id in activeEffects:
+		if data[id].Type == Enums.EFFECT_TYPE.CRIT_BUFF and data[id]["CritDmg"]:
+			dmgStack[0] += data[id]["CritDmg"][0]
+			dmgStack[1] += data[id]["CritDmg"][1]
+			effects.CritDmg = dmgStack
+		if data[id].Type == Enums.EFFECT_TYPE.CRIT_BUFF and data[id]["CritMulti"] and data[id]["CritMulti"] > highest:
+			highest = data[id]["CritMulti"]
+			effects.CritMulti = highest
+			
+	return effects
+	
+func get_icat(item) -> Dictionary: 
+	var iCat = {"Main" : itemData[item.ID].Category, "Sub" : false}
+	if itemData[item.ID].SubGroup:
+		iCat.Sub = itemData[item.ID].SubGroup
 	return iCat
 
-	
+func reduce_durability(item : Dictionary, reduc : int = 1): ##Weapon only considered broken at 0 durability!!! -1 is unbreakable! If reduc value would put an item below 0, it is clamped to 0 and will break.
+	var inv = unitData.Inv
+	var i = inv.find(item)
+	var maxDur = itemData[item.ID].MaxDur
+	print("Durability reduction for: ", item)
+	if item.DUR == -1:
+		print("Weapon is unbreakable")
+		return
+	item.DUR -= reduc
+	clampi(item.DUR, 0, maxDur)
+	print("Durability reduced to: ", item.DUR)
+	if item.DUR == 0 and item.Equip:
+		print("Item Broken, unequipping")
+		unequip(i)
+	if item.DUR == 0 and itemData[item.ID].Expendable:
+		print("Queued item Deletion")
+		call_deferred("delete_item", item)
+
+
+func delete_item(item):
+	var inv = unitData.Inv
+	var eqp = get_equipped_weapon()
+	var i = inv.find(item)
+	if eqp == item:
+		unequip(i)
+	inv.remove_at(i)
+
+
 func check_valid_equip(item : Dictionary, mode : int = 0): #Subweapons not fully implemented, Sub returns true regardless of which sub it is. There is no differentiation yet. 0 = Any, 1 = Weapon; 2 = Accessory
 	var iCat = get_icat(item) 
 	if item.DUR == 0:
 		return false
-	if mode < 2 and unitData.Weapons.has(iCat):
+	if mode < 2 and unitData.Weapons.has(iCat.Main) and iCat.Sub and unitData.Weapons.has(iCat.Sub):
 		return true
-	elif mode == 0 and iCat == "ACC":
+	elif mode < 2 and unitData.Weapons.has(iCat.Main):
 		return true
-	elif mode == 2 and iCat == "ACC":
+	elif mode == 0 and iCat.Main == "ACC":
+		return true
+	elif mode == 2 and iCat.Main == "ACC":
 		return true
 	else:
 		return false
-			
+
+
+
+
 func update_combatdata():
 	#no catch for empty inv!!!!! HERE Wait, isn't there one? setting it to Null, and then having null translate to "NONE" when all null instances could just be "NONE" is retarded. Fix this, you god damned retard.
 	var terrainBonus = update_terrain_bonus()
-	var equipped = get_equipped_weapon()
-	var wep = itemData[equipped.ID]
+	var wep = itemData[get_equipped_weapon().ID]
 	
 	combatData.Type = wep.Type
 	if wep.Type == Enums.DAMAGE_TYPE.PHYS:
-		combatData.Dmg = wep.Dmg + activeStats.PWR
+		combatData.Dmg = wep.Dmg + activeStats.Pwr
 	elif wep.Type == Enums.DAMAGE_TYPE.MAG:
-		combatData.Dmg = wep.Dmg + activeStats.MAG
+		combatData.Dmg = wep.Dmg + activeStats.Mag
 	elif wep.Type == Enums.DAMAGE_TYPE.TRUE:
 		combatData.Dmg = wep.Dmg
-	combatData.ACC = activeStats.ELEG * 2 + (wep.ACC + activeStats.CHA)
-	combatData.AVOID = activeStats.CELE * 2 + activeStats.CHA + terrainBonus
-	combatData.GRAZE = wep.GRAZE
-	combatData.GRZPRC = activeStats.ELEG + activeStats.BAR
-	combatData.Crit = activeStats.ELEG + wep.Crit
-	combatData.CRTAVD = activeStats.CHA
-	combatData.MAGBASE = activeStats.MAG
-	combatData.PWRBASE = activeStats.PWR
-	combatData.ACCBASE = activeStats.ELEG * 2 + activeStats.CHA
-	combatData.CRITBASE = activeStats.ELEG
-	combatData.RESIST = activeStats.CHA * 2
-	combatData.EFFACC = activeStats.CHA * 2
-	if status.SLEEP:
-		combatData.AVOID = 0
-		combatData.GRZPRC = 0
+	combatData.Hit = activeStats.Eleg * 2 + (wep.Hit + activeStats.Cha)
+	combatData.Avoid = activeStats.Cele * 2 + activeStats.Cha + terrainBonus
+	combatData.Graze = wep.Graze
+	combatData.GrzPrc = activeStats.Eleg + activeStats.Bar
+	combatData.Crit = activeStats.Eleg + wep.Crit
+	combatData.CrtAvd = activeStats.Cha
+	combatData.CompRes = (activeStats.Cha / 2) + (activeStats.Eleg / 2)
+	combatData.CompRes = clampi(combatData.CompRes, -200, 75)
+	combatData.CompBonus = activeStats.Cha / 4
+	combatData.MagBase = activeStats.Mag
+	combatData.PwrBase = activeStats.Pwr
+	combatData.HitBase = activeStats.Eleg * 2 + activeStats.Cha
+	combatData.CritBase = activeStats.Eleg
+	combatData.Resist = activeStats.Cha * 2
+	combatData.EffHit = activeStats.Cha
+	combatData.Def = {Enums.DAMAGE_TYPE.PHYS: activeStats.Bar, Enums.DAMAGE_TYPE.MAG: activeStats.Mag, Enums.DAMAGE_TYPE.TRUE: 0}
+	combatData.TrueHit = false
+	if status.Sleep:
+		combatData.Avoid = 0
+		combatData.GrzPrc = 0
 		
-func get_skill_combat_stats(skillId):
-	var stats = combatData.duplicate()
-	var skill = UnitData.skillData[skillId]
-	if skill.Dmg and skill.Type == Enums.DAMAGE_TYPE.PHYS:
-		stats.Dmg = stats.PWRBASE + skill.Dmg
-	elif skill.Dmg and skill.Type == Enums.DAMAGE_TYPE.MAG:
-		stats.Dmg = stats.MAGBASE + skill.Dmg
-	elif skill.Dmg and skill.Type == Enums.DAMAGE_TYPE.TRUE: 
-		stats.Dmg = skill.Dmg
-	else: stats.Dmg = false
 	
-	if skill.CanMiss:
-		stats.ACC = stats.ACCBASE + skill.ACC
-	else: stats.ACC = false
-	stats.Crit = stats.CRITBASE
+func get_skill_combat_stats(skillId, augmented := false):
+	var skill = UnitData.skillData[skillId]
+	var stats = combatData.duplicate()
+	var dmgStat := 0
+	var attack
+	var typeLord
+	if augmented: 
+		attack = itemData[get_equipped_weapon().ID]
+	else: attack = skill
+	
+	if augmented and skill.Type: typeLord = skill.type
+	else: typeLord = attack.Type
+	
+	match typeLord:
+		Enums.DAMAGE_TYPE.PHYS: dmgStat = stats.PwrBase
+		Enums.DAMAGE_TYPE.MAG: dmgStat = stats.MagBase
+		Enums.DAMAGE_TYPE.TRUE: dmgStat = 0
+		
+	if !skill.Dmg and skill.Dmg != 0:
+		stats.Dmg = false
+	elif augmented:
+		stats.Dmg = dmgStat + attack.Dmg + skill.Dmg
+	else:
+		stats.Dmg = dmgStat + attack.Dmg
+
+	stats.TrueHit = skill.TrueHit
+	
+	if augmented:
+		stats.Hit = stats.HitBase + attack.Hit + skill.Hit
+	else:
+		stats.Hit = stats.HitBase + attack.Hit
+	
+	if !skill.Crit and skill.Crit != 0:
+		stats.Crit = false
+	elif augmented: 
+		stats.Crit = stats.CritBase + attack.Crit + skill.Crit
+	else: 
+		stats.Crit = stats.CritBase + attack.Crit
+	
+		
 	return stats
-func update_stats():
+
+
+func update_stats(): #GO BACK AND FINISH ACTIVE DEBUFFS AFTER THIS
+	var effSort := []
+	var time := Global.timeOfDay
+	var timeMod : Dictionary = UnitData.timeModData[unitData.Profile.Species][time]
+	var statKeys := baseStats.keys()
+	var buffTotal := {}
+	var baseUpdated := false
+	var combatUpdated := false
+	var modifiedStats := activeStats
+	var baseValues := baseStats
+	var subKeys := Enums.SUB_TYPE.keys()
+	
 	if baseStats == null or activeStats == null or lifeBar == null:
 		return
-	lifeBar.max_value = baseStats.LIFE
-	lifeBar.value = activeStats.CLIFE
-	if activeStats["CLIFE"] <= 0:
+	lifeBar.max_value = baseStats.Life
+	lifeBar.value = activeStats.CurLife
+	if activeStats["CurLife"] <= 0:
 		run_death()
 		return
+	if activeStats.CurComp <= 0:
+		pass #comp check!
 	#######
-	var statKeys = baseStats.keys()
-	var buffTotal = {}
-	for stat in statKeys:
-		buffTotal[stat] = 0
-	for buff in activeBuffs:
-		buffTotal[buff.BuffStat] += buff.BuffValue
-	for effId in activeEffects:
+	
+	while !combatUpdated:
+		buffTotal.clear()
+		if baseUpdated:
+			statKeys = combatData.keys()
+			modifiedStats = combatData
+			baseValues = combatData
+			
+		for stat in statKeys:
+			stat = stat.to_pascal_case()
+			buffTotal[stat] = 0
+			if timeMod.has(stat):
+				buffTotal[stat] += timeMod[stat]
+		
+		for aura in activeAuras:
+			for effect in activeAuras[aura]:
+				var mod = UnitData.effectData[effect]
+				var stat = subKeys[mod.SubType].to_pascal_case()
+				if buffTotal.has(stat): buffTotal[stat] += mod.Value
+		
+		for buff in activeBuffs:
+			var stat = buff.SubType.to_pascal_case()
+			if buffTotal.has(stat): buffTotal[stat] += buff.Value
+			
+		for debuff in activeDebuffs:
+			var stat = debuff.SubType.to_pascal_case()
+			if buffTotal.has(stat): buffTotal[stat] += debuff.Value
+			
+		for effId in activeEffects:
 			if UnitData.effectData[effId].Type == Enums.EFFECT_TYPE.BUFF or UnitData.effectData[effId].Type == Enums.EFFECT_TYPE.DEBUFF:
-				buffTotal[UnitData.effectData[effId].BuffStat] += UnitData.effectData[effId].BuffValue
-	for stat in statKeys:
-		activeStats[stat] = baseStats[stat] + buffTotal[stat]
-	update_combatdata()
-	if status.SLEEP:
-		activeStats.MOVE = 0
+				effSort.append(effId)
+					
+		for effId in effSort:
+			var stat = UnitData.effectData[effId].SubType.to_pascal_case()
+			if UnitData.effectData[effId].Target == Enums.EFFECT_TARGET.EQUIPPED:
+				if buffTotal.has(stat): buffTotal[stat] += UnitData.effectData[effId].Value
+		
+		for stat in statKeys:
+			if !buffTotal.has(stat):
+				continue
+			match stat:
+				"Def": 
+					modifiedStats["Def"][Enums.DAMAGE_TYPE.PHYS] += buffTotal[stat]
+					modifiedStats["Def"][Enums.DAMAGE_TYPE.MAG] += buffTotal[stat]
+				"PhysDef": modifiedStats["Def"][Enums.DAMAGE_TYPE.PHYS] += buffTotal[stat]
+				"MagDef": modifiedStats["Def"][Enums.DAMAGE_TYPE.MAG] += buffTotal[stat]
+				"TrueHit": continue
+				_: modifiedStats[stat] = baseValues[stat] + buffTotal[stat]
+				
+		if timeMod.MoveType: #HERE need sprite swap for fly/foot movement changes
+			unitData.MoveType = timeMod.MoveType
+			
+		if !baseUpdated:
+			update_combatdata()
+			baseUpdated = true
+		else:
+			combatUpdated = true
+		
+	update_sprite()
 	
-#	print(unitName, ": ", activeStats)
-
-func apply_dmg(dmg = 0):
-	activeStats.CLIFE -= dmg
-	activeStats.CLIFE = clampi(activeStats.CLIFE, 0, baseStats.LIFE)
-	if dmg > 0 and status.SLEEP:
-		cure_status("SLEEP")
-	return activeStats.CLIFE
+	if status.Sleep:
+		activeStats.Move = 0
 	
-func apply_heal(heal = 0):
-	activeStats.CLIFE += heal
-	activeStats.CLIFE = clampi(activeStats.CLIFE, 0, baseStats.LIFE)
-	return activeStats.CLIFE
 
-func cure_status(statusEff): #Unnest this someday? I dunno, eat shit.
-	if statusEff == "All":
+func update_sprite():
+	for condition in status:
+		if status[condition] and condition == "Sleep":
+			_animPlayer.play("disabled")
+			return
+	if !_is_walking:
+		_animPlayer.play("idle")
+
+func apply_dmg(dmg := 0):
+	activeStats.CurLife -= dmg
+	activeStats.CurLife = clampi(activeStats.CurLife, 0, activeStats.Life)
+	if dmg > 0 and status.Sleep:
+		cure_status("Sleep")
+	#return activeStats.CurLife
+	
+func apply_heal(heal := 0):
+	activeStats.CurLife += heal
+	activeStats.CurLife = clampi(activeStats.CurLife, 0, activeStats.Life)
+	
+func apply_composure(comp := 0):
+	activeStats.CurComp -= comp
+	activeStats.CurComp = clampi(activeStats.CurComp, -activeStats.Comp, activeStats.Comp)
+
+func cure_status(cureType, ignoreCurable = false): #Unnest this someday? I dunno, eat shit.
+	var statusKeys : Array = Enums.SUB_TYPE.keys()
+	var s : String = statusKeys[cureType].to_pascal_case()
+	if s == "All":
 		for condition in status:
-			if status[condition] and sParam.has(condition) and sParam[condition].Curable:
+			if status[condition] and sParam.has(condition) and sParam[condition].Curable and condition != "Acted":
 				status[condition] = false
-				sParam.erase(statusEff)
-	elif status[statusEff] and sParam.has(statusEff) and sParam.Curable:
-		status[statusEff] = false
-		sParam.erase(statusEff)
+				sParam.erase(s)
+	elif status[s] and sParam.has(s) and !ignoreCurable and sParam.Curable:
+		status[s] = false
+		sParam.erase(s)
+	elif status[s] and sParam.has(s) and ignoreCurable:
+		status[s] = false
+		sParam.erase(s)
+	else:
+		print("No status cured")
 	update_stats()
 	#$PathFollow2D/Cell2.set_text(str(status))
 	
@@ -577,10 +887,13 @@ func set_status(effect): #I wish I could inflict sleep status on myself
 	if !effect:
 		print("No condition found")
 		return
-	var statusKeys : Array = Enums.STATUS_EFFECT.keys()
-	var s : String = statusKeys[effect.Status]
+	var statusKeys : Array = Enums.SUB_TYPE.keys()
+	var s : String = statusKeys[effect.SubType].to_pascal_case()
 	status[s] = true
-	sParam[s] = {"Duration":effect.Duration, "Curable":effect.Curable}
+	if sParam.has(s) and !sParam[s].Curable:
+		sParam[s].Duration = effect.Duration
+	else:
+		sParam[s] = {"Duration":effect.Duration, "Curable":effect.Curable}
 	update_stats()
 	#{"Active" : true, "Duration" : duration, "Curable" : isCurable}
 	#$PathFollow2D/Cell2.set_text(str(status))
@@ -592,8 +905,8 @@ func check_status(condition:String):
 		return false
 
 func set_acted(actState: bool):
-	status.ACTED = actState
-	match status.ACTED:
+	status.Acted = actState
+	match status.Acted:
 		false: _animPlayer.play("idle")
 		true: 
 			_animPlayer.play("disabled")
@@ -630,7 +943,7 @@ func update_terrain_data(data : Array):
 	terrainData = data
 	
 func update_terrain_bonus():
-#	print(combatData.AVOID)
+#	print(combatData.Avoid)
 	var bonus = 0
 	if deployed:
 		var i = find_nested(terrainData, Vector2i(cell))
@@ -722,17 +1035,3 @@ func map_start_init():
 	originCell = map.local_to_map(position) #BUG GY
 	#print(originCell)
 	
-
-
-#func get_equipped_items(): #returns Array of equipped items, stored in dictionaries: Item ID, Inventory Index; item category [{"ITEM":id, "INDEX": i, "CAT": c}]
-	#var inv = unitData.Inv
-	#var i : int = 0
-	#var equipment : Array = [] 
-	#for item in inv:
-		#if item.EQUIP == true:
-			#var p : Dictionary = {}
-			#var c = get_icat(item)
-			#p["ID"] = item.ID
-			#
-			
-			

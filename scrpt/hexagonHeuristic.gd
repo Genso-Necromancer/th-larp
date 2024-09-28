@@ -3,8 +3,8 @@ class_name AHexGrid2D
 #var Astar = AStarGrid2D.new()
 var mapSize
 var mapRect
-var tileSize
-var tilemap: GameMap
+#var tileSize
+var tilemap
 var oddq_directions = [
 	[[+1,  0], [+1, -1], [ 0, -1], 
 	[-1, -1], [-1,  0], [ 0, +1]],
@@ -24,14 +24,14 @@ var unitsList: Dictionary
 func reinit():
 	_init(tilemap)
 
-func _init(tileMap: GameMap):
+func _init(tileMap):
 	self.tilemap = tileMap
 	open_list = []
 	closed_list = []
 	solidList = []
 	mapRect = tilemap.get_used_rect()
 	mapSize = mapRect.size
-	tileSize = tilemap.tileSize
+	#tileSize = tilemap.tileSize
 	lowest_f_cost = INF
 	lowest_node = null
 
@@ -91,7 +91,7 @@ func find_path(start: Vector2i, end: Vector2i, moveType: int, attack: bool = fal
 #				continue
 				
 				
-			var g_cost = current_node.g_cost + compute_cost(current_node.node, neighbor.node, moveType, terrain)
+			var g_cost = current_node.g_cost + compute_cost(current_node.node, neighbor.node, terrain, moveType)
 			var h_cost = compute_cost(neighbor.node, end_node, moveType, terrain)
 			var f_cost = g_cost + h_cost
 			
@@ -134,7 +134,53 @@ func find_all_paths(start: Vector2i, max_cost: int, moveType: int = Enums.MOVE_T
 			
 		for neighbor in get_BFS_nhbr(current_node):
 			var neighbor_info = get_visited_info(visited, neighbor)
-			var neighbor_cost = current_cost + compute_cost(current_node, neighbor, moveType, terrain)
+			var neighbor_cost = current_cost + compute_cost(current_node, neighbor, terrain, moveType)
+			if neighbor_cost > max_cost:
+				continue
+			if neighbor_info == {}  or neighbor_cost < neighbor_info["cost"]:
+				var neighbor_paths = []
+				if neighbor_info != {} and neighbor_cost < neighbor_info["cost"]:
+					neighbor_info["cost"] = neighbor_cost
+					neighbor_info["paths"] = []
+				else:
+					visited.append({ "node": neighbor, "cost": neighbor_cost, "paths": neighbor_paths })
+					neighbor_info = visited[-1]
+				
+				for path in current_paths:
+					var new_path = path + [neighbor]
+					neighbor_info["paths"].append(new_path)
+					
+				queue.append(neighbor)
+
+	result = dict_strip(result)
+	return result
+	
+func find_aura(start: Vector2i, max_cost: int) -> Array: #HERE
+#	var visited: Dictionary = {}
+#	visited[start] = { "cost": 0, "paths": [[]] }
+	
+	var visited: Array = []
+	visited.append({"node": start, "cost": 0, "paths": [[]]})
+	
+	var queue: Array = []
+	queue.append(start)
+	
+	var result: Array = []
+	
+	while queue.size() > 0:
+		var current_node = queue.pop_front()
+		var current_info = get_visited_info(visited, current_node)
+		var current_cost = current_info.cost
+		var current_paths = current_info.paths
+		
+		result.append({ "node": current_node, "paths": current_paths })
+		
+		if current_cost >= max_cost:
+			continue
+			
+		for neighbor in get_BFS_nhbr(current_node, true, true):
+			var neighbor_info = get_visited_info(visited, neighbor)
+			var neighbor_cost = current_cost + compute_cost(current_node, neighbor, false)
 			if neighbor_cost > max_cost:
 				continue
 			if neighbor_info == {}  or neighbor_cost < neighbor_info["cost"]:
@@ -215,7 +261,7 @@ func estimate_cost(a, b) -> float:
 	var distance = axial_distance(ac, bc)
 	return distance
 	
-func compute_cost(a: Vector2i, b: Vector2i, moveType: int, terrain: bool = true) -> float:
+func compute_cost(a: Vector2i, b: Vector2i, terrain: bool = true, moveType: int = Enums.MOVE_TYPE.FOOT) -> float:
 	var tileWeight = 1
 	var tileType
 	if terrain:
@@ -343,15 +389,11 @@ func get_BFS_nhbr(hex: Vector2i, ignoreSolid: bool = false, justNhbrs = false) -
 		for offsetH in offsets:
 			var neighbor = hex
 			neighbor += offsetH
-	
-		
+			
 		# Check if the neighbor is valid
-			if !ignoreSolid:
-				if check_valid_nhbr(neighbor, false, ignoreSolid):
-					neighbors.append(neighbor)
-			elif ignoreSolid:
-				if check_valid_nhbr(neighbor, false, ignoreSolid):
-					neighbors.append(neighbor)
+			if check_valid_nhbr(neighbor, false, ignoreSolid):
+				neighbors.append(neighbor)
+				
 		return neighbors
 
 		
@@ -363,6 +405,9 @@ func resolve_shove(matchHex, targetHex, neighbors, distance): #for Shove, give t
 	var isSlam = false
 	var travel = 0
 	var shoveStopper
+	
+	if !distance:
+		distance = 0
 	
 	for hex in neighbors:
 		if hex == matchHex and i < 3:
@@ -459,8 +504,8 @@ func find_range(current):
 	for wep in current.unitData.Inv:
 		if current.unitData.Inv[wep].LIMIT and current.unitData.Inv[wep].USES == 0:
 			continue
-		maxRange = max(maxRange, current.unitData.Inv[wep].MAXRANGE, maxRange)
-		minRange = min(minRange, current.unitData.Inv[wep].MINRANGE, minRange)
+		maxRange = max(maxRange, current.unitData.Inv[wep].MaxRange, maxRange)
+		minRange = min(minRange, current.unitData.Inv[wep].MinRange, minRange)
 	var unitRange = [minRange, maxRange]
 	return unitRange
 	
@@ -492,7 +537,7 @@ func find_threat(walkable, unitRange, moveType = "Flat"):
 	
 	for tile in threatRange:
 		for cell in walkable:
-			var tileRange = compute_cost(cell, tile, moveType, false)
+			var tileRange = compute_cost(cell, tile, false, moveType)
 			if tileRange >= minRange and !filteredThreatRange.has(tile):
 				filteredThreatRange.append(tile)
 	return filteredThreatRange

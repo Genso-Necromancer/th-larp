@@ -5,11 +5,12 @@ var gameBoard
 func setup(newSlaves):
 	super.setup(newSlaves)
 	gameBoard = slaves[0]
+	print(str(slaves))
 
 func _handle_bind(bind):
 	match bind:
 		"invalid": return
-		"ui_accept": pass
+		"ui_accept": gameBoard.confirm_forecast()
 		"ui_info": pass
 		"ui_return": gameBoard.return_targeting()
 		"ui_scroll_left": pass

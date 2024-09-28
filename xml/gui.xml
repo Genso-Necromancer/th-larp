@@ -1,15 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
 	<language id = "CHINA">
-		<tools>
+		<template>
 			<entry id = "effect_chance"><![CDATA[CHING CHONG]]></entry>
+		</template>
+		<string>
 			<entry id = "name_sleep"><![CDATA[[color=#5F9EA0]STEAL BABY ORGANS[/color]]]></entry>
-		</tools>
+		</string>
 	</language>
 	<language id = "AMERICAN">
-		<tools>
-			<entry id = "effect_chance"><![CDATA[%s (%d%%)]]></entry>
-			<entry id = "name_sleep"><![CDATA[[color=#5F9EA0]Sleep[/color]]]></entry>
-		</tools>
+		<template>
+			<entry id = "value_template"><![CDATA[%s %d]]></entry>
+			<entry id = "percent_value_template"><![CDATA[%s %d%%]]></entry>
+			<entry id = "proc_template"><![CDATA[%s (%d%%)]]></entry>
+			<entry id = "duration_template"><![CDATA[%s for %d %s]]></entry>
+			<entry id = "unit_name"><![CDATA[%s %s]]></entry>
+			<entry id = "combat_hp_remain"><![CDATA[[[color=#FF0000]%d[/color]] %s]]></entry>
+			<entry id = "combat_hp"><![CDATA[%d/%d]]></entry>
+			<!-- effect type templates -->
+			<entry id = "effect_template_buff"><![CDATA[[color=#6495ED]Buff[/color] %s]]></entry>
+			<entry id = "effect_template_status"><![CDATA[%s]]></entry>
+			<entry id = "effect_template_time"><![CDATA[%s Time]]></entry>
+			<entry id = "effect_template_life_steal"><![CDATA[[color=#8C1717]Life Steal[/color]]]></entry>
+			
+		</template>
+		<string>
+			<entry id = "void_value"><![CDATA[--]]></entry>
+			<!-- Durations -->
+			<entry id = "duration_round"><![CDATA[Rounds]]></entry>
+			<entry id = "duration_turn"><![CDATA[Turns]]></entry>
+			<!-- effects -->
+			<entry id = "effect_sub_type_speed_up"><![CDATA[Speed up]]></entry>
+			<entry id = "effect_sub_type_slow_down"><![CDATA[Slow down]]></entry>
+			<entry id = "effect_sub_type_sleep"><![CDATA[[color=#5F9EA0]Sleep[/color]]]></entry>
+			<!-- names -->
+			<entrt id = "unit_name_remilia"><![CDATA[Remilia Scarlet]]></entry>
+			<entrt id = "unit_name_sakuya"><![CDATA[Sakuya Izayoi]]></entry>
+			<entrt id = "unit_name_patchouli"><![CDATA[Patchouli Knowledge]]></entry>
+			<entrt id = "unit_name_meiling"><![CDATA[Hong Meiling]]></entry>
+			<!-- species -->
+			<entry id = "species_name_fairy"><![CDATA[Fairy]]></entry>
+			<entry id = "species_name_human"><![CDATA[Vampire]]></entry>
+			<entry id = "species_name_vampire"><![CDATA[Human]]></entry>
+			<entry id = "species_name_magician"><![CDATA[Magician]]></entry>
+			<entry id = "species_name_dragon"><![CDATA[Dragon]]></entry>
+			<!-- character roles -->
+			<entry id = "role_name_troublemaker"><![CDATA[Troublemaker]]></entry>
+			<entry id = "role_name_cointaker"><![CDATA[Cointaker]]></entry>
+			<entry id = "role_name_maid"><![CDATA[Maid]]></entry>
+			<entry id = "role_name_lady"><![CDATA[Lady]]></entry>
+			<entry id = "role_name_guard"><![CDATA[Gatekeeper]]></entry>
+			<entry id = "role_name_mage"><![CDATA[Magician]]></entry>
+			<!-- targeting -->
+			<entry id = "effect_target_self"><![CDATA[Self: ]]></entry>
+			<entry id = "effect_target_target"><![CDATA[Target: ]]></entry>
+		</string>
 	</language>
 </root>

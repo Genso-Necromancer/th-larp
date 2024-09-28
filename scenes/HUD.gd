@@ -8,5 +8,9 @@ func _ready():
 	self.jobs_done_hud.connect(parent._on_jobs_done)
 	emit_signal("jobs_done_hud", "HUD", self)
 
+func set_sun(time):
+	var rot = Global.rotationFactor * time
+	sunDial.rotation_degrees += rot
+
 func update_sun(rot):
 	sunDial.rotation_degrees += rot

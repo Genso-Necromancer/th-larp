@@ -1,19 +1,18 @@
 extends Control
 
 
-func show_fc():
+func show_fc() -> void:
 	self.visible = true
 	
-func hide_fc():
+func hide_fc() -> void:
 	self.visible = false
+	_close_effects()
 	
-func update_fc(cmbData): #Not full functioning. Just placeholder. Add GRAZE and an effect loading function
+func update_fc(cmbData) -> void: #HERE labels need updating to using StringGetter AND "unarmed" doesn't appear correct
 	var groups : Dictionary = {}
 	var units : Array = cmbData.keys()
 	var i := 0
-	
 	var sprites: Array = []
-	
 	sprites.append($GC/BGA1/MC/AtkFull)
 	sprites.append($GC/BGA2/MC/TrgtFull)
 	groups["LEFT"] = $GC/HBC/AtkPanel/AMa/AVB.get_children()
@@ -23,53 +22,102 @@ func update_fc(cmbData): #Not full functioning. Just placeholder. Add GRAZE and 
 		var hit := "--"
 		var dmg := "--"
 		var crit := "--"
-		var remaining : String = ""
 		var active : Dictionary = units[i].activeStats
-		var cStats : Dictionary = cmbData[units[i]].combat
-		if cStats.ACC and cmbData[units[i]].counter and cmbData[units[i]].reach: hit = str(cStats.ACC)
-		elif !cStats.ACC and cmbData[units[i]].counter and cmbData[units[i]].reach: hit = "TRUE" 
-		if cStats.Dmg and cmbData[units[i]].counter and cmbData[units[i]].reach: dmg = str(cStats.Dmg)
-		if cStats.Crit and cmbData[units[i]].counter and cmbData[units[i]].reach: crit = str(cStats.Crit)
+		var cStats : Dictionary = cmbData[units[i]].Combat
+		var lifeTemplate : String = StringGetter.get_template("combat_hp")
+		var remainTemplate : String = StringGetter.get_template("combat_hp_remain")
+		var lifeText : String = "[center]%s[/center]"
+		var hp = lifeTemplate % [active.CurLife, units[i].baseStats.Life]
 		
-		#if cStats.Dmg and (units[i].baseStats.LIFE - cStats.Dmg) != active.CLIFE: #ITS FUCKING WRONG FIX IT. YOU CANOT FUCKING GET THE DAMAGE LIKE THIS IT ONLY HAS ACCESS TO THE FUCKING SELF STATS, YOU JUST REMOVED ITS OWN DAMAGE FROM ITS HEALTH JUST LIKE LAST TIME IN A DIFFERENT FUNCTION YOU ABSOLUTE FUCKING BAFOON. HERE
-			#var rLife : int = units[i].baseStats.LIFE - cStats.Dmg
-			#remaining = " [[color=#FF2400]%d[/color] ]" % [rLife]
-		var lifeText : String = "[center]%s%d/%d[/center]" % [remaining, active.CLIFE, units[i].baseStats.LIFE]
+		if !cStats.TrueHit and cmbData[units[i]].Counter and cmbData[units[i]].Reach: hit = str(cStats.Hit)
+		elif cStats.TrueHit and cmbData[units[i]].Counter and cmbData[units[i]].Reach: hit = "TRUE" 
+		
+		if !cStats.Dmg and cStats.Dmg != 0: pass
+		elif cmbData[units[i]].Counter and cmbData[units[i]].Reach: dmg = str(cStats.Dmg)
+		
+		if !cStats.Crit and cStats.Crit != 0: pass
+		elif cmbData[units[i]].Counter and cmbData[units[i]].Reach: crit = str(cStats.Crit)
+		
+		if cStats.has("Rlife") and active.CurLife != cStats.Rlife:
+			lifeText = lifeText % [remainTemplate]
+			lifeText = lifeText % [cStats.Rlife, hp]
+		else: lifeText = lifeText % [hp]
+		
 		sprites[i].set_texture(units[i].unitData.Profile.Prt)
 		groups[g][0].set_text(units[i].unitName)
 		groups[g][1].set_text(lifeText)
-
 		groups[g][2].set_text(hit)
 		groups[g][3].set_text(dmg)
 		groups[g][4].set_text(crit)
+		#HERE check for swing count for visual representation
 		i += 1
+	if cmbData[units[0]].Effects or cmbData[units[1]].Effects:
+		_load_effects(cmbData)
 	
-func _load_effects(cmbData):
-	var l : Control = $GC/HBC/AtkEfPanel
-	var c : Control = $GC/HBC/Labels2
-	var r : Control = $GC/HBC/TargetEfPanel
-	var all : Array = [l,c,r]
-	var eff = UnitData.effectData
-	#HERE Unfinished, awaiting effects overhaul
+func _load_effects(cmbData) -> void:
+	var units : Array = cmbData.keys()
+	var lists : Dictionary = {units[0]:$GC/HBC/AtkEfPanel/AMa/AVB, units[1]:$GC/HBC/TargetEfPanel/TMa/TVB}
+	var panels : Array = [$GC/HBC/AtkEfPanel, $GC/HBC/Labels2, $GC/HBC/TargetEfPanel]
 	
-func _get_effect_string(effectType): #Time to create the string XML and string getter, eh?
+	for p in panels:
+		p.visible = true
+	for unit in units:
+		_clear_old(lists[unit])
+		var strings : Array = []
+		var selfEff : Array = []
+		var targEff : Array = []
+		var globEff : Array = []
+		if !cmbData[unit].Effects:
+			var string : String = "[center]%s[/center]" % [StringGetter.get_string("void_value")]
+			strings.append(string)
+			continue
+		#var keys : Array = cmbData[unit].Effects.keys()
+		for effId in cmbData[unit].Effects:
+			var string : String = "[center]%s[/center]" % StringGetter.get_combat_effect_string(effId, cmbData[unit])
+			match UnitData.effectData[effId].Target:
+				Enums.EFFECT_TARGET.SELF: selfEff.append(string)
+				Enums.EFFECT_TARGET.TARGET: targEff.append(string)
+				Enums.EFFECT_TARGET.GLOBAL: globEff.append(string)
+		
+		if globEff.size() > 0:
+			_add_effect_labels(lists[unit], globEff)
+			
+		if targEff.size() > 0:
+			_add_effect_labels(lists[unit], targEff)
+			
+		if selfEff.size() > 0:
+			var lbl = RichTextLabel.new()
+			var selfString = "[center]%s[/center]" % StringGetter.get_string("effect_target_self")
+			Global.set_rich_text_params(lbl)
+			lbl.set_text(selfString)
+			lists[unit].add_child(lbl)
+			_add_effect_labels(lists[unit], selfEff)
+
+
+func _clear_old(list):
+	var old = list.get_children()
+	for l in old:
+		l.queue_free()
+
+		
+func _add_effect_labels(lists, strings):
+	for string in strings:
+		var lbl = RichTextLabel.new()
+		Global.set_rich_text_params(lbl)
+		lbl.set_text(string)
+		lists.add_child(lbl)
+
+func _close_effects() -> void:
+	var lists : Array = [$GC/HBC/TargetEfPanel/TMa/TVB, $GC/HBC/AtkEfPanel/AMa/AVB]
+	var panels : Array = [$GC/HBC/AtkEfPanel, $GC/HBC/Labels2, $GC/HBC/TargetEfPanel]
+	for l in lists:
+		for child in l.get_children():
+				child.queue_free()
+	for p in panels:
+		p.visible = false
 	
-	
-	
-	match effectType:
-		Enums.EFFECT_TYPE.ADD_PASSIVE: pass
-		Enums.EFFECT_TYPE.ADD_SKILL: pass
-		Enums.EFFECT_TYPE.BUFF: pass
-		Enums.EFFECT_TYPE.CURE: pass
-		Enums.EFFECT_TYPE.DAMAGE: pass
-		Enums.EFFECT_TYPE.DASH: pass
-		Enums.EFFECT_TYPE.DEBUFF: pass
-		Enums.EFFECT_TYPE.HEAL: pass
-		Enums.EFFECT_TYPE.SHOVE: pass
-		Enums.EFFECT_TYPE.STATUS: pass
-		Enums.EFFECT_TYPE.TIME: pass
-		Enums.EFFECT_TYPE.TOSS: pass
-		Enums.EFFECT_TYPE.WARP: pass
-	
-func _on_gameboard_cmbData_updated(cmbData):
+
+
+
+func _on_gameboard_cmbData_updated(cmbData) -> void:
 	update_fc(cmbData)

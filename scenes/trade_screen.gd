@@ -209,7 +209,7 @@ func _fill_item_list(list, unit):
 		var itemData = UnitData.itemData[item.ID]
 		var b = Button.new()
 		var dur = item.DUR
-		var mDur = itemData.MAXDUR
+		var mDur = itemData.MaxDur
 		var durString
 		if dur == -1 or mDur == -1:
 			durString = str(" --")
@@ -239,7 +239,7 @@ func _fill_supply_list(s):
 		var itemData = UnitData.itemData[item.ID]
 		var b = Button.new()
 		var dur = item.DUR
-		var mDur = itemData.MAXDUR
+		var mDur = itemData.MaxDur
 		var durString
 		if dur == -1 or mDur == -1:
 			durString = str(" --")
@@ -418,7 +418,7 @@ func _give_select(b):
 	var unit = b.get_meta("unit")
 	var item = b.get_meta("item")
 	var iData = UnitData.itemData[item.ID]
-	var iType = iData.CATEGORY
+	var iType = iData.Category
 	var iInd = b.get_meta("index")
 	var inv = unit.unitData.Inv
 	var list = get_trade_list(1)
@@ -454,7 +454,7 @@ func _take_select(b):
 	var unit = firstUnit
 	var item = b.get_meta("item")
 	var iData = UnitData.itemData[item.ID]
-	var iType = iData.CATEGORY
+	var iType = iData.Category
 	var iInd = b.get_meta("index")
 	var inv = unit.unitData.Inv
 	var list = get_trade_list(1)

@@ -26,7 +26,6 @@ func on_index_pressed(index):
 	sceneMenu.set_text(str(popUp.get_item_text(index)))
 
 func _on_load_button_pressed():
-	var scenes
 	match itemId:
 		0: 
 			var map = preload("res://scenes/maps/TestMap.tscn")

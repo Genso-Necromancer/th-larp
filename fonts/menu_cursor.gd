@@ -12,7 +12,7 @@ var cursor_index : int = 0
 var shouldUpdateCursor = false
 var currentFocus
 
-func _process(delta):
+func _process(_delta):
 	set_cursor(currentFocus)
 
 func _ready():

@@ -1,0 +1,28 @@
+[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://ddn21fp2rgt22"]
+
+[ext_resource type="Texture2D" uid="uid://bn4u1sykritxk" path="res://sprites/hex cover test.png" id="1_areco"]
+[ext_resource type="Texture2D" uid="uid://cwdtp8f162l40" path="res://sprites/hexAttackTest.png" id="2_ojpyl"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_imj64"]
+texture = ExtResource("1_areco")
+texture_region_size = Vector2i(48, 16)
+use_texture_padding = false
+0:0/0 = 0
+0:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
+0:0/0/physics_layer_0/angular_velocity = 0.0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-40, -24, -80, 0, -40, 24, 40, 24, 80, 0, 40, -24)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jtw8t"]
+texture = ExtResource("2_ojpyl")
+texture_region_size = Vector2i(48, 16)
+0:0/0 = 0
+0:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
+0:0/0/physics_layer_0/angular_velocity = 0.0
+
+[resource]
+tile_shape = 3
+tile_offset_axis = 1
+tile_size = Vector2i(160, 48)
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_imj64")
+sources/1 = SubResource("TileSetAtlasSource_jtw8t")

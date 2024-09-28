@@ -295,7 +295,6 @@ theme = ExtResource("1_jeq77")
 horizontal_alignment = 1
 
 [node name="AtkEfPanel" type="PanelContainer" parent="GC/HBC"]
-visible = false
 layout_mode = 2
 
 [node name="BackgroundCenter2" type="NinePatchRect" parent="GC/HBC/AtkEfPanel"]
@@ -310,14 +309,10 @@ patch_margin_bottom = 16
 [node name="AMa" type="MarginContainer" parent="GC/HBC/AtkEfPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-
-[node name="MC" type="MarginContainer" parent="GC/HBC/AtkEfPanel/AMa"]
-layout_mode = 2
-
-[node name="bg?" type="TextureRect" parent="GC/HBC/AtkEfPanel/AMa/MC"]
-layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 10
 
 [node name="AVB" type="VBoxContainer" parent="GC/HBC/AtkEfPanel/AMa"]
 layout_mode = 2
@@ -325,7 +320,6 @@ theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
 
 [node name="Labels2" type="PanelContainer" parent="GC/HBC"]
-visible = false
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 
@@ -342,24 +336,26 @@ patch_margin_bottom = 16
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 8
+theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_bottom = 10
 
 [node name="VBoxContainer" type="VBoxContainer" parent="GC/HBC/Labels2/Margin"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
 
-[node name="EFFLB" type="Label" parent="GC/HBC/Labels2/Margin/VBoxContainer"]
+[node name="EFFLB" type="RichTextLabel" parent="GC/HBC/Labels2/Margin/VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
 theme = ExtResource("1_jeq77")
-text = "Effects"
-horizontal_alignment = 1
-vertical_alignment = 1
+bbcode_enabled = true
+text = "[center]Effects[/center]"
+fit_content = true
+scroll_active = false
 
 [node name="TargetEfPanel" type="PanelContainer" parent="GC/HBC"]
-visible = false
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 
@@ -375,8 +371,10 @@ patch_margin_bottom = 16
 [node name="TMa" type="MarginContainer" parent="GC/HBC/TargetEfPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 10
 
 [node name="TVB" type="VBoxContainer" parent="GC/HBC/TargetEfPanel/TMa"]
 layout_mode = 2

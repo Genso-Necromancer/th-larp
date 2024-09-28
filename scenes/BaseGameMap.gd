@@ -88,6 +88,9 @@ func get_forced_deploy(): #make sure there is equal units assigned as forced as 
 		if tileData.get_custom_data("trigger") == "forcedCell":
 			forcedCells.append(cell)
 	for unit in forcedUnits:
+		if i > forcedCells.size()+1:
+			print("Not enough forced deploy Cells!")
+			break
 		forcedDeploy[unit] = forcedCells[i]
 		i += 1
 	return forcedDeploy
@@ -110,7 +113,7 @@ func check_event(trigger, parameter): ##Triggers: death, time, seize
 func _check_death_conditionals(parameter):
 	var unitId
 	var condition
-	if parameter.faction == "Player":
+	if parameter.FACTION_ID == Enums.FACTION_ID.PLAYER:
 		unitId = parameter.unitId
 		condition = "Player Death"
 	else:

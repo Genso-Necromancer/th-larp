@@ -101,15 +101,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="UnitExp" parent="Profile/M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats" index="1"]
-visible_characters = 0
-visible_ratio = 0.0
-
-[node name="SkillLbl" parent="Profile/M/HBoxContainer/G/MC2/VB/BG/MC" index="0"]
-visible_characters = 0
-visible_ratio = 0.0
-
-[node name="PassLbl" parent="Profile/M/HBoxContainer/G/MC3/VB/BG/MC" index="0"]
+[node name="Eqp" parent="Profile/M/HBoxContainer/InventoryBox/MC2/VB/BG/MC" index="0"]
 visible_characters = 0
 visible_ratio = 0.0
 

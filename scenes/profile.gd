@@ -21,28 +21,28 @@ func _on_update_prof():
 	var unitBuffs = focusUnit.activeBuffs
 
 	
-	focusUnit.update_combatdata()
+	focusUnit.update_stats()
 	if focusUnit.is_in_group("Enemy"):
 		$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitExp.set_text("0/100")
 	elif focusUnit.is_in_group("Player"):
 		$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitExp.set_text(str(unitData["Profile"]["EXP"]) + "/100")
-	$M/HBoxContainer/G/NameBox/VBoxContainer/UnitName.set_text(unitData["Profile"]["UnitName"])
+	$M/HBoxContainer/G/NameBox/VBoxContainer/UnitName.set_text("[center]%s[/center]" % [focusUnit.unitName])
 	$M/HBoxContainer/PortraitBox/MC/MC/UnitPrt.set_texture(unitData["Profile"]["Prt"])
 	$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitLevel.set_text(str(unitData["Profile"]["Level"]))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitHp.set_text(str(unitStats.CLIFE) + "/" + str(unitData.Stats.LIFE))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitCmp.set_text(str(unitStats.CCOMP) + "/" + str(unitData.Stats.COMP))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitStr.set_text(str(unitStats["PWR"]))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitMag.set_text(str(unitStats["MAG"]))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitEle.set_text(str(unitStats["ELEG"]))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitCele.set_text(str(unitStats["CELE"]))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitBar.set_text(str(unitStats["BAR"]))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitCha.set_text(str(unitStats["CHA"]))
-	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitAcc.set_text(str(focusUnit.combatData.ACC))
-	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitAvd.set_text(str(focusUnit.combatData.AVOID))
+	$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitHp.set_text(str(unitStats.CurLife) + "/" + str(unitData.Stats.Life))
+	$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitCmp.set_text(str(unitStats.CurComp) + "/" + str(unitData.Stats.Comp))
+	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitStr.set_text(str(unitStats["Pwr"]))
+	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitMag.set_text(str(unitStats["Mag"]))
+	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitEle.set_text(str(unitStats["Eleg"]))
+	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitCele.set_text(str(unitStats["Cele"]))
+	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitBar.set_text(str(unitStats["Bar"]))
+	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitCha.set_text(str(unitStats["Cha"]))
+	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitAcc.set_text(str(focusUnit.combatData.Hit))
+	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitAvd.set_text(str(focusUnit.combatData.Avoid))
 	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitDmg.set_text(str(focusUnit.combatData.Dmg))
-	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitGrz.set_text(str(focusUnit.combatData.GRAZE) + " (" + str(focusUnit.combatData.GRZPRC)) + "%)"
+	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitGrz.set_text(str(focusUnit.combatData.Graze) + " (" + str(focusUnit.combatData.GrzPrc) + "%)")
 	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitCrit.set_text(str(focusUnit.combatData.Crit))
-	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitCritAvd.set_text(str(focusUnit.combatData.CRTAVD))
+	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitCritAvd.set_text(str(focusUnit.combatData.CrtAvd))
 	
 	_fill_inv(focusUnit)
 
@@ -57,10 +57,10 @@ func _fill_inv(unit):
 	var unitInv = unit.unitData.Inv
 	var durString : String
 	
-	if equipped.DUR <= -1 or eqStats.MAXDUR <= -1:
+	if equipped.DUR <= -1 or eqStats.MaxDur <= -1:
 		durString = str(" --")
 	else:
-		durString = str(" [" + str(equipped.DUR) + "/" + str(eqStats.MAXDUR)+"]")
+		durString = str(" [" + str(equipped.DUR) + "/" + str(eqStats.MaxDur)+"]")
 	
 	eqpLabel.set_text(str(eqStats.Name) + durString)
 	eqpLabel.set_meta("data_key", eqStats)
@@ -72,11 +72,11 @@ func _fill_inv(unit):
 		var gStats = UnitData.itemData[item.ID]
 		var l = Label.new()
 		equipped.DUR = item.DUR
-		eqStats.MAXDUR = gStats.MAXDUR
-		if equipped.DUR <= -1 or eqStats.MAXDUR <= -1:
+		eqStats.MaxDur = gStats.MaxDur
+		if equipped.DUR <= -1 or eqStats.MaxDur <= -1:
 			durString = str(" --")
 		else:
-			durString = str(" [" + str(equipped.DUR) + "/" + str(eqStats.MAXDUR)+"]")
+			durString = str(" [" + str(equipped.DUR) + "/" + str(eqStats.MaxDur)+"]")
 		l.set_text(str(gStats.Name) + durString)
 		l.set_meta("data_key", item.ID)
 		invPanel.add_child(l)

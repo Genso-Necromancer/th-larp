@@ -18,6 +18,8 @@ signal cmbData_updated(cmbData)
 signal walk_complete
 signal map_loaded
 signal skill_target_canceled
+signal forecast_confirmed
+signal time_set
 
 
 signal toggle_prof
@@ -63,7 +65,7 @@ var mapSize
 var mapCellSize
 var mapRect
 var terrainData := []
-var lastSkill
+
 var warpTarget
 var deathList = []
 
@@ -106,7 +108,7 @@ var turnComplete : bool = false
 var globalEffects = {}
 
 #I don't even know if I need this
-var activeSkill
+var activeAction #SEARCH THIS OKAY? 
 
 #controls pseudo UI elements, like HP bars
 var HpBarVis = true
@@ -167,8 +169,6 @@ func _on_jobs_done(id, node):
 	match id:
 		"Cursor": 
 			cursor = node
-		"CmbMng":
-			combatManager = node
 			
 #Map Functions
 func _get_current_map():
@@ -233,11 +233,14 @@ func _initialize_terrain_data():
 func _initialize_hexstar():
 	mapRect = currMap.get_used_rect() #initializing hexStar
 	mapSize = mapRect.size
-	mapCellSize = currMap.tileSize
+	#mapCellSize = currMap.tileSize
 	
 	#start up pathfinder
 	hexStar = AHexGrid2D.new(currMap)
-	hexStar.tileSize = mapCellSize
+	#hexStar.tileSize = mapCellSize
+	
+func get_hex_star() -> AHexGrid2D:
+	return hexStar
 	
 func _store_enemy_units():
 	units.clear()
@@ -322,6 +325,7 @@ func _connect_unit_signals(unit):
 		
 func _set_game_time():
 	Global.gameTime = currMap.gameTime #setting game time
+	emit_signal("time_set")
 	checkSun()
 		
 #func _reinitialize() -> void:
@@ -394,9 +398,9 @@ func _connect_general_signals():
 	
 func checkSun():
 	if Global.gameTime >= 6.0 and Global.gameTime <= 18.0:
-		Global.day = true
+		Global.timeOfDay = Enums.TIME.DAY
 	else:
-		Global.day = false
+		Global.timeOfDay = Enums.TIME.NIGHT
 	for unit in units:
 		units[unit].check_passives()
 		
@@ -453,7 +457,7 @@ func init_hexStar_terrain(attack: bool = false):
 	solidsArray.clear()
 	solidsArray = []
 	hexStar.size = mapRect.size
-	hexStar.cell_size = mapCellSize
+	#hexStar.cell_size = mapCellSize
 	#units are split between factions, then it's opposing faction is considered "solid"
 	##Plans to allow for flying units to go 'over' opposing units in the future possibly, not currently implemented
 	var team = null
@@ -488,7 +492,7 @@ func init_hexStar_terrain(attack: bool = false):
 func get_walkable_cells(unit: Unit) -> Array:
 	#Possibly unnecessary. 
 	#It's convienent to just call using only unit variable and let the function split the necessary info
-	return _flood_fill(unit.cell, unit.activeStats.MOVE, unit.unitData.MoveType)
+	return _flood_fill(unit.cell, unit.activeStats.Move, unit.unitData.MoveType)
 
 func _flood_fill(cell: Vector2i, max_distance: int, moveType : int, terrain: bool = true, attack: bool = false) -> Array:
 	#initializes pathfinder, calls floodfill pathfind and visual displays it all at once
@@ -602,28 +606,28 @@ func on_unit_relocated(oldCell, newCell, unit): #updates unit locations with it'
 	units[newCell] = unit
 	
 
-func grab_target(cell, skillId = false):
+func grab_target(cell): #HERE Add "Action" compatability
 	#Called to assign values based on unit at cursor's coordinate
-	var distance : float
-	var foreCast : Dictionary
-	var mode : int
 	if not units.has(cell):
 		print("oops")
 		return
+	var foreCast : Dictionary
+	var mode : int
 	targetUnit = units[cell]
-	distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.unitData.MoveType, false)
-	if !skillId:
-		foreCast = combatManager.get_forecast(activeUnit, targetUnit, distance)
+	var distance := hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.unitData.MoveType, false)
+	var range := [distance, distance]
+	if activeAction.Weapon:
+		foreCast = combatManager.get_forecast(activeUnit, targetUnit, activeAction)
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		mode = 0
 	else:
-		foreCast = combatManager.get_forecast(activeUnit, targetUnit, distance, skillId)
+		foreCast = combatManager.get_forecast(activeUnit, targetUnit, activeAction)
 		mode = 1
-	emit_signal("target_focused", foreCast, mode, distance)
+	emit_signal("target_focused", foreCast, mode, range)
 			
-func _activate_skill():
+func _activate_skill(): #OLD MARKED FOR DELETION
 	#print("Skill Manager")
-	combatManager.run_skill(activeUnit, targetUnit, activeSkill)
+	combatManager.run_skill(activeUnit, targetUnit, activeAction) #NOT FIXED
 	if warpTarget == null:
 		combat_sequence(activeUnit, targetUnit)
 		
@@ -734,27 +738,21 @@ func menu_step_back():
 	
 	
 func attack_target_selected():
-	var friendly = false
-	var team = null
-	if activeUnit.is_in_group("Player"):
-		team = "Player"
-	if activeUnit.is_in_group("Enemy"):
-		team = "Enemy"
-	if focusUnit.is_in_group(team):
-		friendly = true
-	if is_occupied(cursorCell) and !friendly:
-		mainCon.previousState = mainCon.state
-		mainCon.state = GameState.GB_COMBAT_FORECAST
+	if is_occupied(cursorCell) and !_check_friendly(activeUnit, focusUnit):
+		_change_state(GameState.GB_COMBAT_FORECAST)
 #				$Cursor.visible = false
 		grab_target(cursorCell)
 		
+func confirm_forecast():
+	emit_signal("forecast_confirmed")
+		
 func skill_target_selected():
-	if !UnitData.skillData.has(activeSkill):
+	if !UnitData.skillData.has(activeAction.Skill):
 		print("No Valid SkillID")
 		return
 	var friendly := false
 	var valid := false
-	var skill = UnitData.skillData[activeSkill]
+	var skill = UnitData.skillData[activeAction.Skill]
 	if focusUnit.FACTION_ID == activeUnit.FACTION_ID or focusUnit.FACTION_ID == Enums.FACTION_ID.NPC:
 		friendly = true
 	match skill.Target:
@@ -775,7 +773,15 @@ func skill_target_selected():
 				valid = true
 	if valid:
 		_change_state(GameState.GB_COMBAT_FORECAST)
-		grab_target(cursorCell, activeSkill)
+		grab_target(cursorCell)
+
+func _check_friendly(unit1, unit2) ->bool:
+	if unit1.FACTION_ID == unit2.FACTION_ID:
+		return true
+	elif unit1.FACTION_ID != Enums.FACTION_ID.ENEMY and unit2.FACTION_ID != Enums.FACTION_ID.ENEMY:
+		return true
+	return false
+
 
 func return_targeting():
 	#var s
@@ -784,9 +790,9 @@ func return_targeting():
 		GameState.GB_ATTACK_TARGETING: 
 			#s = "Attack"
 			activeUnit.restore_equip()
-			attack_targeting(activeUnit)
+			attack_targeting(activeUnit, activeAction)
 		GameState.GB_SKILL_TARGETING:
-			attack_targeting(activeUnit, activeSkill)
+			attack_targeting(activeUnit, activeAction)
 			
 func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMORE???
 	# Controls what happens when an element is selected by the player based on input Global.state
@@ -839,7 +845,7 @@ func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMO
 		GameState.GB_SKILL_TARGETING: 
 			var friendly = false
 			var team = null
-			var targeting = activeSkill.Target
+			var targeting = UnitData.skillData[activeAction.Skill].Target
 			if activeUnit.is_in_group("Player"):
 				team = "Player"
 			if activeUnit.is_in_group("Enemy"):
@@ -849,33 +855,33 @@ func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMO
 					if is_occupied(cell) and activeUnit == focusUnit:
 						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
-						grab_target(cell, activeSkill)
+						grab_target(cell)
 				"Enemy":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and !friendly:
 						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
-						grab_target(cell, activeSkill)
+						grab_target(cell)
 				"Ally":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and friendly and activeUnit != focusUnit:
 						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
-						grab_target(cell, activeSkill)
+						grab_target(cell)
 				"Self+":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and friendly:
 						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
-						grab_target(cell, activeSkill)
+						grab_target(cell)
 				"Other":
 					if is_occupied(cell) and activeUnit != focusUnit:
 						mainCon.state = GameState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
-						grab_target(cell, activeSkill)
+						grab_target(cell)
 	
 
 
@@ -887,8 +893,8 @@ func _on_cursor_moved(new_cell: Vector2i) -> void:
 	var drawPath = false
 	if units.has(new_cell) and units[new_cell] == null: #safety measure, catches any uncleared cell storage that slips through the cracks
 		units.erase(new_cell)
-	if is_occupied(new_cell): #let's the game know what unit is the player's focus, and remains as such until a new unit is focused.
-		focusUnit = units[new_cell]
+	#if is_occupied(new_cell): #let's the game know what unit is the player's focus, and remains as such until a new unit is focused.
+		#focusUnit = units[new_cell]
 	
 	if activeUnit and activeUnit.is_selected and mainCon.state == GameState.GB_SELECTED:
 		drawPath = true
@@ -922,28 +928,54 @@ func on_directional_press(direction: Vector2i):
 	else: cursorCell += direction
 
 
-
-func attack_targeting(unit: Unit, skillId := ""): 
-	var maxRange := 0
+func attack_targeting(unit: Unit, action): 
 	var minRange := 1000
+	var maxRange := 0
 	var wepData :Dictionary = UnitData.itemData
+	var skillData = UnitData.skillData
+	var isAugment := false
+	activeAction = action
 			
-	if skillId != "":
-		var skillData = UnitData.skillData[skillId]
-		activeSkill = skillId
-		maxRange = skillData.RangeMax
-		minRange = skillData.RangeMin
+	if action.Weapon and action.Skill:
+		var range = _get_aug_range(unit, action)
+		minRange = range[0]
+		maxRange = range[1]
+		_change_state(GameState.GB_ATTACK_TARGETING)
+	elif action.Skill:
+		minRange = skillData[action.Skill].RangeMin
+		maxRange = skillData[action.Skill].RangeMax
 		_change_state(GameState.GB_SKILL_TARGETING)
 	else:
 		for wep in unit.unitData.Inv:
 			if wep.DUR == 0:
 				continue
-			maxRange = max(maxRange, wepData[wep.ID].MAXRANGE, maxRange)
-			minRange = min(minRange, wepData[wep.ID].MINRANGE, minRange)
+			minRange = min(minRange, wepData[wep.ID].MinRange, minRange)
+			maxRange = max(maxRange, wepData[wep.ID].MaxRange, maxRange)
 		_change_state(GameState.GB_ATTACK_TARGETING)
-			
-	_draw_range(unit, maxRange, minRange)
 	
+	_draw_range(unit, maxRange, minRange)
+
+func _get_aug_range(unit, action) -> Array:
+	var minRange := 1000
+	var maxRange := 0
+	var range := []
+	var skill = UnitData.skillData[action.Skill]
+	var wepData :Dictionary = UnitData.itemData
+	if skill.RangeMin == 0 or skill.RangeMax == 0:
+		for wep in unit.unitData.Inv:
+			if wep.DUR == 0:
+				continue
+			minRange = min(minRange, wepData[wep.ID].MinRange, minRange)
+			maxRange = max(maxRange, wepData[wep.ID].MaxRange, maxRange)
+	else:
+		minRange = skill.RangeMin
+		maxRange = skill.RangeMax
+	range.append(minRange)
+	range.append(maxRange)
+	return range
+		
+
+
 func warp_targeting(unit, wRange):
 	_draw_range(unit, wRange)
 	_change_state(GameState.GB_WARP)
@@ -1178,13 +1210,13 @@ func start_ai_turn():
 	
 #The next three functions process the AI's decided action based on which one is taken
 ##Attacking, Move without attacking; waiting in place
-func ai_attack(result):
+func ai_attack(result): #HERE..... EVENTUALLY. So fuckin out of date.
 	var actor = result["Unit"]
 	var target = result["Best Move"]["target"]
 	var destination = Vector2i(result["Best Move"]["launch"])
 	var weapon = result["Best Move"]["weapon"]
 	var wInd = actor.unitData.Inv.find(weapon)
-	var distance = hexStar.compute_cost(destination, target.cell, actor.moveType, false)
+	
 	_select_unit(actor.cell)
 #	var closestCell = hexStar.find_closest(actor.cell, target.cell, actor.moveType, walkableCells)
 	var path = get_path_to_cell(actor.cell, destination, actor.moveType)
@@ -1194,8 +1226,8 @@ func ai_attack(result):
 	
 	actor.set_equipped(wInd)
 	actor.update_stats()
-	combatManager.get_forecast(actor, target, distance)
-	combatManager.start_the_justice(actor,target)
+	combatManager.get_forecast(actor, target, activeAction)
+	#combatManager.start_the_justice(actor,target)
 #	print(activeUnit)
 	
 	boardState.add_acted(activeUnit)
@@ -1233,13 +1265,16 @@ func _on_combat_manager_combat_resolved():
 	#Left over from very early development
 	_cursor_toggle(true, false)
 
-func set_time_factor(effId, factor, duration, type):
-	Global.timeFactor -= factor
+func set_time_factor(effId):
+	var effect = UnitData.effectData[effId]
+	match effect.SubType:
+		Enums.SUB_TYPE.SPEED_UP: Global.timeFactor += effect.Value
+		Enums.SUB_TYPE.SLOW_DOWN: Global.timeFactor -= effect.Value
 	Global.timeFactor = clampf(Global.timeFactor, 0, 2)
 	globalEffects[effId] = {}
-	globalEffects[effId]["Type"] = type
-	globalEffects[effId]["Factor"] = factor
-	globalEffects[effId]["Duration"] = duration
+	globalEffects[effId]["Type"] = effect.SubType
+	globalEffects[effId]["Factor"] = effect.Value
+	globalEffects[effId]["Duration"] = effect.Duration
 
 func _progress_time():
 	if Global.gameTime >= 24 - Global.timeFactor:
@@ -1262,8 +1297,8 @@ func round_duration_tick(): #tracks duration of round based effects, removing th
 			globalEffects.erase(effId)
 
 
-func _on_combat_manager_time_factor_changed(effId, factor, duration, type):
-	set_time_factor(effId, factor, duration, type)
+func _on_combat_manager_time_factor_changed(effId):
+	set_time_factor(effId)
 
 
 func _on_combat_manager_warp_selected(actor, target, reach):
@@ -1316,12 +1351,7 @@ func _update_roster_label():
 
 			
 			
-func _cursor_toggle(enable, snapLeader = true): #lmao gay retard fix HERE
-	var forcedUnits = forcedDeploy.keys()
-	var leader = forcedUnits[0]
-	
-	
-	
+func _cursor_toggle(enable, snapLeader = true): 
 	
 	if enable:
 		cursor.visible = true
@@ -1340,11 +1370,14 @@ func _on_exp_gain_exp_finished():
 	emit_signal("continue_turn")
 
 	
-func _on_gui_manager_start_the_justice(button):
-	var i = button.get_meta("index")
-	activeUnit.set_equipped(i)
+func _on_gui_manager_start_the_justice(button = false):
+	var combatResults
+	if activeAction.Weapon:
+		var i = button.get_meta("index")
+		activeUnit.set_equipped(i)
 	_change_state(GameState.LOADING)
-	combatManager.start_the_justice(activeUnit, focusUnit) #Why is durability going down by 2??
+	combatResults = combatManager.start_the_justice(activeUnit, focusUnit, activeAction)
+	#print(str(combatResults))
 	boardState.add_acted(activeUnit)
 	activeUnit.set_acted(true)
 	combat_sequence(activeUnit, focusUnit)
@@ -1373,7 +1406,7 @@ func _on_gui_manager_formation_toggled():
 			_cursor_toggle(false)
 	
 func _on_gui_manager_item_used(unit, item):
-	combatManager.use_item(unit, item)
+	combatManager.use_item(unit, unit, item)
 
 func _on_gui_manager_map_started():
 	for unit in units:
@@ -1384,15 +1417,14 @@ func _on_gui_manager_map_started():
 	_initialize_turns()
 	
 
-func _on_action_menu_action_selected(selection, skillId = null):
-	lastSkill = skillId #lastSkill?????????????????
+func _on_action_menu_action_selected(selection, action = false):
 	match selection:
 		"Attack": 
-			
-			attack_targeting(activeUnit)
+			attack_targeting(activeUnit, action)
 		"Skill": 
-			
-			attack_targeting(activeUnit, skillId)
+			attack_targeting(activeUnit, action)
+		"Augment":
+			attack_targeting(activeUnit, action)
 		"Wait": 
 			_change_state(GameState.GB_DEFAULT)
 			_deselect_active_unit(true)
@@ -1402,13 +1434,15 @@ func _on_action_menu_action_selected(selection, skillId = null):
 			_change_state(GameState.GB_ROUND_END)
 			earlyEnd = true
 			turnComplete = true
-
+		
+		
 func _on_action_menu_weapon_changed(button):
 	var i = button.get_meta("index")
-	var distance = hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.unitData.MoveType, false)
 	var cmbData
+	if button.disabled:
+		return
 	activeUnit.set_temp_equip(i)
-	cmbData = combatManager.get_forecast(activeUnit, targetUnit, distance)
+	cmbData = combatManager.get_forecast(activeUnit, targetUnit, activeAction)
 	emit_signal("cmbData_updated", cmbData)
 	
 	
@@ -1433,3 +1467,15 @@ func _kill_lady():
 	var lady = unitObjs["Remilia"]
 	lady.apply_dmg(9999)
 
+
+
+func _on_area_2d_area_entered(area):
+	#print("Entered: ", area)
+	focusUnit = area.get_master()
+	#print("focusUnit: ", focusUnit)
+
+
+func _on_area_2d_area_exited(area):
+	#print("Exited: ", area)
+	focusUnit = null
+	#print("focusUnit: ", focusUnit)

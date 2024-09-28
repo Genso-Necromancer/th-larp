@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://dl4nn8ib77txs"]
+
+[ext_resource type="Script" path="res://scenes/AuraArea.gd" id="1_6jjyn"]
+[ext_resource type="TileSet" uid="uid://d1u4yyh77nn4t" path="res://scenes/aura_test.tres" id="2_2x4ni"]
+
+[node name="AuraArea" type="Area2D"]
+collision_mask = 2
+input_pickable = false
+script = ExtResource("1_6jjyn")
+
+[node name="AuraMap" type="TileMap" parent="."]
+position = Vector2(-80, -25)
+tile_set = ExtResource("2_2x4ni")
+format = 2

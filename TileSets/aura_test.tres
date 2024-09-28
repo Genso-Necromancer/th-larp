@@ -1,0 +1,21 @@
+[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://632g2hxv8e7i"]
+
+[ext_resource type="Texture2D" uid="uid://cohgco0axr0cx" path="res://sprites/tiles/aura.png" id="1_x7c1j"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_6ii3g"]
+texture = ExtResource("1_x7c1j")
+texture_region_size = Vector2i(160, 48)
+0:0/0 = 0
+
+[resource]
+tile_shape = 3
+tile_offset_axis = 1
+tile_size = Vector2i(160, 48)
+navigation_layer_0/layers = 1
+custom_data_layer_0/name = "terrainType"
+custom_data_layer_0/type = 21
+custom_data_layer_1/name = "terrainBonus"
+custom_data_layer_1/type = 2
+custom_data_layer_2/name = "trigger"
+custom_data_layer_2/type = 21
+sources/6 = SubResource("TileSetAtlasSource_6ii3g")

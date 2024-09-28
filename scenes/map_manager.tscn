@@ -7,7 +7,7 @@
 
 [node name="Gameboard" parent="." instance=ExtResource("1_1o3kx")]
 
-[node name="Cursor" parent="Gameboard" index="2"]
+[node name="Cursor" parent="Gameboard" index="3"]
 position = Vector2(0, 0)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
@@ -21,6 +21,7 @@ mapCursorPath = NodePath("../../Gameboard/Cursor")
 [connection signal="cmbData_updated" from="Gameboard" to="CanvasLayer/GUIManager/CombatForecast" method="_on_gameboard_cmbData_updated"]
 [connection signal="deploy_toggled" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_deploy_toggled"]
 [connection signal="exp_display" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_exp_display"]
+[connection signal="forecast_confirmed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_forecast_confirmed"]
 [connection signal="formation_closed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_formation_closed"]
 [connection signal="gb_ready" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_gb_ready"]
 [connection signal="map_loaded" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_map_loaded"]
@@ -29,6 +30,7 @@ mapCursorPath = NodePath("../../Gameboard/Cursor")
 [connection signal="player_win" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_player_win"]
 [connection signal="skill_target_canceled" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_skill_target_canceled"]
 [connection signal="target_focused" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_target_focused"]
+[connection signal="time_set" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_time_set"]
 [connection signal="toggle_prof" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_prof"]
 [connection signal="toggle_skills" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_skills"]
 [connection signal="turn_changed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_turn_changed"]
@@ -44,7 +46,7 @@ mapCursorPath = NodePath("../../Gameboard/Cursor")
 [connection signal="formation_toggled" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_formation_toggled"]
 [connection signal="item_used" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_item_used"]
 [connection signal="map_started" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_map_started"]
-[connection signal="startTheJustice" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_start_the_justice"]
+[connection signal="start_the_justice" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_start_the_justice"]
 [connection signal="action_selected" from="CanvasLayer/GUIManager/ActionMenu" to="Gameboard" method="_on_action_menu_action_selected"]
 [connection signal="weapon_changed" from="CanvasLayer/GUIManager/ActionMenu" to="Gameboard" method="_on_action_menu_weapon_changed"]
 [connection signal="weapon_changed" from="CanvasLayer/GUIManager/ActionMenu" to="CanvasLayer/GUIManager" method="_on_action_menu_weapon_changed"]
@@ -53,6 +55,7 @@ mapCursorPath = NodePath("../../Gameboard/Cursor")
 [connection signal="exp_finished" from="CanvasLayer/GUIManager/ExpGain" to="Gameboard" method="_on_exp_gain_exp_finished"]
 
 [editable path="Gameboard"]
+[editable path="Gameboard/Cursor"]
 [editable path="CanvasLayer/GUIManager"]
 [editable path="CanvasLayer/GUIManager/CombatForecast"]
 [editable path="CanvasLayer/GUIManager/ActionMenu"]

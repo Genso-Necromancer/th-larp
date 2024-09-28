@@ -7,8 +7,8 @@ extends Node
 
 var focusUnit : Unit
 var activeUnit : Unit
-var day: bool = true
-var gameTime
+var timeOfDay := Enums.TIME.DAY
+var gameTime := 12
 var timeFactor = 1
 var trueTimeFactor = 1
 var rotationFactor = 15
@@ -18,7 +18,11 @@ var flags : Dictionary
 
 var language
 
-var slamage = 5
+var slamage := 5
+var spdGap := 4
+var critRange := [10, 20] 
+var knifeCrit := [15, 25]
+var compCosts := {"Attack": 1, "WasHit":1, "Miss":1, "Dodge": 1, "NegEff": 1, "Healed":-1, "Move":0, "Crit": -1, "Kill": -1, "Break": 1}
 #combat variables
 func _init():
 	language = Enums.LANGUAGE.AMERICAN
@@ -27,8 +31,8 @@ func _init():
 	randomize()
 	_init_flags()
 	
-func set_flags(flags):
-	pass
+#func set_flags(f):
+	#pass
 	
 func _init_flags():
 	flags = {
@@ -43,3 +47,9 @@ func _init_flags():
 		"currentMap": 0
 	}
 
+func set_rich_text_params(label):
+	label.set_use_bbcode(true)
+	label.set_scroll_active(false)
+	label.set_fit_content(true)
+	label.set_mouse_filter(Control.MOUSE_FILTER_PASS)
+	label.set_autowrap_mode(TextServer.AUTOWRAP_OFF)

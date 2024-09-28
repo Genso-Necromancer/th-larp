@@ -53,7 +53,7 @@ func find_moves(state: BoardState):
 	for unit in state.enemy:
 		var unitCell = unit.cell
 		
-		var moves = get_valid_moves(unit, unit.cell, unit.unitData.Stats.MOVE, state)
+		var moves = get_valid_moves(unit, unit.cell, unit.unitData.Stats.Move, state)
 		if moves == null or moves.size() == 0:
 			continue
 		else:
@@ -127,8 +127,8 @@ func find_wait_value(unit, bestAttack, bestMove):
 
 func find_best_move(validMoves, unit, state, bestAttack):
 	var movePairs = []
-	var curLife = unit.unitData.CLIFE
-	var maxLife = unit.unitData.Stats.LIFE
+	var curLife = unit.unitData.CurLife
+	var maxLife = unit.unitData.Stats.Life
 	var lifePrc:float = (maxLife - ((maxLife-curLife) / maxLife)) / 10
 #	var value:float = 0
 	for cell in validMoves:
@@ -168,17 +168,17 @@ func find_valid_attacks(aiUnit, path, state):
 	var targetDef
 	for wep in aiInv:
 		var wepID = wep["ID"]
-		var ranges = [wepData[wepID].MINRANGE, wepData[wepID].MAXRANGE]
+		var ranges = [wepData[wepID].MinRange, wepData[wepID].MaxRange]
 		var threat = aHex.find_threat(path, ranges, aiUnit.moveType)
 		for unit in state.player:
 			match wepData[wepID].Type:
 				"Physical":
-					targetDef = "BAR"
-					if (aiUnit.combatData.Dmg - unit.unitData.Stats.BAR <= 0):
+					targetDef = "Bar"
+					if (aiUnit.combatData.Dmg - unit.unitData.Stats.Bar <= 0):
 						continue
 				"Magic":
 					targetDef = "RES"
-					if (aiUnit.combatData.Dmg - unit.unitData.Stats.MAG <= 0):
+					if (aiUnit.combatData.Dmg - unit.unitData.Stats.Mag <= 0):
 						continue
 			
 			if threat.has(unit.cell):
@@ -223,24 +223,24 @@ func combat_values(aiUnit, attack, targetDef):
 	var value: float
 	var target = attack.target
 	var dmgDealt = aiUnit.combatData.Dmg - target.unitData.Stats[targetDef]
-	var remHP = attack.target.unitData.CLIFE - dmgDealt
+	var remHP = attack.target.unitData.CurLife - dmgDealt
 	remHP = clampf(remHP, 0, 1000)
 	var dmgTaken = 0
 	if remHP == 0:
 		value += 1
 	else:
 #		print(value)
-		value += ((target.unitData.Stats.LIFE - remHP) / target.unitData.Stats.LIFE)
-#		print(target.unitData.Stats.LIFE)
+		value += ((target.unitData.Stats.Life - remHP) / target.unitData.Stats.Life)
+#		print(target.unitData.Stats.Life)
 #		print(value)
 		value = value * dmgWeight
-	var accScore = aiUnit.combatData.ACC - target.combatData.AVOID
+	var accScore = aiUnit.combatData.Hit - target.combatData.Avoid
 	accScore = clampf(accScore, 0, 1000)
 	if accScore != 0:
 		var accValue = accScore/100
 		accValue = accValue - 0.5
 		accValue = accValue * accScale
-		var grazeProc:float  = target.combatData.GRZPRC
+		var grazeProc:float  = target.combatData.GrzPrc
 		var grazeScore: float = (grazeProc / 100)
 		if grazeScore < 1:
 #			print("grz: ", grazeScore)
@@ -256,11 +256,11 @@ func combat_values(aiUnit, attack, targetDef):
 			
 	match target.combatData.Type:
 		"Physical":
-			dmgTaken = target.combatData.Dmg - aiUnit.unitData.Stats.BAR
+			dmgTaken = target.combatData.Dmg - aiUnit.unitData.Stats.Bar
 		"Magic":
-			dmgTaken = target.combatData.Dmg - aiUnit.unitData.Stats.MAG
+			dmgTaken = target.combatData.Dmg - aiUnit.unitData.Stats.Mag
 			
-	if aiUnit.unitData.CLIFE - dmgTaken <= 0 and target.unitData.CLIFE - dmgDealt > 0:
+	if aiUnit.unitData.CurLife - dmgTaken <= 0 and target.unitData.CurLife - dmgDealt > 0:
 		value = value * survWeight
 	return value
 	
@@ -273,9 +273,9 @@ func check_safe(aiUnit, target, launch):
 	var safe = false
 	var wep = wepData[wepID]
 	if target.is_in_group("Player"):
-		targetReach = wep.MAXRANGE
+		targetReach = wep.MaxRange
 	elif target.is_in_group("Enemy"):
-		targetReach = wep.MAXRANGE
+		targetReach = wep.MaxRange
 #	if distance == 3:
 #		print(launch, target.cell)
 	if distance > targetReach:
@@ -323,7 +323,7 @@ func assign_unit_value(team):
 				value = ((oldValue-(avgLv - 20))*newRange/oldRange) + 0
 				value = value * uWeight
 				if unit.is_in_group("Player"):
-					var lifeValue: float = ((unit.activeStats.LIFE - unit.unitData.CLIFE) / unit.unitData.Stats.LIFE)
+					var lifeValue: float = ((unit.activeStats.Life - unit.unitData.CurLife) / unit.unitData.Stats.Life)
 					lifeValue = lifeValue * ulWeight
 					value += lifeValue
 				if unit.is_in_group("Enemy"):

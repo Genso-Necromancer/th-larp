@@ -108,15 +108,15 @@ func open_action_menu(unit):
 	else: 
 		sBtn.disabled = true
 			
-	if unit != null and unit.check_status("SLEEP"):
+	if unit != null and unit.check_status("Sleep"):
 		aBtn.disabled = true
 		sBtn.disabled = true
 	#print("open_menu:")
 	#print("Button: " + str(aBtn.get_global_position()))
 	_open_menu()
 	action.visible = true
-	_fill_items()
-	_fill_skills()
+	#_fill_items()
+	#_fill_skills()
 	emit_signal("menu_opened", action)
 	
 func open_skill_menu():
@@ -135,16 +135,19 @@ func _on_end_btn_pressed():
 
 func _on_atk_btn_pressed():
 	var selection = "Attack"
+	var action = {"Weapon": true, "Skill": false}
 	accept_event()
 	close_menu()
-	emit_signal("action_selected", selection)
+	emit_signal("action_selected", selection, action)
 	
 func _on_skill_pressed(b):
 	var selection = "Skill"
-	var skillId = b.get_meta("skill")
+	var action = b.get_meta("action")
 	accept_event()
 	_close_all()
-	emit_signal("action_selected", selection, skillId)
+	if action.Weapon:
+		selection = "Augment"
+	emit_signal("action_selected", selection, action)
 
 func _close_all_others(menu):
 	var generic = $VFlowContainer/ActComCon/Count/ActionBox/GenericContainer
@@ -163,15 +166,13 @@ func _on_wait_btn_pressed():
 	emit_signal("action_selected", selection)
 
 
-func open_weapons(distance: int = -1): #Don't pass a distance value to open in "item mode" for use/equip.
+func open_weapons(range: Array = [-1, -1], augment = false): #Don't pass a distance value to open in "item mode" for use/equip.
 	var itemFrame = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
 	_close_all_others(itemFrame)
 	_open_menu()
 	itemFrame.visible = true
 	#itemFrame.set_deferred("visible", true)
-	_fill_items(distance)
-	if distance == -1:
-		_progress_state(MENU_STATES.ITEM_OPEN)
+	_fill_items(range, augment)
 	emit_signal("menu_opened", itemFrame)
 
 func _open_sub_menu(menu: Control):
@@ -180,16 +181,19 @@ func _open_sub_menu(menu: Control):
 	menu.visible = true
 	emit_signal("menu_opened", menu)
 
-func _fill_items(d: int = -1):
+func _fill_items(range: Array = [-1, -1], augment = false):
 	var itemFrame = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
 	var unitData
 	var inv
 	var aUnit = Global.activeUnit
 	var itemData = UnitData.itemData
-	var iMode = true
+	var iMode = false
+	var minR = range[0]
+	var maxR = range[1]
 	
-	if d > -1:
-		iMode = false
+	if minR <= -1 or maxR <= -1:
+		iMode = true
+		_progress_state(MENU_STATES.ITEM_OPEN)
 	unitData = aUnit.unitData
 	inv = unitData.Inv
 	for wep in inv: #needs "weapon selected" signal
@@ -198,19 +202,22 @@ func _fill_items(d: int = -1):
 		var wepName = itemData[wep.ID].Name
 		var disable = false
 		var dur = wep.DUR
-		var mDur = wepData.MAXDUR
+		var mDur = wepData.MaxDur
 		var durString
 		var valid = true
 		var i = inv.find(wep)
-		if !iMode and wepData.CATEGORY == "ITEM":
+		#var action := {"weapon": true, "skill": false}
+		if !iMode and wepData.Category == "ITEM":
 			continue
-		elif !iMode and wepData.CATEGORY == "ACC":
+		elif !iMode and wepData.Category == "ACC":
 			continue
 		elif !iMode and !valid:
 			continue
-		elif iMode and wepData.CATEGORY != "ITEM":
+		elif iMode and wepData.Category != "ITEM":
 			valid = aUnit.check_valid_equip(wep)
-		if d > wepData.MAXRANGE or d < wepData.MINRANGE:
+		if maxR == 0 and minR == 0:
+			pass
+		elif maxR < wepData.MaxRange and minR > wepData.MinRange:
 			disable = true
 		if !valid:
 			disable = true
@@ -222,61 +229,87 @@ func _fill_items(d: int = -1):
 		b.set_text(str(wepName) + durString)
 		b.set_button_icon(wepData.Icon)
 		b.set_expand_icon(false)
+		#b.set_meta("action", action)
 		b.set_meta("weapon", wep)
 		b.set_meta("index", i)
+		b.set_meta("action", {"Weapon": wep, "Skill": augment})
 		b.set_mouse_filter(Control.MOUSE_FILTER_PASS)
 		b.set_focus_neighbor(SIDE_LEFT, b.get_path_to(b))
 		b.set_focus_neighbor(SIDE_RIGHT, b.get_path_to(b))
 		
 		if !iMode and disable == true:
 			b.set_disabled(true)
+			
 		if !iMode:
 			b.pressed.connect(self._on_weapon_pressed.bind(b))
 			b.focus_entered.connect(self._on_weapon_hovered.bind(b))
 			b.mouse_entered.connect(self._on_weapon_hovered.bind(b))
 		else:
 			b.pressed.connect(self._on_item_pressed.bind(b))
+			
 		itemFrame.add_child(b)
+		print("Item Added: " + b.get_text() + " | " + str(b))
 		
 func _fill_skills():
 	var p = $VFlowContainer/ActComCon/Count/ActionBox/SkillContainer
 	var aUnit = Global.activeUnit
 	var skills = aUnit.unitData.Skills
-	for skill in skills:
+	for id in skills:
 		var b : Button
-		var cost := str(UnitData.skillData[skill].Cost)
-		var sName : String = UnitData.skillData[skill].SkillName
+		var skill = UnitData.skillData[id]
+		var cost := str(skill.Cost)
+		var sName : String = skill.SkillName #switch to parser
+		var isAugment : bool = skill.Augment
+		var action := {"Weapon": isAugment, "id": id}
+		var icon = skill.Icon
+		
 		b = Button.new()
 		b.set_text(str(sName) + " " + cost)
-		b.set_button_icon(UnitData.skillData[skill].Icon)
+		b.set_button_icon(icon)
 		b.set_expand_icon(false)
-		b.set_meta("skill", skill)
+		b.set_meta("action", action)
 		#b.set_meta("index", i)
 		b.set_mouse_filter(Control.MOUSE_FILTER_PASS)
 		b.set_focus_neighbor(SIDE_LEFT, b.get_path_to(b))
 		b.set_focus_neighbor(SIDE_RIGHT, b.get_path_to(b))
 		p.add_child(b)
 		b.pressed.connect(self._on_skill_pressed.bind(b))
+		if !validate_skill(skill):
+			b.disabled = true
+		print("id Added: " + b.get_text() + " | " + str(b))
 	#print("Skills filled")
-	
+
+func validate_skill(skill) -> bool:
+	var time = Global.timeOfDay
+	var isValid := false
+	if skill.RuleType:
+		match skill.RuleType:
+			Enums.RULE_TYPE.TIME:
+				if skill.Rule == time:
+					isValid = true
+				
+	return isValid
 
 func _clear_items():
 	var itemFrame = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
 	for button in itemFrame.get_children():
 		button.queue_free()
+	print("Items Cleared")
 	
 
 func _clear_skills():
 	var skillFrame = $VFlowContainer/ActComCon/Count/ActionBox/SkillContainer
 	for button in skillFrame.get_children():
 		button.queue_free()
-	#print("Skills cleared")
+	print("Skills cleared")
 		
 func _on_weapon_pressed(b):
 	close_menu()
 	emit_signal("weapon_selected", b)
 	
 func _on_weapon_hovered(b):
+	if b.disabled:
+		return
 	emit_signal("weapon_changed", b)
 
 func _on_itm_btn_pressed():
@@ -287,6 +320,7 @@ func _on_itm_btn_pressed():
 	
 func _on_skl_btn_pressed():
 	var skills = $VFlowContainer/ActComCon/Count/ActionBox/SkillContainer
+	_fill_skills()
 	_open_sub_menu(skills)
 	_progress_state(MENU_STATES.SKILL_OPEN)
 
@@ -308,11 +342,11 @@ func _on_item_pressed(button):
 	
 	valid = aUnit.check_valid_equip(item)
 	
-	if valid and !item.EQUIP:
+	if valid and !item.Equip:
 		eqBtn.visible = true
 		eqBtn.disabled = false
 		eqBtn.set_meta("index", index)
-	elif item.EQUIP:
+	elif item.Equip:
 		unBtn.visible = true
 		unBtn.disabled = false
 		unBtn.set_meta("index", index)

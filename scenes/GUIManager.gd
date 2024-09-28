@@ -2,7 +2,7 @@ extends Control
 class_name GUIManager
 
 signal gui_closed
-signal startTheJustice
+signal start_the_justice
 signal guiReady
 signal deploy_toggled(unitID, depStatus)
 signal profile_called
@@ -115,6 +115,9 @@ func _ready():
 	foreCast.visible = false
 	_load_turn_tracker()
 	
+func update_labels(): #Use this to cascade assigning strings from XML to all hard loaded buttons HERE
+	pass
+	
 func _change_state(state):
 	mainCon.newSlave = [self]
 	mainCon.previousState = mainCon.state
@@ -151,43 +154,6 @@ func reinitialize():
 	
 
 	
-
-#func _process(_delta):
-	#var _guiSizeAct = $ActionMenu/Count/BackgroundCenter.get_size()
-	#var _guiSizeProf = unitProf.get_size()
-	#var delayTick = 0
-#	if game_cursor != null:
-##		if game_cursor.position.x >= 237:
-###			print("what")
-##			$ActionMenu.global_position.x = 0 + guiSizeAct.x / 2
-##		else:
-##			$ActionMenu.position.x = originalPositionActX
-#		if game_cursor.position.x >= 137:
-#			unitProf.position.x = 0
-#			:))))))))))))))))))))))))
-#
-#		else:
-#			unitProf.position.x = originalPositionProfX
-#
-#	else:
-#		return
-		
-	#var actMenuCount = ActionBox.get_child_count()
-	#if actMenuCount > 1:
-		#var adjustY = originalPositionActY - ((actMenuCount - 3) * 8)
-		#$ActionMenu.position.y = adjustY
-	#else:
-		#$ActionMenu.position.y = originalPositionActY
-	
-	#var wepCount = weaponFrame.get_child_count()
-	#if wepCount > 3:
-		#var adjustY = originalPositionActY - ((actMenuCount - 3) * 8)
-		#$ActionMenu.position.y = adjustY
-	#else:
-		#$ActionMenu.position.y = originalPositionActY
-		
-#	timeLb.set_text("Time: " + str(Global.gameTime))
-#	timeFactorLb.set_text("Time Factor: " + str(Global.timeFactor))
 	
 func _clear_active_btn():
 	if activeBtn.get_meta("deployed"):
@@ -280,74 +246,17 @@ func _on_gameboard_toggle_prof(): #Needs filtering for while in set-up menu. Per
 func update_prof():
 	emit_signal("profile_called")
 		
-func _on_gameboard_target_focused(cmbData : Dictionary, mode : int, distance: int = 0):
+func _on_gameboard_target_focused(cmbData : Dictionary, mode : int, range: Array = [-1, -1]):
 	var fc = $CombatForecast
 	fc.update_fc(cmbData)
 	fc.show_fc()
 	match mode:
-		0: actMenu.open_weapons(distance)
+		0: actMenu.open_weapons(range)
 		1: pass
-	
+		
 
-		
-func weapon_selected(index):
-	var wepData 
-	var unitData
-	if Global.activeUnit.is_in_group("Enemy"): 
-		unitData = UnitData.unitData[Global.activeUnit.ykTag]
-		wepData = UnitData.npcInv
-	elif Global.activeUnit.is_in_group("Player"):
-		unitData = UnitData.unitData[Global.activeUnit.unitName.get_slice(" ", 0)]
-		wepData = UnitData.plrInv
-	accept_event()
-	if wepData[index].LIMIT:
-		if wepData[index].DUR == 0:
-			return
-		else:
-			emit_signal("startTheJustice")
-	else:
-		emit_signal("startTheJustice")
-		
-#skills menu
-func open_skills():
-#	clearInventoryButtons()
-	if !weaponBox.visible:
-		var first: Button = null
-		var skills = Global.activeUnit.unitData.Skills
-		var i = 0
-		for skill in skills:
-			var b = Button.new()
-			var skillData = UnitData.skillData
-			b.set_text(str(skillData[skill].SkillName))
-			
-			b.set_meta("skill_index", skill) 
-			b.set_button_icon(skillData[skill].Icon)
-			b.set_expand_icon(false)
-			weaponFrame.add_child(b)
-			b.button_down.connect(self.skill_selected.bind(b.get_meta("skill_index")))
-			b.mouse_entered.connect(menuCursor._on_mouse_entered.bind(i))
-			i += 1
-			if first == null and !b.is_disabled():
-				first = b
-				
-		weaponBox.visible = true
-		menuCursor.menu_parent = $ActionMenu/m/m/c/v
-		menuCursor.set_cursor(first)
-#		await get_tree().create_timer(0.1).timeout
-		menuCursor.state = 2
-		menuCursor.visible= true
-		first.grab_focus()
-		Global.skillMenu = true
-	elif weaponBox.visible:
-		clearInventoryButtons()
-		menuCursor.menu_parent = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer
-		menuCursor.state = 0
-		weaponBox.visible = false
-		Global.skillMenu = false
-		
-func clearInventoryButtons():
-	for button in weaponFrame.get_children():
-		button.queue_free()
+func _on_gameboard_time_set():
+	HUD.set_sun(Global.gameTime)
 
 func _on_gameboard_turn_changed():
 #	var sunMod = 0
@@ -360,7 +269,7 @@ func _on_gameboard_turn_changed():
 #	sunDial.rotation_degrees += sunRot
 #	clockLabel.set_text(str(Global.gameTime))
 	HUD.update_sun(sunRot)
-	
+
 
 func _on_gameboard_gb_ready(_state):
 	reinitialize()
@@ -539,6 +448,7 @@ func _connect_unit_btn(b, i):
 func _resignal_menuCursor(p, strip = true, oldP = menuCursor.menu_parent):
 	var i = 0
 	var btns = p.get_children()
+	var focus
 	
 	if strip and oldP != null:
 		_strip_menuCursor(oldP)
@@ -547,14 +457,13 @@ func _resignal_menuCursor(p, strip = true, oldP = menuCursor.menu_parent):
 	for b in btns:
 		_connect_btn_to_cursor(b)
 		
-	while btns[i].disabled == true:
+	while btns.size() > i and btns[i].disabled == true:
 		i += 1
-		if btns.size() < i:
-			break
-	
-	btns[i].grab_focus()
+		
+	if btns.size() > i: focus = btns[i]
+	else: focus = btns[0]
 	#btns[i].call_deferred("grab_focus")
-	menuCursor.call_deferred("set_cursor", btns[i])
+	menuCursor.call_deferred("set_cursor", focus)
 	#print("resignal: ")
 	#print("-Button: " + str(btns[i].get_global_position()))
 	
@@ -768,17 +677,24 @@ func _on_gameboard_unit_deselected():
 func _on_gameboard_menu_canceled():
 	_close_act_menu()
 	
+func _on_gameboard_forecast_confirmed():
+	if actMenu.visible:
+		return
+	foreCast.hide_fc()
+	_strip_menuCursor()
+	emit_signal("start_the_justice")
 
 func _on_gameboard_skill_target_canceled():
 	actMenu.open_skill_menu()
 
 func _on_action_menu_menu_opened(container):
-	_resignal_menuCursor(container)
+	#_resignal_menuCursor(container)
+	call_deferred("_resignal_menuCursor",container)
 	
 func _on_weapon_selected(button):
 	foreCast.hide_fc()
 	_strip_menuCursor()
-	emit_signal("startTheJustice", button)
+	emit_signal("start_the_justice", button)
 
 
 #func _on_action_menu_weapon_changed(weapon):
@@ -809,8 +725,6 @@ func _on_win_screen_win_finished():
 func _on_gameboard_map_loaded():
 	_end_load_screen()
 	
-
-
 
 
 
