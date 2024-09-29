@@ -24,10 +24,12 @@ func update_fc(cmbData) -> void: #HERE labels need updating to using StringGette
 		var crit := "--"
 		var active : Dictionary = units[i].activeStats
 		var cStats : Dictionary = cmbData[units[i]].Combat
+		var swings = cmbData[units[i]].Swings
 		var lifeTemplate : String = StringGetter.get_template("combat_hp")
 		var remainTemplate : String = StringGetter.get_template("combat_hp_remain")
 		var lifeText : String = "[center]%s[/center]"
 		var hp = lifeTemplate % [active.CurLife, units[i].baseStats.Life]
+		
 		
 		if !cStats.TrueHit and cmbData[units[i]].Counter and cmbData[units[i]].Reach: hit = str(cStats.Hit)
 		elif cStats.TrueHit and cmbData[units[i]].Counter and cmbData[units[i]].Reach: hit = "TRUE" 
@@ -37,6 +39,10 @@ func update_fc(cmbData) -> void: #HERE labels need updating to using StringGette
 		
 		if !cStats.Crit and cStats.Crit != 0: pass
 		elif cmbData[units[i]].Counter and cmbData[units[i]].Reach: crit = str(cStats.Crit)
+		
+		if swings:
+			dmg = dmg + " x" + str(swings)
+		
 		
 		if cStats.has("Rlife") and active.CurLife != cStats.Rlife:
 			lifeText = lifeText % [remainTemplate]

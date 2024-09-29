@@ -30,12 +30,12 @@ var itemData = UnitData.itemData
 
 var needDeath := false
 var terrainData : Array
-var statsLoaded := false
+var firstLoad := false
 
 #equip variables
-const unarmed : Dictionary = UnitData.unarmed
-var natural  = false
-var tempSet : bool = false
+var natural  : Dictionary = {"ID": "NONE", "Equip": false, "DUR": -1, "Broken": false}
+var unarmed := {"ID": "NONE", "Equip": false, "DUR": -1, "Broken": false}
+var tempSet = false
 
 #status effects
 @export var status : Dictionary = {"Acted":false, "Sleep":false}
@@ -174,7 +174,8 @@ func _process(delta: float) -> void:
 		curve.clear_points()
 		_animPlayer.play("idle")
 		emit_signal("walk_finished")
-	if statsLoaded:
+	if firstLoad:
+		firstLoad = false
 		update_stats()
 
 
@@ -240,8 +241,7 @@ func _load_stats():
 	activeStats["CurComp"] = baseStats.Comp
 	update_stats()
 	_init_inv()
-	check_passives()
-	statsLoaded = true
+	firstLoad = true
 
 func _validate_skills():
 	if !unitData.has("Skills"):
@@ -371,6 +371,8 @@ func check_passives():
 				if p.IsTimeSens: aura = p[Global.timeOfDay]
 				valid.append(aura)
 				load_aura(aura)
+			Enums.PASSIVE_TYPE.SUB_WEAPON:
+				_update_natural(p)
 	validate_auras(valid)
 
 
@@ -442,20 +444,32 @@ func _on_aura_exited(area):
 
 ##Equipment functions
 func restore_equip():
-	var i = 0
-	for item in unitData.Inv:
-		if tempSet and get_icat(item).Main != "ACC" and item.Equip:
-			unitData.Inv[i].Equip = false
-			unitData.Inv[0].Equip = true
-		i += 1
-	tempSet = false
-	
+	if tempSet:
+		for item in unitData.Inv:
+			if get_icat(item).Main != "ACC" and item.Equip:
+				item.Equip = false
+				
+		tempSet.Equip = true
+		tempSet = false
+		update_stats()
+		
 func set_temp_equip(i):
-	var tempWep = unitData.Inv[i]
-	if check_valid_equip(tempWep) and get_icat(tempWep).Main != "ACC":
-		unitData.Inv[0].Equip = false
-		tempWep.Equip = true
-	tempSet = true
+	var tempWep
+	var found = false
+	tempSet = get_equipped_weapon()
+	if tempSet != natural and tempSet != unarmed:
+		var indx = unitData.Inv.find(tempSet)
+		unequip(indx)
+	
+	if i > -1:
+		tempWep = unitData.Inv[i]
+	elif unitData.Weapons.Sub and unitData.Weapons.Sub.has("NATURAL"):
+		tempWep = natural
+	if tempWep == natural:
+		_equip_weapon(-2)
+	elif check_valid_equip(tempWep) and get_icat(tempWep).Main != "ACC":
+		_equip_weapon(i)
+		
 	update_stats()
 	
 func set_equipped(iInv = false): #searches for first valid if false or out of bounds, otherwise pass inv index and will equip if valid
@@ -491,10 +505,12 @@ func get_equipped_weapon(): #returns the currently equipped weapon within invent
 			wep = item
 			found = true
 			break
-	if !found and unitData.Weapons.has("NATURAL") and natural:
+	if !found and unitData.Weapons.Sub.has("NATURAL"):
 		wep = natural
+		_equip_weapon(-2)
 	elif !found:
 		wep = unarmed
+		_equip_weapon(-1)
 	return wep
 	
 func get_equipped_acc(): #returns the currently equipped accessories within inventory. use .ID to find global statistics. Return false if none.
@@ -508,13 +524,31 @@ func get_equipped_acc(): #returns the currently equipped accessories within inve
 	
 func unequip(slot = 0):
 	var item = unitData.Inv[slot]
-	while !item.Equip:
-		slot += 1
-		if slot >= unitData.Inv.size():
-			return
-		item = unitData.Inv[slot]
-	_remove_equip_effects(item)
-	item.Equip = false
+	var unarmed = false
+	
+	match slot:
+		-2: 
+			natural.Equip = false
+			_remove_equip_effects(natural)
+		-1: 
+			natural.Equip = false
+			_remove_equip_effects(unarmed)
+		_:
+			while !item.Equip:
+				slot += 1
+				if slot >= unitData.Inv.size():
+					return
+				item = unitData.Inv[slot]
+			_remove_equip_effects(item)
+			item.Equip = false
+			
+			for i in unitData.Inv:
+				if i.Equip: unarmed = true
+			
+	if unarmed and unitData.Weapons.Sub and unitData.Weapons.Sub.has("NATURAL"):
+		_equip_weapon(-2)
+	elif unarmed:
+		_equip_weapon(-1)
 
 
 func _equip_acc(i : int):
@@ -536,43 +570,135 @@ func _equip_acc(i : int):
 	_add_equip_effects(acc)
 
 func _equip_weapon(index):
-	var wep = unitData.Inv.pop_at(index)
+	var wep
 	
 	for item in unitData.Inv:
-		var type : String = get_icat(wep).Main
-		if type != "ACC" and wep.Equip:
-			var i = unitData.Inv.find(wep)
+		var type : String = get_icat(item).Main
+		if type != "ACC" and item.Equip:
+			var i = unitData.Inv.find(item)
 			unequip(i)
-		
+	
+	match index:
+		-2: wep = natural
+		-1: wep = unarmed
+		_: 
+			wep = unitData.Inv.pop_at(index)
+			unitData.Inv.push_front(wep)
+			
+	if wep.Equip: return
+	
 	_add_equip_effects(wep)
-	unitData.Inv.push_front(wep)
-	unitData.Inv[0].Equip = true
+	wep.Equip = true
 	
 func _add_equip_effects(item):
 	var iData = UnitData.itemData[item.ID]
 	var effData = UnitData.effectData
 	
-	if iData.Effect and iData.Effect.size() > 0:
-		for effId in iData.Effect:
+	if iData.Effects and iData.Effects.size() > 0:
+		for effId in iData.Effects:
 			if effData[effId].Target == Enums.EFFECT_TARGET.EQUIPPED:
 				_add_effect(effId)
 	#print(activeEffects)
 		
 func _remove_equip_effects(item):
 	var iData = UnitData.itemData[item.ID]
-	if iData.has("Effect"):
-		for effect in iData.Effect:
+	if iData.has("Effects"):
+		for effect in iData.Effects:
 			var i = activeEffects.find(effect)
 			activeEffects.remove_at(i)
 	#print(activeEffects)
 	
+	
 func _add_effect(effId):
 	activeEffects.append(effId)
+		
 		
 func _remove_effect(effId):
 	var i = activeEffects.find(effId)
 	activeEffects.remove_at(i)
 	
+	
+func check_valid_equip(item : Dictionary, mode : int = 0): #Subweapons not fully implemented, Sub returns true regardless of which sub it is. There is no differentiation yet. 0 = Any, 1 = Weapon; 2 = Accessory
+	var iCat = get_icat(item) 
+	if item.DUR == 0:
+		return false
+	if mode < 2 and iCat.Sub and unitData.Weapons.has(iCat.Sub):
+		return true
+	elif mode < 2 and unitData.Weapons.has(iCat.Main):
+		return true
+	elif mode == 0 and iCat.Main == "ACC":
+		return true
+	elif mode == 2 and iCat.Main == "ACC":
+		return true
+	else:
+		return false
+		
+	
+func get_icat(item) -> Dictionary:
+	var iCat = {"Main" : itemData[item.ID].Category, "Sub" : false}
+	if itemData[item.ID].SubGroup:
+		iCat.Sub = itemData[item.ID].SubGroup
+	return iCat
+	
+
+func reduce_durability(item : Dictionary, reduc : int = 1): ##Weapon only considered broken at 0 durability!!! -1 is unbreakable! If reduc value would put an item below 0, it is clamped to 0 and will break.
+	var inv = unitData.Inv
+	var i = inv.find(item)
+	var maxDur = itemData[item.ID].MaxDur
+	print("Durability reduction for: ", item)
+	if item.DUR == -1:
+		print("Weapon is unbreakable")
+		return
+	item.DUR -= reduc
+	clampi(item.DUR, 0, maxDur)
+	print("Durability reduced to: ", item.DUR)
+	if item.DUR == 0 and item.Equip:
+		print("Item Broken, unequipping")
+		unequip(i)
+	if item.DUR == 0 and itemData[item.ID].Expendable:
+		print("Queued item Deletion")
+		call_deferred("delete_item", item)
+
+
+func delete_item(item):
+	var inv = unitData.Inv
+	var eqp = get_equipped_weapon()
+	var i = inv.find(item)
+	if eqp == item:
+		unequip(i)
+	inv.remove_at(i)
+
+func _update_natural(passive):
+	var base : Dictionary = UnitData.itemData[passive.String].duplicate()
+	var scaleType = passive.String
+	var final : Dictionary = base
+	var dmgScale := 0
+	var hitScale := 0
+	var grazeScale := 0
+	var tier : int = unitData.Profile.Level
+	
+	match scaleType:
+		"NaturalMartial": 
+			dmgScale = 2 + ceili(unitData.Profile.Level/4)
+			hitScale = 65 + ceili(unitData.Profile.Level)
+			grazeScale = 2 + ceili(unitData.Profile.Level/6)
+	
+	match tier:
+		40: tier = 6
+		tier when tier > 35: tier = 5
+		tier when tier > 25: tier = 4
+		tier when tier > 15: tier = 3
+		tier when tier > 5: tier = 2
+		_: tier = 1
+	
+	final.Dmg = base.Dmg + dmgScale
+	final.Hit = base.Hit + hitScale
+	final.Graze = base.Graze + grazeScale
+	final.Name = scaleType + str(tier)
+	UnitData.itemData[unitName] = final
+	natural.ID = unitName
+	
+##Effect Functions
 func get_effects(key, value, falseRule = false):
 	var effData = UnitData.effectData
 	var matched := []
@@ -624,57 +750,6 @@ func get_crit_dmg_effects():
 			effects.CritMulti = highest
 			
 	return effects
-	
-func get_icat(item) -> Dictionary: 
-	var iCat = {"Main" : itemData[item.ID].Category, "Sub" : false}
-	if itemData[item.ID].SubGroup:
-		iCat.Sub = itemData[item.ID].SubGroup
-	return iCat
-
-func reduce_durability(item : Dictionary, reduc : int = 1): ##Weapon only considered broken at 0 durability!!! -1 is unbreakable! If reduc value would put an item below 0, it is clamped to 0 and will break.
-	var inv = unitData.Inv
-	var i = inv.find(item)
-	var maxDur = itemData[item.ID].MaxDur
-	print("Durability reduction for: ", item)
-	if item.DUR == -1:
-		print("Weapon is unbreakable")
-		return
-	item.DUR -= reduc
-	clampi(item.DUR, 0, maxDur)
-	print("Durability reduced to: ", item.DUR)
-	if item.DUR == 0 and item.Equip:
-		print("Item Broken, unequipping")
-		unequip(i)
-	if item.DUR == 0 and itemData[item.ID].Expendable:
-		print("Queued item Deletion")
-		call_deferred("delete_item", item)
-
-
-func delete_item(item):
-	var inv = unitData.Inv
-	var eqp = get_equipped_weapon()
-	var i = inv.find(item)
-	if eqp == item:
-		unequip(i)
-	inv.remove_at(i)
-
-
-func check_valid_equip(item : Dictionary, mode : int = 0): #Subweapons not fully implemented, Sub returns true regardless of which sub it is. There is no differentiation yet. 0 = Any, 1 = Weapon; 2 = Accessory
-	var iCat = get_icat(item) 
-	if item.DUR == 0:
-		return false
-	if mode < 2 and unitData.Weapons.has(iCat.Main) and iCat.Sub and unitData.Weapons.has(iCat.Sub):
-		return true
-	elif mode < 2 and unitData.Weapons.has(iCat.Main):
-		return true
-	elif mode == 0 and iCat.Main == "ACC":
-		return true
-	elif mode == 2 and iCat.Main == "ACC":
-		return true
-	else:
-		return false
-
-
 
 
 func update_combatdata():
@@ -765,6 +840,8 @@ func update_stats(): #GO BACK AND FINISH ACTIVE DEBUFFS AFTER THIS
 	var modifiedStats := activeStats
 	var baseValues := baseStats
 	var subKeys := Enums.SUB_TYPE.keys()
+	
+	check_passives()
 	
 	if baseStats == null or activeStats == null or lifeBar == null:
 		return
@@ -920,9 +997,12 @@ func _on_test_map_map_ready():
 
 #Turn Signals
 func on_turn_changed():
-	check_passives()
+	update_stats()
+	
+	
 func on_turn_order_updated(_to):
 	status_duration_tick()
+	
 	
 #DEATH
 func run_death():

@@ -61,15 +61,15 @@ static func get_named_unit_data():
 				"Skills":["LifeStealRem"],
 				"Passives":["RemAura", "Fated"],
 				"Weapons": {
-					"BLADE": false,
-					"BLUNT": false,
-					"STICK": true,
-					"BOOK": false,
-					"GOHEI": false,
-					"FAN": false,
-					"BOW": false,
-					"GUN": false,
-					"SUB": false},
+					"Blade": false,
+					"Blunt": false,
+					"Stick": true,
+					"Book": false,
+					"Gohei": false,
+					"Fan": false,
+					"Bow": false,
+					"Gun": false,
+					"Sub": false},
 				"MoveType": MOVE_TYPE.FLY
 			},
 		"Sakuya": {
@@ -122,16 +122,16 @@ static func get_named_unit_data():
 				"Skills":["ST05", "AttackTest1"],
 				"Passives":[],
 				"Weapons": {
-					"BLADE": true,
-					"BLUNT": false,
-					"STICK": false,
-					"BOOK": false,
-					"GOHEI": false,
-					"FAN": false,
-					"BOW": false,
-					"GUN": false,
-					"SUB": ["KNIFE"]},
-				"MoveType": MOVE_TYPE.FOOT
+					"Blade": true,
+					"Blunt": false,
+					"Stick": false,
+					"Book": false,
+					"Gohei": false,
+					"Fan": false,
+					"Bow": false,
+					"Gun": false,
+					"Sub": ["KNIFE"]},
+				"MoveType": MOVE_TYPE.RANGER
 			},
 		"Patchouli": {
 			"CurLife": 1,
@@ -182,15 +182,15 @@ static func get_named_unit_data():
 				"Skills":[],
 				"Passives":[],
 				"Weapons": {
-					"BLADE": false,
-					"BLUNT": false,
-					"STICK": false,
-					"BOOK": true,
-					"GOHEI": false,
-					"FAN": false,
-					"BOW": false,
-					"GUN": false,
-					"SUB": false},
+					"Blade": false,
+					"Blunt": false,
+					"Stick": false,
+					"Book": true,
+					"Gohei": false,
+					"Fan": false,
+					"Bow": false,
+					"Gun": false,
+					"Sub": false},
 				"MoveType": MOVE_TYPE.FOOT
 			},
 		"Meiling": {"CurLife": 1,
@@ -207,12 +207,12 @@ static func get_named_unit_data():
 					"Move": 4,
 					"Life": 18,
 					"Comp": 100,
-					"Pwr": 2,
-					"Mag": 7,
+					"Pwr": 5,
+					"Mag": 2,
 					"Eleg": 6,
 					"Cele": 3,
-					"Bar": 1,
-					"Cha": 6
+					"Bar": 6,
+					"Cha": 4
 					},
 				"Growths": {
 					"Move": 0.02,
@@ -237,19 +237,19 @@ static func get_named_unit_data():
 					"Cha": 20
 					},
 				"MaxInv": 6,
-				"Inv":[{"ID":"CLB", "Equip":true, "DUR":40, }, {"ID":"CLB", "Equip":false, "DUR":40, }],
-				"Passives":[],
+				"Inv":[],
+				"Passives":["Martial"],
 				"Skills":[],
 				"Weapons": {
-					"BLADE": false,
-					"BLUNT": true,
-					"STICK": false,
-					"BOOK": false,
-					"GOHEI": false,
-					"FAN": false,
-					"BOW": false,
-					"GUN": false,
-					"SUB": ["NATURAL"]},
+					"Blade": false,
+					"Blunt": true,
+					"Stick": false,
+					"Book": false,
+					"Gohei": false,
+					"Fan": false,
+					"Bow": false,
+					"Gun": false,
+					"Sub": ["NATURAL"]},
 				"MoveType": MOVE_TYPE.FOOT
 			}
 		}
@@ -341,14 +341,15 @@ static func get_job(jobInd):
 					},
 				"Passives":[],
 				"Weapons": {
-					"BLADE": false,
-					"BLUNT": true,
-					"STICK": false,
-					"BOOK": false,
-					"GOHEI": false,
-					"FAN": false,
-					"BOW": false,
-					"GUN": false
+					"Blade": false,
+					"Blunt": true,
+					"Stick": false,
+					"Book": false,
+					"Gohei": false,
+					"Fan": false,
+					"Bow": false,
+					"Gun": false,
+					"Sub": [],
 				}
 				}
 		JOB_ID.THIEF: return {
@@ -390,15 +391,15 @@ static func get_job(jobInd):
 					},
 				"Passives":[],
 				"Weapons": {
-					"BLADE": true,
-					"BLUNT": false,
-					"STICK": false,
-					"BOOK": false,
-					"GOHEI": false,
-					"FAN": false,
-					"BOW": false,
-					"GUN": false,
-					"SUB": ("KNIFE")
+					"Blade": true,
+					"Blunt": false,
+					"Stick": false,
+					"Book": false,
+					"Gohei": false,
+					"Fan": false,
+					"Bow": false,
+					"Gun": false,
+					"Sub": ["KNIFE"],
 					}
 				}
 
@@ -417,15 +418,22 @@ static func load_generated_sprite(species, job):
 
 static func get_terrain_costs():
 	var terrainCost : Dictionary = {
-		Enums.MOVE_TYPE.FOOT: 
-			{"Flat": 1,
+		Enums.MOVE_TYPE.FOOT: {
+			"Flat": 1,
 			"Fort": 2,
-			"Hill": 3},
-		Enums.MOVE_TYPE.FLY:
-			{"Flat": 1,
+			"Hill": 3
+			},
+		Enums.MOVE_TYPE.FLY:{
+			"Flat": 1,
 			"Fort": 1,
-			"Hill": 1}
+			"Hill": 1
+			},
+		Enums.MOVE_TYPE.RANGER:{
+			"Flat": 1,
+			"Fort": 2,
+			"Hill": 2
 		}
+}
 	return terrainCost
 	
 static func get_items():
@@ -442,8 +450,9 @@ static func get_items():
 				"Category": "NONE",
 				"MaxDur": -1,
 				"Equip":true,
-				"SubGroup": false},
-				##################
+				"SubGroup": false,
+				},
+				## Weapons
 				"GNG":{
 				"Name":"Gungnir",
 				"Icon": load(("res://sprites/gungnir.png")),
@@ -454,11 +463,12 @@ static func get_items():
 				"Graze": 3,
 				"MinRange": 1,
 				"MaxRange": 2,
-				"Category": "STICK",
+				"Category": "Stick",
 				"MaxDur": 40,
 				"Equip":true,
-				"SubGroup": false},
-				###############
+				"SubGroup": false,
+				},
+				
 				"SLVKNF":{
 				"Name":"Silver Knife",
 				"Icon": load(("res://sprites/gungnir.png")),
@@ -469,11 +479,12 @@ static func get_items():
 				"Graze": 2,
 				"MinRange": 1,
 				"MaxRange": 2,
-				"Category": "BLADE",
+				"Category": "Blade",
 				"MaxDur": 40,
 				"Equip":true,
-				"SubGroup": "KNIVES"},
-				###############
+				"SubGroup": "KNIVES",
+				},
+				
 				"CLB": {
 				"Name":"Club",
 				"Icon": load(("res://sprites/gungnir.png")),
@@ -484,11 +495,12 @@ static func get_items():
 				"Graze": 4,
 				"MinRange": 1,
 				"MaxRange": 1,
-				"Category": "BLUNT",
+				"Category": "Blunt",
 				"MaxDur": 40,
 				"Equip":true,
-				"SubGroup": false},
-				###############
+				"SubGroup": false,
+				},
+				
 				"DGR": {
 				"Name":"Dagger",
 				"Icon": load(("res://sprites/gungnir.png")),
@@ -499,11 +511,12 @@ static func get_items():
 				"Graze": 1,
 				"MinRange": 1,
 				"MaxRange": 1,
-				"Category": "BLADE",
+				"Category": "Blade",
 				"MaxDur": 40,
 				"Equip":true,
-				"SubGroup": false},
-				###############
+				"SubGroup": false,
+				},
+				
 				"THKN":{
 				"Name":"Throwing Knife",
 				"Icon": load(("res://sprites/gungnir.png")),
@@ -514,11 +527,12 @@ static func get_items():
 				"Graze": 1,
 				"MinRange": 2,
 				"MaxRange": 2,
-				"Category": "BLADE",
+				"Category": "Blade",
 				"MaxDur": 40,
 				"Equip":true,
-				"SubGroup": "KNIVES"},
-				###############
+				"SubGroup": "KNIVES",
+				},
+				
 				"BK":{
 				"Name":"Book",
 				"Icon": load(("res://sprites/gungnir.png")),
@@ -529,33 +543,55 @@ static func get_items():
 				"Graze": 0,
 				"MinRange": 1,
 				"MaxRange": 1,
-				"Category": "BOOK",
+				"Category": "Book",
 				"MaxDur": 40,
 				"Equip":true,
-				"SubGroup": false},
-				###############
+				"SubGroup": false,
+				},
+				
+				"NaturalMartial":{
+				"Name": "PUNCH",
+				"Icon": load(("res://sprites/gungnir.png")),
+				"Type": Enums.DAMAGE_TYPE.PHYS,
+				"Dmg": 0,
+				"Hit": 0,
+				"Crit": 0,
+				"Graze": 0,
+				"MinRange": 1,
+				"MaxRange": 1,
+				"Category": "",
+				"MaxDur": -1,
+				"Expendable": false,
+				"Equip": true,
+				"Trade": false,
+				"SubGroup": "NATURAL",
+				"Effects": ["MultiStrike2"],
+				},
+				
+				## Consumables
 				"PZA":{
 				"Name":"Pizza",
 				"Icon": load(("res://sprites/gungnir.png")),
 				"Category": "ITEM",
 				"MaxDur": 3,
 				"USE": true,
-				"Effect": ["Pizza01"] },
-				###############
+				"Effects": ["Pizza01"] },
+				
 				"PWRELIX":{
 				"Name":"Power Elixir",
 				"Icon": load(("res://sprites/gungnir.png")),
 				"Category": "ITEM",
 				"MaxDur": 1,
 				"USE": true,
-				"Effect": ["StrBuff01"] },
-				###############
+				"Effects": ["StrBuff01"] },
+				## Accessories
 				"TESTACC":{
 				"Name": "STR Ring",
 				"Icon": load(("res://sprites/gungnir.png")),
 				"Category": "ACC",
 				"Equip": true,
-				"Effect": ["StrBuff01"] }
+				"Effects": ["StrBuff01"] },
+				
 				
 				}
 	return iData
@@ -585,10 +621,14 @@ static func get_effects():
 			},
 			"Thirst50":{
 				"Type": Enums.EFFECT_TYPE.LIFE_STEAL,
-				"SubType": false, 
 				"Target": Enums.EFFECT_TARGET.SELF, 
 				"OnHit": true, 
 				"Value": 0.5, 
+			},
+			"MultiStrike2":{
+				"Type": Enums.EFFECT_TYPE.MULTI_SWING,
+				"Target": Enums.EFFECT_TARGET.EQUIPPED,
+				"Value": 2,
 			},
 			"Test2": {
 			"Target": "Target",
@@ -665,37 +705,10 @@ static func get_skills():
 			"RangeMin": 1, #if 0, ignored by Augment. Set value to require specific weapon range.
 			"RangeMax": 1,
 			"Cost": 15,
-			"Effect": ["Thirst50"], #any attacking effects for an augment skill must be set to instant.
+			"Effects": ["Thirst50"], #any attacking effects for an augment skill must be set to instant.
 			"RuleType": Enums.RULE_TYPE.TIME,
 			"Rule": Enums.TIME.NIGHT,
 			
-		},
-		"TEST1": {
-		"SkillId": "TEST1",
-		"SkillName": "Example",
-		"Icon": load(("res://sprites/gungnir.png")),
-		"Target": "Enemy", #Enemy, Self, Ally, Self+(This is Self and Ally), Other(Enemy or Ally, not Self)
-		"TrueHit": false, #default true
-		"Hit": 0, #Int only. negative values acceptable for Hit penalties to the skill
-		"Dmg": false, #set an int value for damage
-		"Crit": false, #set an int value for crit bonus
-		"Type": Enums.DAMAGE_TYPE.PHYS, #use enum types
-		"RangeMin": 0,
-		"RangeMax": 0,
-		"Cost": 0,
-		"Effect": []
-		},
-		"TEST2": {
-		"SkillId": "TEST2",
-		"SkillName": "Test Heal",
-		"Icon": load(("res://sprites/gungnir.png")),
-		"Target": "Ally",
-		"TrueHit": false,
-		"Hit": 100,
-		"RangeMin": 1,
-		"RangeMax": 1,
-		"Cost": 0,
-		"Effect": ["Test2"]
 		},
 		"ST05": {
 		"SkillId": "ST05",
@@ -707,7 +720,7 @@ static func get_skills():
 		"RangeMin": 0,
 		"RangeMax": 0,
 		"Cost": 0,
-		"Effect": ["SlowTime05"]
+		"Effects": ["SlowTime05"]
 		},
 		"SLP1": {
 		"SkillId": "SLP1",
@@ -719,7 +732,7 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 2,
 		"Cost": 0,
-		"Effect": ["SleepTest"]
+		"Effects": ["SleepTest"]
 		},
 		"SHV1": {
 		"SkillId": "SHV1",
@@ -731,7 +744,7 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 1,
 		"Cost": 0,
-		"Effect": ["Shove1"]
+		"Effects": ["Shove1"]
 		},
 		"TOSS1": {
 		"SkillId": "TOSS1",
@@ -743,7 +756,7 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 1,
 		"Cost": 0,
-		"Effect": ["Toss1"]
+		"Effects": ["Toss1"]
 		},
 		"WARP1": {
 		"SkillId": "WARP1",
@@ -755,7 +768,7 @@ static func get_skills():
 		"RangeMin": 1,
 		"RangeMax": 1,
 		"Cost": 0,
-		"Effect": ["Warp05"]
+		"Effects": ["Warp05"]
 		},
 		"AttackTest1": {
 		"SkillName": "Attack_Test",
@@ -785,6 +798,12 @@ static func get_passives():
 			"Icon": load(("res://sprites/gungnir.png")),
 			"Value": 10
 		},
+		"Martial":{
+			"Type": Enums.PASSIVE_TYPE.SUB_WEAPON,
+			"SubType": Enums.WEAPON_CATEGORY.NATURAL,
+			"Icon": load(("res://sprites/gungnir.png")),
+			"String": "NaturalMartial",
+		}
 	}
 	return passives
 	

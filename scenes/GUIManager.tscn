@@ -101,10 +101,6 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="Eqp" parent="Profile/M/HBoxContainer/InventoryBox/MC2/VB/BG/MC" index="0"]
-visible_characters = 0
-visible_ratio = 0.0
-
 [node name="SetUpMain" type="Control" parent="."]
 custom_minimum_size = Vector2(500, 500)
 layout_mode = 1
@@ -658,4 +654,3 @@ texture_progress = ExtResource("18_18bf3")
 [editable path="CombatForecast"]
 [editable path="ActionMenu"]
 [editable path="HUD"]
-[editable path="Profile"]

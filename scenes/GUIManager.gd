@@ -460,10 +460,9 @@ func _resignal_menuCursor(p, strip = true, oldP = menuCursor.menu_parent):
 	while btns.size() > i and btns[i].disabled == true:
 		i += 1
 		
-	if btns.size() > i: focus = btns[i]
-	else: focus = btns[0]
+	if btns.size() > i: menuCursor.call_deferred("set_cursor", btns[i])
 	#btns[i].call_deferred("grab_focus")
-	menuCursor.call_deferred("set_cursor", focus)
+	
 	#print("resignal: ")
 	#print("-Button: " + str(btns[i].get_global_position()))
 	

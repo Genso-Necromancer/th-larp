@@ -92,7 +92,7 @@ func find_path(start: Vector2i, end: Vector2i, moveType: int, attack: bool = fal
 				
 				
 			var g_cost = current_node.g_cost + compute_cost(current_node.node, neighbor.node, terrain, moveType)
-			var h_cost = compute_cost(neighbor.node, end_node, moveType, terrain)
+			var h_cost = compute_cost(neighbor.node, end_node, terrain, moveType)
 			var f_cost = g_cost + h_cost
 			
 			
@@ -537,7 +537,7 @@ func find_threat(walkable, unitRange, moveType = "Flat"):
 	
 	for tile in threatRange:
 		for cell in walkable:
-			var tileRange = compute_cost(cell, tile, false, moveType)
+			var tileRange = compute_cost(cell, tile, moveType, false)
 			if tileRange >= minRange and !filteredThreatRange.has(tile):
 				filteredThreatRange.append(tile)
 	return filteredThreatRange

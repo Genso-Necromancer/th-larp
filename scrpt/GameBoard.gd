@@ -697,12 +697,10 @@ func deselect_formation_cell():
 func toggle_unit_profile(): 
 	if mainCon.state == GameState.GB_PROFILE:
 		var stateStore = mainCon.previousState
-		mainCon.previousState = mainCon.state
-		mainCon.state = stateStore
+		_change_state(stateStore)
 		emit_signal("toggle_prof")
-	elif is_occupied(cursorCell):
-		mainCon.previousState = mainCon.state
-		mainCon.state = GameState.GB_PROFILE
+	elif focusUnit:
+		_change_state(GameState.GB_PROFILE)
 		emit_signal("toggle_prof")
 	else: toggle_extra_info()
 	
@@ -922,6 +920,9 @@ func on_directional_press(direction: Vector2i):
 	var nextCell = cursorCell + direction
 	var newCell
 	
+	if mainCon.state == GameState.GB_PROFILE:
+		return
+		
 	if snapPath != null and !snapPath.has(nextCell):
 		newCell = find_next_best_cell(cursorCell, nextCell)
 		cursorCell = newCell
@@ -951,6 +952,11 @@ func attack_targeting(unit: Unit, action):
 				continue
 			minRange = min(minRange, wepData[wep.ID].MinRange, minRange)
 			maxRange = max(maxRange, wepData[wep.ID].MaxRange, maxRange)
+		if  unit.unitData.Weapons.Sub and unit.unitData.Weapons.Sub.has("NATURAL"):
+			var id = unit.natural.ID
+			minRange = min(minRange, wepData[id].MinRange, minRange)
+			maxRange = max(maxRange, wepData[id].MaxRange, maxRange)
+			
 		_change_state(GameState.GB_ATTACK_TARGETING)
 	
 	_draw_range(unit, maxRange, minRange)

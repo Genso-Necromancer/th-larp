@@ -18,7 +18,8 @@ var supply = {}
 var npcInv = {}
 var terrainCosts = {}
 var rosterOnce := false
-const unarmed := {"ID": "NONE", "Equip": true, "DUR": -1, "Broken": false}
+
+
 
 
 
@@ -61,7 +62,9 @@ func _load_items():
 		"USE":false,
 		"Equip":false,
 		"Expendable": true,
-		"Effect":{},
+		"Trade": true,
+		"Personal": false,
+		"Effects":{},
 		}
 		var innerKeys = rawData[key].keys()
 		for iKey in innerKeys:
@@ -92,7 +95,7 @@ func _load_skills():
 		"RangeMin": 0, #if 0, ignored by Augment. Set value to require specific weapon range.
 		"RangeMax": 0,
 		"Cost": 0,
-		"Effect": [], #any attacking effects for an augment skill must be set to instant.
+		"Effects": [], #any attacking effects for an augment skill must be set to instant.
 		"RuleType": false,
 		"Rule": false,
 		}
@@ -221,8 +224,10 @@ func _load_passive_data():
 	for key in rawData:
 			passiveData[key] = {
 			"Type": Enums.PASSIVE_TYPE,
+			"SubType": false,
 			"Icon": load(("res://sprites/gungnir.png")),
 			"Value": 0,
+			"String": false,
 			"IsTimeSens": false,
 			"Aura": false,
 			Enums.TIME.DAY: false,
@@ -330,14 +335,14 @@ func init_roster():
 
 func init_supply():
 	supply = {
-		"BLADE":[{"ID":"SLVKNF", "DUR":40, }],
-		"BLUNT":[{"ID":"CLB", "DUR":40, }],
-		"STICK":[],
-		"GOHEI":[],
-		"BOOK":[],
-		"FAN":[],
-		"BOW":[],
-		"GUN":[],
+		"Blade":[],
+		"Blunt":[],
+		"Stick":[],
+		"Gohei":[],
+		"Book":[],
+		"Fan":[],
+		"Bow":[],
+		"Gun":[],
 		"Hit":[],
 		"ITEM":[]
 		}

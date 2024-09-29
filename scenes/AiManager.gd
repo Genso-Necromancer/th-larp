@@ -266,7 +266,7 @@ func combat_values(aiUnit, attack, targetDef):
 	
 func check_safe(aiUnit, target, launch):
 	var wepData = UnitData.itemData
-	var distance = aHex.compute_cost(launch, target.cell, aiUnit.moveType, false)
+	var distance = aHex.compute_cost(launch, target.cell, false, aiUnit.moveType,)
 	var equip = target.get_equipped_weapon()
 	var wepID = equip["ID"]
 	var targetReach

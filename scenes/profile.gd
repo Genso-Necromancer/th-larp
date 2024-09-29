@@ -50,36 +50,57 @@ func _fill_skills(unit):
 	pass
 		
 func _fill_inv(unit):
+	unit.update_stats()
 	var invPanel = $M/HBoxContainer/InventoryBox/MC2/MC/InvGrid
 	var eqpLabel = $M/HBoxContainer/InventoryBox/MC2/VB/BG/MC/Eqp
 	var equipped = unit.get_equipped_weapon()
-	var eqStats = UnitData.itemData[equipped.ID]
+	var id = equipped.ID
+	var dur = equipped.DUR
+	var maxDur = UnitData.itemData[id].MaxDur
+	var iName = UnitData.itemData[id].Name
 	var unitInv = unit.unitData.Inv
 	var durString : String
+	var subProf = unit.unitData.Weapons.Sub
 	
-	if equipped.DUR <= -1 or eqStats.MaxDur <= -1:
+	if dur <= -1 or maxDur <= -1:
 		durString = str(" --")
 	else:
-		durString = str(" [" + str(equipped.DUR) + "/" + str(eqStats.MaxDur)+"]")
+		durString = str(" [" + str(dur) + "/" + str(maxDur)+"]")
 	
-	eqpLabel.set_text(str(eqStats.Name) + durString)
-	eqpLabel.set_meta("data_key", eqStats)
+	eqpLabel.set_text(str(iName) + durString)
+	eqpLabel.set_meta("data_key", id)
 	
+	if subProf and subProf.has("NATURAL") and id != unit.natural.ID:
+		var item = unit.natural
+		id = item.ID
+		var iStats = UnitData.itemData[id]
+		var l = Label.new()
+		
+		dur = item.DUR
+		maxDur = iStats.MaxDur
+		iName = iStats.Name
+		durString = str(" --")
+		_add_item_label(invPanel,l,iName,durString,id)
 	
 	for item in unitInv:
-		if item == equipped:
+		if item.Equip:
 			continue
-		var gStats = UnitData.itemData[item.ID]
+		var iStats = UnitData.itemData[item.ID]
 		var l = Label.new()
-		equipped.DUR = item.DUR
-		eqStats.MaxDur = gStats.MaxDur
-		if equipped.DUR <= -1 or eqStats.MaxDur <= -1:
+		dur = item.DUR
+		maxDur = iStats.MaxDur
+		iName = iStats.Name
+		
+		if dur <= -1 or maxDur <= -1:
 			durString = str(" --")
 		else:
-			durString = str(" [" + str(equipped.DUR) + "/" + str(eqStats.MaxDur)+"]")
-		l.set_text(str(gStats.Name) + durString)
-		l.set_meta("data_key", item.ID)
-		invPanel.add_child(l)
+			durString = str(" [" + str(dur) + "/" + str(maxDur)+"]")
+		_add_item_label(invPanel,l,iName,durString,id)
+
+func _add_item_label(panel, label, iName, durString, id):
+	label.set_text(str(iName) + durString)
+	label.set_meta("data_key", id)
+	panel.add_child(label)
 
 func _clear_inv():
 	var inv = $M/HBoxContainer/InventoryBox/MC2/MC/InvGrid

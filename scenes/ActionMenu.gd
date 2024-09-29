@@ -182,22 +182,30 @@ func _open_sub_menu(menu: Control):
 	emit_signal("menu_opened", menu)
 
 func _fill_items(range: Array = [-1, -1], augment = false):
-	var itemFrame = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
-	var unitData
-	var inv
 	var aUnit = Global.activeUnit
-	var itemData = UnitData.itemData
+	var subProf = aUnit.unitData.Weapons.Sub
 	var iMode = false
 	var minR = range[0]
 	var maxR = range[1]
+	var inv = aUnit.unitData.Inv
 	
 	if minR <= -1 or maxR <= -1:
 		iMode = true
 		_progress_state(MENU_STATES.ITEM_OPEN)
-	unitData = aUnit.unitData
-	inv = unitData.Inv
-	for wep in inv: #needs "weapon selected" signal
+	
+	if subProf and subProf.has("NATURAL"):
+		_add_item(aUnit.natural, iMode, range, augment)
+	
+	for wep in inv: 
+		_add_item(wep, iMode, range, augment)
+
+func _add_item(wep, iMode, range, augment):
+		var itemFrame = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
+		var unit = Global.activeUnit
+		var unitData = unit.unitData
+		var inv = unitData.Inv
 		var b : Button
+		var itemData = UnitData.itemData
 		var wepData = itemData[wep.ID]
 		var wepName = itemData[wep.ID].Name
 		var disable = false
@@ -206,15 +214,17 @@ func _fill_items(range: Array = [-1, -1], augment = false):
 		var durString
 		var valid = true
 		var i = inv.find(wep)
+		var minR = range[0]
+		var maxR = range[1]
 		#var action := {"weapon": true, "skill": false}
 		if !iMode and wepData.Category == "ITEM":
-			continue
+			return
 		elif !iMode and wepData.Category == "ACC":
-			continue
+			return
 		elif !iMode and !valid:
-			continue
+			return
 		elif iMode and wepData.Category != "ITEM":
-			valid = aUnit.check_valid_equip(wep)
+			valid = unit.check_valid_equip(wep)
 		if maxR == 0 and minR == 0:
 			pass
 		elif maxR < wepData.MaxRange and minR > wepData.MinRange:

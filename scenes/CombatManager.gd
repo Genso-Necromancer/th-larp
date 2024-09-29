@@ -102,10 +102,10 @@ func _evaluate_effects(a: Unit, t: Unit, skillId = false): ##returns proc chance
 		attack = skillData[skillId]
 	else:
 		attack = a.get_equipped_weapon()
-	if !attack.has("Effect"):
+	if !attack.has("Effects"):
 		return false
 	
-	for id in attack.Effect:
+	for id in attack.Effects:
 		var effect = effectData[id]
 		var value = effect.Value
 		results = {id:{}}
@@ -301,7 +301,7 @@ func _get_death_match(unit : Unit, action: Dictionary):
 	var deathMatch = unit.get_multi_round()
 	if !action.Skill or deathMatch:
 		return deathMatch
-	for effect in skillData[action.Skill].Effect:
+	for effect in skillData[action.Skill].Effects:
 		if effectData[effect].Type == Enums.EFFECT_TYPE.MULTI_ROUND:
 			deathMatch = effectData[effect].Value
 	return deathMatch
@@ -359,7 +359,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, isInitia
 	var multiSwing = false
 	var swings = 1
 	var outcome : Dictionary = {}
-	var swingIndx := "Swing"
+	var swingIndx
 	var unitCompCost := 0
 	var targetCompCost := 0
 	var triggers = Enums.COMP_TRIGGERS
@@ -382,7 +382,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, isInitia
 		if !action.Skill:
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.ATTACK)
 			print("Basic attack comp loss added: ",unit.unitName, " ", unitCompCost)
-		swingIndx = swingIndx + str(swing)
+		swingIndx = ("Swing" + str(swing))
 		print(str(swingIndx))
 		outcome[unit] = {swingIndx:{"Hit" : false, "CompLoss": 0, "Dmg" : false, "Crit" : false, "SkillId" : action.Skill, "PassiveProc" : false, "Effects" : [], "Break" : false}}
 		outcome[target] = {swingIndx:{"Graze" : false, "CompLoss": 0, "PassiveProc" : false, "Effects" : false, "Dead" : false,}}
@@ -555,7 +555,7 @@ func get_roll():
 func _get_effects(id) -> Array:
 	var effects := []
 	var seen := []
-	for effId in id.Effect:
+	for effId in id.Effects:
 		var effect = UnitData.effectData[effId]
 		if effect.Target != Enums.EFFECT_TARGET.EQUIPPED and !seen.has(effId):
 			effects.append(effId)
@@ -599,8 +599,8 @@ func _sort_instant(effectArray) -> Dictionary:
 	#var unitSwings = unit.get_multi_swing()
 	#var unitWeapon = UnitData.itemData[unit.get_equipped_weapon().ID]
 	#var weaponSwings := 0
-	#if unitWeapon.Effect:
-		#for effId in unitWeapon.Effect:
+	#if unitWeapon.Effects:
+		#for effId in unitWeapon.Effects:
 			#if UnitData.effectData[effId].Type == Enums.EFFECT_TYPE.MULTI_SWING and UnitData.effectData[effId].Value > weaponSwings:
 				#weaponSwings = UnitData.effectData[effId].Value
 	#if unitSwings and unitSwings > weaponSwings and unitSwings > swings:
@@ -612,7 +612,7 @@ func _sort_instant(effectArray) -> Dictionary:
 func _get_skill_swing_count(skillId):
 	var swings := 1
 	var skillSwings := 0
-	for effId in UnitData.skillData[skillId].Effect:
+	for effId in UnitData.skillData[skillId].Effects:
 		if UnitData.effectData[effId].Type == Enums.EFFECT_TYPE.MULTI_SWING and UnitData.effectData[effId].Value > skillSwings:
 				skillSwings = UnitData.effectData[effId].Value
 	if skillSwings > swings:
@@ -835,11 +835,11 @@ func use_item(unit, target, invItem):
 	var item = itemData[invItem.ID]
 	var results = []
 	var compChange = 0
-	for effId in item.Effect:
+	for effId in item.Effects:
 		var effect = UnitData.effectData[effId]
 		results = results +  _run_effect(unit, target, effect, actionType)
 	compChange += _get_composure_total(unit, results)
-	print("Harvesting Effect Comp Loss.... ", unit.unitName, ": ", compChange)
+	print("Harvesting Effects Comp Loss.... ", unit.unitName, ": ", compChange)
 	unit.apply_composure(compChange)
 	unit.reduce_durability(item)
 
