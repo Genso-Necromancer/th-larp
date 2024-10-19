@@ -11,10 +11,12 @@ signal menu_canceled
 signal player_lost
 signal player_win
 signal cell_selected
-signal unit_selected(unit)
-signal unit_move_ended(unit)
+signal unit_selected(unit:Unit)
+signal unit_move_ended(unit:Unit)
 signal unit_deselected
-signal cmbData_updated(cmbData)
+signal sequence_concluded
+signal sequence_initiated(sequence:Dictionary)
+
 signal walk_complete
 signal map_loaded
 signal skill_target_canceled
@@ -321,6 +323,8 @@ func _connect_unit_signals(unit):
 		unit.exp_gained.connect(self.on_exp_gained)
 	if !self.turn_order_updated.is_connected(unit.on_turn_order_updated):
 		self.turn_order_updated.connect(unit.on_turn_order_updated)
+	if !self.sequence_concluded.is_connected(unit.on_sequence_concluded):
+		self.sequence_concluded.connect(unit.on_sequence_concluded)
 	
 		
 func _set_game_time():
@@ -611,25 +615,20 @@ func grab_target(cell): #HERE Add "Action" compatability
 	if not units.has(cell):
 		print("oops")
 		return
-	var foreCast : Dictionary
 	var mode : int
 	targetUnit = units[cell]
 	var distance := hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.unitData.MoveType, false)
-	var range := [distance, distance]
+	var reach := [distance, distance]
 	if activeAction.Weapon:
-		foreCast = combatManager.get_forecast(activeUnit, targetUnit, activeAction)
+		combatManager.get_forecast(activeUnit, targetUnit, activeAction)
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		mode = 0
 	else:
-		foreCast = combatManager.get_forecast(activeUnit, targetUnit, activeAction)
+		combatManager.get_forecast(activeUnit, targetUnit, activeAction)
 		mode = 1
-	emit_signal("target_focused", foreCast, mode, range)
+	emit_signal("target_focused", mode, reach)
 			
-func _activate_skill(): #OLD MARKED FOR DELETION
-	#print("Skill Manager")
-	combatManager.run_skill(activeUnit, targetUnit, activeAction) #NOT FIXED
-	if warpTarget == null:
-		combat_sequence(activeUnit, targetUnit)
+
 		
 func _clear_active_unit() -> void:
 	# Clears the reference to the activeUnit and the corresponding walkable cells
@@ -745,30 +744,41 @@ func confirm_forecast():
 	emit_signal("forecast_confirmed")
 		
 func skill_target_selected():
+	if !is_occupied(cursorCell):
+		return
 	if !UnitData.skillData.has(activeAction.Skill):
 		print("No Valid SkillID")
 		return
 	var friendly := false
 	var valid := false
 	var skill = UnitData.skillData[activeAction.Skill]
+	
 	if focusUnit.FACTION_ID == activeUnit.FACTION_ID or focusUnit.FACTION_ID == Enums.FACTION_ID.NPC:
 		friendly = true
 	match skill.Target:
 		"Self":
-			if is_occupied(cursorCell) and activeUnit == focusUnit:
+			if activeUnit == focusUnit:
 				valid = true
 		"Enemy":
-			if is_occupied(cursorCell) and !friendly:
+			if !friendly:
 				valid = true
+			#if skill.RuleType:
+				#match skill.RuleType:
+					#Enums.RULE_TYPE.TARGET_SPEC:
+						#if skill.Rule != focusUnit.SPEC_ID:
+							#valid = false
 		"Ally":
-			if is_occupied(cursorCell) and friendly and activeUnit != focusUnit:
+			if friendly and activeUnit != focusUnit:
 				valid = true
 		"Self+":
-			if is_occupied(cursorCell) and friendly:
+			if friendly:
 				valid = true
 		"Other":
-			if is_occupied(cursorCell) and activeUnit != focusUnit:
+			if activeUnit != focusUnit:
 				valid = true
+				
+	
+					
 	if valid:
 		_change_state(GameState.GB_COMBAT_FORECAST)
 		grab_target(cursorCell)
@@ -938,9 +948,9 @@ func attack_targeting(unit: Unit, action):
 	activeAction = action
 			
 	if action.Weapon and action.Skill:
-		var range = _get_aug_range(unit, action)
-		minRange = range[0]
-		maxRange = range[1]
+		var reach = _get_aug_range(unit, action)
+		minRange = reach[0]
+		maxRange = reach[1]
 		_change_state(GameState.GB_ATTACK_TARGETING)
 	elif action.Skill:
 		minRange = skillData[action.Skill].RangeMin
@@ -964,7 +974,7 @@ func attack_targeting(unit: Unit, action):
 func _get_aug_range(unit, action) -> Array:
 	var minRange := 1000
 	var maxRange := 0
-	var range := []
+	var reach := []
 	var skill = UnitData.skillData[action.Skill]
 	var wepData :Dictionary = UnitData.itemData
 	if skill.RangeMin == 0 or skill.RangeMax == 0:
@@ -976,9 +986,9 @@ func _get_aug_range(unit, action) -> Array:
 	else:
 		minRange = skill.RangeMin
 		maxRange = skill.RangeMax
-	range.append(minRange)
-	range.append(maxRange)
-	return range
+	reach.append(minRange)
+	reach.append(maxRange)
+	return reach
 		
 
 
@@ -1005,28 +1015,20 @@ func initiate_warp():
 #	var team = null
 	if !is_occupied(cursorCell) and !solidsArray.has(cursorCell) and snapPath.has(cursorCell):
 		combatManager.warp_to(warpTarget, cursorCell)
-		combat_sequence(activeUnit, warpTarget, "warp")
+		combat_sequence("warp")
 		warpTarget = null
 
-func combat_sequence(a,t, _scenario = null):
-	#Place holder for when combat has a visual component, currently handles end of combat duties that would occur right after
-	var addingExp = false
-	
+func combat_sequence(scenario):
+	_change_state(GameState.ACCEPT_PROMPT)
+	emit_signal("sequence_initiated", scenario)
+
+func _on_animation_handler_sequence_complete():
+	_change_state(GameState.LOADING)
+	emit_signal("sequence_concluded")
 	wipe_region()
 	_deselect_active_unit(true)
-	a.update_stats()
-	t.update_stats()
-	if a.needDeath:
-		
-		await a.death_done
-		addingExp = t.add_exp("Kill", a)
-	if t.needDeath:
-		
-		await t.death_done
-		addingExp = a.add_exp("Kill", t)
-	if addingExp:
-		await self.continue_turn
 	turnComplete = true
+	
 
 func toggle_extra_info():
 	#Toggles HP bars
@@ -1100,6 +1102,12 @@ func on_death_done(unit: Unit):
 	
 	#Plan to alter this down the line for Seiga fight, where fallen units will be cached instead of completely removed
 	#Intention would be for Seiga to "reanimate" fallen units as part of her "danmaku"
+	var addingExp = false
+	if unit.FACTION_ID == Enums.FACTION_ID.ENEMY:
+		var killer = unit.killer
+		addingExp = killer.add_exp("Kill", unit)
+	if addingExp:
+		await self.continue_turn
 	deathList.append(unit)
 	currMap.check_event("death", unit)
 	
@@ -1222,7 +1230,7 @@ func ai_attack(result): #HERE..... EVENTUALLY. So fuckin out of date.
 	var destination = Vector2i(result["Best Move"]["launch"])
 	var weapon = result["Best Move"]["weapon"]
 	var wInd = actor.unitData.Inv.find(weapon)
-	
+	var combatResults
 	_select_unit(actor.cell)
 #	var closestCell = hexStar.find_closest(actor.cell, target.cell, actor.moveType, walkableCells)
 	var path = get_path_to_cell(actor.cell, destination, actor.moveType)
@@ -1232,13 +1240,13 @@ func ai_attack(result): #HERE..... EVENTUALLY. So fuckin out of date.
 	
 	actor.set_equipped(wInd)
 	actor.update_stats()
-	combatManager.get_forecast(actor, target, activeAction)
+	combatResults = combatManager.get_forecast(actor, target, activeAction)
 	#combatManager.start_the_justice(actor,target)
 #	print(activeUnit)
 	
 	boardState.add_acted(activeUnit)
 	activeUnit.set_acted(true)
-	combat_sequence(activeUnit, target)
+	combat_sequence(combatResults)
 	
 func ai_move(result):
 	var actor = result["Unit"]
@@ -1384,9 +1392,10 @@ func _on_gui_manager_start_the_justice(button = false):
 	_change_state(GameState.LOADING)
 	combatResults = combatManager.start_the_justice(activeUnit, focusUnit, activeAction)
 	#print(str(combatResults))
+	combat_sequence(combatResults)
 	boardState.add_acted(activeUnit)
 	activeUnit.set_acted(true)
-	combat_sequence(activeUnit, focusUnit)
+	
 #	mainCon.state = GameState.GB_DEFAULT
 
 func _on_win_screen_win_finished():
@@ -1444,12 +1453,11 @@ func _on_action_menu_action_selected(selection, action = false):
 		
 func _on_action_menu_weapon_changed(button):
 	var i = button.get_meta("index")
-	var cmbData
+	
 	if button.disabled:
 		return
 	activeUnit.set_temp_equip(i)
-	cmbData = combatManager.get_forecast(activeUnit, targetUnit, activeAction)
-	emit_signal("cmbData_updated", cmbData)
+	combatManager.get_forecast(activeUnit, targetUnit, activeAction)
 	
 	
 
@@ -1481,7 +1489,10 @@ func _on_area_2d_area_entered(area):
 	#print("focusUnit: ", focusUnit)
 
 
-func _on_area_2d_area_exited(area):
+func _on_area_2d_area_exited(_area):
 	#print("Exited: ", area)
 	focusUnit = null
 	#print("focusUnit: ", focusUnit)
+
+
+

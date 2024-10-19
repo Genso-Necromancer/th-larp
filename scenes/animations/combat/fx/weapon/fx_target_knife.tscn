@@ -1,0 +1,225 @@
+[gd_scene load_steps=7 format=3 uid="uid://djo8xtq1qv18a"]
+
+[ext_resource type="Script" path="res://scenes/animations/combat/fx/gen/fx_.gd" id="1_py7jm"]
+[ext_resource type="Texture2D" uid="uid://c220k3sjbwgvy" path="res://sprites/fx/weapon/maid dagger asset.png" id="2_m6l7u"]
+[ext_resource type="Texture2D" uid="uid://optrxiewffae" path="res://sprites/fx/weapon/maid dagger hit asset.png" id="3_k7fuh"]
+
+[sub_resource type="Animation" id="Animation_hufmj"]
+resource_name = "Action"
+length = 1.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Skeleton2D/KnifeThrown:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(-445, 0), Vector2(-122, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Skeleton2D/KnifeThrown:rotation")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-1.57079]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Skeleton2D/Knife Embed:position")
+tracks/2/interp = 2
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Skeleton2D/Knife Embed:rotation")
+tracks/3/interp = 2
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.5, 0.7, 0.9, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [-3.14159, -3.14159, -2.87979, -3.40339, -2.87979, -3.40339, -3.14159]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("polgons/KnifeEmbed:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("polgons/KnifeThrown:self_modulate")
+tracks/5/interp = 2
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("polgons/KnifeThrown:visible")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [true, false]
+}
+
+[sub_resource type="Animation" id="Animation_prkun"]
+resource_name = "RESET"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Skeleton2D/KnifeThrown:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-445, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Skeleton2D/KnifeThrown:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-1.57079]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Skeleton2D/Knife Embed:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Skeleton2D/Knife Embed:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-3.14159]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("polgons/KnifeEmbed:visible")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("polgons/KnifeThrown:self_modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("polgons/KnifeThrown:visible")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_c47h8"]
+_data = {
+"Action": SubResource("Animation_hufmj"),
+"RESET": SubResource("Animation_prkun")
+}
+
+[node name="fx_target_knife" type="Node2D"]
+z_index = 2
+script = ExtResource("1_py7jm")
+
+[node name="polgons" type="Node2D" parent="."]
+
+[node name="KnifeThrown" type="Polygon2D" parent="polgons"]
+visible = false
+self_modulate = Color(1, 1, 1, 0)
+texture = ExtResource("2_m6l7u")
+skeleton = NodePath("../../Skeleton2D")
+polygon = PackedVector2Array(24, 0, 40, 0, 56, 0, 56, 64, 80, 56, 80, 96, 56, 88, 56, 200, 40, 216, 24, 200, 24, 88, 0, 96, 0, 56, 24, 64)
+uv = PackedVector2Array(24, 0, 40, 0, 56, 0, 56, 64, 80, 56, 80, 96, 56, 88, 56, 200, 40, 216, 24, 200, 24, 88, 0, 96, 0, 56, 24, 64)
+bones = ["KnifeThrown", PackedFloat32Array(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5)]
+
+[node name="KnifeEmbed" type="Polygon2D" parent="polgons"]
+visible = false
+texture = ExtResource("3_k7fuh")
+skeleton = NodePath("../../Skeleton2D")
+polygon = PackedVector2Array(0, 24, 64, 24, 56, 0, 96, 0, 88, 24, 136, 24, 152, 0, 160, 16, 160, 32, 152, 72, 136, 72, 136, 56, 88, 56, 96, 80, 56, 80, 64, 56, 0, 56)
+uv = PackedVector2Array(0, 24, 64, 24, 56, 0, 96, 0, 88, 24, 136, 24, 152, 0, 160, 16, 160, 32, 152, 72, 136, 72, 136, 56, 88, 56, 96, 80, 56, 80, 64, 56, 0, 56)
+bones = ["KnifeThrown", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "Knife Embed", PackedFloat32Array(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5)]
+
+[node name="Skeleton2D" type="Skeleton2D" parent="."]
+
+[node name="KnifeThrown" type="Bone2D" parent="Skeleton2D"]
+position = Vector2(-445, 0)
+rotation = -1.57079
+rest = Transform2D(1, 0, 0, 1, 40, 75)
+
+[node name="Knife Embed" type="Bone2D" parent="Skeleton2D"]
+rotation = -3.14159
+rest = Transform2D(-1, -4.44253e-06, 4.44253e-06, -1, 149, 40)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_c47h8")
+}

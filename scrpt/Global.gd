@@ -22,6 +22,7 @@ var slamage := 5
 var spdGap := 4
 var critRange := [10, 20] 
 var knifeCrit := [15, 25]
+var slayerMulti := 3
 var compCosts := {"Attack": 1, "WasHit":1, "Miss":1, "Dodge": 1, "NegEff": 1, "Healed":-1, "Move":0, "Crit": -1, "Kill": -1, "Break": 1}
 #combat variables
 func _init():

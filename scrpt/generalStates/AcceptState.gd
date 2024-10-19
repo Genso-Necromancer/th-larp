@@ -2,6 +2,7 @@ extends GenericState
 class_name AcceptState
 var slave
 
+
 func setup(newSlaves):
 	super.setup(newSlaves)
 	slave = slaves[0]
@@ -9,4 +10,5 @@ func setup(newSlaves):
 func _handle_bind(bind):
 	match bind:
 		"invalid": return
-		"ui_accept": slave.accept_skip()
+		"ui_accept": emit_signal("prompt_accepted")
+		

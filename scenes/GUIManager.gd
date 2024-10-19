@@ -12,6 +12,7 @@ signal map_started
 signal action_selected
 
 
+
 @export var mapCursorPath : NodePath
 @export var menuOffSet : int = 150
 
@@ -110,7 +111,6 @@ var profFocus
 
 
 func _ready():
-	
 	menuCursor.visible = false
 	foreCast.visible = false
 	_load_turn_tracker()
@@ -172,18 +172,21 @@ func _relocate_child(child, newParent):
 	newParent.add_child(child)
 	
 		
-func accept_skip():
-	var failScreen : Control = $FailScreen
-	var winScreen : Control = $WinScreen
-	var expContainer : Control = $ExpGain
-	match true:
-		expContainer.visible:
-			expContainer.animation_skip()
-			
-		failScreen.visible:
-			pass
-		winScreen.visible:
-			winScreen.close_win_screen()
+#func accept_skip():
+	#var failScreen : Control = $FailScreen
+	#var winScreen : Control = $WinScreen
+	#var expContainer : Control = $ExpGain
+	#match mainCon.state:
+		#GameState.ACCEPT_PROMPT:
+			#if expContainer.visible:
+				#expContainer.animation_skip()
+			#
+		#GameState.FAIL_STATE:
+			#pass
+		#GameState.WIN_STATE:
+			#winScreen.close_win_screen()
+		#GameState.SCENE_ACTIVE:
+			#emit_signal("scene_skipped")
 		
 		
 
@@ -246,13 +249,14 @@ func _on_gameboard_toggle_prof(): #Needs filtering for while in set-up menu. Per
 func update_prof():
 	emit_signal("profile_called")
 		
-func _on_gameboard_target_focused(cmbData : Dictionary, mode : int, range: Array = [-1, -1]):
+func _on_gameboard_target_focused( mode : int, reach: Array = [-1, -1]):
 	var fc = $CombatForecast
-	fc.update_fc(cmbData)
 	fc.show_fc()
+	turnTracker.visible = false
 	match mode:
-		0: actMenu.open_weapons(range)
+		0: actMenu.open_weapons(reach)
 		1: pass
+	
 		
 
 func _on_gameboard_time_set():
@@ -277,6 +281,7 @@ func _on_gameboard_gb_ready(_state):
 #HERE
 func _on_gameboard_exp_display(oldExp, expSteps, results, unitPrt, unitName):
 	var expContainer : Control = $ExpGain
+	
 	_change_state(gameState.ACCEPT_PROMPT)
 	expContainer.init_exp_display(oldExp, expSteps, results, unitPrt, unitName)
 	expContainer.toggle_visibility()
@@ -286,7 +291,7 @@ func _on_gameboard_call_setup(dLimit, forced):
 	var homeMenu = $SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet
 	var infoPanel = $SetUpMain/SetUpGrid/SetUpPnl2
 	var homeBtns = homeMenu.get_children()
-	var i = 0
+	#var i = 0
 	sState = sStates.HOME
 	forcedDep = forced
 	depLimit = dLimit
@@ -651,7 +656,7 @@ func _on_begin_btn_pressed():
 #Action/Generic options menu functions
 
 func _close_act_menu():
-	foreCast.hide_fc()
+	#foreCast.hide_fc()
 	actMenu.close_menu()
 	
 func _on_action_menu_menu_closed():
@@ -679,7 +684,7 @@ func _on_gameboard_menu_canceled():
 func _on_gameboard_forecast_confirmed():
 	if actMenu.visible:
 		return
-	foreCast.hide_fc()
+	#foreCast.hide_fc()
 	_strip_menuCursor()
 	emit_signal("start_the_justice")
 
@@ -690,8 +695,8 @@ func _on_action_menu_menu_opened(container):
 	#_resignal_menuCursor(container)
 	call_deferred("_resignal_menuCursor",container)
 	
-func _on_weapon_selected(button):
-	foreCast.hide_fc()
+func _on_weapon_selected(button): #weapon can change after selection if mouse moves at wrong time. HERE Fix this, you absolute fucking retard
+	#foreCast.hide_fc()
 	_strip_menuCursor()
 	emit_signal("start_the_justice", button)
 
@@ -725,5 +730,10 @@ func _on_gameboard_map_loaded():
 	_end_load_screen()
 	
 
+func _on_animation_handler_sequence_complete():
+	foreCast.hide_fc()
+	turnTracker.visible = true
 
 
+func _on_gameboard_sequence_initiated(_sequence):
+	_change_state(GameState.SCENE_ACTIVE)

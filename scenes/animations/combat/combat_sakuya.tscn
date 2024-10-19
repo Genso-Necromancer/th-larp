@@ -1,0 +1,423 @@
+[gd_scene load_steps=12 format=3 uid="uid://bmgmpnvee7hd2"]
+
+[ext_resource type="Script" path="res://scenes/animations/combat/combat_anim.gd" id="1_vq7oy"]
+[ext_resource type="Texture2D" uid="uid://d0a2u1dbyibvp" path="res://sprites/character/sakuya/SakuyaIdle.png" id="2_faeb1"]
+[ext_resource type="Animation" uid="uid://omspph7bdn7u" path="res://scenes/animations/combat/Entry.res" id="4_gxd7g"]
+[ext_resource type="Texture2D" uid="uid://ct5jdyqgsrdra" path="res://sprites/character/sakuya/SakuyaCombatSheet.png" id="4_ixkwl"]
+[ext_resource type="Animation" uid="uid://bkuu5e1emitb3" path="res://scenes/animations/combat/Idle.res" id="5_mpxt3"]
+
+[sub_resource type="Animation" id="Animation_bgmxd"]
+resource_name = "Attack"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Assets/CombatSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Assets/CombatSprite:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Assets/Idle:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"target_fx_request"
+}, {
+"args": [],
+"method": &"play_self_fx"
+}, {
+"args": [],
+"method": &"target_pop_up_request"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_8t516"]
+resource_name = "Cast"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Assets/CombatSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Assets/CombatSprite:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Assets/Idle:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "method"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath(".")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
+"values": [{
+"args": [],
+"method": &"target_fx_request"
+}, {
+"args": [],
+"method": &"play_self_fx"
+}, {
+"args": [],
+"method": &"target_pop_up_request"
+}]
+}
+
+[sub_resource type="Animation" id="Animation_aorc4"]
+resource_name = "Death"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Assets:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4, 0.7),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(0, 0, 0, 1), Color(0, 0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CombatSkeleton:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(172, 90)]
+}
+
+[sub_resource type="Animation" id="Animation_jb3uu"]
+resource_name = "Defend"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Assets/CombatSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [2]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Assets/CombatSprite:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Assets/Idle:visible")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CombatSkeleton:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(172, 90)]
+}
+
+[sub_resource type="Animation" id="Animation_v5su4"]
+resource_name = "RESET"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Assets/CombatSprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [1]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Assets/CombatSprite:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Assets/Idle:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-82, 84)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Assets/Idle:scale")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Assets/Idle:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Assets/Idle:self_modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Assets/Idle:visible")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("CombatSkeleton:rotation")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("CombatSkeleton:position")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("CombatSkeleton:scale")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(1, 1)]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("Assets:modulate")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("CombatSkeleton:visible")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_456y4"]
+_data = {
+"Attack": SubResource("Animation_bgmxd"),
+"Cast": SubResource("Animation_8t516"),
+"Death": SubResource("Animation_aorc4"),
+"Defend": SubResource("Animation_jb3uu"),
+"Entry": ExtResource("4_gxd7g"),
+"Idle": ExtResource("5_mpxt3"),
+"RESET": SubResource("Animation_v5su4")
+}
+
+[node name="combat_sakuya" type="Node2D"]
+script = ExtResource("1_vq7oy")
+
+[node name="Assets" type="Node2D" parent="."]
+position = Vector2(47, 13)
+
+[node name="Idle" type="Polygon2D" parent="Assets"]
+visible = false
+self_modulate = Color(1, 1, 1, 0)
+position = Vector2(-82, 84)
+antialiased = true
+texture = ExtResource("2_faeb1")
+skeleton = NodePath("../../CombatSkeleton")
+polygon = PackedVector2Array(8, -24, 360, -24, 360, 624, 8.00003, 624)
+uv = PackedVector2Array(8, -24, 360, -24, 360, 624, 8, 624)
+
+[node name="CombatSprite" type="Sprite2D" parent="Assets"]
+visible = false
+position = Vector2(281, 467)
+texture = ExtResource("4_ixkwl")
+vframes = 3
+frame = 1
+
+[node name="CombatPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_456y4")
+}
+
+[node name="CombatSkeleton" type="Skeleton2D" parent="."]
+
+[node name="Hip" type="Bone2D" parent="CombatSkeleton"]
+position = Vector2(105, 418)
+rest = Transform2D(1, 0, 0, 1, 105, 418)
+
+[node name="AttackFx" type="Bone2D" parent="CombatSkeleton"]
+position = Vector2(133, 281)
+rest = Transform2D(1, 0, 0, 1, 133, 281)
+
+[node name="ChestFx" type="Bone2D" parent="CombatSkeleton"]
+position = Vector2(115, 298)
+rest = Transform2D(1, 0, 0, 1, 115, 298)
+
+[node name="TargetFx" type="Bone2D" parent="CombatSkeleton"]
+position = Vector2(119, 570)
+rest = Transform2D(1, 0, 0, 1, 119, 570)
+
+[node name="EffectFx" type="Bone2D" parent="CombatSkeleton"]
+position = Vector2(112, 352)
+rest = Transform2D(1, 0, 0, 1, 112, 352)
+
+[node name="HeadFx" type="Bone2D" parent="CombatSkeleton"]
+position = Vector2(124, 166)
+rest = Transform2D(1, 0, 0, 1, 124, 166)
+
+[node name="SkillNameFx" type="Bone2D" parent="CombatSkeleton"]
+position = Vector2(107, 399)
+rest = Transform2D(1, 0, 0, 1, 0, 0)
+
+[node name="PassiveCutInContainer" type="VBoxContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0

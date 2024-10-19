@@ -15,6 +15,9 @@ func set_aura(unit: Unit, auraData: Dictionary):
 	#print("Aura Cells:","[",unit,"]",auraCells)
 	if !aura.IsSelf:
 		auraCells.erase(Vector2i(0,0))
+	if aura.SelfOnly:
+			self.area_entered.connect(master._on_self_aura_entered.bind(self))
+			self.area_exited.connect(master._on_self_aura_exited.bind(self))
 	_place_areas(auraCells)
 
 func _place_areas(cells: Array) -> void:

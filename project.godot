@@ -21,6 +21,7 @@ Global="*res://scrpt/Global.gd"
 UnitData="*res://scrpt/UnitData.gd"
 Enums="*res://scrpt/enums.gd"
 StringGetter="*res://scrpt/string_getter.gd"
+SignalTower="*res://scrpt/signal_tower.gd"
 
 [display]
 
@@ -33,7 +34,8 @@ project/assembly_name="The Crypt"
 
 [editor]
 
-movie_writer/movie_file="C:/Users/Necromancer/Documents/game_clips/early_demo.avi"
+movie_writer/mjpeg_quality=0.5
+movie_writer/movie_file="C:/Users/Necromancer/Documents/game_clips/toss_em.avi"
 
 [editor_plugins]
 

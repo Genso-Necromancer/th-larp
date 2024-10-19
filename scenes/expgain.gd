@@ -12,6 +12,11 @@ var expGrowSpeed : float = 1
 var expAdded : int = 0
 var lvlResults : Dictionary = {}
 
+
+func _ready():
+	SignalTower.prompt_accepted.connect(self.animation_skip)
+
+
 func animation_skip():
 	if tween and growExp:
 		tween.custom_step(10000)

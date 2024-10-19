@@ -19,9 +19,17 @@
 			<entry id = "combat_hp"><![CDATA[%d/%d]]></entry>
 			<!-- effect type templates -->
 			<entry id = "effect_template_buff"><![CDATA[[color=#6495ED]Buff[/color] %s]]></entry>
+			<entry id = "effect_template_debuff"><![CDATA[[color=#6495ED]Debuff[/color] %s]]></entry>
 			<entry id = "effect_template_status"><![CDATA[%s]]></entry>
 			<entry id = "effect_template_time"><![CDATA[%s Time]]></entry>
 			<entry id = "effect_template_life_steal"><![CDATA[[color=#8C1717]Life Steal[/color]]]></entry>
+			<entry id = "effect_template_heal"><![CDATA[[color=#3CB371]Heal[/color]]]></entry>
+			<entry id = "effect_template_slayer"><![CDATA[%s [color=#3CB371]Slayer[/color]]]></entry>
+			<!-- Pop Up Text -->
+			<entry id = "pop_up_template_value"><![CDATA[%s %d]]></entry>
+			<entry id = "pop_up_template_buff"><![CDATA[%s %s]]></entry>
+			<entry id = "pop_up_template"><![CDATA[%s]]></entry>
+			
 			
 		</template>
 		<string>
@@ -29,15 +37,62 @@
 			<!-- Durations -->
 			<entry id = "duration_round"><![CDATA[Rounds]]></entry>
 			<entry id = "duration_turn"><![CDATA[Turns]]></entry>
-			<!-- effects -->
+			<!-- Effects -->
 			<entry id = "effect_sub_type_speed_up"><![CDATA[Speed up]]></entry>
 			<entry id = "effect_sub_type_slow_down"><![CDATA[Slow down]]></entry>
 			<entry id = "effect_sub_type_sleep"><![CDATA[[color=#5F9EA0]Sleep[/color]]]></entry>
+			<entry id = "effect_sub_type_move"><![CDATA[Move]]></entry>
+			<entry id = "effect_sub_type_life"><![CDATA[Life]]></entry>
+			<entry id = "effect_sub_type_comp"><![CDATA[Composure]]></entry>
+			<entry id = "effect_sub_type_pwr"><![CDATA[Power]]></entry>
+			<entry id = "effect_sub_type_mag"><![CDATA[Magic]]></entry>
+			<entry id = "effect_sub_type_eleg"><![CDATA[Elegance]]></entry>
+			<entry id = "effect_sub_type_cele"><![CDATA[Celerity]]></entry>
+			<entry id = "effect_sub_type_bar"><![CDATA[Barrier]]></entry>
+			<entry id = "effect_sub_type_cha"><![CDATA[Charisma]]></entry>
+			<entry id = "effect_sub_type_hit"><![CDATA[Hit]]></entry>
+			<entry id = "effect_sub_type_dmg"><![CDATA[Damage]]></entry>
+			<entry id = "effect_sub_type_avoid"><![CDATA[Avoid]]></entry>
+			<entry id = "effect_sub_type_graze"><![CDATA[Graze]]></entry>
+			<entry id = "effect_sub_type_grzprc"><![CDATA[Graze Chance]]></entry>
+			<entry id = "effect_sub_type_crit"><![CDATA[Crit]]></entry>
+			<entry id = "effect_sub_type_crtavd"><![CDATA[Crit Avoid]]></entry>
+			<entry id = "effect_sub_type_resist"><![CDATA[Resist]]></entry>
+			<entry id = "effect_sub_type_effhit"><![CDATA[Effect Chance]]></entry>
+			<entry id = "effect_sub_type_def"><![CDATA[Defense]]></entry>
+			<!-- Effect Pop Text -->
+			<entry id = "effect_pop_text_resisted"><![CDATA[Resisted!]]></entry>
+			<entry id = "effect_pop_text_buff"><![CDATA[Up!]]></entry>
+			<entry id = "effect_pop_text_debuff"><![CDATA[Down!]]></entry>
+			<entry id = "effect_pop_text_cure"><![CDATA[Cured!]]></entry>
+			<entry id = "effect_pop_text_resisted"><![CDATA[Resisted!]]></entry>
+			<entry id = "effect_pop_text_status_sleep"><![CDATA[Sleep!]]></entry>
+			<entry id = "effect_pop_text_move"><![CDATA[Move]]></entry>
+			<entry id = "effect_pop_text_life"><![CDATA[Life]]></entry>
+			<entry id = "effect_pop_text_comp"><![CDATA[Composure]]></entry>
+			<entry id = "effect_pop_text_pwr"><![CDATA[Power]]></entry>
+			<entry id = "effect_pop_text_mag"><![CDATA[Magic]]></entry>
+			<entry id = "effect_pop_text_eleg"><![CDATA[Elegance]]></entry>
+			<entry id = "effect_pop_text_cele"><![CDATA[Celerity]]></entry>
+			<entry id = "effect_pop_text_bar"><![CDATA[Barrier]]></entry>
+			<entry id = "effect_pop_text_cha"><![CDATA[Charisma]]></entry>
+			<entry id = "effect_pop_text_hit"><![CDATA[Hit]]></entry>
+			<entry id = "effect_pop_text_dmg"><![CDATA[Damage]]></entry>
+			<entry id = "effect_pop_text_avoid"><![CDATA[Avoid]]></entry>
+			<entry id = "effect_pop_text_graze"><![CDATA[Graze]]></entry>
+			<entry id = "effect_pop_text_grzprc"><![CDATA[Graze Chance]]></entry>
+			<entry id = "effect_pop_text_crit"><![CDATA[Crit]]></entry>
+			<entry id = "effect_pop_text_crtavd"><![CDATA[Crit Avoid]]></entry>
+			<entry id = "effect_pop_text_resist"><![CDATA[Resist]]></entry>
+			<entry id = "effect_pop_text_effhit"><![CDATA[Effect Chance]]></entry>
+			<entry id = "effect_pop_text_def"><![CDATA[Defense]]></entry>
+			
 			<!-- names -->
-			<entrt id = "unit_name_remilia"><![CDATA[Remilia Scarlet]]></entry>
-			<entrt id = "unit_name_sakuya"><![CDATA[Sakuya Izayoi]]></entry>
-			<entrt id = "unit_name_patchouli"><![CDATA[Patchouli Knowledge]]></entry>
-			<entrt id = "unit_name_meiling"><![CDATA[Hong Meiling]]></entry>
+			<entry id = "unit_name_remilia"><![CDATA[Remilia Scarlet]]></entry>
+			<entry id = "unit_name_sakuya"><![CDATA[Sakuya Izayoi]]></entry>
+			<entry id = "unit_name_patchouli"><![CDATA[Patchouli Knowledge]]></entry>
+			<entry id = "unit_name_meiling"><![CDATA[Hong Meiling]]></entry>
+			<entry id = "unit_name_reimu"><![CDATA[Reimu Hakuri]]></entry>
 			<!-- species -->
 			<entry id = "species_name_fairy"><![CDATA[Fairy]]></entry>
 			<entry id = "species_name_human"><![CDATA[Vampire]]></entry>
@@ -54,6 +109,18 @@
 			<!-- targeting -->
 			<entry id = "effect_target_self"><![CDATA[Self: ]]></entry>
 			<entry id = "effect_target_target"><![CDATA[Target: ]]></entry>
+			<!-- Pop Up Text -->
+			<entry id = "pop_up_graze"><![CDATA[Graze!]]></entry>
+			<entry id = "pop_up_critgraze"><![CDATA[Critical Graze!]]></entry>
+			<!-- <entry id = "pop_up_template_slayer"><![CDATA[Slayer!]]></entry> -->
+			<entry id = "pop_up_crit"><![CDATA[Critical!]]></entry>
+			<entry id = "pop_up_dodge"><![CDATA[Dodge!]]></entry>
+			<!-- Passives -->
+			<entry id = "passive_name_fated"><![CDATA[Fated]]></entry>
+			<!-- Skill Names -->
+			<entry id = "skill_name_life_steal_rem"><![CDATA[Scarlet Thirst]]></entry>
+			<entry id = "skill_name_fire_basic"><![CDATA[Fire Ball]]></entry>
+			
 		</string>
 	</language>
 </root>

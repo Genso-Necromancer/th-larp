@@ -1,0 +1,79 @@
+[gd_scene load_steps=7 format=3 uid="uid://bj6ofu6yqyl58"]
+
+[ext_resource type="Texture2D" uid="uid://bqvljtxjt53a8" path="res://sprites/character/sakuya/SakuyaAttack.png" id="1_wr5ie"]
+[ext_resource type="Texture2D" uid="uid://d0a2u1dbyibvp" path="res://sprites/character/sakuya/SakuyaIdle.png" id="2_e2ejh"]
+[ext_resource type="Texture2D" uid="uid://dm32qlweuwdcr" path="res://sprites/character/sakuya/SakuyaDefend.png" id="3_tocso"]
+
+[sub_resource type="Animation" id="Animation_b0v0v"]
+resource_name = "idle"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("../Assets/Idle:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.1),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
+}
+
+[sub_resource type="Animation" id="Animation_kpb80"]
+resource_name = "RESET"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_e8xwy"]
+_data = {
+"RESET": SubResource("Animation_kpb80"),
+"idle": SubResource("Animation_b0v0v")
+}
+
+[node name="SakuyaSkeleton" type="Node2D"]
+
+[node name="Assets" type="Node2D" parent="."]
+
+[node name="Attack" type="Polygon2D" parent="Assets"]
+visible = false
+position = Vector2(-8, 37)
+texture = ExtResource("1_wr5ie")
+skeleton = NodePath("../../Attack")
+polygon = PackedVector2Array(8, 16, 432, 16, 432, 552, 7.99998, 552)
+uv = PackedVector2Array(0, 16, 440, 16, 440, 552, 0, 552)
+
+[node name="Idle" type="Polygon2D" parent="Assets"]
+antialiased = true
+texture = ExtResource("2_e2ejh")
+skeleton = NodePath("../../Idle")
+polygon = PackedVector2Array(8, -24, 360, -24, 360, 624, 8.00003, 624)
+uv = PackedVector2Array(8, -24, 360, -24, 360, 624, 8, 624)
+
+[node name="Defend" type="Polygon2D" parent="Assets"]
+visible = false
+position = Vector2(64, 1)
+texture = ExtResource("3_tocso")
+skeleton = NodePath("../../Defend")
+polygon = PackedVector2Array(-64, 0, 424, 0, 424, 624, -64, 624)
+uv = PackedVector2Array(-64, 0, 424, 0, 424, 624, -64, 624)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_e8xwy")
+}
+
+[node name="Idle" type="Skeleton2D" parent="."]
+
+[node name="BaseNode" type="Bone2D" parent="Idle"]
+position = Vector2(182, 292)
+rest = Transform2D(1, 0, 0, 1, 182, 292)
+
+[node name="Attack" type="Skeleton2D" parent="."]
+
+[node name="BaseNode" type="Bone2D" parent="Attack"]
+position = Vector2(182, 292)
+rest = Transform2D(1, 0, 0, 1, 182, 292)
+
+[node name="Defend" type="Skeleton2D" parent="."]
+
+[node name="BaseNode" type="Bone2D" parent="Defend"]
+position = Vector2(182, 292)
+rest = Transform2D(1, 0, 0, 1, 182, 292)

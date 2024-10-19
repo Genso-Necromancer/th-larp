@@ -24,7 +24,7 @@ var rosterOnce := false
 
 
 func _ready():
-	var index = 0
+	#var index = 0
 	
 	_load_unique_units()
 	_load_items()
@@ -81,19 +81,21 @@ func _load_skills():
 		"Icon": load(("res://sprites/gungnir.png")),
 		"Augment": false, #Set true if weapon stats should be used.
 		"Target": "Enemy", #Enemy, Self, Ally, Self+(This is Self and Ally), Other(Enemy or Ally, not Self)
-		"TrueHit": false, #default true
+		"CanMiss": true, #default true
+		"CanCrit": true,
+		"CanDmg": true,
 		##Only if Augment
 		"WepCat": Enums.WEAPON_CATEGORY.ANY, #Set to required weapon category, or sub type, for skill use.
 		"BonusMinRange": 0,
 		"BonusMaxRange": 0,
 		##If !augment, these are the parameters used as if it was a weapon. If Augment, these values are added as bonus/penalty if altered.
 		"Hit": 0, #Int only. negative values acceptable for Hit penalties to the skill
-		"Dmg": false, #set an int value for damage, set false to prevent dealing damage
-		"Crit": false, #set an int value for crit bonus, set false to prevent crits
+		"Dmg": 0, #set an int value for damage, set false to prevent dealing damage
+		"Crit": 0, #set an int value for crit bonus, set false to prevent crits
 		"Type": Enums.DAMAGE_TYPE.PHYS, #use enum types. Set False if augment should use weapon's type.
 		##Used regardless of Augment
-		"RangeMin": 0, #if 0, ignored by Augment. Set value to require specific weapon range.
-		"RangeMax": 0,
+		"RangeMin": 1, #if 0, ignored by Augment. Set value to require specific weapon reach.
+		"RangeMax": 1,
 		"Cost": 0,
 		"Effects": [], #any attacking effects for an augment skill must be set to instant.
 		"RuleType": false,
@@ -113,7 +115,7 @@ func _load_effects():
 				"SubType": false, #Use Enums.SUB_TYPE. For Damage, use Damage Enums. Just how it's gotta be.
 				"Target": Enums.EFFECT_TARGET.TARGET, #Self, Target, Global, Equipped
 				"Instant": false, #only set for effects that should occur before an augment skill is rolled.
-				"OnHit": false, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
+				"OnHit": true, #True: skill's accuracy check must pass for the effect to occur. False: effect is ran regardless of accuracy check
 				"Proc": -1, #Set to -1 to have gaurenteed proc chance
 				"Duration": 0, #Unit turns the effect lasts, -1 causes the effect to be permanent. Duration is ignored entirely for on-equip effects of items.
 				"DurationType": false,
@@ -138,7 +140,8 @@ func _load_effects():
 				"CritDmg": false, # use and array of a min-value and max-value. Can be negative or positive.
 				"CritMulti": false, #use 1.x floats
 				"CritRate": false,
-				#RULE TYPES. YET TO BE IMPLEMENTED!!!!
+				"RuleType": false,
+				"Rule": false,
 }
 			var innerKeys = rawData[key].keys()
 			for iKey in innerKeys:
@@ -212,6 +215,7 @@ func _load_aura_data():
 						"Range": 0,
 						"IsSelf": false,
 						"IsFriendly": true,
+						"SelfOnly": false,
 						"Effects":[]
 }
 			var innerKeys = rawData[key].keys()
@@ -259,7 +263,7 @@ func stat_gen(job :int, tag : String, spec : int):
 		for stat in stats:
 			totalStats[stat] = sData.StatGroups[group][stat] + jData.StatGroups[group][stat]
 		groupedStats[group] = totalStats
-	var genname = "%s %s" % [specKeys[sData["Spec"]], jData["Role"]]
+	var genname = "%s %s" % [specKeys[sData["Spec"]].to_pascal_case(), jData["Role"]]
 	var combinePassives = sData["Passives"] + jData["Passives"]
 	#combinePassives.merge(jData["Passives"])
 	unitData[tag] = groupedStats
@@ -297,7 +301,7 @@ func stat_gen(job :int, tag : String, spec : int):
 #		unitStats = level_up(unitStats, growths, caps)
 #	return [totalExp, unitStats]
 	
-func level_up(uData, loops): #consider range bands for stat normalization. Growth rates are a spook tho.
+func level_up(uData, loops): #consider reach bands for stat normalization. Growth rates are a spook tho.
 	var rng = RandomNumberGenerator.new()
 	randomize()
 	var growth_check
@@ -329,7 +333,9 @@ func init_roster():
 		rosterData.append("Remilia")
 		rosterData.append("Sakuya")
 		rosterData.append("Patchouli")
+		rosterData.append("Reimu")
 		rosterData.append("Meiling")
+		
 		rosterOnce = true
 	return
 

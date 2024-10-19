@@ -639,6 +639,7 @@ texture_under = ExtResource("16_nw8x6")
 texture_over = ExtResource("17_a06i1")
 texture_progress = ExtResource("18_18bf3")
 
+[connection signal="sequence_complete" from="CombatForecast/AnimationHandler" to="." method="_on_animation_handler_sequence_complete"]
 [connection signal="action_selected" from="ActionMenu" to="." method="_on_action_menu_action_selected"]
 [connection signal="menu_closed" from="ActionMenu" to="." method="_on_action_menu_menu_closed"]
 [connection signal="menu_opened" from="ActionMenu" to="." method="_on_action_menu_menu_opened"]

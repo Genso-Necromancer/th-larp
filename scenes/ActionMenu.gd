@@ -166,13 +166,13 @@ func _on_wait_btn_pressed():
 	emit_signal("action_selected", selection)
 
 
-func open_weapons(range: Array = [-1, -1], augment = false): #Don't pass a distance value to open in "item mode" for use/equip.
+func open_weapons(reach: Array = [-1, -1], augment = false): #Don't pass a distance value to open in "item mode" for use/equip.
 	var itemFrame = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
 	_close_all_others(itemFrame)
 	_open_menu()
 	itemFrame.visible = true
 	#itemFrame.set_deferred("visible", true)
-	_fill_items(range, augment)
+	_fill_items(reach, augment)
 	emit_signal("menu_opened", itemFrame)
 
 func _open_sub_menu(menu: Control):
@@ -181,12 +181,12 @@ func _open_sub_menu(menu: Control):
 	menu.visible = true
 	emit_signal("menu_opened", menu)
 
-func _fill_items(range: Array = [-1, -1], augment = false):
+func _fill_items(reach: Array = [-1, -1], augment = false):
 	var aUnit = Global.activeUnit
 	var subProf = aUnit.unitData.Weapons.Sub
 	var iMode = false
-	var minR = range[0]
-	var maxR = range[1]
+	var minR = reach[0]
+	var maxR = reach[1]
 	var inv = aUnit.unitData.Inv
 	
 	if minR <= -1 or maxR <= -1:
@@ -194,12 +194,12 @@ func _fill_items(range: Array = [-1, -1], augment = false):
 		_progress_state(MENU_STATES.ITEM_OPEN)
 	
 	if subProf and subProf.has("NATURAL"):
-		_add_item(aUnit.natural, iMode, range, augment)
+		_add_item(aUnit.natural, iMode, reach, augment)
 	
 	for wep in inv: 
-		_add_item(wep, iMode, range, augment)
+		_add_item(wep, iMode, reach, augment)
 
-func _add_item(wep, iMode, range, augment):
+func _add_item(wep, iMode, reach, augment):
 		var itemFrame = $VFlowContainer/ActComCon/Count/ActionBox/ItemContainer
 		var unit = Global.activeUnit
 		var unitData = unit.unitData
@@ -214,8 +214,8 @@ func _add_item(wep, iMode, range, augment):
 		var durString
 		var valid = true
 		var i = inv.find(wep)
-		var minR = range[0]
-		var maxR = range[1]
+		var minR = reach[0]
+		var maxR = reach[1]
 		#var action := {"weapon": true, "skill": false}
 		if !iMode and wepData.Category == "ITEM":
 			return
@@ -270,7 +270,7 @@ func _fill_skills():
 		var cost := str(skill.Cost)
 		var sName : String = skill.SkillName #switch to parser
 		var isAugment : bool = skill.Augment
-		var action := {"Weapon": isAugment, "id": id}
+		var action := {"Weapon": isAugment, "Skill": id}
 		var icon = skill.Icon
 		
 		b = Button.new()
@@ -291,12 +291,12 @@ func _fill_skills():
 
 func validate_skill(skill) -> bool:
 	var time = Global.timeOfDay
-	var isValid := false
+	var isValid := true
 	if skill.RuleType:
 		match skill.RuleType:
 			Enums.RULE_TYPE.TIME:
-				if skill.Rule == time:
-					isValid = true
+				if skill.Rule != time:
+					isValid = false
 				
 	return isValid
 
