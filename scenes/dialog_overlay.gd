@@ -14,60 +14,105 @@ var line_is_finished = false
 
 var example_dict = [
 	{
-		"active_speaker": "Sakula",
-		"text": "Just know, the milady's with me. With that out of the way, how may I be of service?",
-		"effects": [{"name": "portrait-sil", "target": "Sakula"}]
+		"active_speaker": "Remi",
+		"animations": [{"name": "slide", "target": "Remi", "pos": 0.75}]
 	},
 	{
-		"text": "This was just a test... OK!",
-		"effects": [{"name": "portrait-normal", "target": "Sakula"}],
-		"animations": [{"name": "slide", "target": "Sakula", "pos": 0.5}]
+		"animations": [{"name": "interact", "target": "Remi"}]
 	},
 	{
-		"active_speaker": "Pakooli",
-		"text": "Hey I just ordered a pizz- ...oh sorry for interrupting.",
+		"animations": [{"name": "slide", "target": "Remi", "pos": 0.25}]
 	},
 	{
-		"active_speaker": "Sirno",
-		"text": "Erm... What the sigma?",
-		"animations": [{"name": "slide", "target": "Sakula", "pos": 0.9},{"name": "slide", "target": "Pakooli", "pos": 0.5}]
+		"animations": [{"name": "interact", "target": "Remi"}]
 	},
 	{
-		"animations": [{"name": "shake", "target": "Pakooli"}, {"name": "shake", "target": "Sakula"}]
+		"text": "Hmm... I know I left my wing caps around here somewhere...",
+		"animations": [{"name": "slide", "target": "Pakooli", "pos": -0.2}]
 	},
 	{
 		"active_speaker": "Pakooli",
-		"text": "dieee!!",
-		"animations": [{"name": "slide", "target": "Pakooli", "pos": 0.15}],
-		"effects": [{"name": "dim", "target": "Sakula"}]
+		"text": "Hey-"
 	},
 	{
-		"animations": [{"name": "shake", "target": "Sirno"}]
+		"active_speaker": "Remi",
+		"text": "GGIAYAAAAAAGHGH !!",
+		"effects": [{"name": "loud"}],
+		"animations": [{"name": "slide", "target": "Remi", "pos": 0.8}, {"name": "double_hop", "target": "Remi"}, {"name": "slide", "target": "Pakooli", "pos": 0.25}]
 	},
 	{
-		"animations": [{"name": "slide", "target": "Sirno", "pos": -0.2}]
+		"active_speaker": "Pakooli",
+		"text": "uh, like sorry for scaring you or whatever.",
 	},
 	{
-		"active_speaker": "Sirno",
-		"text": "im died."
+		"text": "Were you talking to yourself ?",
+		"effects": [{"name": "quiet"}]
 	},
 	{
-		"active_speaker": "Sakula",
-		"text": "boy am i glad shes gone.",
-		"effects": [{"name": "portrait-normal", "target": "Sakula"}],
-		"animations": [{"name": "slide", "target": "Sakula", "pos": 0.6}]
-	},
-	{
-		"active_speaker": "Sakula",
-		"text": "lets get out of here.",
-		"animations": [{"name": "toggle_fade", "target": "Sakula"}, {"name": "toggle_fade", "target": "Pakooli"}]
-	},
-	{
-		"active_speaker": "Sirno",
-		"text": "but spring all ways return. !!!",
-		"animations": [{"name": "slide", "target": "Sirno", "pos": 0.5}]
+		"active_speaker": "Remi",
+		"text": "Get out of my room I'm playing Minecraft!!",
+		"animations": [{"name": "hop", "target": "Remi"}]
 	},
 ]
+
+	#{
+		#"active_speaker": "Sakula",
+		#"text": "Just know, the milady's with me. With that out of the way, how may I be of service?",
+		#"effects": [{"name": "portrait-sil", "target": "Sakula"}]
+	#},
+	#{
+		#"text": "This was just a test... OK!",
+		#"effects": [{"name": "portrait-normal", "target": "Sakula"},{"name": "loud"}],
+		#"animations": [{"name": "slide", "target": "Sakula", "pos": 0.5}]
+	#},
+	#{
+		#"active_speaker": "Pakooli",
+		#"text": "Hey I just ordered a pizz- ...oh sorry for interrupting.",
+		#"effects": [{"name": "quiet"}]
+	#},
+	#{
+		#"active_speaker": "Sirno",
+		#"text": "Erm... What the sigma?",
+		#"animations": [{"name": "slide", "target": "Sakula", "pos": 0.9},{"name": "slide", "target": "Pakooli", "pos": 0.5}]
+	#},
+	#{
+		#"animations": [{"name": "shake", "target": "Pakooli"}, {"name": "shake", "target": "Sakula"},{"name": "interact", "target": "Sirno"}]
+	#},
+	#{
+		#"active_speaker": "Pakooli",
+		#"text": "dieee!!",
+		#"animations": [{"name": "slide", "target": "Pakooli", "pos": 0.25}, {"name": "hop", "target": "Pakooli"}],
+		#"effects": [{"name": "dim", "target": "Sakula"}]
+	#},
+	#{
+		#"animations": [{"name": "double_hop", "target": "Sirno"}]
+	#},
+	#{
+		#"animations": [{"name": "slide", "target": "Sirno", "pos": -0.2}]
+	#},
+	#{
+		#"active_speaker": "Sirno",
+		#"text": "im died."
+	#},
+	#{
+		#"active_speaker": "Sakula",
+		#"text": "boy am i glad shes gone.",
+		#"effects": [{"name": "portrait-normal", "target": "Sakula"}],
+		#"animations": [{"name": "slide", "target": "Sakula", "pos": 0.6}]
+	#},
+	#{
+		#"active_speaker": "Sakula",
+		#"text": "lets get out of here.",
+		#"animations": [{"name": "toggle_fade", "target": "Sakula"}, {"name": "toggle_fade", "target": "Pakooli"}]
+	#},
+	#{
+		#"animations": [{"name": "slide", "target": "Sirno", "pos": 0.5}]
+	#},
+	#{
+		#"active_speaker": "Sirno",
+		#"text": "but spring all ways return. !!!",
+		#"effects": [{"name": "zoom", "target": "Sirno"}]
+	#}
 
 
 var speaker_setup = [
@@ -87,7 +132,7 @@ var speaker_setup = [
 		"portrait": "res://sprites/th2.png" #"res://sprites/PatchouliPrt.png"
 	},
 	{
-		"name": "remi",
+		"name": "Remi",
 		"title": "just racist",
 		"portrait": "res://sprites/th1.png"
 	}
@@ -182,6 +227,7 @@ func next_textline():
 	
 	delta_speed = 0.0
 	text_body.text = ""
+	text_body.label_settings.font_size = 24 # default size 24
 	$TextStopper.visible = false
 	$TextStopper/AnimationPlayer.stop()
 	
@@ -223,6 +269,13 @@ func next_textline():
 				$PortraitsNode.find_child(eff.target,true,false).modulate = Color(1,1,1)
 			if eff.name == "dim":
 				$PortraitsNode.find_child(eff.target,true,false).dim()
+			if eff.name == "loud":
+				print("lets get louder")
+				text_body.label_settings.font_size = 36
+			if eff.name == "quiet":
+				text_body.label_settings.font_size = 16
+			if eff.name == "zoom":
+				$PortraitsNode.find_child(eff.target,true,false).zoom()
 	
 	if cur_line.has("animations"):
 		for anim in cur_line["animations"]:
@@ -230,6 +283,12 @@ func next_textline():
 				$PortraitsNode.find_child(anim.target,true,false).slide(anim.pos)
 			if anim.name == "shake":
 				$PortraitsNode.find_child(anim.target,true,false).shake()
+			if anim.name == "hop":
+				$PortraitsNode.find_child(anim.target,true,false).hop()
+			if anim.name == "double_hop":
+				$PortraitsNode.find_child(anim.target,true,false).double_hop()
+			if anim.name == "interact":
+				$PortraitsNode.find_child(anim.target,true,false).interact()
 			if anim.name == "toggle_fade":
 				$PortraitsNode.find_child(anim.target,true,false).toggle_fade()
 

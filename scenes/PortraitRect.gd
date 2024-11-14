@@ -1,22 +1,25 @@
 extends Control
 
+@onready var tex_rext = $SpeakerPortrait
 var speaker_name = ""
 var speaker_title = ""
-var starting_pos = Vector2(55,270) #Vector2(64,400)
+var texture
+var starting_pos = Vector2(28,324) #Vector2(64,400)
 
-# Might use these...
+
 signal anim_finished
 signal effect_finished
 
 
 func _ready():
 	position = starting_pos
+	tex_rext.texture = texture
 
 
 func _unhandled_input(_event):
 	pass
-	#if event.is_action_released("ui_accept"):
-		#shake()
+	#if _event.is_action_released("ui_accept"):
+		#double_hop()
 
 
 func slide(screen_percent: float):
@@ -28,15 +31,61 @@ func slide(screen_percent: float):
 
 func shake():
 	const TWEEN_DURATION = 0.05
-	const max_shake = 20
-	var start_pos = position
+	const max_shake = 24
+	var start_pos = tex_rext.position
 	var tween = create_tween()
-	tween.tween_property(self, "position", Vector2(start_pos.x - max_shake, position.y), TWEEN_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(self, "position", Vector2(start_pos.x + max_shake, position.y), TWEEN_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(self, "position", Vector2(start_pos.x - (max_shake/2.0), position.y), TWEEN_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
-	#tween.tween_property(self, "position", Vector2(start_pos.x + (max_shake/2), position.y), TWEEN_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(self, "position", start_pos, TWEEN_DURATION).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)\
+	tween.tween_property(tex_rext, "position", Vector2(start_pos.x - max_shake, tex_rext.position.y), TWEEN_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(tex_rext, "position", Vector2(start_pos.x + max_shake, tex_rext.position.y), TWEEN_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(tex_rext, "position", Vector2(start_pos.x - (max_shake/2.0), tex_rext.position.y), TWEEN_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(tex_rext, "position", Vector2(start_pos.x + (max_shake/2), tex_rext.position.y), TWEEN_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(tex_rext, "position", start_pos, TWEEN_DURATION).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)\
 	.finished.connect(func(): anim_finished.emit())
+
+
+func hop():
+	const TWEEN_DURATION = 0.1
+	const hop_height = 24
+	var start_pos = tex_rext.position
+	var tween = create_tween()
+	tween.tween_property(tex_rext, "position", Vector2(tex_rext.position.x, start_pos.y - hop_height), TWEEN_DURATION).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(tex_rext, "position", start_pos, TWEEN_DURATION*3.0).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BOUNCE)\
+	.finished.connect(func(): anim_finished.emit())
+
+
+func double_hop():
+	const TWEEN_DURATION = 0.1
+	const hop_height = 30
+	var start_pos = tex_rext.position
+	var tween = create_tween()
+	#tween.tween_property(self, "position", Vector2(position.x, starting_pos.y - hop_height), TWEEN_DURATION).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
+	#tween.tween_property(self, "position", Vector2(position.x, starting_pos.y + (hop_height/2.0)), TWEEN_DURATION).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+	#tween.tween_property(self, "position", Vector2(position.x, starting_pos.y - (hop_height/2.0)), TWEEN_DURATION).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
+	#tween.tween_property(self, "position", start_pos, TWEEN_DURATION*4.0).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BOUNCE)\
+	#.finished.connect(func(): anim_finished.emit())
+	tween.tween_property(tex_rext, "position", Vector2(tex_rext.position.x, start_pos.y - hop_height), TWEEN_DURATION).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(tex_rext, "position", Vector2(tex_rext.position.x, start_pos.y - (hop_height/4.0)), TWEEN_DURATION*2.0).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(tex_rext, "position", Vector2(tex_rext.position.x, start_pos.y - hop_height), TWEEN_DURATION).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(tex_rext, "position", start_pos, TWEEN_DURATION*4.0).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BOUNCE)\
+	.finished.connect(func(): anim_finished.emit())
+
+
+func interact():
+	const TWEEN_DURATION = 0.2
+	const hop_height = 24
+	var start_pos = tex_rext.position
+	var tween = create_tween()
+	tween.tween_property(tex_rext, "position", Vector2(tex_rext.position.x, start_pos.y - hop_height/3), TWEEN_DURATION/2.0).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(tex_rext, "position", Vector2(tex_rext.position.x, start_pos.y + hop_height), TWEEN_DURATION).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(tex_rext, "position", Vector2(tex_rext.position.x, start_pos.y + hop_height), TWEEN_DURATION/2.0).set_ease(Tween.EASE_IN).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(tex_rext, "position", start_pos, TWEEN_DURATION/1.5).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_SINE)\
+	.finished.connect(func(): anim_finished.emit())
+
+
+func zoom():
+	scale = Vector2(1.5, 1.5)
+	position = Vector2(position.x - (size.x/4.0), position.y - (size.y/2.0))
+	#tex_rext.scale = Vector2(1.5, 1.5)
+	#tex_rext.position = Vector2(tex_rext.position.x, tex_rext.position.y - 128)
 
 
 func dim():

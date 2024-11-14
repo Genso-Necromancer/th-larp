@@ -4,20 +4,35 @@
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_gaf50"]
 
-[node name="SpeakerPortrait" type="TextureRect"]
+[node name="Control" type="Control"]
+layout_mode = 3
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -192.0
-offset_top = -192.0
-offset_right = 64.0
-offset_bottom = 64.0
+offset_left = -128.0
+offset_top = -128.0
+offset_right = 128.0
+offset_bottom = 128.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_lmf7o")
+
+[node name="SpeakerPortrait" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -128.0
+offset_top = -128.0
+offset_right = 128.0
+offset_bottom = 128.0
 grow_horizontal = 2
 grow_vertical = 2
 pivot_offset = Vector2(57.5, 56)
 texture = SubResource("PlaceholderTexture2D_gaf50")
 expand_mode = 3
 stretch_mode = 5
-script = ExtResource("1_lmf7o")
