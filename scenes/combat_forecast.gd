@@ -6,22 +6,23 @@ func show_fc() -> void:
 	self.visible = true
 	
 func hide_fc() -> void:
-	var effectPanels = [$GC/HBC/AtkEfPanel, $GC/HBC/Labels2, $GC/HBC/TargetEfPanel]
+	var effectPanels = [$ForecastBox/EffectRow/AtkEfPanel, $ForecastBox/EffectRow/Labels2, $ForecastBox/EffectRow/TargetEfPanel]
 	self.visible = false
 	for p in effectPanels:
 		p.visible = false
 	_close_effects()
+	if animationsLoaded: _free_animations()
 	
 func update_fc(foreCast) -> void: #HERE labels need updating to using StringGetter AND "unarmed" doesn't appear correct
 	var groups : Dictionary = {}
 	var units : Array = foreCast.keys()
 	var i := 0
 	#var sprites: Array = []
-	var atkPanel = $GC/HBC/AtkPanel/AMa/AVB
-	var trgtPanel = $GC/HBC/TargetPanel/TMa/TVB
+	var atkPanel = $ForecastBox/StatRow/AtkPanel/AMa/AVB
+	var trgtPanel = $ForecastBox/StatRow/TargetPanel/TMa/TVB
 	
 	
-	call_animations(units)
+	_call_animations(units)
 		
 	#sprites.append($GC/BGA1/MC/AtkFull)
 	#sprites.append($GC/BGA2/MC/TrgtFull)
@@ -81,11 +82,11 @@ func _load_effects(cmbData) -> void:
 	var panels : Array 
 	
 	if units.size() < 2: 
-		lists = {units[0]:$GC/HBC/AtkEfPanel/AMa/AVB}
-		panels = [$GC/HBC/AtkEfPanel, $GC/HBC/Labels2]
+		lists = {units[0]:$ForecastBox/EffectRow/AtkEfPanel/AMa/AVB}
+		panels = [$ForecastBox/EffectRow/AtkEfPanel, $ForecastBox/EffectRow/Labels2]
 	else: 
-		lists = {units[0]:$GC/HBC/AtkEfPanel/AMa/AVB, units[1]:$GC/HBC/TargetEfPanel/TMa/TVB}
-		panels = [$GC/HBC/AtkEfPanel, $GC/HBC/Labels2, $GC/HBC/TargetEfPanel]
+		lists = {units[0]:$ForecastBox/EffectRow/AtkEfPanel/AMa/AVB, units[1]:$ForecastBox/EffectRow/TargetEfPanel/TMa/TVB}
+		panels = [$ForecastBox/EffectRow/AtkEfPanel, $ForecastBox/EffectRow/Labels2, $ForecastBox/EffectRow/TargetEfPanel]
 		
 		
 	
@@ -138,8 +139,8 @@ func _add_effect_labels(lists, strings):
 		lists.add_child(lbl)
 
 func _close_effects() -> void:
-	var lists : Array = [$GC/HBC/TargetEfPanel/TMa/TVB, $GC/HBC/AtkEfPanel/AMa/AVB]
-	var panels : Array = [$GC/HBC/AtkEfPanel, $GC/HBC/Labels2, $GC/HBC/TargetEfPanel]
+	var lists : Array = [$ForecastBox/EffectRow/TargetEfPanel/TMa/TVB, $ForecastBox/EffectRow/AtkEfPanel/AMa/AVB]
+	var panels : Array = [$ForecastBox/EffectRow/AtkEfPanel, $ForecastBox/EffectRow/Labels2, $ForecastBox/EffectRow/TargetEfPanel]
 	for l in lists:
 		for child in l.get_children():
 				child.queue_free()
@@ -147,24 +148,17 @@ func _close_effects() -> void:
 		p.visible = false
 	
 
-func call_animations(units):
+func _call_animations(units):
 	var animHandler = $AnimationHandler
 	if !animationsLoaded:
 		animHandler.load_animations(units)
 		animationsLoaded = true
 	return
 
-#func reduce_hp(valueChange : int, side : int):
-	#var lifeLabel
-	#var startHp
-	#var finalHp
-	#
-	#match side:
-		#0: lifeLabel = $GC/HBC/AtkPanel/AMa/AVB/LIFE
-		#1: lifeLabel = $GC/HBC/TargetPanel/TMa/TVB/LIFE
-	#
-	#startHp = lifeLabel
+func _free_animations():
+	var animHandler = $AnimationHandler
+	animHandler._clear_sequence()
+	animationsLoaded = false
 
-
-#func _on_gameboard_cmbData_updated(cmbData) -> void:
-	#update_fc(cmbData)
+func _on_animation_handler_sequence_complete():
+	animationsLoaded = false

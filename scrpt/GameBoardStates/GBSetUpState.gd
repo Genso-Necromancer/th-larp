@@ -7,6 +7,7 @@ func setup(newSlaves):
 	slave = slaves[0]
 
 func _handle_bind(bind):
+	
 	match bind:
 		"invalid": return
 		"ui_accept": pass

@@ -8,5 +8,6 @@ func fade_in_failure(): #lol finish this retard
 	self.visible = true
 	
 func close_fail_screen():
-	self.visible = false
-	emit_signal("fail_finished")
+	if self.visible: 
+		self.visible = false
+		emit_signal("fail_finished")

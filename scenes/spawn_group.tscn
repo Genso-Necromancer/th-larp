@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://cst1mk4jvlky"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/Unit.tscn" id="1_t3r1f"]
+
+[node name="SpawnGroup" type="Node2D"]
+
+[node name="Reinforcement1" parent="." instance=ExtResource("1_t3r1f")]
+disabled = true
+_items = "NONE"
+inventory = Array[String](["CLB"])
+
+[node name="Sprite" parent="Reinforcement1/PathFollow2D" index="0"]
+self_modulate = Color(1, 0, 0, 1)
+
+[editable path="Reinforcement1"]

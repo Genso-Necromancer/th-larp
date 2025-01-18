@@ -22,10 +22,16 @@ UnitData="*res://scrpt/UnitData.gd"
 Enums="*res://scrpt/enums.gd"
 StringGetter="*res://scrpt/string_getter.gd"
 SignalTower="*res://scrpt/signal_tower.gd"
+Options="*res://scrpt/Options.gd"
 
 [display]
 
+window/size/viewport_width=1920
+window/size/viewport_height=1080
 window/size/initial_position_type=2
+window/size/initial_screen=1
+window/size/borderless=true
+window/stretch/mode="viewport"
 window/custom_image=""
 
 [dotnet]

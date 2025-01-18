@@ -6,6 +6,7 @@ extends Node
 
 
 var focusUnit : Unit
+var aiTarget : Unit
 var activeUnit : Unit
 var timeOfDay := Enums.TIME.DAY
 var gameTime := 12
@@ -15,7 +16,7 @@ var rotationFactor = 15
 var rng
 var unitObjs : Dictionary
 var flags : Dictionary
-
+var timePassed := 0
 var language
 
 var slamage := 5

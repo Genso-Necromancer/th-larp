@@ -118,6 +118,55 @@ func get_combat_effect_string(effId, cmbData) -> String: #Time to create the str
 		s = get_template("duration_template") % [s, effect.Duration, durationString]
 	
 	return s
+	
+	
+func get_effect_string(effId) -> String: 
+	var effect = UnitData.effectData[effId]
+	#var proc = cmbData.Effects[effId].Proc
+	#var value = cmbData.Effects[effId].Value
+	var typeKeys : Array = Enums.EFFECT_TYPE.keys()
+	var subKeys : Array = Enums.SUB_TYPE.keys()
+	#Get Template: "Buff %s"
+	var templatePath : String = "effect_template_%s" % [typeKeys[effect.Type].to_lower()]
+	var s : String = get_template(templatePath)
+	var duration = false
+	var durationType = false
+	var effVal = effect.Value
+	
+	#Get SubType "string": "Buff Pwr"
+	if effect.SubType:
+		var subTypePath := "effect_sub_type_%s" % [subKeys[effect.SubType].to_lower()]
+		var subType := get_string(subTypePath)
+		s = s % [subType]
+		
+	#Check if Value: "Buff Power #"
+	if effVal and effVal > 0:
+		var v
+		var path := "value_template"
+		if typeof(effVal) == Variant.Type.TYPE_FLOAT:
+			v = effVal * 100
+			v = round(v)
+			path = "percent_value_template"
+		else: v = effVal
+		s = get_template(path) % [s, v]
+	
+	#Check if Proc: "Buff Power # (98%)"
+	#if effect.Proc and effect.Proc > -1:
+		#s = get_template("proc_template") % [s, proc]
+	#
+	##Check if Duration and Duration Type: "string # (###%) for # dType"
+	if effect.DurationType:
+		durationType = effect.DurationType
+	else: durationType = Enums.DURATION_TYPE.TURN
+	
+	if effect.Duration > 0:
+		var durKeys = Enums.DURATION_TYPE.keys()
+		var durationPath = "duration_%s" % [durKeys[durationType].to_lower()]
+		var durationString = get_string(durationPath)
+		s = get_template("duration_template") % [s, effect.Duration, durationString]
+	
+	return s
+
 		
 func mash_string(base: String, variables: Array) -> String:
 	var s : String

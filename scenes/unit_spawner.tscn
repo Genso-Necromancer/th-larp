@@ -1,0 +1,29 @@
+[gd_scene load_steps=6 format=3 uid="uid://olsjiwasnvxl"]
+
+[ext_resource type="Script" path="res://scenes/spawn_group.gd" id="1_8f15w"]
+[ext_resource type="PackedScene" uid="uid://cst1mk4jvlky" path="res://scenes/spawn_group.tscn" id="2_wyc45"]
+[ext_resource type="Texture2D" uid="uid://cvwlg1ibgcatk" path="res://sprites/tiles/event_spawner.png" id="2_y28xd"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_wonwp"]
+texture = ExtResource("2_y28xd")
+texture_region_size = Vector2i(160, 48)
+0:0/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_o73xi"]
+tile_shape = 3
+tile_offset_axis = 1
+tile_size = Vector2i(160, 48)
+sources/0 = SubResource("TileSetAtlasSource_wonwp")
+
+[node name="UnitSpawner" type="Node2D"]
+visible = false
+script = ExtResource("1_8f15w")
+spawnGroup = ExtResource("2_wyc45")
+timeMethod = "Time Passed"
+timeHours = 0
+
+[node name="EventGrid" type="TileMap" parent="."]
+top_level = true
+tile_set = SubResource("TileSet_o73xi")
+format = 2
+layer_0/name = "events"

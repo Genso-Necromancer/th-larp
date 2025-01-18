@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bix6u63iahalq"
-path="res://.godot/imported/TRBLRSpr.png-0f5b5900d75c7e9cd99fd22d8e5888ac.ctex"
+path="res://.godot/imported/TRBLRSpr.png-8ba3e3294fa19322e562cd4e1fa8e529.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/Fairy/TRBLRSpr.png"
-dest_files=["res://.godot/imported/TRBLRSpr.png-0f5b5900d75c7e9cd99fd22d8e5888ac.ctex"]
+source_file="res://sprites/FAIRY/TRBLRSpr.png"
+dest_files=["res://.godot/imported/TRBLRSpr.png-8ba3e3294fa19322e562cd4e1fa8e529.ctex"]
 
 [params]
 

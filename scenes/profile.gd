@@ -1,11 +1,6 @@
-extends MarginContainer
-signal jobs_done_prf
+extends AspectRatioContainer
 
-func _ready():
-	var parent = get_parent()
-	self.jobs_done_prf.connect(parent._on_jobs_done)
-	parent.profile_called.connect(self._on_update_prof)
-	emit_signal("jobs_done_prf", "Profile", self)
+class_name UnitProfile
 
 func _on_update_prof():
 	var focusUnit = Global.focusUnit
@@ -23,9 +18,9 @@ func _on_update_prof():
 	
 	focusUnit.update_stats()
 	if focusUnit.is_in_group("Enemy"):
-		$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitExp.set_text("0/100")
+		$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitExp.set_text("00")
 	elif focusUnit.is_in_group("Player"):
-		$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitExp.set_text(str(unitData["Profile"]["EXP"]) + "/100")
+		$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitExp.set_text(str(unitData["Profile"]["EXP"]))
 	$M/HBoxContainer/G/NameBox/VBoxContainer/UnitName.set_text("[center]%s[/center]" % [focusUnit.unitName])
 	$M/HBoxContainer/PortraitBox/MC/MC/UnitPrt.set_texture(unitData["Profile"]["Prt"])
 	$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitLevel.set_text(str(unitData["Profile"]["Level"]))
@@ -40,7 +35,7 @@ func _on_update_prof():
 	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitAcc.set_text(str(focusUnit.combatData.Hit))
 	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitAvd.set_text(str(focusUnit.combatData.Avoid))
 	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitDmg.set_text(str(focusUnit.combatData.Dmg))
-	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitGrz.set_text(str(focusUnit.combatData.Graze) + " (" + str(focusUnit.combatData.GrzPrc) + "%)")
+	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitGrz.set_text(str(focusUnit.combatData.Barrier) + " (" + str(focusUnit.combatData.GrzPrc) + "%)")
 	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitCrit.set_text(str(focusUnit.combatData.Crit))
 	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitCritAvd.set_text(str(focusUnit.combatData.CrtAvd))
 	
@@ -55,7 +50,7 @@ func _fill_inv(unit):
 	var eqpLabel = $M/HBoxContainer/InventoryBox/MC2/VB/BG/MC/Eqp
 	var equipped = unit.get_equipped_weapon()
 	var id = equipped.ID
-	var dur = equipped.DUR
+	var dur = equipped.Dur
 	var maxDur = UnitData.itemData[id].MaxDur
 	var iName = UnitData.itemData[id].Name
 	var unitInv = unit.unitData.Inv
@@ -76,7 +71,7 @@ func _fill_inv(unit):
 		var iStats = UnitData.itemData[id]
 		var l = Label.new()
 		
-		dur = item.DUR
+		dur = item.Dur
 		maxDur = iStats.MaxDur
 		iName = iStats.Name
 		durString = str(" --")
@@ -87,7 +82,7 @@ func _fill_inv(unit):
 			continue
 		var iStats = UnitData.itemData[item.ID]
 		var l = Label.new()
-		dur = item.DUR
+		dur = item.Dur
 		maxDur = iStats.MaxDur
 		iName = iStats.Name
 		

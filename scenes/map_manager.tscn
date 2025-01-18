@@ -1,9 +1,11 @@
-[gd_scene load_steps=3 format=3 uid="uid://dtt1es8lctsrv"]
+[gd_scene load_steps=4 format=3 uid="uid://dtt1es8lctsrv"]
 
 [ext_resource type="PackedScene" uid="uid://cmvmjk0jj7dam" path="res://scenes/Gameboard.tscn" id="1_1o3kx"]
+[ext_resource type="Script" path="res://scenes/map_manager.gd" id="1_o0i0e"]
 [ext_resource type="PackedScene" uid="uid://r6wtvva5qput" path="res://scenes/GUIManager.tscn" id="2_3ng14"]
 
 [node name="mapManager" type="Node"]
+script = ExtResource("1_o0i0e")
 
 [node name="Gameboard" parent="." instance=ExtResource("1_1o3kx")]
 
@@ -16,7 +18,6 @@ follow_viewport_scale = 0.001
 [node name="GUIManager" parent="CanvasLayer" instance=ExtResource("2_3ng14")]
 mapCursorPath = NodePath("../../Gameboard/Cursor")
 
-[connection signal="call_setup" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_call_setup"]
 [connection signal="cell_selected" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_cell_selected"]
 [connection signal="deploy_toggled" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_deploy_toggled"]
 [connection signal="exp_display" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_exp_display"]
@@ -46,9 +47,7 @@ mapCursorPath = NodePath("../../Gameboard/Cursor")
 [connection signal="warp_selected" from="Gameboard/CombatManager" to="Gameboard" method="_on_combat_manager_warp_selected"]
 [connection signal="deploy_toggled" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_deploy_toggled"]
 [connection signal="formation_toggled" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_formation_toggled"]
-[connection signal="item_used" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_item_used"]
 [connection signal="map_started" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_map_started"]
-[connection signal="scene_skipped" from="CanvasLayer/GUIManager" to="CanvasLayer/GUIManager/CombatForecast/AnimationHandler" method="_on_gui_manager_scene_skipped"]
 [connection signal="start_the_justice" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_start_the_justice"]
 [connection signal="sequence_complete" from="CanvasLayer/GUIManager/CombatForecast/AnimationHandler" to="Gameboard" method="_on_animation_handler_sequence_complete"]
 [connection signal="action_selected" from="CanvasLayer/GUIManager/ActionMenu" to="Gameboard" method="_on_action_menu_action_selected"]

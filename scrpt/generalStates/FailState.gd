@@ -6,7 +6,7 @@ func setup(newSlaves):
 	super.setup(newSlaves)
 	slave = slaves[0]
 
-func mouse_motion(event: InputEvent) -> void:
+func mouse_motion(_event: InputEvent) -> void:
 	pass
 	
 func _handle_bind(bind):

@@ -1,0 +1,470 @@
+[gd_scene load_steps=5 format=3 uid="uid://bcjctan4cbioy"]
+
+[ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="1_3prja"]
+[ext_resource type="Script" path="res://scenes/GUI/unit_roster.gd" id="2_n8lfe"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_rssp2"]
+[ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="4_ouxu2"]
+
+[node name="UnitRoster" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_3prja")
+script = ExtResource("2_n8lfe")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 500
+theme_override_constants/margin_top = 200
+theme_override_constants/margin_right = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer"]
+layout_mode = 2
+texture = ExtResource("3_rssp2")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer"]
+layout_mode = 2
+theme = ExtResource("1_3prja")
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "Deploy: "
+
+[node name="CountLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "00"
+
+[node name="Spacer" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "/"
+
+[node name="CapLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+text = "00"
+metadata/Limit = 0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer"]
+layout_mode = 2
+columns = 3
+
+[node name="SideBar" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="UnitPreviewPanel" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar"]
+custom_minimum_size = Vector2(250, 350)
+layout_mode = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel"]
+layout_mode = 2
+texture = ExtResource("3_rssp2")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel"]
+layout_mode = 2
+theme = ExtResource("1_3prja")
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="HeaderPanel" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/HeaderPanel"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/HeaderPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+
+[node name="HeaderBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/HeaderPanel/MarginContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_constants/separation = 60
+
+[node name="LvBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/HeaderPanel/MarginContainer/HeaderBox"]
+layout_mode = 2
+
+[node name="LvLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/HeaderPanel/MarginContainer/HeaderBox/LvBox"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "Lv."
+
+[node name="LvValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/HeaderPanel/MarginContainer/HeaderBox/LvBox"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="XpBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/HeaderPanel/MarginContainer/HeaderBox"]
+layout_mode = 2
+
+[node name="XpLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/HeaderPanel/MarginContainer/HeaderBox/XpBox"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "Exp."
+
+[node name="XpValueBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/HeaderPanel/MarginContainer/HeaderBox/XpBox"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="XpValueCurrent" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/HeaderPanel/MarginContainer/HeaderBox/XpBox/XpValueBox"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="Splitter" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/HeaderPanel/MarginContainer/HeaderBox/XpBox/XpValueBox"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "/"
+
+[node name="XpValueMax" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/HeaderPanel/MarginContainer/HeaderBox/XpBox/XpValueBox"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "100"
+
+[node name="StatsPanel" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+
+[node name="StatsBox" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="StatsLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Stats"
+
+[node name="Condition" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HPBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/Condition"]
+layout_mode = 2
+
+[node name="HpLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/Condition/HPBox"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "HP"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/Condition/HPBox"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="HpValueCurrent" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/Condition/HPBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="Splitter" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/Condition/HPBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "/"
+
+[node name="HpValueMax" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/Condition/HPBox/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="CmpBox" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/Condition"]
+layout_mode = 2
+
+[node name="CmpLb2" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/Condition/CmpBox"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "Cmp"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/Condition/CmpBox"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="CmpValueCurrent" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/Condition/CmpBox/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "000"
+
+[node name="Splitter" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/Condition/CmpBox/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "/"
+
+[node name="CmpValueMax" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/Condition/CmpBox/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "000"
+
+[node name="CoreStats" type="HBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox"]
+layout_mode = 2
+theme_override_constants/separation = 26
+
+[node name="StatGrid" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats"]
+layout_mode = 2
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="PwrLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "Pwr"
+
+[node name="PwrValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="MagLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "Mag"
+
+[node name="MagValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="EleLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "Ele"
+
+[node name="EleValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="SpdLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "Spd"
+
+[node name="SpdValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="DefLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "Def"
+
+[node name="DefValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="ChaLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "Cha"
+
+[node name="ChaValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="StatGrid2" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats"]
+layout_mode = 2
+theme_override_constants/v_separation = 8
+columns = 2
+
+[node name="PwrLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid2"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Pwr"
+
+[node name="PwrValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid2"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+text = "00"
+
+[node name="MagLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid2"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Mag"
+
+[node name="MagValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid2"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+text = "00"
+
+[node name="EleLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid2"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Ele"
+
+[node name="EleValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid2"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+text = "00"
+
+[node name="SpdLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid2"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "Spd"
+
+[node name="SpdValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid2"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="DefLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid2"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "Def"
+
+[node name="DefValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid2"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="ChaLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid2"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "Cha"
+
+[node name="ChaValue" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/StatsPanel/MarginContainer/StatsBox/CoreStats/StatGrid2"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_fonts/font = ExtResource("4_ouxu2")
+theme_override_font_sizes/font_size = 15
+text = "00"
+
+[node name="InvPanel" type="PanelContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="InvBack" type="TextureRect" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/InvPanel"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/InvPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+
+[node name="Inventory" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/InvPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="ItemsLb" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/InvPanel/MarginContainer/Inventory"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Inventory"
+
+[node name="InvBox" type="VBoxContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar/UnitPreviewPanel/MarginContainer/VBoxContainer/InvPanel/MarginContainer/Inventory"]
+layout_mode = 2

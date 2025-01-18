@@ -29,6 +29,7 @@ var effectQue = []
 var weaponFx : FxPlayer
 var skillFx : FxPlayer
 var skillNameFx : SkillCutIn
+var isHit = false
 
 var grazeFx : FxPlayer
 var popUp : PopText
@@ -42,9 +43,9 @@ func set_unit(newUnit : Unit):
 	unit = newUnit
 	
 	
-func assign_action(actionType, skillId = false):
+func assign_action(hit, actionType, skillId = false):
 	var sData = UnitData.skillData
-	
+	isHit = hit
 	match actionType:
 		ACTION_TYPE.WEAPON: _assign_attack_animation()
 		ACTION_TYPE.FRIENDLY_SKILL: _assign_skill_animation(skillId)
@@ -176,6 +177,8 @@ func play_target_fx():
 	if targetFxQue.size() > 0:
 		for targetFx in targetFxQue:
 			targetFx.play_action()
+	else:
+		emit_signal("animation_end")
 
 
 func add_skill_fx(skillId):
@@ -189,24 +192,25 @@ func add_skill_fx(skillId):
 	bone.add_child(skillNameFx)
 		
 	if ANIM_DATA.SKILL_ANIM.has(skillId):
-		var fxGroup = {"TargetFx": ANIM_DATA.SKILL_ANIM[skillId].TargetFx, 
-		"FxBone": ANIM_DATA.SKILL_ANIM[skillId].FxBone}
-		targetFxArray.append(fxGroup)
+		if isHit:
+			var fxGroup = {"TargetFx": ANIM_DATA.SKILL_ANIM[skillId].TargetFx, 
+			"FxBone": ANIM_DATA.SKILL_ANIM[skillId].FxBone}
+			targetFxArray.append(fxGroup)
 		
 		skillFxPath = ANIM_DATA.SKILL_ANIM[skillId].SkillFx
 		skillFx = load(skillFxPath).instantiate()
 	else:
-		var fxGroup = {"TargetFx": "res://scenes/animations/combat/fx/weapon/fx_target_knife.tscn", 
-		"FxBone": "Head"}
+		if isHit:
+			var fxGroup = {"TargetFx": "res://scenes/animations/combat/fx/weapon/fx_target_knife.tscn", 
+			"FxBone": "Head"}
+			targetFxArray.append(fxGroup)
+		
 		skillFx = load("res://scenes/animations/combat/fx/weapon/fx_self_knife.tscn").instantiate()
-		targetFxArray.append(fxGroup)
-		
-		
 		
 
-	if isFlipped:
-		skillNameFx.flip_text()
-		skillFx.set_scale(Vector2(-1,1))
+	#if isFlipped:
+		#skillNameFx.flip_text()
+		#skillFx.set_scale(Vector2(-1,1))
 	skillFx.connect_signal(self)
 	attackBone.add_child(skillFx)
 	
@@ -217,22 +221,26 @@ func add_weapon_fx(weaponId):
 
 	
 	if ANIM_DATA.WEAPON_ANIM.has(weaponId):
-		var fxGroup = {"TargetFx": ANIM_DATA.WEAPON_ANIM[weaponId].TargetFx, 
-		"FxBone": ANIM_DATA.WEAPON_ANIM[weaponId].FxBone}
-		
+		if isHit:
+			var fxGroup = {"TargetFx": ANIM_DATA.WEAPON_ANIM[weaponId].TargetFx, 
+			"FxBone": ANIM_DATA.WEAPON_ANIM[weaponId].FxBone}
+			targetFxArray.append(fxGroup)
 		weaponFxPath = ANIM_DATA.WEAPON_ANIM[weaponId].WeaponFx
 		weaponFx = load(weaponFxPath).instantiate()
-		targetFxArray.append(fxGroup)
+		
 	else:
-		var fxGroup = {"TargetFx": "res://scenes/animations/combat/fx/weapon/fx_target_knife.tscn", 
-		"FxBone": "Head"}
+		if isHit:
+			var fxGroup = {"TargetFx": "res://scenes/animations/combat/fx/weapon/fx_target_knife.tscn", 
+			"FxBone": "Head"}
+			targetFxArray.append(fxGroup)
+		
 		weaponFx = load("res://scenes/animations/combat/fx/weapon/fx_self_knife.tscn").instantiate()
-		targetFxArray.append(fxGroup)
+		
 		
 		
 
-	if isFlipped:
-		weaponFx.set_scale(Vector2(-1,1))
+	#if isFlipped:
+		#weaponFx.set_scale(Vector2(-1,1))
 	if !skillFx:
 		weaponFx.connect_signal(self)
 	attackBone.add_child(weaponFx)
@@ -241,15 +249,16 @@ func add_target_fx(targetFxs:Array):
 	var bone 
 	for fx in targetFxs:
 		var targetFx = load(fx.TargetFx).instantiate()
-		if isFlipped:
-			targetFx.set_scale(Vector2(-1,1))
+		#if isFlipped:
+			#targetFx.set_scale(Vector2(-1,1))
 		match fx.FxBone:
 			"Target": bone = $CombatSkeleton/TargetFx
 			"Head": bone = $CombatSkeleton/HeadFx
 			"Chest": bone = $CombatSkeleton/ChestFx
 		bone.add_child(targetFx)
 		targetFxQue.append(targetFx)
-	targetFxQue[-1].connect_signal(self)
+	if targetFxQue.size() > 0:
+		targetFxQue[-1].connect_signal(self)
 	
 func add_passive_cut_in(passiveArray):
 	for passiveId in passiveArray:
@@ -265,8 +274,9 @@ func add_passive_cut_in(passiveArray):
 
 
 func _add_graze_fx():
+	var chest = $CombatSkeleton/ChestFx
 	grazeFx = GRAZE_PATH.instantiate()
-	add_child(grazeFx)
+	chest.add_child(grazeFx)
 	
 	
 func _add_crit_fx():

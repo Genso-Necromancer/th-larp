@@ -1,0 +1,126 @@
+[gd_scene load_steps=11 format=3 uid="uid://ba4p0a5q0fvet"]
+
+[ext_resource type="Script" path="res://scenes/danmaku.gd" id="1_kuxoj"]
+[ext_resource type="Texture2D" uid="uid://ywry0pe1d4v8" path="res://sprites/danmaku/danmaku.png" id="2_8xdxl"]
+[ext_resource type="Script" path="res://scenes/UnitArea.gd" id="3_tpu7c"]
+[ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="4_mpphj"]
+
+[sub_resource type="Animation" id="Animation_oy20w"]
+resource_name = "Collision"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_dmej2"]
+resource_name = "Idle"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, -10), Vector2(0, -20)]
+}
+
+[sub_resource type="Animation" id="Animation_0c5wl"]
+resource_name = "RESET"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -10)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:self_modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_y25xl"]
+resource_name = "Spawning"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_sml42"]
+_data = {
+"Collision": SubResource("Animation_oy20w"),
+"Idle": SubResource("Animation_dmej2"),
+"RESET": SubResource("Animation_0c5wl"),
+"Spawning": SubResource("Animation_y25xl")
+}
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_uipls"]
+size = Vector2(51, 37.5)
+
+[node name="Danmaku" type="Path2D"]
+z_index = 1
+script = ExtResource("1_kuxoj")
+
+[node name="PathFollow2D" type="PathFollow2D" parent="."]
+
+[node name="Sprite2D" type="Sprite2D" parent="PathFollow2D"]
+position = Vector2(0, -10)
+scale = Vector2(-0.8, -0.8)
+texture = ExtResource("2_8xdxl")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="PathFollow2D/Sprite2D"]
+libraries = {
+"": SubResource("AnimationLibrary_sml42")
+}
+
+[node name="Area2D" type="Area2D" parent="PathFollow2D/Sprite2D"]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("3_tpu7c")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PathFollow2D/Sprite2D/Area2D"]
+position = Vector2(0.5, 0.75)
+shape = SubResource("RectangleShape2D_uipls")
+
+[node name="Cell" type="Label" parent="."]
+offset_left = -35.0
+offset_top = 19.0
+offset_right = 36.0
+offset_bottom = 45.0
+theme = ExtResource("4_mpphj")
+theme_override_colors/font_color = Color(0.843137, 0.588235, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "(0, 0)"

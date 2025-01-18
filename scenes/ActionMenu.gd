@@ -12,8 +12,8 @@ signal denied
 signal menu_closed
 
 @onready var actFrame = $VFlowContainer/ActComCon/Count
-@onready var subFrame = $m
-@onready var frames = [actFrame, subFrame]
+#@onready var subFrame = $m
+#@onready var frames = [actFrame, subFrame]
 
 enum MENU_STATES {ACTION, ITEM_OPEN, AUX_OPEN, SKILL_OPEN}
 var state = MENU_STATES.ACTION
@@ -209,7 +209,7 @@ func _add_item(wep, iMode, reach, augment):
 		var wepData = itemData[wep.ID]
 		var wepName = itemData[wep.ID].Name
 		var disable = false
-		var dur = wep.DUR
+		var dur = wep.Dur
 		var mDur = wepData.MaxDur
 		var durString
 		var valid = true
@@ -360,7 +360,7 @@ func _on_item_pressed(button):
 		unBtn.visible = true
 		unBtn.disabled = false
 		unBtn.set_meta("index", index)
-	if wData.USE:
+	if wData.Use:
 		usBtn.visible = true
 		usBtn.disabled = false
 		usBtn.set_meta("index", index)

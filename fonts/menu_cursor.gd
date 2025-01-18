@@ -1,5 +1,5 @@
 extends TextureRect
-signal wep_updated
+
 signal jobs_done_crs
 
 
@@ -12,8 +12,8 @@ var cursor_index : int = 0
 var shouldUpdateCursor = false
 var currentFocus
 
-func _process(_delta):
-	set_cursor(currentFocus)
+#func _process(_delta):
+	#set_cursor(currentFocus)
 
 func _ready():
 	var parent = get_parent()
@@ -31,6 +31,9 @@ func set_cursor(button):
 	var newPos
 	newPos = Vector2(cPosition.x, cPosition.y + cSize.y / 2.0) - (size / 2.0) - cursor_offset
 	set_global_position(newPos)
+	#print(button, Time.get_ticks_msec())
 	
-	
+func toggle_visible():
+	var isVisible = visible
+	visible = !isVisible
 	

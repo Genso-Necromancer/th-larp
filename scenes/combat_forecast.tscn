@@ -1,12 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://ct2rsfnl7fi6u"]
+[gd_scene load_steps=5 format=3 uid="uid://ct2rsfnl7fi6u"]
 
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_3ryf8"]
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_jeq77"]
 [ext_resource type="Script" path="res://scenes/combat_forecast.gd" id="2_npc5x"]
-[ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="3_hiwoo"]
 [ext_resource type="Script" path="res://scenes/animation_handler.gd" id="5_knule"]
-
-[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_twugi"]
 
 [node name="CombatForecast" type="Control"]
 layout_mode = 3
@@ -37,22 +34,26 @@ layout_mode = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.545098)
 
-[node name="GC" type="GridContainer" parent="."]
+[node name="ForecastBox" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -259.0
-offset_right = 259.0
-offset_bottom = 144.0
+offset_left = -110.0
+offset_top = 194.0
+offset_right = 110.0
+offset_bottom = 330.0
 grow_horizontal = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/h_separation = 0
-columns = 5
 
-[node name="BGA1" type="NinePatchRect" parent="GC"]
-visible = false
-custom_minimum_size = Vector2(80, 144)
+[node name="StatRow" type="HBoxContainer" parent="ForecastBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="AtkPanel" type="PanelContainer" parent="ForecastBox/StatRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastBox/StatRow/AtkPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 texture = ExtResource("1_3ryf8")
@@ -61,79 +62,30 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="MC" type="MarginContainer" parent="GC/BGA1"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -36.0
-offset_top = -68.0
-offset_right = 36.0
-offset_bottom = 68.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
-
-[node name="AtkFull" type="TextureRect" parent="GC/BGA1/MC"]
-layout_mode = 2
-texture = ExtResource("3_hiwoo")
-expand_mode = 1
-
-[node name="s5" type="PanelContainer" parent="GC"]
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxEmpty_twugi")
-
-[node name="HBC" type="GridContainer" parent="GC"]
-layout_mode = 2
-columns = 3
-
-[node name="AtkPanel" type="PanelContainer" parent="GC/HBC"]
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-
-[node name="BackgroundCenter2" type="NinePatchRect" parent="GC/HBC/AtkPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="AMa" type="MarginContainer" parent="GC/HBC/AtkPanel"]
+[node name="AMa" type="MarginContainer" parent="ForecastBox/StatRow/AtkPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 
-[node name="MC" type="MarginContainer" parent="GC/HBC/AtkPanel/AMa"]
+[node name="MC" type="MarginContainer" parent="ForecastBox/StatRow/AtkPanel/AMa"]
 layout_mode = 2
 
-[node name="bg?" type="TextureRect" parent="GC/HBC/AtkPanel/AMa/MC"]
+[node name="bg?" type="TextureRect" parent="ForecastBox/StatRow/AtkPanel/AMa/MC"]
 layout_mode = 2
 
-[node name="AVB" type="VBoxContainer" parent="GC/HBC/AtkPanel/AMa"]
+[node name="AVB" type="VBoxContainer" parent="ForecastBox/StatRow/AtkPanel/AMa"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
 
-[node name="NAME" type="RichTextLabel" parent="GC/HBC/AtkPanel/AMa/AVB"]
-clip_contents = false
+[node name="NAME" type="Label" parent="ForecastBox/StatRow/AtkPanel/AMa/AVB"]
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
 theme = ExtResource("1_jeq77")
-bbcode_enabled = true
 text = "Null"
-fit_content = true
-autowrap_mode = 0
 
-[node name="LIFE" type="RichTextLabel" parent="GC/HBC/AtkPanel/AMa/AVB"]
+[node name="LIFE" type="RichTextLabel" parent="ForecastBox/StatRow/AtkPanel/AMa/AVB"]
 custom_minimum_size = Vector2(24, 10)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -150,7 +102,7 @@ hint_underlined = false
 deselect_on_focus_loss_enabled = false
 text_direction = 1
 
-[node name="ACC" type="Label" parent="GC/HBC/AtkPanel/AMa/AVB"]
+[node name="ACC" type="Label" parent="ForecastBox/StatRow/AtkPanel/AMa/AVB"]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -158,7 +110,7 @@ theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 1
 
-[node name="DMG" type="Label" parent="GC/HBC/AtkPanel/AMa/AVB"]
+[node name="DMG" type="Label" parent="ForecastBox/StatRow/AtkPanel/AMa/AVB"]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -166,24 +118,24 @@ theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 1
 
-[node name="CRIT" type="Label" parent="GC/HBC/AtkPanel/AMa/AVB"]
+[node name="CRIT" type="Label" parent="ForecastBox/StatRow/AtkPanel/AMa/AVB"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 1
 
-[node name="BLANK" type="Label" parent="GC/HBC/AtkPanel/AMa/AVB"]
+[node name="BLANK" type="Label" parent="ForecastBox/StatRow/AtkPanel/AMa/AVB"]
 layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("1_jeq77")
 horizontal_alignment = 1
 
-[node name="Labels" type="PanelContainer" parent="GC/HBC"]
+[node name="Labels" type="PanelContainer" parent="ForecastBox/StatRow"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="GC/HBC/Labels"]
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastBox/StatRow/Labels"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 texture = ExtResource("1_3ryf8")
@@ -192,7 +144,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="Margin" type="MarginContainer" parent="GC/HBC/Labels"]
+[node name="Margin" type="MarginContainer" parent="ForecastBox/StatRow/Labels"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/margin_left = 4
@@ -200,50 +152,50 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
-[node name="VBoxContainer" type="VBoxContainer" parent="GC/HBC/Labels/Margin"]
+[node name="VBoxContainer" type="VBoxContainer" parent="ForecastBox/StatRow/Labels/Margin"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
 
-[node name="BLANK" type="Label" parent="GC/HBC/Labels/Margin/VBoxContainer"]
+[node name="BLANK" type="Label" parent="ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
 custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 horizontal_alignment = 1
 
-[node name="LIFELB" type="Label" parent="GC/HBC/Labels/Margin/VBoxContainer"]
+[node name="LIFELB" type="Label" parent="ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 text = "Life"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ACCLB" type="Label" parent="GC/HBC/Labels/Margin/VBoxContainer"]
+[node name="ACCLB" type="Label" parent="ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 text = "Accuracy"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DMGLB" type="Label" parent="GC/HBC/Labels/Margin/VBoxContainer"]
+[node name="DMGLB" type="Label" parent="ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 text = "Damage"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CRITLB" type="Label" parent="GC/HBC/Labels/Margin/VBoxContainer"]
+[node name="CRITLB" type="Label" parent="ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 text = "Crit"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TargetPanel" type="PanelContainer" parent="GC/HBC"]
+[node name="TargetPanel" type="PanelContainer" parent="ForecastBox/StatRow"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="GC/HBC/TargetPanel"]
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastBox/StatRow/TargetPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 texture = ExtResource("1_3ryf8")
@@ -252,391 +204,24 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="TMa" type="MarginContainer" parent="GC/HBC/TargetPanel"]
+[node name="TMa" type="MarginContainer" parent="ForecastBox/StatRow/TargetPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 
-[node name="TVB" type="VBoxContainer" parent="GC/HBC/TargetPanel/TMa"]
+[node name="TVB" type="VBoxContainer" parent="ForecastBox/StatRow/TargetPanel/TMa"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
 
-[node name="NAME" type="RichTextLabel" parent="GC/HBC/TargetPanel/TMa/TVB"]
-clip_contents = false
-layout_mode = 2
-size_flags_vertical = 3
-theme = ExtResource("1_jeq77")
-bbcode_enabled = true
-text = "Null"
-fit_content = true
-scroll_active = false
-autowrap_mode = 0
-
-[node name="LIFE" type="RichTextLabel" parent="GC/HBC/TargetPanel/TMa/TVB"]
-custom_minimum_size = Vector2(15, 10)
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("1_jeq77")
-bbcode_enabled = true
-text = "[center]Null[/center]"
-fit_content = true
-scroll_active = false
-autowrap_mode = 0
-shortcut_keys_enabled = false
-meta_underlined = false
-hint_underlined = false
-deselect_on_focus_loss_enabled = false
-
-[node name="ACC" type="Label" parent="GC/HBC/TargetPanel/TMa/TVB"]
-custom_minimum_size = Vector2(15, 10)
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("1_jeq77")
-text = "Null"
-horizontal_alignment = 1
-
-[node name="DMG" type="Label" parent="GC/HBC/TargetPanel/TMa/TVB"]
-custom_minimum_size = Vector2(15, 10)
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("1_jeq77")
-text = "Null"
-horizontal_alignment = 1
-
-[node name="CRIT" type="Label" parent="GC/HBC/TargetPanel/TMa/TVB"]
-custom_minimum_size = Vector2(15, 10)
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("1_jeq77")
-text = "Null"
-horizontal_alignment = 1
-
-[node name="BLANK" type="Label" parent="GC/HBC/TargetPanel/TMa/TVB"]
-custom_minimum_size = Vector2(15, 0)
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("1_jeq77")
-horizontal_alignment = 1
-
-[node name="AtkEfPanel" type="PanelContainer" parent="GC/HBC"]
-visible = false
-layout_mode = 2
-
-[node name="BackgroundCenter2" type="NinePatchRect" parent="GC/HBC/AtkEfPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="AMa" type="MarginContainer" parent="GC/HBC/AtkEfPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 10
-
-[node name="AVB" type="VBoxContainer" parent="GC/HBC/AtkEfPanel/AMa"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/separation = 2
-
-[node name="Labels2" type="PanelContainer" parent="GC/HBC"]
-visible = false
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-
-[node name="BackgroundCenter2" type="NinePatchRect" parent="GC/HBC/Labels2"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="Margin" type="MarginContainer" parent="GC/HBC/Labels2"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 10
-
-[node name="VBoxContainer" type="VBoxContainer" parent="GC/HBC/Labels2/Margin"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/separation = 2
-
-[node name="EFFLB" type="RichTextLabel" parent="GC/HBC/Labels2/Margin/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-mouse_filter = 1
-theme = ExtResource("1_jeq77")
-bbcode_enabled = true
-text = "[center]Effects[/center]"
-fit_content = true
-scroll_active = false
-
-[node name="TargetEfPanel" type="PanelContainer" parent="GC/HBC"]
-visible = false
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-
-[node name="BackgroundCenter2" type="NinePatchRect" parent="GC/HBC/TargetEfPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="TMa" type="MarginContainer" parent="GC/HBC/TargetEfPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 10
-
-[node name="TVB" type="VBoxContainer" parent="GC/HBC/TargetEfPanel/TMa"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/separation = 2
-
-[node name="PanelContainer6" type="PanelContainer" parent="GC"]
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxEmpty_twugi")
-
-[node name="BGA2" type="NinePatchRect" parent="GC"]
-visible = false
-custom_minimum_size = Vector2(80, 0)
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="MC" type="MarginContainer" parent="GC/BGA2"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -36.0
-offset_top = -68.0
-offset_right = 36.0
-offset_bottom = 68.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
-
-[node name="TrgtFull" type="TextureRect" parent="GC/BGA2/MC"]
-layout_mode = 2
-texture = ExtResource("3_hiwoo")
-expand_mode = 1
-
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -20.0
-offset_right = 20.0
-offset_bottom = 40.0
-grow_horizontal = 2
-
-[node name="HBC" type="GridContainer" parent="HBoxContainer"]
-layout_mode = 2
-columns = 3
-
-[node name="AtkPanel" type="PanelContainer" parent="HBoxContainer/HBC"]
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-
-[node name="BackgroundCenter2" type="NinePatchRect" parent="HBoxContainer/HBC/AtkPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="AMa" type="MarginContainer" parent="HBoxContainer/HBC/AtkPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-
-[node name="MC" type="MarginContainer" parent="HBoxContainer/HBC/AtkPanel/AMa"]
-layout_mode = 2
-
-[node name="bg?" type="TextureRect" parent="HBoxContainer/HBC/AtkPanel/AMa/MC"]
-layout_mode = 2
-
-[node name="AVB" type="VBoxContainer" parent="HBoxContainer/HBC/AtkPanel/AMa"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/separation = 2
-
-[node name="NAME" type="Label" parent="HBoxContainer/HBC/AtkPanel/AMa/AVB"]
-custom_minimum_size = Vector2(60, 0)
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-text = "Null"
-
-[node name="LIFE" type="RichTextLabel" parent="HBoxContainer/HBC/AtkPanel/AMa/AVB"]
-custom_minimum_size = Vector2(24, 10)
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("1_jeq77")
-theme_override_font_sizes/normal_font_size = 0
-bbcode_enabled = true
-text = "[center]Null[/center]"
-fit_content = true
-scroll_active = false
-autowrap_mode = 0
-shortcut_keys_enabled = false
-meta_underlined = false
-hint_underlined = false
-deselect_on_focus_loss_enabled = false
-text_direction = 1
-
-[node name="ACC" type="Label" parent="HBoxContainer/HBC/AtkPanel/AMa/AVB"]
-custom_minimum_size = Vector2(24, 0)
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("1_jeq77")
-text = "Null"
-horizontal_alignment = 1
-
-[node name="DMG" type="Label" parent="HBoxContainer/HBC/AtkPanel/AMa/AVB"]
-custom_minimum_size = Vector2(24, 0)
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("1_jeq77")
-text = "Null"
-horizontal_alignment = 1
-
-[node name="CRIT" type="Label" parent="HBoxContainer/HBC/AtkPanel/AMa/AVB"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("1_jeq77")
-text = "Null"
-horizontal_alignment = 1
-
-[node name="BLANK" type="Label" parent="HBoxContainer/HBC/AtkPanel/AMa/AVB"]
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("1_jeq77")
-horizontal_alignment = 1
-
-[node name="Labels" type="PanelContainer" parent="HBoxContainer/HBC"]
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-
-[node name="BackgroundCenter2" type="NinePatchRect" parent="HBoxContainer/HBC/Labels"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="Margin" type="MarginContainer" parent="HBoxContainer/HBC/Labels"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 4
-
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/HBC/Labels/Margin"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/separation = 2
-
-[node name="BLANK" type="Label" parent="HBoxContainer/HBC/Labels/Margin/VBoxContainer"]
-custom_minimum_size = Vector2(0, 8)
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-horizontal_alignment = 1
-
-[node name="LIFELB" type="Label" parent="HBoxContainer/HBC/Labels/Margin/VBoxContainer"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-text = "Life"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="ACCLB" type="Label" parent="HBoxContainer/HBC/Labels/Margin/VBoxContainer"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-text = "Accuracy"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="DMGLB" type="Label" parent="HBoxContainer/HBC/Labels/Margin/VBoxContainer"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-text = "Damage"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="CRITLB" type="Label" parent="HBoxContainer/HBC/Labels/Margin/VBoxContainer"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-text = "Crit"
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="TargetPanel" type="PanelContainer" parent="HBoxContainer/HBC"]
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-
-[node name="BackgroundCenter2" type="NinePatchRect" parent="HBoxContainer/HBC/TargetPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="TMa" type="MarginContainer" parent="HBoxContainer/HBC/TargetPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-
-[node name="TVB" type="VBoxContainer" parent="HBoxContainer/HBC/TargetPanel/TMa"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/separation = 2
-
-[node name="NAME" type="Label" parent="HBoxContainer/HBC/TargetPanel/TMa/TVB"]
+[node name="NAME" type="Label" parent="ForecastBox/StatRow/TargetPanel/TMa/TVB"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 2
 
-[node name="LIFE" type="RichTextLabel" parent="HBoxContainer/HBC/TargetPanel/TMa/TVB"]
+[node name="LIFE" type="RichTextLabel" parent="ForecastBox/StatRow/TargetPanel/TMa/TVB"]
 custom_minimum_size = Vector2(15, 10)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -651,7 +236,7 @@ meta_underlined = false
 hint_underlined = false
 deselect_on_focus_loss_enabled = false
 
-[node name="ACC" type="Label" parent="HBoxContainer/HBC/TargetPanel/TMa/TVB"]
+[node name="ACC" type="Label" parent="ForecastBox/StatRow/TargetPanel/TMa/TVB"]
 custom_minimum_size = Vector2(15, 10)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -659,7 +244,7 @@ theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 1
 
-[node name="DMG" type="Label" parent="HBoxContainer/HBC/TargetPanel/TMa/TVB"]
+[node name="DMG" type="Label" parent="ForecastBox/StatRow/TargetPanel/TMa/TVB"]
 custom_minimum_size = Vector2(15, 10)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -667,7 +252,7 @@ theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 1
 
-[node name="CRIT" type="Label" parent="HBoxContainer/HBC/TargetPanel/TMa/TVB"]
+[node name="CRIT" type="Label" parent="ForecastBox/StatRow/TargetPanel/TMa/TVB"]
 custom_minimum_size = Vector2(15, 10)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -675,43 +260,23 @@ theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 1
 
-[node name="BLANK" type="Label" parent="HBoxContainer/HBC/TargetPanel/TMa/TVB"]
+[node name="BLANK" type="Label" parent="ForecastBox/StatRow/TargetPanel/TMa/TVB"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("1_jeq77")
 horizontal_alignment = 1
 
-[node name="AtkEfPanel" type="PanelContainer" parent="HBoxContainer/HBC"]
+[node name="EffectRow" type="HBoxContainer" parent="ForecastBox"]
+visible = false
 layout_mode = 2
+alignment = 1
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="HBoxContainer/HBC/AtkEfPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="AMa" type="MarginContainer" parent="HBoxContainer/HBC/AtkEfPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 10
-
-[node name="AVB" type="VBoxContainer" parent="HBoxContainer/HBC/AtkEfPanel/AMa"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/separation = 2
-
-[node name="Labels2" type="PanelContainer" parent="HBoxContainer/HBC"]
+[node name="AtkEfPanel" type="PanelContainer" parent="ForecastBox/EffectRow"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="HBoxContainer/HBC/Labels2"]
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastBox/EffectRow/AtkEfPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 texture = ExtResource("1_3ryf8")
@@ -720,7 +285,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="Margin" type="MarginContainer" parent="HBoxContainer/HBC/Labels2"]
+[node name="AMa" type="MarginContainer" parent="ForecastBox/EffectRow/AtkEfPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/margin_left = 4
@@ -728,12 +293,38 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/HBC/Labels2/Margin"]
+[node name="AVB" type="VBoxContainer" parent="ForecastBox/EffectRow/AtkEfPanel/AMa"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
 
-[node name="EFFLB" type="RichTextLabel" parent="HBoxContainer/HBC/Labels2/Margin/VBoxContainer"]
+[node name="Labels2" type="PanelContainer" parent="ForecastBox/EffectRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastBox/EffectRow/Labels2"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+texture = ExtResource("1_3ryf8")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="Margin" type="MarginContainer" parent="ForecastBox/EffectRow/Labels2"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ForecastBox/EffectRow/Labels2/Margin"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+theme_override_constants/separation = 2
+
+[node name="EFFLB" type="RichTextLabel" parent="ForecastBox/EffectRow/Labels2/Margin/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 1
@@ -743,11 +334,11 @@ text = "[center]Effects[/center]"
 fit_content = true
 scroll_active = false
 
-[node name="TargetEfPanel" type="PanelContainer" parent="HBoxContainer/HBC"]
+[node name="TargetEfPanel" type="PanelContainer" parent="ForecastBox/EffectRow"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="HBoxContainer/HBC/TargetEfPanel"]
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastBox/EffectRow/TargetEfPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 texture = ExtResource("1_3ryf8")
@@ -756,7 +347,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="TMa" type="MarginContainer" parent="HBoxContainer/HBC/TargetEfPanel"]
+[node name="TMa" type="MarginContainer" parent="ForecastBox/EffectRow/TargetEfPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/margin_left = 4
@@ -764,21 +355,11 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 10
 
-[node name="TVB" type="VBoxContainer" parent="HBoxContainer/HBC/TargetEfPanel/TMa"]
+[node name="TVB" type="VBoxContainer" parent="ForecastBox/EffectRow/TargetEfPanel/TMa"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
-
-[node name="ForecastBox" type="VBoxContainer" parent="."]
-visible = false
-layout_mode = 2
-offset_bottom = 40.0
-
-[node name="StatRow" type="HBoxContainer" parent="ForecastBox"]
-layout_mode = 2
-
-[node name="EffectRow" type="HBoxContainer" parent="ForecastBox"]
-layout_mode = 2
+alignment = 2
 
 [node name="AnimationHandler" type="Node2D" parent="."]
 position = Vector2(556, 0)
@@ -789,3 +370,5 @@ position = Vector2(-556, 0)
 
 [node name="InitiateNode" type="Node2D" parent="AnimationHandler"]
 position = Vector2(596, 0)
+
+[connection signal="sequence_complete" from="AnimationHandler" to="." method="_on_animation_handler_sequence_complete"]

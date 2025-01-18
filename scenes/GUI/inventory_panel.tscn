@@ -1,0 +1,27 @@
+[gd_scene load_steps=3 format=3 uid="uid://ws1f3jg0wotp"]
+
+[ext_resource type="Texture2D" uid="uid://de0fc4ialpktg" path="res://sprites/UI/bag.png" id="1_filpb"]
+[ext_resource type="Theme" uid="uid://vjf2mwcfssah" path="res://fonts/Izayoi_Theme_Trading.tres" id="1_uaniy"]
+
+[node name="TradePnl1" type="PanelContainer"]
+custom_minimum_size = Vector2(400, 500)
+theme = ExtResource("1_uaniy")
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="."]
+layout_mode = 2
+texture = ExtResource("1_filpb")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 120
+theme_override_constants/margin_right = 25
+theme_override_constants/margin_bottom = 125
+
+[node name="ItemList1" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 7

@@ -1,0 +1,184 @@
+[gd_scene load_steps=3 format=3 uid="uid://dfr2jdyxd14oy"]
+
+[ext_resource type="Theme" uid="uid://vjf2mwcfssah" path="res://fonts/Izayoi_Theme_Trading.tres" id="1_5o2bp"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_wiuqg"]
+
+[node name="ConvoyPnl" type="PanelContainer"]
+custom_minimum_size = Vector2(225, 0)
+theme = ExtResource("1_5o2bp")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="PanelContainer2" type="PanelContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(225, 40)
+layout_mode = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="VBoxContainer/PanelContainer2"]
+layout_mode = 2
+texture = ExtResource("1_wiuqg")
+patch_margin_left = 16
+patch_margin_top = 12
+patch_margin_right = 16
+patch_margin_bottom = 12
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/PanelContainer2"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 6
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/PanelContainer2/MarginContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 3
+columns = 5
+
+[node name="BladeBtn" type="Button" parent="VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../GunBtn")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../BluntBtn")
+focus_neighbor_bottom = NodePath("../GoheiBtn")
+text = "Blades"
+metadata/Category = "BLADE"
+metadata/NeedNeighbor = false
+
+[node name="BluntBtn" type="Button" parent="VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../BladeBtn")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../PoleBtn")
+focus_neighbor_bottom = NodePath("../BookBtn")
+text = "Blunt"
+metadata/Category = "BLUNT"
+metadata/NeedNeighbor = false
+
+[node name="PoleBtn" type="Button" parent="VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../BluntBtn")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../BowBtn")
+focus_neighbor_bottom = NodePath("../FanBtn")
+text = "Polearms
+"
+metadata/Categorty = "STICK"
+metadata/NeedNeighbor = false
+
+[node name="BowBtn" type="Button" parent="VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../PoleBtn")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../GunBtn")
+focus_neighbor_bottom = NodePath("../AccBtn")
+text = "Bows"
+metadata/Categorty = "BOW"
+metadata/NeedNeighbor = false
+
+[node name="GunBtn" type="Button" parent="VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../BowBtn")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../BladeBtn")
+focus_neighbor_bottom = NodePath("../ItemBtn")
+text = "Guns"
+metadata/Categorty = "GUN"
+metadata/NeedNeighbor = false
+
+[node name="GoheiBtn" type="Button" parent="VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../ItemBtn")
+focus_neighbor_top = NodePath("../BladeBtn")
+focus_neighbor_right = NodePath("../BookBtn")
+focus_neighbor_bottom = NodePath("../BladeBtn")
+text = "Goheis"
+metadata/Categorty = "GOHEI"
+metadata/NeedNeighbor = true
+
+[node name="BookBtn" type="Button" parent="VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../GoheiBtn")
+focus_neighbor_top = NodePath("../BluntBtn")
+focus_neighbor_right = NodePath("../FanBtn")
+focus_neighbor_bottom = NodePath("../BluntBtn")
+text = "Books"
+metadata/Categorty = "BOOK"
+metadata/NeedNeighbor = true
+
+[node name="FanBtn" type="Button" parent="VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../BookBtn")
+focus_neighbor_top = NodePath("../PoleBtn")
+focus_neighbor_right = NodePath("../AccBtn")
+focus_neighbor_bottom = NodePath("../PoleBtn")
+text = "Fans"
+metadata/Categorty = "FAN"
+metadata/NeedNeighbor = true
+
+[node name="AccBtn" type="Button" parent="VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../FanBtn")
+focus_neighbor_top = NodePath("../BowBtn")
+focus_neighbor_right = NodePath("../ItemBtn")
+focus_neighbor_bottom = NodePath("../BowBtn")
+text = "Acc."
+metadata/Categorty = "ACC"
+metadata/NeedNeighbor = true
+
+[node name="ItemBtn" type="Button" parent="VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../AccBtn")
+focus_neighbor_top = NodePath("../GunBtn")
+focus_neighbor_right = NodePath("../GoheiBtn")
+focus_neighbor_bottom = NodePath("../GunBtn")
+text = "Items"
+metadata/Categorty = "ITEM"
+metadata/NeedNeighbor = true
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="VBoxContainer/PanelContainer"]
+layout_mode = 2
+texture = ExtResource("1_wiuqg")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/PanelContainer"]
+custom_minimum_size = Vector2(0, 337)
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/PanelContainer/MarginContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+
+[node name="SupplyList" type="VBoxContainer" parent="VBoxContainer/PanelContainer/MarginContainer/ScrollContainer"]
+layout_mode = 2

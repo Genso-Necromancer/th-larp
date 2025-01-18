@@ -16,6 +16,7 @@ func set_passive_style(passiveId):
 	
 func flip_text():
 	var lbl = $PanelContainer/TextBox/Label
+	self.set_scale(Vector2(-1,1))
 	lbl.set_scale(Vector2(-1,1))
 	
 	

@@ -1,32 +1,55 @@
 extends Control
-signal jobs_done_trd
+class_name TradeScreen
+
+signal item_list_filled(buttons)
 signal item_selected
-signal item_deselected
 signal new_btn_added
 signal trade_closed
 signal trd_focus_changed
-signal convoy_opened
-signal convoy_closed
-signal tab_selected
-signal profile_request
-signal trd_item_used
 
 
-@export var nFSize = 18
-@export var iFSize = 14
-var firstBtn : Button
+
+@export var nFSize = 30
+@export var iFSize = 30
+
+
+#Node references
+@onready var box1 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1
+@onready var box2 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2
+@onready var list1 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1/TradePnl1/MarginContainer/ItemList1
+@onready var list2 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/TradePnl2/MarginContainer/ItemList2
+@onready var sprite1 = $CharacterArtGroup/MarginContainer/PrtPnl1/MarginContainer/UnitPrt1
+@onready var sprite2 = $CharacterArtGroup/MarginContainer/PrtPnl2/MarginContainer/UnitPrt2
+@onready var prtPanel1 = $CharacterArtGroup/MarginContainer/PrtPnl1
+@onready var prtPanel2 = $CharacterArtGroup/MarginContainer/PrtPnl2
+@onready var infoPanel = $TradeContainer/MarginContainer/TradeScreenVBox/ItemInfoPanel
+@onready var supplyPanel = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl
+@onready var supplyList = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/SupplyList
+@onready var tabContainer = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer
+@onready var optionsPop = $OptionsPopUp
+@onready var effTitle = $TradeContainer/MarginContainer/TradeScreenVBox/ItemInfoPanel/MarginContainer/VBoxContainer/EffectTitleBox
+
+#Trade tracking
+var firstBtn : ItemButton
 var firstUnit : Unit
 var secondUnit : Unit
+
+#cursorTracking
+var lastClicked : BaseButton
+
+#trade states
 enum tStates {
 	DEFAULT,
 	TRADE,
-	GIVE,
-	TAKE,
-	USE}
-
+	SUPPLY,
+	MANAGE,
+	ITEMOP,}
+	
 var tState := tStates.DEFAULT:
 	set(value):
 		tState = value
+
+#tabs
 enum tabTypes {
 	BLADE,
 	BLUNT,
@@ -41,223 +64,295 @@ enum tabTypes {
 }
 var openTab := tabTypes.BLADE:
 	set(value):
-		
 		if tabTypes.find_key(value) == null:
 			print("Invalid Tab Enum")
 			return
-		_change_tab(value)
 		openTab = value
+		_change_tab()
+		
+
+#Supply Tracking
+var supplyStats = UnitData.supplyStats
+
+#func _init():
+	#toggle_visible()
+
 
 func _ready():
+	_connect_signals()
+	_connect_tabs()
+	_hide_panels()
+	_refresh_count()
+
+
+func _init():
+	toggle_visible()
+
+
+func toggle_visible():
+	var isVis = visible
+	visible = !isVis
+
+
+func _hide_panels():
+	box1.visible = false
+	box2.visible = false
+	supplyPanel.visible = false
+
+
+func _connect_signals():
 	var parent = get_parent()
-	self.jobs_done_trd.connect(parent._on_jobs_done)
 	self.item_selected.connect(parent._on_item_selected)
-	self.item_deselected.connect(parent._on_item_deselected)
+	
 	self.new_btn_added.connect(parent._connect_btn_to_cursor)
 	self.trade_closed.connect(parent._on_trade_closed)
+	self.item_list_filled.connect(parent._on_item_list_filled)
+	get_viewport().gui_focus_changed.connect(self._update_item_info)
 	self.trd_focus_changed.connect(parent._on_trd_focus_changed)
-	self.tab_selected.connect(parent._on_tab_selected)
-	self.profile_request.connect(parent._on_profile_request)
-	self.trd_item_used.connect(parent._on_item_used)
-	emit_signal("jobs_done_trd", "Trade", self)
+	
+
+
+func _reparent_info(mode:int) -> void:
+	var oldParent = infoPanel.get_parent()
+	var newParent
+	match mode:
+		0: newParent = $TradeContainer/MarginContainer/TradeScreenVBox
+		_: newParent = box1
+	
+	if !oldParent:
+		pass
+	elif oldParent == newParent:
+		return
+	else:
+		oldParent.remove_child(infoPanel)
+	newParent.add_child(infoPanel)
+	#var newPath = get_path_to(infoPanel)
+	#infoPanel = get_node(newPath)
+
+func _refresh_count():
+	var countLabel = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel/MarginContainer/HBoxContainer/SupplyCount
+	var capLabel = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel/MarginContainer/HBoxContainer/SupplyCap
+	var supply : Dictionary = UnitData.supply
+	supplyStats.Count = 0
+	
+	for key in supply.keys():
+		supplyStats.Count += supply[key].size()
+	
+	capLabel.set_text(str(supplyStats.Max))
+	countLabel.set_text(str(supplyStats.Count))
+	if supplyStats.Count >= supplyStats.Max:
+		_font_state_change(countLabel, "Capped")
+	else:
+		_font_state_change(countLabel)
+
+
+func _font_state_change(node, state := ""):
+	var fColor
+	match state:
+		"Capped": fColor = Color(0.604, 0, 0)
+		_: 
+			node.remove_theme_color_override("font_color")
+			node.remove_theme_color_override("font_pressed_color")
+			node.remove_theme_color_override("font_hover_color")
+			node.remove_theme_color_override("font_focus_color")
+			node.remove_theme_color_override("font_hover_pressed_color")
+			return
+	node.add_theme_color_override("font_color", fColor)
+	node.add_theme_color_override("font_pressed_color", fColor)
+	node.add_theme_color_override("font_hover_color", fColor)
+	node.add_theme_color_override("font_focus_color", fColor)
+	node.add_theme_color_override("font_hover_pressed_color", fColor)
+	
 	
 func open_trade_menu(unit1, unit2):
-	var box1 = $VBoxContainer/TradeBox1
-	var box2 = $VBoxContainer/TradeBox2
-	var list1 = $VBoxContainer/TradeBox1/TradePnl1/MarginContainer/ItemList1
-	var list2 = $VBoxContainer/TradeBox2/TradePnl2/MarginContainer/ItemList2
-	var sprite1 = $VBoxContainer/TradeBox1/PrtPnl1/MarginContainer/UnitPrt1
-	var sprite2 = $VBoxContainer/TradeBox2/PrtPnl2/MarginContainer/UnitPrt2
-	var name1 = $VBoxContainer/TradeBox1/NamePnl1/MarginContainer/NameLb1
-	var name2 = $VBoxContainer/TradeBox2/NamePnl2/MarginContainer/NameLb2
 	firstUnit = unit1
 	secondUnit = unit2
-	self.visible = true
+	toggle_visible()
 	box1.visible = true
 	box2.visible = true
-	sprite1.set_texture(unit1.unitData["Profile"]["Prt"])
-	sprite2.set_texture(unit2.unitData["Profile"]["Prt"])
-	name1.set_text(unit1.unitData.Profile.UnitName)
-	name1.add_theme_font_size_override("font_size", nFSize)
-	name2.set_text(unit2.unitData.Profile.UnitName)
-	name2.add_theme_font_size_override("font_size", nFSize)
-	_fill_item_list(list1, unit1)
-	_fill_item_list(list2, unit2)
-	_assign_neighbors(list1, list2)
 	tState = tStates.TRADE
+	_load_sprites([unit1, unit2])
+	_load_names([unit1, unit2])
+	_reparent_info(0)
+	list1.set_meta("Unit", unit1)
+	list2.set_meta("Unit", unit2)
+	call_deferred("_refresh_list")
+	#_refresh_list()
 	
 	
 func _close_trade_menu():
-	var box1 = $VBoxContainer/TradeBox1
-	var box2 = $VBoxContainer/TradeBox2
-	var list1 = $VBoxContainer/TradeBox1/TradePnl1/MarginContainer/ItemList1
-	var list2 = $VBoxContainer/TradeBox2/TradePnl2/MarginContainer/ItemList2
-	
+	firstUnit = null
+	secondUnit = null
 	box1.visible = false
 	box2.visible = false
-	self.visible = false
+	_hide_sprites()
+	toggle_visible()
 	_clear_item_list(list1)
 	_clear_item_list(list2)
 	tState = tStates.DEFAULT
 	emit_signal("trade_closed")
 	
-func open_supply_menu(unit):
-	var box = $VBoxContainer/TradeBox1
-	var sprite = $VBoxContainer/TradeBox1/PrtPnl1/MarginContainer/UnitPrt1
-	var nameLb = $VBoxContainer/TradeBox1/NamePnl1/MarginContainer/NameLb1
-	var list = $VBoxContainer/TradeBox1/TradePnl1/MarginContainer/ItemList1
-	var supplyBox = $VBoxContainer/ConvoyPnl
-	#var supplyList = $VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/VBoxContainer
+func open_supply_menu(unit): #HERE
+	var tab = _get_first_valid_category()
+	_load_names([unit])
+	_load_sprites([unit])
 	firstUnit = unit
-	self.visible = true
-	box.visible = true
-	supplyBox.visible = true
-	sprite.set_texture(unit.unitData["Profile"]["Prt"])
-	nameLb.set_text(unit.unitData.Profile.UnitName)
-	nameLb.add_theme_font_size_override("font_size", nFSize)
-	_fill_item_list(list, unit)
-	_open_supply_options(unit)
-	openTab = tabTypes.BLADE
+	toggle_visible()
+	box1.visible = true
+	supplyPanel.visible = true
 	
-func _close_supply_menu():
-	var box = $VBoxContainer/TradeBox1
-	var supplyBox = $VBoxContainer/ConvoyPnl
-	_close_supply_options()
-	firstUnit = null
-	self.visible = false
-	box.visible = false
-	supplyBox.visible = false
-	emit_signal("trade_closed")
-	
-	
-func _open_supply_options(unit):
-	var supplyPnl = $SupplyOpPnl
-	var supplyOp = $SupplyOpPnl/MarginContainer/supplyOpList
-	var storeBtn = $SupplyOpPnl/MarginContainer/supplyOpList/StoreBtn
-	var retrieveBtn = $SupplyOpPnl/MarginContainer/supplyOpList/RetrieveBtn
-	
-	var list = get_trade_list(1)
-	
-	
-	supplyPnl.visible = true
-	_toggle_group_filter("convoyTabs", false)
-	_toggle_group_filter("unitInv", false)
-	_toggle_group_filter("convoyInv", false)
-	storeBtn.disabled = _check_empty_unit_inv(unit)
-	if _check_full_unit_inv(unit) or _check_empty_supply():
-		retrieveBtn.disabled = true
-	else:
-		retrieveBtn.disabled = false
-	
-		
+	_reparent_info(1)
+	tState = tStates.SUPPLY
+	list1.set_meta("Unit", unit)
+	openTab = tab
 
-		
-	_clear_item_list(list)
-	_fill_item_list(list, unit)
-	emit_signal("trd_focus_changed", supplyOp)
-	
-	
-func _close_supply_options():
-	var supplyPnl = $SupplyOpPnl
-	supplyPnl.visible = false
-	
-func open_use_menu(unit):
-	#var container = $VBoxContainer
-	var box = $VBoxContainer/TradeBox1
-	var sprite = $VBoxContainer/TradeBox1/PrtPnl1/MarginContainer/UnitPrt1
-	var nameLb = $VBoxContainer/TradeBox1/NamePnl1/MarginContainer/NameLb1
-	var list = $VBoxContainer/TradeBox1/TradePnl1/MarginContainer/ItemList1
-	firstUnit = unit
-	self.visible = true
-	box.visible = true
-	sprite.set_texture(unit.unitData["Profile"]["Prt"])
-	nameLb.set_text(unit.unitData.Profile.UnitName)
-	nameLb.add_theme_font_size_override("font_size", nFSize)
-	_refresh_list(false, list, firstUnit)
-	_toggle_group_filter("unitInv", true)
-#	emit_signal("profile_request", container)
-	emit_signal("trd_focus_changed", list)
-	
-	
-	
-func _close_use_menu():
-	var box = $VBoxContainer/TradeBox1
+
+func _close_supply_menu():
 	firstUnit = null
-	self.visible = false
-	box.visible = false
-	emit_signal("trade_closed")
-	_toggle_group_filter("unitInv", false)
+	box1.visible = false
+	supplyPanel.visible = false
+	_hide_sprites()
+	toggle_visible()
+	_clear_item_list(list1)
+	_clear_item_list(supplyList)
 	tState = tStates.DEFAULT
+	emit_signal("trade_closed")
 	
+	
+func open_manage_menu(unit):
+	_load_names([unit])
+	_load_sprites([unit])
+	firstUnit = unit
+	box1.visible = true
+	toggle_visible()
+	_reparent_info(1)
+	tState = tStates.MANAGE
+	list1.set_meta("Unit", unit)
+	#_refresh_list()
+	call_deferred("_refresh_list")
+
+func close_manage_menu():
+	firstUnit = null
+	box1.visible = false
+	toggle_visible()
+	_clear_item_list(list1)
+	tState = tStates.DEFAULT
+	emit_signal("trade_closed")
+
+
+#Sprite Functions
+func _load_sprites(units:Array):
+	var sprites = [sprite1, sprite2]
+	var panels = [prtPanel1, prtPanel2]
+	var i = 0
+	for unit in units:
+		var path = "res://sprites/character/%s/portrait_full.png" 
+		var fallBack = "debug"
+		var texture = load(path % [unit.unitData.Profile.UnitName])
+		if !texture:
+			texture = load(path % [fallBack])
+		sprites[i].set_texture(texture)
+		panels[i].visible = true
+		i += 1
+
+
+func _hide_sprites():
+	var panels = [prtPanel1, prtPanel2]
+	for p in panels:
+		p.visible = false
+
+func _load_names(units:Array):
+	var name1 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1/NamePnl1/MarginContainer/NameLb1
+	var name2 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/NamePnl2/MarginContainer/NameLb2
+	var names = [name1, name2]
+	var i = 0
+	for unit in units:
+		names[i].set_text(unit.unitData.Profile.UnitName)
+		names[i].add_theme_font_size_override("font_size", nFSize)
+		i += 1
+
 func get_trade_list(i) -> Node: #call only after opening trade screen
-	var list1 = $VBoxContainer/TradeBox1/TradePnl1/MarginContainer/ItemList1
-	var list2 = $VBoxContainer/TradeBox2/TradePnl2/MarginContainer/ItemList2
 	var list
 	match i:
 		1: list = list1
 		2: list = list2
 	return list
 	
+func get_buttons() -> Array:
+	var btns : Array = []
+	var children : Array
+	
+	match tState:
+		tStates.TRADE: children = list1.get_children() + list2.get_children()
+		tStates.SUPPLY: children = list1.get_children() + list2.get_children() + supplyList.get_children() + tabContainer.get_children()
+		tStates.MANAGE:  children = list1.get_children()
+		
+	
+	for child in children:
+		var b := child as Button
+		if not b:
+			btns.append(child.button)
+		else:
+			btns.append(child)
+		
+	return btns
+	
 func get_items(list) -> Array:
 	var items = list.get_children()
 	return items
 	
-func _fill_item_list(list, unit):
+func _fill_item_list(list):
+	var unit = list.get_meta("Unit")
 	var inv = unit.unitData.Inv
 	var i = 0
+	var bPath = load("res://scenes/GUI/item_button.tscn")
 	for item in inv:
 		var itemData = UnitData.itemData[item.ID]
-		var b = Button.new()
-		var dur = item.DUR
+		var b = bPath.instantiate()
+		var dur = item.Dur
 		var mDur = itemData.MaxDur
 		var durString
 		if dur == -1 or mDur == -1:
 			durString = str(" --")
 		else:
 			durString = str(" [" + str(dur) + "/" + str(mDur)+"]")
-		b.set_text(str(itemData.Name) + durString)
-		b.add_theme_font_size_override("font_size", iFSize)
-		b.set_meta("item", item)
-		b.set_meta("unit", unit)
-		b.set_meta("index", i)
+			
+		b.set_item_text(str(itemData.Name), durString, iFSize)
+		b.set_item_icon(itemData.Icon)
+		b.set_meta_data(item, unit, i, itemData.Trade)
+		if tState == tStates.TRADE and !itemData.Trade:
+			b.state = "Disabled"
 		i += 1
-		b.set_button_icon(itemData.Icon)
-		b.set_expand_icon(false)
-		b.set_action_mode(BaseButton.ACTION_MODE_BUTTON_PRESS)
-		b.set_focus_neighbor(SIDE_LEFT, b.get_path_to(b))
-		b.set_focus_neighbor(SIDE_RIGHT, b.get_path_to(b))
+		#does this work still like this? HERE
+		#b.get_button().set_focus_neighbor(SIDE_LEFT, b.get_path_to(b.get_button()))
+		#b.get_button().set_focus_neighbor(SIDE_RIGHT, b.get_path_to(b.get_button()))
 		list.add_child(b)
-		_connect_item(b)
+		_connect_item(b.get_button())
 		b.add_to_group("unitInv")
+	
 		
 func _fill_supply_list(s):
-	var list = $VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/VBoxContainer
 	var tabKeys = tabTypes.keys()
 	var supply = UnitData.supply[tabKeys[s]]
 	var i = 0
+	var bPath = load("res://scenes/GUI/item_button.tscn")
 	for item in supply:
 		var itemData = UnitData.itemData[item.ID]
-		var b = Button.new()
-		var dur = item.DUR
+		var b = bPath.instantiate()
+		var dur = item.Dur
 		var mDur = itemData.MaxDur
 		var durString
 		if dur == -1 or mDur == -1:
 			durString = str(" --")
 		else:
 			durString = str(" [" + str(dur) + "/" + str(mDur)+"]")
-		b.set_text(str(itemData.Name) + durString)
-		b.add_theme_font_size_override("font_size", iFSize)
-		b.set_meta("item", item)
-		b.set_meta("unit", "supply")
-		b.set_meta("index", i)
-		b.set_button_icon(itemData.Icon)
-		b.set_expand_icon(false)
-		b.set_action_mode(BaseButton.ACTION_MODE_BUTTON_PRESS)
-		list.add_child(b)
-		_connect_item(b)
+		b.set_item_text(str(itemData.Name), durString, iFSize)
+		b.set_item_icon(itemData.Icon)
+		b.set_meta_data(item, "Supply", i, itemData.Trade)
+		i += 1
+		supplyList.add_child(b)
+		_connect_item(b.get_button(), true)
 		b.add_to_group("convoyInv")
-		if tState == tStates.GIVE:
-			b.set_mouse_filter(Control.MOUSE_FILTER_PASS)
 		
 func _clear_item_list(list):
 	var btns = list.get_children()
@@ -265,14 +360,137 @@ func _clear_item_list(list):
 		list.remove_child(b)
 		b.queue_free()
 	
-func _refresh_list(isSupply, list = null, unit = null):
-	if isSupply:
+func _refresh_list(useLastItem := false, resetList :VBoxContainer = list1):
+	var lists := []
+	var i : int
+	if tState == tStates.SUPPLY: 
 		_sort_supply()
-	else:
-		_clear_item_list(list)
-		_fill_item_list(list, unit)
+	if box1.visible: lists.append(list1)
+	if box2.visible: lists.append(list2)
+	if useLastItem and firstBtn:
+		i = firstBtn.get_meta("Index")
+	for l in lists:
+		_clear_item_list(l)
+		_fill_item_list(l)
+	_assign_neighbors()
+	emit_signal("item_list_filled", get_buttons(), useLastItem)
+	if useLastItem:
+		_find_valid_cursor_focus(resetList, i)
+	elif lastClicked:
+		lastClicked.call_deferred("grab_focus")
+		lastClicked = null
 	
-func increment_tabs(isIncrease, inc = 1):
+	
+	
+func _assign_neighbors():
+	var neighbor
+	var isConvoy : bool = false
+	if tState == tStates.SUPPLY: 
+		neighbor = supplyList
+		isConvoy = true
+	else: neighbor = list2
+	var l1Empty = false
+	var l2Empty = false
+	var size1 = list1.get_children().size()
+	var size2 = neighbor.get_children().size()
+	
+	if size2 == 0:
+		l2Empty = true
+	if size1 == 0:
+		l1Empty = true
+		
+	if !l1Empty:
+		#call_deferred("_assign_vertical_neighbors", list1)
+		#call_deferred("_assign_horizontal_neighbors", l2Empty)
+		_assign_vertical_neighbors(list1)
+		#_assign_horizontal_neighbors(l2Empty)
+	if !l2Empty:
+		#call_deferred("_assign_vertical_neighbors", list2)
+		#call_deferred("_assign_horizontal_neighbors", l1Empty)
+		_assign_vertical_neighbors(neighbor, isConvoy)
+		#_assign_horizontal_neighbors(l1Empty)
+	if isConvoy:
+		_assign_tab_neighbor()
+
+
+func _assign_vertical_neighbors(list, isConvoy = false):
+	var i = 0
+	var n = 0
+	var btns = list.get_children()
+	var size1 = btns.size()
+	var iMax1 = size1 - 1
+	
+	if size1 <= 0:
+		return
+	for b in btns:
+		#if size1 == 1:
+			#b.button.focus_neighbor_bottom = b.button.get_path_to(b.button)
+			#break
+		if i - 1 < 0:
+			n = iMax1
+		else:
+			n = i - 1
+		b.button.focus_neighbor_top = b.button.get_path_to(btns[n].button)
+		if i + 1 > iMax1:
+			n = 0
+		else:
+			n = i + 1
+		b.button.focus_neighbor_bottom = b.button.get_path_to(btns[n].button)
+		i += 1
+		#b.button.focus_neighbor_right = b.button.get_path_to(b.button)
+		#b.button.focus_neighbor_left = b.button.get_path_to(b.button)
+	if isConvoy:
+		var goheiTab = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer/GoheiBtn
+		
+		btns[0].button.focus_neighbor_top = btns[0].get_path_to(goheiTab)
+	
+func _assign_horizontal_neighbors(empty):
+	var neighbor
+	if tState == tStates.SUPPLY:
+		neighbor = supplyList
+	else: neighbor = list2
+	var i = 0
+	var n = 0
+	var btns1 = list1.get_children()
+	var btns2 = neighbor.get_children()
+	var size2 = btns2.size()
+	var iMax2 = size2 - 1
+	var nList = btns2
+	if empty:
+		nList = btns1
+	for b in btns1:
+		if !empty and i > iMax2:
+			n = iMax2
+		else:
+			n = i
+		b.button.focus_neighbor_right = b.button.get_path_to(nList[n].button)
+		b.button.focus_neighbor_left = b.button.get_path_to(nList[n].button)
+		i += 1
+
+
+func _assign_tab_neighbor():
+	#var tabKeys = tabTypes.keys()
+	#var supply = UnitData.supply[tabKeys[openTab]]
+	var tabs = tabContainer.get_children()
+	var supplyHasItems = supplyList.get_child_count()
+	var unitHasItems = list1.get_child_count()
+	
+	
+	for tab in tabs:
+		#var isValid = false
+		if !tab.get_meta("NeedNeighbor"):
+			continue
+		if supplyHasItems:
+			var n = supplyList.get_child(0)
+			tab.focus_neighbor_bottom = tab.get_path_to(n.button)
+		elif unitHasItems: 
+			var n = list1.get_child(0)
+			tab.focus_neighbor_bottom = tab.get_path_to(n.button)
+		else:
+			tab.focus_neighbor_bottom = tab.get_path_to(tab)
+
+
+func increment_tabs(isIncrease, inc = 1): #Not yet used. tab incrementing hotkey
 	var tabSize = tabTypes.size()
 	var newTab = openTab
 	if !isIncrease:
@@ -286,21 +504,29 @@ func increment_tabs(isIncrease, inc = 1):
 	openTab = newTab
 		
 
-func _change_tab(s):
-	var list = $VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/VBoxContainer
-	_clear_item_list(list)
-	_fill_supply_list(s)
-	if tState == tStates.TAKE:
-		var tabs = $VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer
-		var parents = [tabs, list]
-		_assign_vertical_neighbors(list, true)
-		_assign_tab_neighbor()
-		emit_signal("tab_selected", parents)
+func _change_tab():
+	_clear_item_list(supplyList)
+	call_deferred("_refresh_list")
+	#_refresh_list()
+	
 
-func _connect_item(b):
-	if b.button_down.is_connected(self._item_selected.bind(b)):
-		b.button_down.disconnect(self._item_selected.bind(b))
-	b.button_down.connect(self._item_selected.bind(b))
+
+func _connect_tabs():
+	var tabs = tabContainer.get_children()
+	for t in tabs:
+		t.pressed.connect(self._on_tab_pressed.bind(t))
+
+
+func _connect_item(b, isSupply := false):
+	
+	if b.pressed.is_connected(self._item_pressed.bind(b.get_parent())):
+		b.pressed.disconnect(self._item_pressed.bind(b.get_parent()))
+		
+	elif b.pressed.is_connected(self._supply_item_pressed.bind(b.get_parent())):
+		b.pressed.disconnect(self._supply_item_pressed.bind(b.get_parent()))
+		
+	if isSupply: b.pressed.connect(self._supply_item_pressed.bind(b.get_parent()))
+	else: b.pressed.connect(self._item_pressed.bind(b.get_parent()))
 	
 func _check_empty_unit_inv(unit):
 	var inv = unit.unitData.Inv
@@ -318,7 +544,8 @@ func _check_full_unit_inv(unit):
 		return false
 	else:
 		return true
-		
+
+
 func _check_empty_supply():
 	var supply = UnitData.supply
 	var allTabs = UnitData.supply.keys()
@@ -329,7 +556,8 @@ func _check_empty_supply():
 			noItems = false
 			break
 	return noItems
-	
+
+
 func _check_usable_inv(unit):
 	var inv = unit.unitData.Inv
 	
@@ -340,65 +568,114 @@ func _check_usable_inv(unit):
 			noUse = false
 			break
 	return noUse
-	
+
+
 func _check_usable(item):
 	var itemData = UnitData.itemData
 	var iData = itemData[item.ID]
-	if iData.USE:
+	if iData.MANAGE:
 		return true
 	else:
 		return false
 
-func _item_selected(b):
+
+func _item_pressed(b):
 	match tState:
 		tStates.TRADE:
-			_trade_select(b)
-		tStates.GIVE:
-			_give_select(b)
-		tStates.TAKE:
-			_take_select(b)
+			if b.get_meta("CanTrade"):
+				b.state = "Selected"
+				_trade_select(b)
+		tStates.SUPPLY:
+			if b.get_meta("CanTrade"):
+				_give_select(b)
 		tStates.DEFAULT:
-			_open_item_manage(b)
-			
-func _open_item_manage(b):
-	var mngMenu = $SupplyOpPnl2
-	var list = $SupplyOpPnl2/MarginContainer/supplyOpList
-	var eBtn = $SupplyOpPnl2/MarginContainer/supplyOpList/EquipBtn
-	var uBtn = $SupplyOpPnl2/MarginContainer/supplyOpList/UseBtn
-	var item = b.get_meta("item")
-	var usable = false
-	var equippable = false
-	firstBtn = b
-	mngMenu.visible = true
-	equippable = firstUnit.check_valid_weapon(item)
-	usable = _check_usable(item)
-	if !usable:
-		uBtn.disabled = true
-	else:
-		uBtn.disabled = false
-	if !equippable:
-		eBtn.disabled = true
-	else:
-		eBtn.disabled = false
-	_toggle_group_filter("unitInv", false)
-	emit_signal("trd_focus_changed", list)
-	tState = tStates.USE
+			pass
+		tStates.MANAGE:
+			b.state = "Selected"
+			firstBtn = b
+			_open_item_options(b)
+
+
+func _supply_item_pressed(b):
+	_take_select(b)
+
+
+func _open_item_options(b):
+	var list = optionsPop.list
+	optionsPop.deploy_pop(b)
+	var isValid : bool = optionsPop.validate_buttons(b)
+	tState = tStates.ITEMOP
+	if isValid: 
+		optionsPop.connect_signal(self)
+		emit_signal("trd_focus_changed", list)
+	else: _close_item_options()
 	
+	#var mngMenu = $SupplyOpPnl2
+	#var list = $SupplyOpPnl2/MarginContainer/supplyOpList
+	#var eBtn = $SupplyOpPnl2/MarginContainer/supplyOpList/EquipBtn
+	#var uBtn = $SupplyOpPnl2/MarginContainer/supplyOpList/UseBtn
+	#var item = b.get_meta("Item")
+	#var usable = false
+	#var equippable = false
+	#firstBtn = b
+	#mngMenu.visible = true
+	#equippable = firstUnit.check_valid_equip(item)
+	#usable = _check_usable(item)
+	#if !usable:
+		#uBtn.disabled = true
+	#else:
+		#uBtn.disabled = false
+	#if !equippable:
+		#eBtn.disabled = true
+	#else:
+		#eBtn.disabled = false
+	##_toggle_group_filter("unitInv", false)
+	#
 	
-func _close_item_manage():
-	var mngMenu = $SupplyOpPnl2
-	var list = $VBoxContainer/TradeBox1/TradePnl1/MarginContainer/ItemList1
-	mngMenu.visible = false
-	_toggle_group_filter("unitInv", true)
-	emit_signal("trd_focus_changed", list)
-	tState = tStates.DEFAULT
+
+
+func _close_item_options():
+	tState = tStates.MANAGE
+	optionsPop.hide_pop()
+	call_deferred("_refresh_list", true)
+	#_refresh_list(true)
+	firstBtn = null
 	
-	
+	#_item_deselected()
+	#var mngMenu = $SupplyOpPnl2
+	#var list = $VBoxContainer/TradeBox1/TradePnl1/MarginContainer/ItemList1
+	#mngMenu.visible = false
+	##_toggle_group_filter("unitInv", true)
+	#emit_signal("trd_focus_changed", list)
+	#tState = tStates.DEFAULT
+
+func _on_selection_made(selection, item):
+	_close_item_options()
+	match selection:
+		"Use": _play_item_anim(item)
+		"Equip": pass
+		"Unequip": pass
+
+
+func _play_item_anim(item) -> void:
+	if tState == tStates.DEFAULT:
+		return
+	var itemFx = load("res://scenes/animations/item_effects/item_fx.tscn").instantiate()
+	itemFx.itemfx_complete.connect(self._on_itemfx_complete)
+	get_parent()._change_state(get_parent().GameState.ACCEPT_PROMPT)
+	$CharacterArtGroup/MarginContainer/PrtPnl1/MarginContainer/UnitPrt1/ItemFxNode.add_child(itemFx)
+	itemFx.play_item(item, true)
+
+
+func _on_itemfx_complete():
+	get_parent()._change_state(get_parent().mainCon.previousState)
+
+
 func _trade_select(b):
 	var unit
 	var list
 	var hasSpace = false
-	if b.get_meta("unit") == firstUnit:
+	if b.get_meta("Unit") == firstUnit:
 		unit = secondUnit
 		list = get_trade_list(2)
 	else:
@@ -412,82 +689,74 @@ func _trade_select(b):
 		firstBtn = b
 		emit_signal("item_selected", b)
 	else:
+		
 		_trade_initiated(firstBtn, b)
 	
-func _give_select(b): 
-	var unit = b.get_meta("unit")
-	var item = b.get_meta("item")
-	var iData = UnitData.itemData[item.ID]
-	var iType = iData.Category
-	var iInd = b.get_meta("index")
-	var inv = unit.unitData.Inv
-	var list = get_trade_list(1)
 	
-	var supply = UnitData.supply
-	var supplyInv = supply[iType]
-	var supplyList = $VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/VBoxContainer
+func _give_select(b) -> void:
+	var unit = b.get_meta("Unit")
+	var item = b.get_meta("Item")
+	var iData = UnitData.itemData[item.ID]
+	var iType = iData.Category.to_upper()
+	var iInd = b.get_meta("Index")
+	var inv = unit.unitData.Inv
+	var supplyInv = UnitData.supply[iType]
+	var wasEquipped := false
+	
+	
+	if supplyStats.Count >= supplyStats.Max: return
+	
+	firstBtn = b
+	
+	if item == unit.get_equipped_weapon():
+		wasEquipped = true
 	
 	if iType != tabTypes.find_key(openTab):
 		openTab = tabTypes.get(iType)
 	supplyInv.append(item)
 	
-		
 	inv.remove_at(iInd)
-	list.remove_child(b)
+	list1.remove_child(b)
+
+	if item.Equip == true:
+		item.Equip = false
 	
-	var btns = list.get_children()
-	
-	supplyList.add_child(b)
-	_reindex_buttons(btns)
-	iInd = b.get_meta("index")
-	_assign_vertical_neighbors(list)
-	_sort_supply()
-	if item == unit.get_equipped_weapon():
+	if wasEquipped:
 		unit.set_equipped()
-	if _check_empty_unit_inv(unit):
-		_end_store()
-	else:
-		_find_valid_cursor_focus(list, iInd)
+		
+	#if !_check_empty_unit_inv(unit):
+		#_find_valid_cursor_focus(list1, iInd)
+		
+	#_refresh_list()
+	call_deferred("_refresh_list",true)
+	_refresh_count()
 	
 	
 func _take_select(b): 
 	var unit = firstUnit
-	var item = b.get_meta("item")
+	var item = b.get_meta("Item")
 	var iData = UnitData.itemData[item.ID]
-	var iType = iData.Category
-	var iInd = b.get_meta("index")
+	var iType = iData.Category.to_upper()
+	var iInd = b.get_meta("Index")
 	var inv = unit.unitData.Inv
-	var list = get_trade_list(1)
-	
 	var supply = UnitData.supply
 	var supplyInv = supply[iType]
-	var supplyList = $VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/VBoxContainer
 	
-#	if iType != tabTypes.find_key(openTab):
-#		openTab = tabTypes.get(iType)
-		
+	firstBtn = b
 	inv.append(item)
 	supplyInv.remove_at(iInd)
-		
 	
-	supplyList.remove_child(b)
-	list.add_child(b)
-	
-	var btns = supplyList.get_children()
-	_reindex_buttons(btns)
-	iInd = b.get_meta("index")
-#	_assign_vertical_neighbors(list)
-	_sort_supply()
 	if unit.get_equipped_weapon() == null:
 		unit.set_equipped()
-	if btns.size() == 0: #not really functioning right yet. place holder
-		increment_tabs(true)
-	if _check_full_unit_inv(unit):
-		_end_store()
-	else:
-		_find_valid_cursor_focus(supplyList, iInd)
-	
-	
+
+	#if !_check_full_unit_inv(unit):
+		#_find_valid_cursor_focus(supplyList, iInd)
+		
+	#_refresh_list()
+	call_deferred("_refresh_list", true, supplyList)
+	_refresh_count()
+
+
 func regress_trade():
 	match tState:
 		tStates.DEFAULT: _close_supply_menu()
@@ -496,34 +765,48 @@ func regress_trade():
 				_item_deselected(true)
 			else:
 				_close_trade_menu()
-		tStates.GIVE: _end_store()
-		tStates.TAKE: _end_retrieve()
-		tStates.USE: _close_item_manage()
-		
-		
+		tStates.SUPPLY: _close_supply_menu()
+		tStates.MANAGE: close_manage_menu()
+		tStates.ITEMOP: _close_item_options()
+
 
 func _item_deselected(snap = false):
+	var b = firstBtn
+	firstBtn.state = "Default"
 	_remove_empty()
-	emit_signal("item_deselected", firstBtn, snap)
+	if snap:
+		b.call_deferred("grab_focus")
 	firstBtn = null
-		
+ 
+
 func _find_valid_cursor_focus(l, i):
 	var btns = l.get_children()
-	if btns.size() < 1:
-		_end_store()
-		return
+	var newFocus = null
+	var backup = 0
+	
+	while btns.size() < 1:
+		match backup:
+			0: btns = list1.get_children()
+			1: btns = list2.get_children()
+			2: btns = supplyList.get_children()
+			3: btns = tabContainer.get_children()
+			_: return
+		backup += 1
+	
+	while newFocus == null:
+		for b in btns:
+			var bInd = b.get_meta("Index")
+			if bInd == i:
+				newFocus = btns[i]
+		if i-1 < 0: 
+			newFocus = btns[0]
+			break
+		i -= 1
 		
-	var newFocus = btns[0]
-	for b in btns:
-		var bInd = b.get_meta("index")
-		if bInd == i:
-			newFocus = btns[i]
-	newFocus.grab_focus()
-		
+	newFocus.button.call_deferred("grab_focus")
+	
 	
 func find_cursor_destionation(b):
-	var list1 = get_trade_list(1)
-	var list2 = get_trade_list(2)
 	var children1 = list1.get_children()
 	var children2 = list2.get_children()
 	
@@ -533,39 +816,38 @@ func find_cursor_destionation(b):
 		
 	elif children2.has(b):
 		return children1[0]
-		
 	
 	
 func _add_empty(unit, list):
-	var b = Button.new()
+	var b = load("res://scenes/GUI/item_button.tscn").instantiate()
+	
 	var i = list.get_children().size()
-	b.set_text(" ")
-	b.add_theme_font_size_override("font_size", iFSize)
-	b.set_meta("item", false)
-	b.set_meta("unit", unit)
-	b.set_meta("index", i)
-	b.set_action_mode(BaseButton.ACTION_MODE_BUTTON_PRESS)
+	b.set_item_text("", "", iFSize)
+	b.toggle_icon()
+	b.set_meta_data(false, unit, i, true)
 	list.add_child(b)
-	_connect_item(b)
-	_assign_neighbors(get_trade_list(1), get_trade_list(2))
-	emit_signal("new_btn_added", b)
+	_connect_item(b.get_button())
+	emit_signal("new_btn_added", b.get_button())
+	#b.add_to_group("unitInv")
+	
 	
 func _remove_empty():
 	var btns1 = get_trade_list(1).get_children()
 	var btns2 = get_trade_list(2).get_children()
 	for b in btns1:
-		if b.get_meta("item"):
+		if b.get_meta("Item"):
 			continue
 		else:
 			b.queue_free()
 	for b in btns2:
-		if b.get_meta("item"):
+		if b.get_meta("Item"):
 			continue
 		else:
 			b.queue_free()
 	_reindex_buttons(btns1)
 	_reindex_buttons(btns2)
-	
+
+
 func _check_i_space(unit, list):
 	var iLimit = unit.unitData.MaxInv
 	var iCount = list.get_children().size()
@@ -574,96 +856,32 @@ func _check_i_space(unit, list):
 		return true
 	else:
 		return false
-	
-func _assign_neighbors(list1, list2):
-	var l1Empty = false
-	var l2Empty = false
-	var size1 = list1.get_children().size()
-	var size2 = list2.get_children().size()
-	if size2 == 0:
-		l2Empty = true
-	if size1 == 0:
-		l1Empty = true
-	if !l1Empty:
-		_assign_vertical_neighbors(list1)
-		_assign_horizontal_neighbors(list1, list2, l2Empty)
-	if !l2Empty:
-		_assign_vertical_neighbors(list2)
-		_assign_horizontal_neighbors(list2, list1, l1Empty)
-		
-func _assign_vertical_neighbors(list1, isConvoy = false):
-	var i = 0
-	var n = 0
-	var btns = list1.get_children()
-	var size1 = btns.size()
-	var iMax1 = size1 - 1
-	
-	if size1 <= 0:
-		return
-	for b in btns:
-		if i - 1 < 0:
-			n = iMax1
-		else:
-			n = i - 1
-		b.focus_neighbor_top = b.get_path_to(btns[n])
-		if i + 1 > iMax1:
-			n = 0
-		else:
-			n = i + 1
-		b.focus_neighbor_bottom = b.get_path_to(btns[n])
-		i += 1
-		b.focus_neighbor_right = b.get_path_to(b)
-		b.focus_neighbor_left = b.get_path_to(b)
-	if isConvoy:
-		var goheiTab = $VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer/GoheiBtn
-		
-		btns[0].focus_neighbor_top = btns[0].get_path_to(goheiTab)
-	
-func _assign_horizontal_neighbors(list1, list2, empty):
-	var i = 0
-	var n = 0
-	var btns1 = list1.get_children()
-	var btns2 = list2.get_children()
-	var size2 = btns2.size()
-	var iMax2 = size2 - 1
-	var nList = btns2
-	if empty:
-		nList = btns1
-	for b in btns1:
-		if !empty and i > iMax2:
-			n = iMax2
-		else:
-			n = i
-		b.focus_neighbor_right = b.get_path_to(nList[n])
-		b.focus_neighbor_left = b.get_path_to(nList[n])
-		i += 1
-	
+
 		
 func _trade_initiated(b1, b2):
 	_swap_items(b1, b2)
 	_item_deselected()
 	
-		
+	
 func _reindex_buttons(btns):
 	var i = 0
 	for b in btns:
-		b.set_meta("index", i)
+		b.set_meta("Index", i)
 		i += 1
-	
 	
 
 func _swap_items(b1, b2):
-	var unit1 = b1.get_meta("unit")
-	var item1 = b1.get_meta("item")
-	var i1 = b1.get_meta("index")
+	var unit1 = b1.get_meta("Unit")
+	var item1 = b1.get_meta("Item")
+	var i1 = b1.get_meta("Index")
 	var inv1 = unit1.unitData.Inv
-	var list1 = get_trade_list(1)
+	
 	var btns1 = list1.get_children()
-	var unit2 = b2.get_meta("unit")
-	var item2 = b2.get_meta("item")
-	var i2 = b2.get_meta("index")
+	var unit2 = b2.get_meta("Unit")
+	var item2 = b2.get_meta("Item")
+	var i2 = b2.get_meta("Index")
 	var inv2 = unit2.unitData.Inv
-	var list2 = get_trade_list(2)
+	
 	#var btns2 = get_trade_list(2).get_children()
 	var home
 	var destination
@@ -679,8 +897,8 @@ func _swap_items(b1, b2):
 	else:
 		destination = list2
 		
-	b1.set_meta("unit", unit2)
-	b2.set_meta("unit", unit1)
+	b1.set_meta("Unit", unit2)
+	b2.set_meta("Unit", unit1)
 	home.remove_child(b1)
 	destination.remove_child(b2)
 	destination.add_child(b1)
@@ -702,26 +920,37 @@ func _swap_items(b1, b2):
 		unit2.set_equipped()
 		
 	_remove_empty()
-	
+	#_refresh_list()
+	call_deferred("_refresh_list")
 	
 	#print("Inv1: " + str(inv1) + "
 	#Inv2: " + str(inv2))
 
+func _get_first_valid_category() -> int:
+	var valid := tabTypes.BLADE
+	var supply = UnitData.supply
+	var keys = tabTypes.keys()
+	for key in keys:
+		var count = supply[key].size()
+		if count > 0:
+			valid = tabTypes[key]
+			break
+	return valid
 
 func _sort_supply():
 	var tabKeys = tabTypes.keys()
 	var supply = UnitData.supply[tabKeys[openTab]]
-	var list = $VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/VBoxContainer
 	supply.sort_custom(_sort_items)
-	_clear_item_list(list)
+	_clear_item_list(supplyList)
 	_fill_supply_list(openTab)
+	
 	
 func _sort_items(a, b):
 	var itemData = UnitData.itemData
 	var aName = itemData[a.ID].Name
 	var bName = itemData[b.ID].Name
-	var aDur = a.DUR
-	var bDur = b.DUR
+	var aDur = a.Dur
+	var bDur = b.Dur
 	var checkDur = false
 	if aName < bName:
 		return true
@@ -734,124 +963,63 @@ func _sort_items(a, b):
 	else:
 		return false
 
-func _end_store():
-	tState = tStates.DEFAULT
-	_open_supply_options(firstUnit)
+
+
+#func _toggle_group_filter(group, enable = false):
+	#var nodes = get_tree().get_nodes_in_group(group)
+	#for node in nodes:
+		##var mode = node.get_mouse_filter()
+		#if enable:
+			#node.set_mouse_filter(0)
+		#else: 
+			#node.set_mouse_filter(2)
+
+
+func _on_tab_pressed(b):
+	var c = b.get_meta("Category")
+	lastClicked = b
+	openTab = tabTypes[c]
+
+#func _on_use_btn_pressed():
+	#var item = firstBtn.get_meta("Item")
+	#
+	#emit_signal("trd_item_used",firstUnit, item)
+	#_refresh_list()
+	#_close_item_manage()
+
+
+#func _on_equip_btn_pressed():
+	#var item = firstBtn.get_meta("Item")
+	#var i = firstBtn.get_meta("Index")
+	#var isEquipped = false
+	#var unequip = false
+	#
+	#if firstUnit.get_equipped_weapon() != null:
+		#isEquipped = true
+	#if isEquipped and item == firstUnit.get_equipped_weapon():
+		#unequip = true
+	#if !unequip:
+		#firstUnit.set_equipped(i)
+		#_refresh_list()
+	#else:
+		#firstUnit.unequip()
+	#_close_item_manage()
+
+
+func _update_item_info(button) -> void: #No Effect Tool Tip generation yet HERE
+	var b := button.get_parent() as ItemButton
+	if !b or !b.get_meta("Item"):
+		return
+	var itemId : String = ""
 	
-
+	itemId = b.get_meta("Item").ID
 	
-func _end_retrieve():
-	tState = tStates.DEFAULT
-	_open_supply_options(firstUnit)
+	if UnitData.itemData[itemId].Effects:
+		effTitle.visible = true
+	else: 
+		effTitle.visible = false
+	get_tree().call_group("EffectList", "update_effects", itemId)
+	get_tree().call_group("ValueLabels", "update_value", itemId)
 	
-func _toggle_group_filter(group, enable = false):
-	var nodes = get_tree().get_nodes_in_group(group)
-	for node in nodes:
-		#var mode = node.get_mouse_filter()
-		if enable:
-			node.set_mouse_filter(0)
-		else: 
-			node.set_mouse_filter(2)
-
-
-func _on_store_btn_pressed():
-	var list = $VBoxContainer/TradeBox1/TradePnl1/MarginContainer/ItemList1
-	var btns = list.get_children()
-	tState = tStates.GIVE
-	_close_supply_options()
-	_reindex_buttons(btns)
-	_assign_vertical_neighbors(list, true)
-	_toggle_group_filter("unitInv", true)
-	emit_signal("trd_focus_changed", list)
 	
-
-func _on_retrieve_btn_pressed():
-	tState = tStates.TAKE
-	_close_supply_options()
-	_toggle_group_filter("convoyTabs", true)
-	_toggle_group_filter("convoyInv", true)
-	openTab = tabTypes.BLADE
 	
-
-
-func _assign_tab_neighbor():
-	var list = $VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/VBoxContainer
-	var tabGrid = $VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer
-	var tabs = tabGrid.get_children()
-	var hasItems = true
-	
-	var lKids = list.get_children()
-	var lKidCount = list.get_child_count()
-	if lKidCount == 0:
-		hasItems = false
-	for tab in tabs:
-		#var isValid = false
-		if !tab.get_meta("NeedNeighbor"):
-			continue
-		if hasItems:
-			tab.focus_neighbor_bottom = tab.get_path_to(lKids[0])
-		else:
-			tab.focus_neighbor_bottom = tab.get_path_to(tab)
-			
-func _on_blade_btn_pressed():
-	openTab = tabTypes.BLADE
-
-
-func _on_blunt_btn_pressed():
-	openTab = tabTypes.BLUNT
-
-
-func _on_pole_btn_pressed():
-	openTab = tabTypes.STICK
-
-
-func _on_bow_btn_pressed():
-	openTab = tabTypes.BOW
-
-
-func _on_gun_btn_pressed():
-	openTab = tabTypes.GUN
-
-
-func _on_gohei_btn_pressed():
-	openTab = tabTypes.GOHEI
-
-
-func _on_book_btn_pressed():
-	openTab = tabTypes.BOOK
-
-
-func _on_fan_btn_pressed():
-	openTab = tabTypes.FAN
-
-
-func _on_acc_btn_pressed():
-	openTab = tabTypes.ACC
-
-
-func _on_item_btn_pressed():
-	openTab = tabTypes.ITEM
-
-func _on_use_btn_pressed():
-	var item = firstBtn.get_meta("item")
-	var list = get_trade_list(1)
-	emit_signal("trd_item_used",firstUnit, item)
-	_refresh_list(false, list, firstUnit)
-	_close_item_manage()
-
-func _on_equip_btn_pressed():
-	var item = firstBtn.get_meta("item")
-	var i = firstBtn.get_meta("index")
-	var isEquipped = false
-	var unequip = false
-	var list = get_trade_list(1)
-	if firstUnit.get_equipped_weapon() != null:
-		isEquipped = true
-	if isEquipped and item == firstUnit.get_equipped_weapon():
-		unequip = true
-	if !unequip:
-		firstUnit.set_equipped(i)
-		_refresh_list(false, list, firstUnit)
-	else:
-		firstUnit.unequip()
-	_close_item_manage()

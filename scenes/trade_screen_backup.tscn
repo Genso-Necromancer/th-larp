@@ -1,0 +1,498 @@
+[gd_scene load_steps=5 format=3 uid="uid://d04eavqssy4l8"]
+
+[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_38fwh"]
+[ext_resource type="Script" path="res://scenes/trade_screen.gd" id="2_ftdo0"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_1e7hl"]
+[ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="4_ueh8n"]
+
+[node name="trade_screen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_right = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 1
+theme = ExtResource("1_38fwh")
+script = ExtResource("2_ftdo0")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="VBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_38fwh")
+theme_override_constants/separation = 50
+
+[node name="TradeBox1" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="PrtPnl1" type="PanelContainer" parent="VBoxContainer/TradeBox1"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="VBoxContainer/TradeBox1/PrtPnl1"]
+layout_mode = 2
+texture = ExtResource("3_1e7hl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/TradeBox1/PrtPnl1"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="UnitPrt1" type="TextureRect" parent="VBoxContainer/TradeBox1/PrtPnl1/MarginContainer"]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+texture = ExtResource("4_ueh8n")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="NamePnl1" type="PanelContainer" parent="VBoxContainer/TradeBox1"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="VBoxContainer/TradeBox1/NamePnl1"]
+layout_mode = 2
+texture = ExtResource("3_1e7hl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/TradeBox1/NamePnl1"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="NameLb1" type="Label" parent="VBoxContainer/TradeBox1/NamePnl1/MarginContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Name"
+horizontal_alignment = 1
+
+[node name="TradePnl1" type="PanelContainer" parent="VBoxContainer/TradeBox1"]
+custom_minimum_size = Vector2(200, 246)
+layout_mode = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="VBoxContainer/TradeBox1/TradePnl1"]
+layout_mode = 2
+texture = ExtResource("3_1e7hl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/TradeBox1/TradePnl1"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="ItemList1" type="VBoxContainer" parent="VBoxContainer/TradeBox1/TradePnl1/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="TradeBox2" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="PrtPnl2" type="PanelContainer" parent="VBoxContainer/TradeBox2"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="VBoxContainer/TradeBox2/PrtPnl2"]
+layout_mode = 2
+texture = ExtResource("3_1e7hl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/TradeBox2/PrtPnl2"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="UnitPrt2" type="TextureRect" parent="VBoxContainer/TradeBox2/PrtPnl2/MarginContainer"]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+texture = ExtResource("4_ueh8n")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="NamePnl2" type="PanelContainer" parent="VBoxContainer/TradeBox2"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="VBoxContainer/TradeBox2/NamePnl2"]
+layout_mode = 2
+texture = ExtResource("3_1e7hl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/TradeBox2/NamePnl2"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="NameLb2" type="Label" parent="VBoxContainer/TradeBox2/NamePnl2/MarginContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Name"
+horizontal_alignment = 1
+
+[node name="TradePnl2" type="PanelContainer" parent="VBoxContainer/TradeBox2"]
+custom_minimum_size = Vector2(200, 246)
+layout_mode = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="VBoxContainer/TradeBox2/TradePnl2"]
+layout_mode = 2
+texture = ExtResource("3_1e7hl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/TradeBox2/TradePnl2"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ItemList2" type="VBoxContainer" parent="VBoxContainer/TradeBox2/TradePnl2/MarginContainer"]
+layout_mode = 2
+
+[node name="ConvoyPnl" type="PanelContainer" parent="VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(225, 0)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/ConvoyPnl"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="PanelContainer2" type="MarginContainer" parent="VBoxContainer/ConvoyPnl/VBoxContainer"]
+custom_minimum_size = Vector2(225, 40)
+layout_mode = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2"]
+layout_mode = 2
+texture = ExtResource("3_1e7hl")
+patch_margin_left = 16
+patch_margin_top = 12
+patch_margin_right = 16
+patch_margin_bottom = 12
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 3
+columns = 5
+
+[node name="BladeBtn" type="Button" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../GunBtn")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../BluntBtn")
+focus_neighbor_bottom = NodePath("../GoheiBtn")
+theme_override_font_sizes/font_size = 12
+text = "Blades"
+metadata/Category = "BLADE"
+metadata/NeedNeighbor = false
+
+[node name="BluntBtn" type="Button" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../BladeBtn")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../PoleBtn")
+focus_neighbor_bottom = NodePath("../BookBtn")
+theme_override_font_sizes/font_size = 12
+text = "Blunt"
+metadata/Category = "BLUNT"
+metadata/NeedNeighbor = false
+
+[node name="PoleBtn" type="Button" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../BluntBtn")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../BowBtn")
+focus_neighbor_bottom = NodePath("../FanBtn")
+theme_override_font_sizes/font_size = 12
+text = "Polearms
+"
+metadata/Categorty = "STICK"
+metadata/NeedNeighbor = false
+
+[node name="BowBtn" type="Button" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../PoleBtn")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../GunBtn")
+focus_neighbor_bottom = NodePath("../AccBtn")
+theme_override_font_sizes/font_size = 12
+text = "Bows"
+metadata/Categorty = "BOW"
+metadata/NeedNeighbor = false
+
+[node name="GunBtn" type="Button" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../BowBtn")
+focus_neighbor_top = NodePath(".")
+focus_neighbor_right = NodePath("../BladeBtn")
+focus_neighbor_bottom = NodePath("../ItemBtn")
+theme_override_font_sizes/font_size = 12
+text = "Guns"
+metadata/Categorty = "GUN"
+metadata/NeedNeighbor = false
+
+[node name="GoheiBtn" type="Button" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../ItemBtn")
+focus_neighbor_top = NodePath("../BladeBtn")
+focus_neighbor_right = NodePath("../BookBtn")
+focus_neighbor_bottom = NodePath("../BladeBtn")
+theme_override_font_sizes/font_size = 12
+text = "Goheis"
+metadata/Categorty = "GOHEI"
+metadata/NeedNeighbor = true
+
+[node name="BookBtn" type="Button" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../GoheiBtn")
+focus_neighbor_top = NodePath("../BluntBtn")
+focus_neighbor_right = NodePath("../FanBtn")
+focus_neighbor_bottom = NodePath("../BluntBtn")
+theme_override_font_sizes/font_size = 12
+text = "Books"
+metadata/Categorty = "BOOK"
+metadata/NeedNeighbor = true
+
+[node name="FanBtn" type="Button" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../BookBtn")
+focus_neighbor_top = NodePath("../PoleBtn")
+focus_neighbor_right = NodePath("../AccBtn")
+focus_neighbor_bottom = NodePath("../PoleBtn")
+theme_override_font_sizes/font_size = 12
+text = "Fans"
+metadata/Categorty = "FAN"
+metadata/NeedNeighbor = true
+
+[node name="AccBtn" type="Button" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../FanBtn")
+focus_neighbor_top = NodePath("../BowBtn")
+focus_neighbor_right = NodePath("../ItemBtn")
+focus_neighbor_bottom = NodePath("../BowBtn")
+theme_override_font_sizes/font_size = 12
+text = "Acc."
+metadata/Categorty = "ACC"
+metadata/NeedNeighbor = true
+
+[node name="ItemBtn" type="Button" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer" groups=["convoyTabs"]]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../AccBtn")
+focus_neighbor_top = NodePath("../GunBtn")
+focus_neighbor_right = NodePath("../GoheiBtn")
+focus_neighbor_bottom = NodePath("../GunBtn")
+theme_override_font_sizes/font_size = 12
+text = "Items"
+metadata/Categorty = "ITEM"
+metadata/NeedNeighbor = true
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer/ConvoyPnl/VBoxContainer"]
+layout_mode = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer"]
+layout_mode = 2
+texture = ExtResource("3_1e7hl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer"]
+custom_minimum_size = Vector2(0, 337)
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer"]
+layout_mode = 2
+
+[node name="SupplyOpPnl" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -27.5
+offset_top = -16.0
+offset_right = 27.5
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="SupplyOpPnl"]
+layout_mode = 2
+texture = ExtResource("3_1e7hl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="SupplyOpPnl"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="supplyOpList" type="VBoxContainer" parent="SupplyOpPnl/MarginContainer"]
+layout_mode = 2
+
+[node name="StoreBtn" type="Button" parent="SupplyOpPnl/MarginContainer/supplyOpList"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../RetrieveBtn")
+text = "Store"
+
+[node name="RetrieveBtn" type="Button" parent="SupplyOpPnl/MarginContainer/supplyOpList"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../StoreBtn")
+focus_neighbor_right = NodePath(".")
+text = "Retrieve"
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+
+[node name="SupplyOpPnl2" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -27.5
+offset_top = -16.0
+offset_right = 27.5
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="SupplyOpPnl2"]
+layout_mode = 2
+texture = ExtResource("3_1e7hl")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="SupplyOpPnl2"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="supplyOpList" type="VBoxContainer" parent="SupplyOpPnl2/MarginContainer"]
+layout_mode = 2
+
+[node name="EquipBtn" type="Button" parent="SupplyOpPnl2/MarginContainer/supplyOpList"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../UseBtn")
+text = "Equip"
+
+[node name="UseBtn" type="Button" parent="SupplyOpPnl2/MarginContainer/supplyOpList"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../EquipBtn")
+focus_neighbor_right = NodePath(".")
+text = "Use"
+
+[connection signal="pressed" from="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer/BladeBtn" to="." method="_on_blade_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer/BluntBtn" to="." method="_on_blunt_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer/PoleBtn" to="." method="_on_pole_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer/BowBtn" to="." method="_on_bow_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer/GunBtn" to="." method="_on_gun_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer/GoheiBtn" to="." method="_on_gohei_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer/BookBtn" to="." method="_on_book_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer/FanBtn" to="." method="_on_fan_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer/AccBtn" to="." method="_on_acc_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/GridContainer/ItemBtn" to="." method="_on_item_btn_pressed"]
+[connection signal="pressed" from="SupplyOpPnl/MarginContainer/supplyOpList/StoreBtn" to="." method="_on_store_btn_pressed"]
+[connection signal="pressed" from="SupplyOpPnl/MarginContainer/supplyOpList/RetrieveBtn" to="." method="_on_retrieve_btn_pressed"]
+[connection signal="pressed" from="SupplyOpPnl2/MarginContainer/supplyOpList/EquipBtn" to="." method="_on_equip_btn_pressed"]
+[connection signal="pressed" from="SupplyOpPnl2/MarginContainer/supplyOpList/UseBtn" to="." method="_on_use_btn_pressed"]

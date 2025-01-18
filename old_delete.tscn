@@ -1,0 +1,171 @@
+[gd_scene load_steps=5 format=3 uid="uid://dxss4yoefigwq"]
+
+[ext_resource type="Theme" uid="uid://bi2ve4mbgqqd0" path="res://fonts/Izayoi_Theme_setup.tres" id="1_fjdtq"]
+[ext_resource type="Script" path="res://scenes/SetUpMain.gd" id="2_4lsoq"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_u3p8s"]
+[ext_resource type="Script" path="res://scenes/MngOptPnl.gd" id="4_s6jeq"]
+
+[node name="OldDelete" type="Control"]
+visible = false
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("1_fjdtq")
+script = ExtResource("2_4lsoq")
+
+[node name="SetUpGrid" type="GridContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -37.5
+offset_top = -25.0
+offset_right = 37.5
+offset_bottom = 25.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/h_separation = 0
+columns = 3
+
+[node name="SetUpPnl1" type="PanelContainer" parent="SetUpGrid"]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="SetUpGrid/SetUpPnl1"]
+layout_mode = 2
+texture = ExtResource("3_u3p8s")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="M" type="MarginContainer" parent="SetUpGrid/SetUpPnl1"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBSet" type="VBoxContainer" parent="SetUpGrid/SetUpPnl1/M"]
+layout_mode = 2
+
+[node name="BTNDeploy" type="Button" parent="SetUpGrid/SetUpPnl1/M/VBSet"]
+layout_mode = 2
+mouse_filter = 1
+theme = ExtResource("1_fjdtq")
+text = "Deploy"
+
+[node name="FrmBtn" type="Button" parent="SetUpGrid/SetUpPnl1/M/VBSet"]
+layout_mode = 2
+mouse_filter = 1
+text = "Formation"
+
+[node name="MngBtn" type="Button" parent="SetUpGrid/SetUpPnl1/M/VBSet"]
+layout_mode = 2
+mouse_filter = 1
+text = "Manage"
+
+[node name="BeginBtn" type="Button" parent="SetUpGrid/SetUpPnl1/M/VBSet"]
+layout_mode = 2
+mouse_filter = 1
+text = "Begin"
+
+[node name="GRDRost" type="GridContainer" parent="SetUpGrid/SetUpPnl1/M"]
+visible = false
+custom_minimum_size = Vector2(560, 480)
+layout_mode = 2
+theme_override_constants/h_separation = 32
+theme_override_constants/v_separation = 32
+columns = 3
+
+[node name="SetUpPnl2" type="PanelContainer" parent="SetUpGrid"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+mouse_filter = 1
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="SetUpGrid/SetUpPnl2"]
+layout_mode = 2
+texture = ExtResource("3_u3p8s")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="M" type="MarginContainer" parent="SetUpGrid/SetUpPnl2"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="DLmtLbl" type="Label" parent="SetUpGrid/SetUpPnl2/M"]
+layout_mode = 2
+
+[node name="MngOptPnl" type="PanelContainer" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -512.0
+offset_top = -264.0
+offset_right = -457.0
+offset_bottom = -201.0
+grow_horizontal = 0
+grow_vertical = 0
+size_flags_horizontal = 8
+size_flags_vertical = 8
+mouse_filter = 1
+script = ExtResource("4_s6jeq")
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="MngOptPnl"]
+layout_mode = 2
+texture = ExtResource("3_u3p8s")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="M" type="MarginContainer" parent="MngOptPnl"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBMng" type="VBoxContainer" parent="MngOptPnl/M"]
+layout_mode = 2
+alignment = 1
+
+[node name="tradeLb" type="Button" parent="MngOptPnl/M/VBMng"]
+layout_mode = 2
+mouse_filter = 1
+theme = ExtResource("1_fjdtq")
+text = "Trade"
+
+[node name="supplyLb" type="Button" parent="MngOptPnl/M/VBMng"]
+layout_mode = 2
+mouse_filter = 1
+text = "Supply"
+
+[node name="equipLb" type="Button" parent="MngOptPnl/M/VBMng"]
+visible = false
+layout_mode = 2
+mouse_filter = 1
+text = "Equip"
+
+[node name="useLb" type="Button" parent="MngOptPnl/M/VBMng"]
+layout_mode = 2
+mouse_filter = 1
+text = "Manage"

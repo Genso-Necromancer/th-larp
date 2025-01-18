@@ -1,0 +1,109 @@
+[gd_resource type="Theme" load_steps=17 format=3 uid="uid://vjf2mwcfssah"]
+
+[ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="1_iaq10"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_6ac8h"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_s7ira"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_t31wv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kl6js"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hsiuf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rfvx0"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_y8ifr"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_63pdl"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_e1sws"]
+texture = ExtResource("2_6ac8h")
+texture_margin_left = 16.0
+texture_margin_top = 12.0
+texture_margin_right = 16.0
+texture_margin_bottom = 12.0
+expand_margin_left = 12.0
+expand_margin_top = 6.0
+expand_margin_right = 12.0
+expand_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hms6d"]
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_o3fh0"]
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_xt31t"]
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vycte"]
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_vqy87"]
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_r8o0u"]
+texture = ExtResource("2_6ac8h")
+texture_margin_left = 16.0
+texture_margin_top = 12.0
+texture_margin_right = 16.0
+texture_margin_bottom = 12.0
+expand_margin_left = 12.0
+expand_margin_top = 12.0
+expand_margin_right = 12.0
+expand_margin_bottom = 6.0
+
+[resource]
+default_base_scale = 1.0
+default_font = ExtResource("1_iaq10")
+Button/colors/font_color = Color(0.87451, 0.87451, 0.87451, 1)
+Button/colors/font_disabled_color = Color(0.255659, 0.255659, 0.255659, 1)
+Button/colors/font_focus_color = Color(0.776471, 0.67451, 0.247059, 1)
+Button/colors/font_hover_color = Color(0.898039, 0.788235, 0.352941, 1)
+Button/colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+Button/colors/font_outline_color = Color(1, 1, 1, 1)
+Button/colors/font_pressed_color = Color(1, 1, 1, 1)
+Button/colors/icon_disabled_color = Color(1, 1, 1, 0.4)
+Button/colors/icon_focus_color = Color(1, 1, 1, 1)
+Button/colors/icon_hover_color = Color(1, 1, 1, 1)
+Button/colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
+Button/colors/icon_normal_color = Color(1, 1, 1, 1)
+Button/colors/icon_pressed_color = Color(1, 1, 1, 1)
+Button/constants/h_separation = 2
+Button/constants/outline_size = 0
+Button/font_sizes/font_size = 20
+Button/fonts/font = ExtResource("1_iaq10")
+Button/styles/disabled = SubResource("StyleBoxEmpty_s7ira")
+Button/styles/focus = SubResource("StyleBoxEmpty_t31wv")
+Button/styles/hover = SubResource("StyleBoxEmpty_kl6js")
+Button/styles/normal = SubResource("StyleBoxEmpty_hsiuf")
+Button/styles/pressed = SubResource("StyleBoxEmpty_rfvx0")
+Fonts/fonts/normal = ExtResource("1_iaq10")
+Label/colors/font_color = Color(1, 1, 1, 1)
+Label/font_sizes/font_size = 25
+MarginContainer/constants/margin_bottom = 15
+MarginContainer/constants/margin_left = 15
+MarginContainer/constants/margin_right = 15
+MarginContainer/constants/margin_top = 15
+Panel/styles/panel = SubResource("StyleBoxEmpty_y8ifr")
+PanelContainer/styles/panel = SubResource("StyleBoxEmpty_63pdl")
+RichTextLabel/font_sizes/normal_font_size = 15
+TabContainer/font_sizes/font_size = 30
+TabContainer/styles/panel = SubResource("StyleBoxTexture_e1sws")
+TabContainer/styles/tab_disabled = SubResource("StyleBoxEmpty_hms6d")
+TabContainer/styles/tab_focus = SubResource("StyleBoxEmpty_o3fh0")
+TabContainer/styles/tab_hovered = SubResource("StyleBoxEmpty_xt31t")
+TabContainer/styles/tab_selected = SubResource("StyleBoxEmpty_vycte")
+TabContainer/styles/tab_unselected = SubResource("StyleBoxEmpty_vqy87")
+TabContainer/styles/tabbar_background = SubResource("StyleBoxTexture_r8o0u")

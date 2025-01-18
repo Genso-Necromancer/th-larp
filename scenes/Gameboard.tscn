@@ -179,7 +179,7 @@ texture_region_size = Vector2i(48, 17)
 [sub_resource type="TileSet" id="TileSet_pq6nq"]
 tile_shape = 3
 tile_offset_axis = 1
-tile_size = Vector2i(160, 48)
+tile_size = Vector2i(168, 54)
 terrain_set_0/mode = 0
 terrain_set_0/terrain_0/name = "Terrain 0"
 terrain_set_0/terrain_0/color = Color(0.501961, 0.345098, 0.25098, 1)

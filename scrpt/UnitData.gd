@@ -3,13 +3,22 @@ extends Node
 
 const pStats = preload("res://character_data/pStats.gd")
 
-@export var supplyMax = 180
+var supplyMax = 180
+var supplyStats :Dictionary = {"Max": 180, "Count": 0}
+var playerMon : int = 100
 
-var unitData : = {}
+var unitData : = {}:
+	get:
+		return unitData
+	set(value):
+		if not Engine.is_editor_hint():
+			unitData = value
+			
 var skillData : = {}
 var effectData := {}
 var timeModData := {}
 var itemData := {}
+
 var passiveData := {}
 var auraData := {}
 var rosterData := []
@@ -25,7 +34,11 @@ var rosterOnce := false
 
 func _ready():
 	#var index = 0
-	
+	unitData = {}
+	skillData = {}
+	effectData = {}
+	timeModData = {}
+	itemData = {}
 	_load_unique_units()
 	_load_items()
 	terrainCosts = pStats.get_terrain_costs()
@@ -50,16 +63,17 @@ func _load_items():
 		"Name":"None",
 		"Icon":load(("res://sprites/gungnir.png")),
 		"Type":"None",
+		"Target": 0,
 		"Dmg":0,
 		"Hit":0,
 		"Crit":0,
-		"Graze":0,
+		"Barrier":0,
 		"MinRange":0,
 		"MaxRange":0,
 		"Category":"ITEM",
 		"MaxDur":1,
 		"SubGroup":false,
-		"USE":false,
+		"Use":false,
 		"Equip":false,
 		"Expendable": true,
 		"Trade": true,
@@ -165,7 +179,7 @@ func _load_time_mods():
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
-							"Graze": 0, 
+							"Barrier": 0, 
 							"GrzPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
@@ -189,7 +203,7 @@ func _load_time_mods():
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
-							"Graze": 0, 
+							"Barrier": 0, 
 							"GrzPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
@@ -246,9 +260,9 @@ func get_generated_sprite(species, job):
 	return s
 
 
-func stat_gen(job :int, tag : String, spec : int):
+func stat_gen(job :int, spec : int):
 	#Need overhaul1!!!!
-
+	
 	var groupedStats = {}
 	#var jData = jobData[job].duplicate(true)
 	var sData = pStats.get_spec(spec)
@@ -256,7 +270,7 @@ func stat_gen(job :int, tag : String, spec : int):
 	var groups = sData.StatGroups.keys()
 	var stats = sData.StatGroups.Stats.keys()
 	var specKeys = Enums.SPEC_ID.keys()
-	
+	var genData := {}
 	groupedStats.clear()
 	for group in groups:
 		var totalStats = {}
@@ -266,20 +280,42 @@ func stat_gen(job :int, tag : String, spec : int):
 	var genname = "%s %s" % [specKeys[sData["Spec"]].to_pascal_case(), jData["Role"]]
 	var combinePassives = sData["Passives"] + jData["Passives"]
 	#combinePassives.merge(jData["Passives"])
-	unitData[tag] = groupedStats
-	unitData[tag]["Profile"] = {"UnitName" : genname}
-	unitData[tag]["Profile"].merge({"Role" : jData["Role"]})
-	unitData[tag]["Profile"].merge({"Species" : sData["Spec"]})
+	genData = groupedStats
+	genData["Profile"] = {"UnitName" : genname}
+	genData["Profile"].merge({"Role" : jData["Role"]})
+	genData["Profile"].merge({"Species" : sData["Spec"]})
 
-	unitData[tag]["Profile"].merge(pStats.get_art(unitData[tag].Profile.UnitName))
-	unitData[tag]["Profile"].merge({"Level": 1})
-	#unitData[tag]["CurLife"] = unitData[tag]["Bases"]["Life"]
-	unitData[tag]["MaxInv"] = 6
-	unitData[tag]["Inv"] = []
-	unitData[tag]["Passives"] = combinePassives
-	unitData[tag]["Weapons"] = jData.Weapons
-	unitData[tag]["MoveType"] = sData["MoveType"]
-	
+	genData["Profile"].merge(pStats.get_art(genData.Profile.UnitName))
+	genData["Profile"].merge({"Level": 1})
+	#genData["CurLife"] = genData["Bases"]["Life"]
+	genData["MaxInv"] = 6
+	genData["Inv"] = []
+	genData["Passives"] = combinePassives
+	genData["Weapons"] = jData.Weapons
+	genData["MoveType"] = sData["MoveType"]
+	return genData
+
+func add_to_unitdata(data, id):
+	unitData[id] = data
+	print_rich("[color=green]Added to UnitData[/color]:", id)
+
+func generate_id():
+	var u := false
+	var c := 0
+	var unitId : String
+	if not Engine.is_editor_hint():
+		while !u:
+			unitId = "yk" + str(c)
+			if unitData.has(unitId):
+				c += 1
+				#print_rich("[color=red]IT'S HAPPENING[/color]:",c)
+			else:
+				u = true
+		#print("GENERATED ID:",unitId)
+		#if c > 5:
+			#print_rich("[color=red]UnitData[/color]:", UnitData.unitData.keys())
+		return unitId
+
 #func get_experience(action, totalExp, targLvl, unitStats, growths, caps):
 #	var gainExp = 0
 #	match action:
@@ -332,26 +368,32 @@ func init_roster():
 	if !rosterOnce:
 		rosterData.append("Remilia")
 		rosterData.append("Sakuya")
+		rosterData.append("Meiling")
 		rosterData.append("Patchouli")
 		rosterData.append("Reimu")
-		rosterData.append("Meiling")
+		
 		
 		rosterOnce = true
 	return
 
 func init_supply():
 	supply = {
-		"Blade":[],
-		"Blunt":[],
-		"Stick":[],
-		"Gohei":[],
-		"Book":[],
-		"Fan":[],
-		"Bow":[],
-		"Gun":[],
-		"Hit":[],
-		"ITEM":[]
+		"BLADE":[{"ID":"SLVKNF", "Equip":false, "Dur":40, "UniqueId": 21451,},],
+		"BLUNT":[],
+		"STICK":[],
+		"GOHEI":[],
+		"BOOK":[],
+		"FAN":[],
+		"BOW":[],
+		"GUN":[],
+		"ACC":[],
+		"ITEM":[{"ID":"PWRELIX", "Equip":false, "Dur":1,"UniqueId": 22521,}],
 		}
 	
+func spawn_item(id:String, durability = itemData[id].MaxDur, isDropable = false) -> Dictionary:
+	var template = {"ID":"id", "Equip":false, "Dur":durability, "Drop": isDropable}
+	return template
 
-
+func get_item_keys():
+	var itemKeys : Array = pStats.get_items().keys()
+	return itemKeys

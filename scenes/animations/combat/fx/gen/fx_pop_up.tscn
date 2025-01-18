@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://bxn00g1rrsv52"]
 
-[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_5fxyd"]
 [ext_resource type="Script" path="res://scenes/animations/combat/fx/gen/fx_pop_up.gd" id="1_6yvvn"]
+[ext_resource type="Theme" uid="uid://beha4ndul0p5x" path="res://fonts/Izayoi_Theme_Chapter_Title.tres" id="2_yv45t"]
 
 [sub_resource type="Animation" id="Animation_xdv5q"]
 length = 0.001
@@ -98,12 +98,12 @@ _healColor = Color(0.278431, 1, 0.254902, 1)
 
 [node name="fxText" type="Label" parent="."]
 self_modulate = Color(1, 1, 1, 0)
-offset_right = 40.0
-offset_bottom = 25.0
+offset_right = 81.0
+offset_bottom = 77.0
 scale = Vector2(2, 2)
 pivot_offset = Vector2(20, 12.5)
 size_flags_horizontal = 4
-theme = ExtResource("1_5fxyd")
+theme = ExtResource("2_yv45t")
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 5
 text = "00"

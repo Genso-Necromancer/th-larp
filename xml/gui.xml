@@ -99,6 +99,7 @@
 			<entry id = "species_name_vampire"><![CDATA[Human]]></entry>
 			<entry id = "species_name_magician"><![CDATA[Magician]]></entry>
 			<entry id = "species_name_dragon"><![CDATA[Dragon]]></entry>
+			<entry id = "species_name_youkai"><![CDATA[Youkai]]></entry>
 			<!-- character roles -->
 			<entry id = "role_name_troublemaker"><![CDATA[Troublemaker]]></entry>
 			<entry id = "role_name_cointaker"><![CDATA[Cointaker]]></entry>
@@ -120,6 +121,7 @@
 			<!-- Skill Names -->
 			<entry id = "skill_name_life_steal_rem"><![CDATA[Scarlet Thirst]]></entry>
 			<entry id = "skill_name_fire_basic"><![CDATA[Fire Ball]]></entry>
+			<entry id = "skill_name_enemy_toss_1"><![CDATA[Toss]]></entry>
 			
 		</string>
 	</language>

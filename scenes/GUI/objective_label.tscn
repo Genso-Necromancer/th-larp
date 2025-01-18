@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://djckvkpadfjnn"]
+
+[ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="1_bcgrm"]
+
+[node name="Objective" type="Label"]
+theme_override_colors/font_color = Color(0.0745098, 0.0745098, 0.0745098, 1)
+theme_override_fonts/font = ExtResource("1_bcgrm")
+text = "Defeat %s"
+horizontal_alignment = 1

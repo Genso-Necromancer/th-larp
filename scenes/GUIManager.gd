@@ -1,6 +1,7 @@
 extends Control
 class_name GUIManager
 
+signal gui_splash_finished
 signal gui_closed
 signal start_the_justice
 signal guiReady
@@ -20,17 +21,9 @@ signal action_selected
 @onready var originalPositionActX = $ActionMenu.position.x
 @onready var originalPositionActY = $ActionMenu.position.y
 
-#remove eventually
-@onready var weaponFrame = $ActionMenu/m/m/c/v
-@onready var weaponBox = $ActionMenu/m
-@onready var ActionBox = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer
 @onready var foreCast = $CombatForecast
 
-#these too
-@onready var AtkB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/AtkBtn
-@onready var SklB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/SklBtn
-@onready var WaitB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/WaitBtn
-@onready var EndB = $ActionMenu/Count/ActionBox/CenterContainer/VBoxContainer/EndBtn
+
 
 
 @onready var parent = get_parent()
@@ -38,6 +31,20 @@ signal action_selected
 @onready var mainCon = GRANDDAD.get_parent()
 @onready var GameState = mainCon.GameState
 
+#states
+enum sStates {
+	HOME,
+	DEPLOY,
+	FORM,
+	ROSTER,
+	UNITOP,
+	TRDSEEK,
+	TRADING,
+	SUPPLY,
+	MANAGE,
+	BEGIN}
+
+var sState := sStates.HOME
 
 var opWepX
 var opWepY
@@ -46,13 +53,19 @@ var originalPositionProfY
 
 #preloads (this is how I should have been doing shit from the start!)
 var turnTrackerRes = preload("res://scenes/turn_tracker.tscn")
+var mapSetUp : MapGui
+var rosterGrid : UnitRoster
+var tradeScreen : TradeScreen
+var unitProf : UnitProfile
 
 #scenes
 var turnTracker
 
+#prompts
+var isForecastPrompt = false
+
 #nodes unassigned
-var unitProf : Node
-var setUpMenu : Node
+
 var HUD : Node
 var timer : Timer
 var tween : Tween
@@ -65,32 +78,20 @@ var rosterData = UnitData.rosterData
 var depCount = 0
 var depLimit = 0
 var forcedDep : Array = []
-var sState = null
 var rosterInit : bool = false
-enum sStates {
-	HOME,
-	DEPLOY,
-	FORM,
-	MANAGE,
-	UNITOP,
-	TRDSEEK,
-	TRADING,
-	SUPPLY,
-	USE,
-	BEGIN}
 var unitObjs = Global.unitObjs
 var activeBtn : Node
 
+#trade variables
+var trade1 : Unit
+var trade2 : Unit
+
 #nodes?
 var actMenu
-var tradeScn : Node
-
-
 
 #states
 @onready var gameState = mainCon.GameState
-var currentButton: Button = null
-#@onready var _timer: Timer = $Timer
+#@onready var _timer: Timer = $PanelContainerTimer
 
 var windowMode = DisplayServer.window_get_mode()
 #var Global.actionMenu = Global.actionMenu:
@@ -108,9 +109,12 @@ var mouseThreshold = 0.1
 var profFocus
 
 
+func _init():
+	_load_assets()
 
 
 func _ready():
+	SignalTower.prompt_accepted.connect(_on_prompt_accepted)
 	menuCursor.visible = false
 	foreCast.visible = false
 	_load_turn_tracker()
@@ -118,8 +122,20 @@ func _ready():
 func update_labels(): #Use this to cascade assigning strings from XML to all hard loaded buttons HERE
 	pass
 	
+	
+
+
+func _on_prompt_accepted():
+	_initiate_ai_sequence()
+	
 func _change_state(state):
-	mainCon.newSlave = [self]
+	var prev = mainCon.previousSlave
+	mainCon.previousSlave = mainCon.newSlave
+	if state == mainCon.state: return
+	elif state == mainCon.previousState: 
+		mainCon.newSlave = prev
+	else: mainCon.newSlave = [self]
+	
 	mainCon.previousState = mainCon.state
 	mainCon.state = state
 	
@@ -134,15 +150,14 @@ func _on_jobs_done(id, node):
 	var parent = get_parent()
 	var mapMan = parent.get_parent()
 	match id:
-		"Profile": 
-			unitProf = node
-			opWepX = node.position.x
-			opWepY = node.position.y
-			originalPositionProfX = unitProf.position.x
-			originalPositionProfY = unitProf.position.y
-		"SetUp": setUpMenu = node
+		#"Profile": 
+			#unitProf = node
+			#opWepX = node.position.x
+			#opWepY = node.position.y
+			#originalPositionProfX = unitProf.position.x
+			#originalPositionProfY = unitProf.position.y
+		
 		"HUD": HUD = node
-		"Trade": tradeScn = node
 		"Cursor": menuCursor = node
 		"Action": 
 			actMenu = node
@@ -156,15 +171,21 @@ func reinitialize():
 	
 	
 func _clear_active_btn():
-	if activeBtn.get_meta("deployed"):
-		_font_color_change(activeBtn, "Default")
-	else:
-		_font_color_change(activeBtn, "Undeployed")
+	activeBtn.temp_font_change()
 	activeBtn = null
 	
-func _set_active_btn(b):
+func _set_active_btn(b) -> void:
+	if !b:
+		push_error("set_active_btn: Missing Button")
+		return
 	activeBtn = b
-	_font_color_change(activeBtn, "Selected")
+	activeBtn.temp_font_change("Selected")
+	
+
+func _set_trade_partners(b):
+	trade1 = activeBtn.get_unit()
+	trade2 = b.get_unit()
+	#b.temp_font_change("Selected")
 	
 func _relocate_child(child, newParent):
 	if child.get_parent():
@@ -194,19 +215,20 @@ func regress_menu():
 	match sState:
 		sStates.HOME: pass
 		sStates.DEPLOY: _close_unit_menu()
-		sStates.MANAGE: _close_unit_menu()
+		sStates.ROSTER: _close_unit_menu()
 		sStates.UNITOP: _close_unit_options()
 		sStates.TRDSEEK: _open_unit_options(activeBtn)
-		sStates.TRADING: tradeScn.regress_trade()
-		sStates.SUPPLY: tradeScn.regress_trade()
-		sStates.USE: tradeScn.regress_trade()
+		sStates.TRADING: tradeScreen.regress_trade()
+		sStates.SUPPLY: tradeScreen.regress_trade()
+		sStates.MANAGE: tradeScreen.regress_trade()
 
 func _font_color_change(b, style):
 	var fColor
 	match style:
-		"Default": fColor = Color(1,1,1)
-		"Undeployed": fColor = Color (0,0,1)
-		"Selected": fColor = Color(1,0,0)
+		"Deployed": fColor = Color(1,1,1)
+		"Undeployed": fColor = Color(0.194, 0.194, 0.194)
+		"Selected": fColor = Color(0.776, 0.675, 0)
+		"Forced": fColor = Color(0, 0.62, 0)
 	b.add_theme_color_override("font_color", fColor)
 	b.add_theme_color_override("font_pressed_color", fColor)
 	b.add_theme_color_override("font_hover_color", fColor)
@@ -226,38 +248,62 @@ func _snap_to_cursor(node): #bug gy save for later
 	print("Node " + str(node.global_position))
 	
 
-
-
-func _on_gameboard_toggle_prof(): #Needs filtering for while in set-up menu. Perhaps a filter function should be called first.
-#	print("GUI",state, unitId)
+func _on_gameboard_toggle_prof():
+	if sState < 4: toggle_profile()
+			
+func toggle_profile(): #Needs filtering for while in set-up menu. Perhaps a filter function should be called first.
 	var profVis = unitProf.visible
 	if sState == sStates.HOME: #profile should not open on set up home menu
 		return
+		
+	if sState != sStates.BEGIN:
+		menuCursor.toggle_visible()
+		
 	if profVis and Global.focusUnit != profFocus:
 		update_prof()
 		profFocus = Global.focusUnit
 	else:
-		
 		if unitProf.visible == false:
 			update_prof()
 			unitProf.visible = true
 			profFocus = Global.focusUnit
-			
+			_change_state(GameState.GB_PROFILE)
 		else:
 			unitProf.visible = false
+			_change_state(mainCon.previousState)
 
 func update_prof():
 	emit_signal("profile_called")
 		
 func _on_gameboard_target_focused( mode : int, reach: Array = [-1, -1]):
-	var fc = $CombatForecast
-	fc.show_fc()
-	turnTracker.visible = false
+	_swap_to_forecast()
 	match mode:
 		0: actMenu.open_weapons(reach)
 		1: pass
+		2: _ai_sequence_check()
 	
-		
+func _ai_sequence_check():
+	isForecastPrompt = true
+	match Options.aiForecastPrompt:
+		0: pass
+		1: _prompt_delay()
+			
+
+func _prompt_delay():
+	var time = Options.promptDelay
+	await get_tree().create_timer(time).timeout
+	_initiate_ai_sequence()
+	
+func _initiate_ai_sequence():
+	if isForecastPrompt:
+		isForecastPrompt = false
+		emit_signal("start_the_justice")
+
+	
+func _swap_to_forecast():
+	var fc = $CombatForecast
+	fc.show_fc()
+	turnTracker.visible = false
 
 func _on_gameboard_time_set():
 	HUD.set_sun(Global.gameTime)
@@ -286,167 +332,130 @@ func _on_gameboard_exp_display(oldExp, expSteps, results, unitPrt, unitName):
 	expContainer.init_exp_display(oldExp, expSteps, results, unitPrt, unitName)
 	expContainer.toggle_visibility()
 
-func _on_gameboard_call_setup(dLimit, forced):
-	var setUpWin = $SetUpMain
-	var homeMenu = $SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet
-	var infoPanel = $SetUpMain/SetUpGrid/SetUpPnl2
-	var homeBtns = homeMenu.get_children()
-	#var i = 0
+func call_setup(dLimit, forced, map):
+	var btns = mapSetUp.btnContainer
+	mapSetUp.connect_buttons(self)
+	mapSetUp.set_chapter(map.chapterNumber, map.title, map.get_objectives(), map.get_loss_conditions())
+	mapSetUp.set_mon(UnitData.playerMon)
+	mapSetUp.toggle_visible()
+	_resignal_menuCursor(btns)
+	
 	sState = sStates.HOME
 	forcedDep = forced
 	depLimit = dLimit
-	setUpWin.visible = true
-	homeMenu.visible = true
+	
+	rosterGrid.init_roster(forcedDep, depLimit)
 	_change_state(gameState.GB_SETUP)
-	infoPanel.visible = false
-	_resignal_menuCursor(homeMenu)
+
+func _load_assets():
+	mapSetUp = load("res://scenes/GUI/MapSetup.tscn").instantiate()
+	rosterGrid = load("res://scenes/GUI/unit_roster.tscn").instantiate()
+	tradeScreen = load("res://scenes/trade_screen.tscn").instantiate()
+	unitProf = load("res://scenes/profile.tscn").instantiate()
+	add_child(unitProf)
+	add_child(tradeScreen)
+	add_child(rosterGrid)
+	add_child(mapSetUp)
+	
+	
 	
 
-
+#SetUp Buttons
 func _on_btn_deploy_pressed():
-	var sCountPnl = $SetUpMain/SetUpGrid/SetUpPnl2
-	sCountPnl.visible = false
+	#var sCountPnl = $SetUpMain/SetUpGrid/SetUpPnl2
+	mapSetUp.toggle_visible()
 	sState = sStates.DEPLOY
 	_open_unit_menu()
+	
+	
+func _on_frm_btn_pressed():
+	mapSetUp.toggle_visible()
+	menuCursor.toggle_visible()
+#	_relocate_child(unitProf, self)
+	sState = sStates.FORM
+	emit_signal("formation_toggled")
+	
+	
+func _on_mng_btn_pressed():
+	mapSetUp.toggle_visible()
+	sState = sStates.ROSTER
+	_open_unit_menu()
+	
+
+func _on_begin_btn_pressed():
+	menuCursor.visible = false
+	mapSetUp.toggle_visible()
+	sState = sStates.BEGIN
+	turnTracker.visible = true
+	emit_signal("map_started")
+	
+
+func _on_status_btn_pressed():
+	pass
+
 
 func _open_unit_menu():
-	var homeMenu = $SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet
-	var grdRost = $SetUpMain/SetUpGrid/SetUpPnl1/M/GRDRost
-	var btns : Array
-#	var infoPanel = $SetUpMain/SetUpGrid/SetUpPnl2
-	var grid = setUpMenu.get_children()
-	homeMenu.visible = false
-#	infoPanel.visible = true
+	match sState:
+		sStates.DEPLOY: rosterGrid.open_menu(0)
+		sStates.ROSTER: rosterGrid.open_menu(1)
 	
-	if !rosterInit:
-		var first: Button = null
-		var units = UnitData.rosterData
-		var filled = 0
-		var i = 0
-		var unitData = UnitData.unitData
-		
-		for unit in units:
-			var b = Button.new()
-			
-			b.set_text(str(unitData[unit].Profile.UnitName))
-			if forcedDep.has(unit):
-				b.set_meta("forced", true)
-				b.set_meta("deployed", true)
-				
-			elif filled < depLimit:
-				b.set_meta("forced", false)
-				b.set_meta("deployed", true)
-				filled += 1
-			else:
-				b.set_meta("forced", false)
-				b.set_meta("deployed", false)
-				_font_color_change(b, "Undeployed")
-			b.set_action_mode(BaseButton.ACTION_MODE_BUTTON_PRESS)
-			b.set_mouse_filter(Control.MOUSE_FILTER_PASS)
-			b.set_meta("unit", unitObjs[unit])
-			b.set_button_icon(unitData[unit].Profile.Prt)
-			b.set_expand_icon(false)
-			grdRost.add_child(b)
-			_connect_unit_btn(b, i)
-			i += 1
-			rosterInit = true
-			btns = grdRost.get_children()
-	else:
-		var i = 0
-		var dQue : Array = []
-		var unQue : Array = []
-		btns = grdRost.get_children()
-		#create match case for if supply or deploy, reconnecting what the unit's "button" does when pressed
-		for b in btns:
-			var isDeployed = b.get_meta("deployed")
-			var isForced = b.get_meta("forced")
-			
-			if isForced:
-				grdRost.move_child(b, i)
-				_connect_unit_btn(b, i)
-				i += 1
-			elif isDeployed:
-				dQue.append(b)
-			else:
-				unQue.append(b)
-		for b in dQue:
-			grdRost.move_child(b, i)
-			_connect_unit_btn(b, i)
-			i += 1			
-		for b in unQue:
-			grdRost.move_child(b, i)
-			_connect_unit_btn(b, i)
-			i += 1
-		btns = grdRost.get_children()
-	
-	_resignal_menuCursor(grdRost)
-	Global.focusUnit = btns[0].get_meta("unit")
+	_assign_cursor_to_roster()
 	update_prof()
-	grdRost.visible = true
 
+
+func _assign_cursor_to_roster():
+	var btns : Array = []
+	for bar in rosterGrid.unitBars:
+		btns.append(bar.button)
+		_connect_unit_btn(bar)
+	#if !activeBtn: Global.focusUnit = rosterGrid.unitBars[0].get_unit()
+	#else: Global.focusUnit = activeBtn.get_unit()
+	_resignal_menuCursor_array(btns, 1)
 
 func _close_unit_menu():
-	var homeMenu = $SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet
-	var grdRost = $SetUpMain/SetUpGrid/SetUpPnl1/M/GRDRost
-	var homeBtns = homeMenu.get_children()
-	var sCountPnl = $SetUpMain/SetUpGrid/SetUpPnl2
-	sCountPnl.visible = false
-#	unitProf.visible = false
-	grdRost.visible = false
-	homeMenu.visible = true
-	_resignal_menuCursor(homeMenu)
-#	homeBtns[0].grab_focus()
+	var btns = mapSetUp.btnContainer
+	rosterGrid.close_menu()
+	mapSetUp.toggle_visible()
+	_resignal_menuCursor(btns)
 	sState = sStates.HOME
+	
 
 func _toggle_unit(b):
 	#metadata: force, deployed; unit
-	var forced = b.get_meta("forced")
-	var deployed = b.get_meta("deployed")
-	var unit = b.get_meta("unit")
+	var state = b.buttonState
+	var unit = b.get_unit()
+	match state:
+		"Forced": #create feedback for user when unable to deploy forced unit
+			print("Unit is Forced")
+		"Deployed":
+			b.set_state("Undeployed")
+			emit_signal("deploy_toggled", unit, true)
+		"Undeployed":
+			if depCount < depLimit:
+				b.set_state("Deployed")
+				emit_signal("deploy_toggled", unit, false)
+			else:
+				#create feedback for user
+				print("Deploy Limit Reached")
+		
 	
-	
-	if forced:
-		#create feedback for user when unable to deploy forced unit
-		print("Unit is Forced")
-		return
-	
-	if deployed:
-		_font_color_change(b, "Undeployed")
-		emit_signal("deploy_toggled", unit, deployed)
-		b.set_meta("deployed", false)
-	elif !deployed and depCount < depLimit:
-		_font_color_change(b, "Default")
-		emit_signal("deploy_toggled", unit, deployed)
-		b.set_meta("deployed", true)
-	
-func _on_gameboard_deploy_toggled(deployed, limit):
-	var label = $SetUpMain/SetUpGrid/SetUpPnl2/M/DLmtLbl
-	depLimit = limit
+func _on_gameboard_deploy_toggled(deployed):
 	depCount = deployed
-	label.set_text(str(deployed) + " / " + str(limit))
+	rosterGrid.update_deploy_count(deployed)
 
 func _roster_mouse_entered(unit):
 	Global.focusUnit = unit
 	update_prof()
 
-func _connect_unit_btn(b, i):
-	var unit = b.get_meta("unit")
+func _connect_unit_btn(bar):
+	var unit = bar.get_unit()
+	var b = bar.button
 	
-	#disconnect signals
-	if b.button_down.is_connected(self._toggle_unit.bind(b)):
-		b.button_down.disconnect(self._toggle_unit.bind(b))
-	if b.button_down.is_connected(self._roster_btn_pressed.bind(b)):
-		b.button_down.disconnect(self._roster_btn_pressed.bind(b))
+	if !b.pressed.is_connected(self._roster_btn_pressed.bind(bar)):
+		b.pressed.connect(self._roster_btn_pressed.bind(bar))
 	
-	if !b.mouse_entered.is_connected(self._roster_mouse_entered.bind(unit)): #only needs to be connected once
+	if !b.mouse_entered.is_connected(self._roster_mouse_entered.bind(unit)):
 		b.mouse_entered.connect(self._roster_mouse_entered.bind(unit))
-	
-	#match and connect appropriate signals
-	match sState:
-		sStates.DEPLOY: b.button_down.connect(self._toggle_unit.bind(b))
-		sStates.MANAGE: b.button_down.connect(self._roster_btn_pressed.bind(b))
-
-
 
 
 #Menu cursor reparenting and resignaling
@@ -465,11 +474,33 @@ func _resignal_menuCursor(p, strip = true, oldP = menuCursor.menu_parent):
 	while btns.size() > i and btns[i].disabled == true:
 		i += 1
 		
-	if btns.size() > i: menuCursor.call_deferred("set_cursor", btns[i])
+	if btns.size() > i and !btns[i].has_focus(): 
+		btns[i].call_deferred("grab_focus")
+		#menuCursor.call_deferred("set_cursor", btns[i])
 	#btns[i].call_deferred("grab_focus")
 	
 	#print("resignal: ")
 	#print("-Button: " + str(btns[i].get_global_position()))
+
+func _resignal_menuCursor_array(btns:Array, mode:= 0):
+	var i = 0
+	var focus
+	menuCursor.visible = true
+	for b in btns:
+		_connect_btn_to_cursor(b)
+		
+	while btns.size() > i and btns[i].disabled == true:
+		i += 1
+	
+	match mode:
+		0: focus = btns[0]
+		1: 
+			if !activeBtn: focus = btns[i]
+			else: focus = activeBtn.button
+		2: focus = false
+	
+	if focus and btns.size() > i: 
+		focus.call_deferred("grab_focus")
 	
 	
 func _connect_btn_to_cursor(b):
@@ -492,149 +523,110 @@ func _strip_menuCursor(p = menuCursor.menu_parent):
 	menuCursor.visible = false
 	
 func _on_mouse_entered(b):
-	b.grab_focus()
+	b.call_deferred("grab_focus")
 ########
 
 #Set-up Menu Functions
 func _roster_btn_pressed(b):
 	match sState:
-		sStates.MANAGE: _open_unit_options(b)
-		sStates.TRDSEEK: _open_trade_menu(b)
-
-func _on_frm_btn_pressed():
-	setUpMenu.visible = false
-	menuCursor.visible = false
-#	_relocate_child(unitProf, self)
-	sState = sStates.FORM
-	emit_signal("formation_toggled")
+		sStates.DEPLOY: _toggle_unit(b)
+		sStates.ROSTER: _open_unit_options(b)
+		sStates.TRDSEEK: _trade_unit_select_roster(b)
 
 
+func _trade_unit_select_roster(b) -> void:
+	if b.get_unit() == activeBtn.get_unit(): return
+	else: 
+		_set_trade_partners(b)
+		rosterGrid.toggle_visible()
+		_open_trade_menu()
+	
 func _on_gameboard_formation_closed():
-	var homeMenu = $SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet
-	var homeBtns = homeMenu.get_children()
-	setUpMenu.visible = true
-	menuCursor.visible = true
+	var btns = mapSetUp.btnContainer
+	mapSetUp.toggle_visible()
+	menuCursor.toggle_visible()
 	#after revamping menuCursor code, make sure setup is it's parent
 	sState = sStates.HOME
 	emit_signal("formation_toggled")
-	homeBtns[1].grab_focus()
-	mainCon.newSlave = [self]
-	mainCon.state = GameState.GB_SETUP
-	
-	
-func _on_mng_btn_pressed():
-	sState = sStates.MANAGE
-	_open_unit_menu()
+	_resignal_menuCursor(btns)
+	_change_state(GameState.GB_SETUP)
+
 	
 func _open_unit_options(b):
-	var unit = b.get_meta("unit")
-	var mngCont = $SetUpMain/MngOptPnl
-	var mngPnl = $SetUpMain/MngOptPnl
-	var unitData = unit.unitData
-	var btns = mngPnl.get_buttons()
-	var menu = mngPnl.get_menu()
-	var noWep = true
-	var noUse = true
-	var noInv = true
-	_set_active_btn(b)
 	sState = sStates.UNITOP
-	mngCont.visible = true
-	_resignal_menuCursor(menu)
-	for item in unitData.Inv:
-		if unit.check_valid_weapon(item):
-			noWep = false
-		
-		if !noWep:
-			break
+	_set_active_btn(b)
+	var cursorParent = rosterGrid.open_unit_manager()
+	_resignal_menuCursor(cursorParent)
 	
-	btns[2].disabled = noWep
-	btns[3].disabled = tradeScn._check_usable_inv(unit)
-		
-func _return_roster_focus():
-	var grdRost = $SetUpMain/SetUpGrid/SetUpPnl1/M/GRDRost
-	_resignal_menuCursor(grdRost)
 
 func _close_unit_options():
-	var mngPnl = $SetUpMain/MngOptPnl
-	mngPnl.visible = false
+	rosterGrid.close_unit_manager()
 	match sState:
-		sStates.TRDSEEK: _return_roster_focus()
+		sStates.TRDSEEK: _assign_cursor_to_roster()
 		sStates.UNITOP: 
-			sState = sStates.MANAGE
+			sState = sStates.ROSTER
+			_assign_cursor_to_roster()
 			_clear_active_btn()
-			_return_roster_focus()
+			
 			
 	
-
-func _on_trade_lb_pressed():
+func _on_trade_pressed():
 	sState = sStates.TRDSEEK
 	_close_unit_options()
 
-func _open_trade_menu(b):
-	var char1 = activeBtn.get_meta("unit")
-	var char2 = b.get_meta("unit")
-	var lists = []
+func _open_trade_menu():
 	var strip = true
-	var setUp = $SetUpMain/SetUpGrid
-	setUp.visible = false
 	sState = sStates.TRADING
-	tradeScn.open_trade_menu(char1, char2)
-	lists.append(tradeScn.get_trade_list(2))
-	lists.append(tradeScn.get_trade_list(1))
-	for p in lists:
-		_resignal_menuCursor(p, strip)
-		strip = false
 	
+	tradeScreen.open_trade_menu(trade1, trade2)
+	
+
+
+func _on_item_list_filled(buttons, ignoreFocus := false):
+	var m = 0
+	if ignoreFocus:
+		m = 2
+	_resignal_menuCursor_array(buttons, m)
+
+
 func _on_item_selected(b):
-	var cursorDest = tradeScn.find_cursor_destionation(b)
-	_font_color_change(b, "Selected")
-	menuCursor.set_cursor(cursorDest)
-	
-func _on_item_deselected(b, snap = false):
-	_font_color_change(b, "Default")
-	if snap:
-		menuCursor.set_cursor(b)
+	var cursorDest = tradeScreen.find_cursor_destionation(b)
+	#_font_color_change(b, "Selected")
+	cursorDest.call_deferred("grab_focus")
 	
 
 func _on_trade_closed():
-	var setUp = $SetUpMain/SetUpGrid
-	setUp.visible = true
+	trade1 = null
+	trade2 = null
+	rosterGrid.toggle_visible()
 	_open_unit_options(activeBtn)
 
-func _on_supply_lb_pressed():
-	var unit = activeBtn.get_meta("unit")
-	var setUp = $SetUpMain/SetUpGrid
+func _on_supply_pressed():
+	var unit = activeBtn.get_unit()
 	sState = sStates.SUPPLY
 	_close_unit_options()
-	setUp.visible = false
-	tradeScn.open_supply_menu(unit) 
+	rosterGrid.close_menu()
+	tradeScreen.open_supply_menu(unit)
 	
 	
 func _on_trd_focus_changed(p, b = null):
 	_resignal_menuCursor(p)
-	
-func _on_tab_selected(p):
-	var kidCount1 = p[1].get_child_count()
-	var focus = menuCursor.currentFocus
-	_resignal_menuCursor(p[0], true)
-	if kidCount1 > 0:
-		_resignal_menuCursor(p[1], false)
-	else:
-		menuCursor.set_cursor(focus)
-	
 
-
-func _on_equip_lb_pressed():
-	pass # Replace with function body.
+func _on_manage_pressed():
+	var unit = activeBtn.get_unit()
+	sState = sStates.MANAGE
+	_close_unit_options()
+	rosterGrid.close_menu()
+	tradeScreen.open_manage_menu(unit)
 
 
 func _on_use_lb_pressed():
 	var unit = activeBtn.get_meta("unit")
 	var setUp = $SetUpMain/SetUpGrid
-	sState = sStates.USE
+	sState = sStates.MANAGE
 	_close_unit_options()
 	setUp.visible = false
-	tradeScn.open_use_menu(unit)
+	tradeScreen.open_use_menu(unit)
 
 func _on_profile_request(newParent):
 	_relocate_child(unitProf, newParent)
@@ -644,19 +636,14 @@ func _on_item_used(unit, item):
 	emit_signal("item_used", unit, item)
 
 
-func _on_begin_btn_pressed():
-	menuCursor.visible = false
-	setUpMenu.visible = false
-	sState = sStates.BEGIN
-	turnTracker.visible = true
-	emit_signal("map_started")
+
 	
 #########
 
 #Action/Generic options menu functions
 
 func _close_act_menu():
-	#foreCast.hide_fc()
+	foreCast.hide_fc()
 	actMenu.close_menu()
 	
 func _on_action_menu_menu_closed():
@@ -701,6 +688,8 @@ func _on_weapon_selected(button): #weapon can change after selection if mouse mo
 	emit_signal("start_the_justice", button)
 
 
+
+
 #func _on_action_menu_weapon_changed(weapon):
 	#pass # Replace with function body.
 
@@ -711,6 +700,18 @@ func _start_load_screen():
 
 func _end_load_screen():
 	pass
+
+func play_splash(chNum:int, chTitle:String, timeString:String):
+	var splashPlayer = load("res://scenes/GUI/chapter_splash.tscn").instantiate()
+	add_child(splashPlayer)
+	_change_state(GameState.ACCEPT_PROMPT)
+	splashPlayer.splash_player_finished.connect(self._on_splash_player_finished)
+	splashPlayer.play_splash(chNum, chTitle, timeString)
+
+
+func _on_splash_player_finished():
+	emit_signal("gui_splash_finished")
+
 
 func _on_gameboard_player_lost():
 	var failScreen = $FailScreen
@@ -726,7 +727,7 @@ func _on_win_screen_win_finished():
 	_start_load_screen()
 	turnTracker.free_tokens()
 
-func _on_gameboard_map_loaded():
+func _on_gameboard_map_loaded(_map):
 	_end_load_screen()
 	
 

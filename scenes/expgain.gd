@@ -18,7 +18,9 @@ func _ready():
 
 
 func animation_skip():
-	if tween and growExp:
+	if !self.visible:
+		return
+	elif tween and growExp:
 		tween.custom_step(10000)
 		tween.kill()
 		growExp = false

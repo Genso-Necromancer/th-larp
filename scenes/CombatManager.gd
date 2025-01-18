@@ -36,8 +36,8 @@ func init_manager():
 	##			CanCrit
 	##			Hit
 	##			DMG
-	##			Graze
-	##			GrazePRC
+	##			Barrier
+	##			BarrierPRC
 	##			CRIT
 	##			FUP
 	##			RLife
@@ -209,10 +209,10 @@ func _evaluate_clash(a, t, action):
 		results.Crit = clampi(results.Crit, 0, 1000)
 	
 	if !skillId:
-		results["Graze"] = results.Dmg - tData.Graze
+		results["Barrier"] = results.Dmg - tData.Barrier
 		results["GrzPrc"] = tData.GrzPrc
 	else:
-		results["Graze"] = false
+		results["Barrier"] = false
 		results["GrzPrc"] = false
 		
 		
@@ -250,7 +250,7 @@ func start_the_justice(attacker : Unit, defender : Unit, attackerAction: Diction
 	var initiate : Unit
 	var initiatorAct
 	var initiateAct
-	var actionType := _get_action_type(attacker, defender, attackerAction)
+	var actionType
 	var vantage = false
 	var deathMatch = false
 	var wepAction := {"Weapon": true, "Skill": false}
@@ -295,6 +295,7 @@ func start_the_justice(attacker : Unit, defender : Unit, attackerAction: Diction
 			initiatorAct = wepAction
 			
 		if initiator.can_act():
+			actionType = _get_action_type(initiator, initiate, initiatorAct)
 			combatResults.Rounds[r][0] = _run_action(initiator, initiate, initiatorAct, actionType, true).duplicate(true)
 			lastAct = combatResults.Rounds[r][0][initiator]
 			print(str(initiator) + ": " + ("Action" + str(0) + ": ") + str(combatResults.Rounds[r][0]))
@@ -302,14 +303,17 @@ func start_the_justice(attacker : Unit, defender : Unit, attackerAction: Diction
 			break
 			
 		if _validate_response(initiate, initiator, lastAct, deathMatch, actionType) and _reach_check(initiate, initiator):
+			actionType = _get_action_type(initiate, initiator, initiateAct)
 			combatResults.Rounds[r][1]  = _run_action(initiate, initiator, initiateAct, actionType, false).duplicate(true)
 			lastAct = combatResults.Rounds[r][1][initiate]
 			print(str(initiator) + ": " + ("Action" + str(1) + ": ") + str(combatResults.Rounds[r][1]))
 		else: continue
 			
 		if _validate_response(initiator, initiate, lastAct, false, actionType) and _speed_check(initiator, initiate) and initiatorAct.Weapon:
+			actionType = _get_action_type(initiator, initiate, initiatorAct)
 			combatResults.Rounds[r][2]  = _run_action(initiator, initiate, initiatorAct, actionType, true).duplicate(true)
 			print(str(initiator) + ": " + ("Action" + str(2) + ": ") + str(combatResults.Rounds[r][2]))
+			
 	return combatResults
 
 func _get_action_type(unit1:Unit, unit2:Unit, action: Dictionary) -> int:
@@ -374,7 +378,7 @@ func _speed_check(unit1, unit2) -> bool:
 	print("Failed")
 	return false
 
-func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, isInitiator:bool) -> Dictionary: ##Augment functionality and passiveProcs not implemented yet
+func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isInitiator:bool) -> Dictionary: ##Augment functionality and passiveProcs not implemented yet
 	var unitCd : Dictionary 
 	var targetCd : Dictionary = target.combatData
 	#var augment : Dictionary
@@ -417,7 +421,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, isInitia
 		swingIndx = ("Swing" + str(swing))
 		print(str(swingIndx))
 		outcome[unit] = {swingIndx:{"ActionType": actionType, "Hit" : false, "CompLoss": 0, "Dmg" : 0, "Crit" : 0, "SkillId" : action.Skill, "PassiveProc" : [], "Instant" : [], "Effects" : [], "Break" : false, "Slayer" : 0}}
-		outcome[target] = {swingIndx:{"Graze" : 0, "CompLoss": 0, "PassiveProc" : [], "Effects" : [], "Dead" : false,}}
+		outcome[target] = {swingIndx:{"Barrier" : 0, "CompLoss": 0, "PassiveProc" : [], "Effects" : [], "Dead" : false,}}
 		
 		if action.Skill and action.Weapon:
 			unitCd = unit.get_skill_combat_stats(action.Skill, true)
@@ -478,14 +482,14 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, isInitia
 				targetCompCost += _get_composure_total(target, outcome[unit][swingIndx].Effects)
 			return outcome
 			
-		#check for Graze
-		print("Rolling for Graze. Chance: ", str(targetCd.GrzPrc))
+		#check for Barrier
+		print("Rolling for Barrier. Chance: ", str(targetCd.GrzPrc))
 		if get_roll() <= targetCd.GrzPrc:
-			grzDef = targetCd.Graze
+			grzDef = targetCd.Barrier
 			
-			print("Grazed. Graze Reduction: ", grzDef)
+			print("Barrierd. Barrier Reduction: ", grzDef)
 		else:
-			print("Graze Failed")
+			print("Barrier Failed")
 		
 		#check for crit
 		
@@ -504,22 +508,24 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, isInitia
 			print("Target HP: ", str(target.activeStats.CurLife))
 			
 			var finalDmg := 0
+			unitCd.Dmg = clampi(unitCd.Dmg, 0, 9999)
 			if skillData and !skillData.CanDmg:
 				print("No Damage: ", unitCd.Dmg)
 			else:
 				print("Applying Damage")
-				var finalGraze = grzDef + (critDmg/2)
+				var finalBarrier = grzDef + roundi(critDmg/2)
 				if slayerMulti > 1:
 					outcome[unit][swingIndx].Slayer = slayerMulti
 				if critDmg and grzDef:
-					outcome[target][swingIndx].Graze = finalGraze
+					outcome[target][swingIndx].Barrier = finalBarrier
 					outcome[unit][swingIndx].Crit = critDmg
 				elif grzDef:
-					outcome[target][swingIndx].Graze = grzDef
+					outcome[target][swingIndx].Barrier = grzDef
 				elif critDmg:
 					outcome[unit][swingIndx].Crit = critDmg
 					
-				finalDmg = (((unitCd.Dmg + critDmg) - (def + finalGraze)) * slayerMulti)
+				finalDmg = (((unitCd.Dmg + critDmg) - (def + finalBarrier)) * slayerMulti)
+				finalDmg = clampi(finalDmg, 0, 9999)
 				outcome[unit][swingIndx].Dmg = finalDmg
 				target.apply_dmg(finalDmg, unit)
 				print("Dmg: ", finalDmg, " Target HP: ", str(target.activeStats.CurLife))
@@ -547,7 +553,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, isInitia
 		if action.Weapon:
 			unit.reduce_durability(weapon)
 			
-		if action.Weapon and weapon.DUR == 0:
+		if action.Weapon and weapon.Dur == 0:
 			outcome[unit][swingIndx].Break = true
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.BREAK)
 			print("Break Composure Loss added: ", unit.unitName, " ", unitCompCost)
@@ -674,10 +680,11 @@ func _run_effect(actor, target, effId, actionType, dmg = 0):
 	var actorCd = actor.combatData
 	var focus : Unit
 	#var proc : bool = false
-	var result = {"Target": false,"EffectId": effId, "Resisted": false, "Dmg": false, "Heal": false, "Comp": false, "Slayer": false}
+	var result = {"Actor":false,"Type":false, "Target": false,"EffectId": effId, "Resisted": false, "Dmg": false, "Heal": false, "Comp": false, "Slayer": false}
 	var effect = UnitData.effectData[effId]
 	var chance := 0 
 	var type = Enums.EFFECT_TYPE
+	
 	
 	match effect.Target:
 		Enums.EFFECT_TARGET.TARGET: 
@@ -687,16 +694,19 @@ func _run_effect(actor, target, effId, actionType, dmg = 0):
 			focus = actor
 			chance = effect.Proc + actorCd.EffHit
 	result.Target = focus
+	result.Actor = actor
+	result.Type = effect.Type
 	if actionType == ACTION_TYPE.FRIENDLY_SKILL:
 		chance = effect.Proc + actorCd.EffHit
 			
 	if _roll_proc(effect, chance):
 		match effect.Type:
 			#Need to go through and enable each effect one at a time
-			type.TIME: 
+			type.TIME:
 				emit_signal("time_factor_changed", " EffectId: ", effId)
 			type.BUFF:
 				focus.set_buff(effId, effect)
+				
 				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effId), " Buffed ", str(effect.SubType), " by +", effect.Value, " for ", effect.Duration, " rounds.")
 			type.DEBUFF: 
 				#"Debuffs" are resistable, possibly different general FXs, too. Remember this. need resist code.
@@ -718,14 +728,15 @@ func _run_effect(actor, target, effId, actionType, dmg = 0):
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				target.apply_heal(result.Heal)
 				target.apply_composure(result.Comp)
+				
 				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effId), " Healed For: ", result.Heal, " HP: ", target.activeStats.CurLife)
-			type.CURE: 
+			type.CURE:
 				target.cure_status(effect.SubType)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				target.apply_composure(result.Comp)
 				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effId), " Cured Status: ", str(effect.SubType))
 			type.RELOC:
-				start_relocation(actor, target, effect)
+				#start_relocation(actor, focus, effect)
 				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effId), "Relocation Requested")
 			type.LIFE_STEAL:
 				result.Heal = _factor_life_steal(focus, effect, dmg)
@@ -741,6 +752,7 @@ func _run_effect(actor, target, effId, actionType, dmg = 0):
 			type.SLAYER: 
 				result.Slayer = _validate_slayer(focus, effect)
 				result.Resisted = !result.Slayer
+		gameBoard.add_post_queue(result.duplicate())
 	else:
 			result.Resisted = true
 			print("Actor: ", actor.unitName, "Target: ", focus.unitName, " Resisted: " + str(effId))
@@ -841,7 +853,7 @@ func _factor_effect_composure(actor, target, effect, lifeStolen: int = 0) -> int
 				compLoss -= 1
 			else: compLoss += Global.compCosts.NegEff
 		Enums.EFFECT_TYPE.LIFE_STEAL:
-			compLoss += Global.compCosts.Healed + (lifeStolen / 4)
+			compLoss += Global.compCosts.Healed + roundi(lifeStolen / 4)
 		_:
 			compLoss += Global.compCosts.NegEff
 	compLoss = round((compLoss * actorBonus) * targetRes)
@@ -857,7 +869,7 @@ func _factor_combat_composure(actor, target, type, dmg := 0) -> int: ##Pass Skil
 		Enums.COMP_TRIGGERS.ATTACK:
 			compLoss += Global.compCosts.Attack
 		Enums.COMP_TRIGGERS.WAS_HIT:
-			compLoss += Global.compCosts.WasHit + (dmg / 4)
+			compLoss += Global.compCosts.WasHit + roundi(dmg / 4)
 		Enums.COMP_TRIGGERS.MISS:
 			compLoss += Global.compCosts.Miss
 		Enums.COMP_TRIGGERS.DODGE:
@@ -880,20 +892,21 @@ func _get_composure_total(unit, results):
 			compLoss += result.Comp
 	return compLoss
 	
-func use_item(unit, target, invItem):
+func use_item(unit, target, invItem) -> Array: #not exactly finished. Missing support for user feed back on all item types.
 	var itemData = UnitData.itemData
-	var actionType = ACTION_TYPE.FRIENDLY_SKILL
+	var actionType = _get_action_type(unit, target, {"Weapon": false, "Skill": false})
 	var item = itemData[invItem.ID]
 	var results = []
 	var compChange = 0
+	
 	for effId in item.Effects:
-		var effect = UnitData.effectData[effId]
-		results = results +  _run_effect(unit, target, effect, actionType)
+		
+		results.append(_run_effect(unit, target, effId, actionType))
 	compChange += _get_composure_total(unit, results)
 	print("Harvesting Effects Comp Loss.... ", unit.unitName, ": ", compChange)
 	unit.apply_composure(compChange)
-	unit.reduce_durability(item)
-
+	unit.reduce_durability(invItem)
+	return results
 
 func _validate_slayer(target, effect):
 	var rule = effect.Rule

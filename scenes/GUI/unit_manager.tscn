@@ -1,0 +1,54 @@
+[gd_scene load_steps=4 format=3 uid="uid://b2uys3ijcwes2"]
+
+[ext_resource type="Theme" uid="uid://vjf2mwcfssah" path="res://fonts/Izayoi_Theme_Trading.tres" id="1_2shno"]
+[ext_resource type="Script" path="res://scenes/GUI/unit_manager.gd" id="2_33cgi"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_eh42n"]
+
+[node name="UnitManager" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_2shno")
+script = ExtResource("2_33cgi")
+
+[node name="Blocker" type="Panel" parent="."]
+custom_minimum_size = Vector2(1920, 1080)
+layout_mode = 0
+offset_left = -1918.0
+offset_top = -566.0
+offset_right = 2.0
+offset_bottom = 514.0
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+offset_right = 111.0
+offset_bottom = 116.0
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="PanelContainer"]
+layout_mode = 2
+texture = ExtResource("2_eh42n")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+
+[node name="Trade" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Trade"
+
+[node name="Supply" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Supply"
+
+[node name="Manage" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Manage"

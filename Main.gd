@@ -14,6 +14,7 @@ enum GameState {
 	GB_SETUP,
 	GB_FORMATION,
 	GB_AI_TURN,
+	GB_END_OF_ROUND,
 	START,
 	ACCEPT_PROMPT,
 	FAIL_STATE,
@@ -33,6 +34,7 @@ var state:= GameState.LOADING: #when this variable is changed to a valid state t
 #			print("Invalid State")
 #			return
 var previousState
+var previousSlave
 var newState
 var shouldChangeState = false
 
@@ -59,6 +61,15 @@ func load_map(map):
 
 func _init(): #Occurs when game first launches, sets to loading state
 	set_new_state(GameState.LOADING)
+	
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		return
+	elif Input.is_action_just_pressed("ui_return"):
+		get_viewport().set_input_as_handled()
+		activeState._handle_bind("ui_return")
+		
 	
 func _unhandled_input(event: InputEvent) -> void: #Main picks up the inputs, then directs them to the currently active state for processing.
 	if event.is_action_pressed("ui_snap"):
@@ -130,40 +141,42 @@ func set_new_state(value): #Value = new State Tag. Call this function, or simply
 
 func _switch_state_get_slaves(value): 
 	var slaves = []
-	
+	var stateKeys = GameState.keys()
+	var key = stateKeys[value]
+	print("StateChange: ", key)
 	match value: #when creating a new state, you must add an entry to this match list
 		GameState.LOADING: 
-			slaves = [] #array of nodes that listen to the state, used to call their functions
+			slaves = newSlave #array of nodes that listen to the state, used to call their functions
 			activeState = LoadingState.new() #the actual state script, remember to change this when making a new one.
 		GameState.GB_DEFAULT:
-			slaves = [gameBoard]
+			slaves = newSlave
 			activeState = GBDefaultState.new()
 		GameState.GB_SELECTED:
-			slaves = [gameBoard]
+			slaves = newSlave
 			activeState = GBSelectedState.new()
 		GameState.GB_ACTION_MENU:
-			slaves = [gameBoard]
+			slaves = newSlave
 			activeState = GBActionMenuState.new()
 		GameState.GB_PROFILE:
-			slaves = [gameBoard]
+			slaves = newSlave
 			activeState = GBProfileState.new()
 		GameState.GB_ATTACK_TARGETING:
-			slaves = [gameBoard]
+			slaves = newSlave
 			activeState = GBAttackState.new()
 		GameState.GB_COMBAT_FORECAST:
-			slaves = [gameBoard]
+			slaves = newSlave
 			activeState = GBForeCastState.new()
 		GameState.GB_SKILL_TARGETING:
-			slaves = [gameBoard]
+			slaves = newSlave
 			activeState = GBSkillTargetState.new()
 		GameState.GB_SKILL_MENU:
-			slaves = [gameBoard]
+			slaves = newSlave
 			activeState = GBSkillMenuState.new()
 		GameState.GB_ROUND_END:
-			slaves = [gameBoard]
+			slaves = newSlave
 			activeState = GBRoundEndState.new()
 		GameState.GB_WARP:
-			slaves = [gameBoard]
+			slaves = newSlave
 			activeState = GBWarpSelectState.new()
 		GameState.GB_SETUP:
 			slaves = newSlave
@@ -189,17 +202,20 @@ func _switch_state_get_slaves(value):
 		GameState.SCENE_ACTIVE:
 			slaves = newSlave
 			activeState = AcceptState.new()
+		GameState.GB_END_OF_ROUND:
+			slaves = newSlave
+			activeState = LoadingState.new()
 	add_child(activeState)
 	return slaves
 
 func on_load_map_manager(map):
 	var manager = preload("res://scenes/map_manager.tscn").instantiate()
 	load_scene(manager)
-	set_map(map)
+	$mapManager.load_map(map)
 	
-func set_map(map):
-	gameBoard = $mapManager/Gameboard
-	gameBoard.change_map(map)
+#func set_map(map):
+	#gameBoard = $mapManager/Gameboard
+	#gameBoard.change_map(map)
 
 func unload_me(scene):
 	scene.queue_free()

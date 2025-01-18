@@ -1,0 +1,32 @@
+[gd_resource type="SpriteFrames" load_steps=5 format=3 uid="uid://bcvhldmqqyr8w"]
+
+[ext_resource type="Texture2D" uid="uid://dlubqmdgui4ys" path="res://sprites/status/sleepTestAsset.png" id="1_nakn8"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pfh4x"]
+atlas = ExtResource("1_nakn8")
+region = Rect2(0, 0, 47, 72)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6ohyc"]
+atlas = ExtResource("1_nakn8")
+region = Rect2(47, 0, 47, 72)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_45nkq"]
+atlas = ExtResource("1_nakn8")
+region = Rect2(94, 0, 47, 72)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 2.0,
+"texture": SubResource("AtlasTexture_pfh4x")
+}, {
+"duration": 2.0,
+"texture": SubResource("AtlasTexture_6ohyc")
+}, {
+"duration": 2.0,
+"texture": SubResource("AtlasTexture_45nkq")
+}],
+"loop": true,
+"name": &"Sleep",
+"speed": 5.0
+}]

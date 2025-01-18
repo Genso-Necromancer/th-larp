@@ -8,7 +8,9 @@ func setup(newSlaves):
 	slave = slaves[0]
 	
 func _handle_bind(bind):
+	
 	match bind:
 		"invalid": return
-		"ui_accept": emit_signal("prompt_accepted")
+		"ui_accept": signalTower.prompt_accepted.emit()
 		
+	

@@ -24,9 +24,9 @@ func update_unit_data(units):
 			solidDick[cell] = units[cell]
 	units = solidDick
 	for unit in units:
-		match units[unit].is_in_group("Player"):
-			true: player.append(units[unit])
-			false: enemy.append(units[unit])
+		match units[unit].FACTION_ID:
+			Enums.FACTION_ID.PLAYER: player.append(units[unit])
+			Enums.FACTION_ID.ENEMY: enemy.append(units[unit])
 	occupied = units.duplicate()
 #	print(player)
 #	print(enemy)

@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://cv74wrcjpasmr"]
+
+[ext_resource type="Script" path="res://Value_label.gd" id="1_xiqgs"]
+
+[node name="ValueLabel" type="Label"]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "--"
+horizontal_alignment = 1
+script = ExtResource("1_xiqgs")
+metadata/Key = ""
+metadata/Type = ""

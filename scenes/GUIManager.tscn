@@ -1,19 +1,16 @@
-[gd_scene load_steps=20 format=3 uid="uid://r6wtvva5qput"]
+[gd_scene load_steps=17 format=3 uid="uid://r6wtvva5qput"]
 
-[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_2n2uh"]
 [ext_resource type="Script" path="res://scenes/GUIManager.gd" id="1_d2r44"]
+[ext_resource type="Theme" uid="uid://bi2ve4mbgqqd0" path="res://fonts/Izayoi_Theme_setup.tres" id="1_puiy8"]
 [ext_resource type="PackedScene" uid="uid://cxjo0fdu14w3o" path="res://scenes/profile.tscn" id="3_14h0a"]
 [ext_resource type="PackedScene" uid="uid://2ggl8hw7vq8n" path="res://scenes/action_menu.tscn" id="4_o6laq"]
 [ext_resource type="PackedScene" uid="uid://ct2rsfnl7fi6u" path="res://scenes/combat_forecast.tscn" id="6_kojdq"]
 [ext_resource type="PackedScene" uid="uid://cv8yj4b660do" path="res://scenes/hud.tscn" id="6_odogd"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="7_llyu2"]
-[ext_resource type="Script" path="res://scenes/SetUpMain.gd" id="8_bwmqx"]
-[ext_resource type="Script" path="res://scenes/MngOptPnl.gd" id="9_k1i1t"]
+[ext_resource type="Script" path="res://scenes/DEBUG.gd" id="10_pjuly"]
 [ext_resource type="PackedScene" uid="uid://cmh8ono4w82cq" path="res://fonts/menu_cursor.tscn" id="10_qxe1h"]
-[ext_resource type="PackedScene" uid="uid://dsqet8mutarh6" path="res://scenes/trade_screen.tscn" id="11_qfsbm"]
 [ext_resource type="Script" path="res://scenes/FailScreen.gd" id="12_jkf6w"]
 [ext_resource type="Script" path="res://scenes/WinScreen.gd" id="13_jghgq"]
-[ext_resource type="Script" path="res://scenes/StateDebug.gd" id="14_xciqv"]
 [ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="15_5mgdm"]
 [ext_resource type="Script" path="res://scenes/expgain.gd" id="15_w87l3"]
 [ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="16_nw8x6"]
@@ -30,33 +27,9 @@ grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 1
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 script = ExtResource("1_d2r44")
 metadata/_edit_use_anchors_ = true
-
-[node name="PanelContainer" type="PanelContainer" parent="."]
-layout_mode = 0
-offset_right = 1280.0
-offset_bottom = 720.0
-mouse_filter = 1
-
-[node name="DEBUG" type="Control" parent="."]
-visible = false
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-mouse_filter = 1
-
-[node name="timeBox" type="VBoxContainer" parent="DEBUG"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="time" type="Label" parent="DEBUG/timeBox"]
-layout_mode = 2
-
-[node name="timeFactor" type="Label" parent="DEBUG/timeBox"]
-layout_mode = 2
 
 [node name="CombatForecast" parent="." instance=ExtResource("6_kojdq")]
 visible = false
@@ -67,13 +40,13 @@ anchor_bottom = 0.0930556
 offset_top = 24.0
 offset_bottom = 384.0
 
-[node name="Margin" parent="CombatForecast/GC/HBC/Labels" index="1"]
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_right = 8
-
 [node name="ActionMenu" parent="." instance=ExtResource("4_o6laq")]
 visible = false
 layout_mode = 1
+offset_left = 0.0
+offset_top = 60.0
+offset_right = 0.0
+offset_bottom = 60.0
 
 [node name="HUD" parent="." instance=ExtResource("6_odogd")]
 layout_mode = 1
@@ -97,171 +70,13 @@ offset_left = -201.0
 offset_top = -144.0
 offset_right = 201.0
 offset_bottom = 144.0
-grow_horizontal = 2
-grow_vertical = 2
 mouse_filter = 1
-
-[node name="SetUpMain" type="Control" parent="."]
-custom_minimum_size = Vector2(500, 500)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 1
-script = ExtResource("8_bwmqx")
-
-[node name="SetUpGrid" type="GridContainer" parent="SetUpMain"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -37.5
-offset_top = -25.0
-offset_right = 37.5
-offset_bottom = 25.0
-grow_horizontal = 2
-grow_vertical = 2
-theme_override_constants/h_separation = 0
-columns = 3
-
-[node name="SetUpPnl1" type="PanelContainer" parent="SetUpMain/SetUpGrid"]
-layout_mode = 2
-mouse_filter = 1
-
-[node name="BackgroundCenter" type="NinePatchRect" parent="SetUpMain/SetUpGrid/SetUpPnl1"]
-layout_mode = 2
-texture = ExtResource("7_llyu2")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="M" type="MarginContainer" parent="SetUpMain/SetUpGrid/SetUpPnl1"]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="VBSet" type="VBoxContainer" parent="SetUpMain/SetUpGrid/SetUpPnl1/M"]
-layout_mode = 2
-
-[node name="BTNDeploy" type="Button" parent="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet"]
-layout_mode = 2
-mouse_filter = 1
-text = "Deploy"
-
-[node name="FrmBtn" type="Button" parent="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet"]
-layout_mode = 2
-mouse_filter = 1
-text = "Formation"
-
-[node name="MngBtn" type="Button" parent="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet"]
-layout_mode = 2
-mouse_filter = 1
-text = "Manage"
-
-[node name="BeginBtn" type="Button" parent="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet"]
-layout_mode = 2
-mouse_filter = 1
-text = "Begin"
-
-[node name="GRDRost" type="GridContainer" parent="SetUpMain/SetUpGrid/SetUpPnl1/M"]
-visible = false
-layout_mode = 2
-columns = 3
-
-[node name="SetUpPnl2" type="PanelContainer" parent="SetUpMain/SetUpGrid"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 0
-mouse_filter = 1
-
-[node name="BackgroundCenter" type="NinePatchRect" parent="SetUpMain/SetUpGrid/SetUpPnl2"]
-layout_mode = 2
-texture = ExtResource("7_llyu2")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="M" type="MarginContainer" parent="SetUpMain/SetUpGrid/SetUpPnl2"]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="DLmtLbl" type="Label" parent="SetUpMain/SetUpGrid/SetUpPnl2/M"]
-layout_mode = 2
-
-[node name="MngOptPnl" type="PanelContainer" parent="SetUpMain"]
-visible = false
-layout_mode = 2
-offset_left = 835.0
-offset_top = 547.0
-offset_right = 890.0
-offset_bottom = 610.0
-size_flags_horizontal = 8
-size_flags_vertical = 8
-mouse_filter = 1
-script = ExtResource("9_k1i1t")
-
-[node name="BackgroundCenter" type="NinePatchRect" parent="SetUpMain/MngOptPnl"]
-layout_mode = 2
-texture = ExtResource("7_llyu2")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="M" type="MarginContainer" parent="SetUpMain/MngOptPnl"]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="VBMng" type="VBoxContainer" parent="SetUpMain/MngOptPnl/M"]
-layout_mode = 2
-alignment = 1
-
-[node name="tradeLb" type="Button" parent="SetUpMain/MngOptPnl/M/VBMng"]
-layout_mode = 2
-mouse_filter = 1
-theme = ExtResource("1_2n2uh")
-text = "Trade"
-
-[node name="supplyLb" type="Button" parent="SetUpMain/MngOptPnl/M/VBMng"]
-layout_mode = 2
-mouse_filter = 1
-text = "Supply"
-
-[node name="equipLb" type="Button" parent="SetUpMain/MngOptPnl/M/VBMng"]
-visible = false
-layout_mode = 2
-mouse_filter = 1
-text = "Equip"
-
-[node name="useLb" type="Button" parent="SetUpMain/MngOptPnl/M/VBMng"]
-layout_mode = 2
-mouse_filter = 1
-text = "Manage"
 
 [node name="menu_cursor" parent="." instance=ExtResource("10_qxe1h")]
 visible = false
 layout_mode = 0
 scale = Vector2(2, 2)
 cursor_offset = Vector2(25, 0)
-
-[node name="trade_screen" parent="." instance=ExtResource("11_qfsbm")]
-visible = false
-layout_mode = 1
 
 [node name="FailScreen" type="Control" parent="."]
 visible = false
@@ -335,13 +150,27 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "winrar"
 
-[node name="StateDebug" type="Label" parent="."]
+[node name="DEBUG" type="Control" parent="."]
+top_level = true
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+mouse_filter = 1
+script = ExtResource("10_pjuly")
+
+[node name="PanelContainer" type="PanelContainer" parent="DEBUG"]
 layout_mode = 0
-offset_left = 88.0
-offset_top = 48.0
 offset_right = 128.0
-offset_bottom = 60.25
-script = ExtResource("14_xciqv")
+offset_bottom = 128.0
+
+[node name="focus" type="Label" parent="DEBUG/PanelContainer"]
+layout_mode = 2
+text = "FOCUS"
+
+[node name="StateDebug" type="Label" parent="DEBUG/PanelContainer"]
+top_level = true
+layout_mode = 2
+text = "STATE"
 
 [node name="ExpGain" type="HBoxContainer" parent="."]
 visible = false
@@ -424,19 +253,19 @@ theme_override_constants/separation = 4
 [node name="UnitLevelTag" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Header"]
 layout_mode = 2
 size_flags_horizontal = 4
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "Level:"
 
 [node name="UnitLevel" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Header"]
 custom_minimum_size = Vector2(10, 0)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "0"
 
 [node name="Increase" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Header"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
 [node name="UnitName" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Header"]
@@ -451,42 +280,42 @@ theme_override_constants/separation = 4
 layout_mode = 2
 size_flags_horizontal = 4
 focus_neighbor_bottom = NodePath("../../Stats/UnitStrTag")
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "Health:"
 
 [node name="UnitHp" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 size_flags_horizontal = 4
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "60"
 horizontal_alignment = 2
 
 [node name="IncreaseHP" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
 [node name="UnitCmpTag" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
 layout_mode = 2
 size_flags_horizontal = 4
 focus_neighbor_bottom = NodePath("../../Stats/UnitStrTag")
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "Composure:"
 
 [node name="UnitCmp" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 size_flags_horizontal = 4
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "60"
 horizontal_alignment = 2
 
 [node name="IncreaseCmp" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/HPCmpBox"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 theme_override_colors/font_color = Color(0.788235, 0.682353, 0.0627451, 1)
 
 [node name="HSeparator" type="HSeparator" parent="ExpGain/PanelContainer/LvUpMargin/Vbox"]
@@ -502,112 +331,112 @@ columns = 9
 layout_mode = 2
 size_flags_horizontal = 0
 focus_neighbor_bottom = NodePath("../UnitMagTag")
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "Power:"
 
 [node name="UnitStr" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 size_flags_horizontal = 0
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "0"
 
 [node name="Increase" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
 size_flags_horizontal = 0
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
 [node name="UnitMagTag" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 layout_mode = 2
 size_flags_horizontal = 0
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "Magic:"
 
 [node name="UnitMag" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
 size_flags_horizontal = 0
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "0"
 
 [node name="Increase2" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
 [node name="UnitElegTag2" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 layout_mode = 2
 size_flags_horizontal = 0
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "Elegance:"
 
 [node name="UnitEle" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "0"
 
 [node name="Increase3" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
 [node name="UnitCeleTag3" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 layout_mode = 2
 size_flags_horizontal = 4
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "Celerity:"
 
 [node name="UnitCele" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "0"
 
 [node name="Increase4" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
 [node name="UnitBarTag4" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 layout_mode = 2
 size_flags_horizontal = 4
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "Barrier:"
 
 [node name="UnitBar" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "0"
 
 [node name="Increase5" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
 [node name="UnitChaTag5" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 layout_mode = 2
 size_flags_horizontal = 4
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "Charisma:"
 
 [node name="UnitCha" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 text = "0"
 
 [node name="Increase6" type="Label" parent="ExpGain/PanelContainer/LvUpMargin/Vbox/Stats"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
-theme = ExtResource("1_2n2uh")
+theme = ExtResource("1_puiy8")
 theme_override_colors/font_color = Color(1, 0.894118, 0.301961, 1)
 
 [node name="ExpMargin" type="MarginContainer" parent="ExpGain/PanelContainer"]
@@ -643,14 +472,6 @@ texture_progress = ExtResource("18_18bf3")
 [connection signal="action_selected" from="ActionMenu" to="." method="_on_action_menu_action_selected"]
 [connection signal="menu_closed" from="ActionMenu" to="." method="_on_action_menu_menu_closed"]
 [connection signal="menu_opened" from="ActionMenu" to="." method="_on_action_menu_menu_opened"]
-[connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/BTNDeploy" to="." method="_on_btn_deploy_pressed"]
-[connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/FrmBtn" to="." method="_on_frm_btn_pressed"]
-[connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/MngBtn" to="." method="_on_mng_btn_pressed"]
-[connection signal="pressed" from="SetUpMain/SetUpGrid/SetUpPnl1/M/VBSet/BeginBtn" to="." method="_on_begin_btn_pressed"]
-[connection signal="pressed" from="SetUpMain/MngOptPnl/M/VBMng/tradeLb" to="." method="_on_trade_lb_pressed"]
-[connection signal="pressed" from="SetUpMain/MngOptPnl/M/VBMng/supplyLb" to="." method="_on_supply_lb_pressed"]
-[connection signal="pressed" from="SetUpMain/MngOptPnl/M/VBMng/equipLb" to="." method="_on_equip_lb_pressed"]
-[connection signal="pressed" from="SetUpMain/MngOptPnl/M/VBMng/useLb" to="." method="_on_use_lb_pressed"]
 
 [editable path="CombatForecast"]
 [editable path="ActionMenu"]

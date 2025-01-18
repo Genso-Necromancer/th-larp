@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://ok7buwks7pfy"]
+
+[ext_resource type="Theme" uid="uid://vjf2mwcfssah" path="res://fonts/Izayoi_Theme_Trading.tres" id="1_erkkn"]
+
+[node name="EffectLabel" type="RichTextLabel"]
+offset_right = 140.0
+offset_bottom = 40.0
+theme = ExtResource("1_erkkn")
+bbcode_enabled = true
+text = "Effect"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false

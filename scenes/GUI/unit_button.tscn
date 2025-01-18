@@ -1,0 +1,92 @@
+[gd_scene load_steps=5 format=3 uid="uid://bwdal2jmyoy6f"]
+
+[ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="1_ausw1"]
+[ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="2_pdeuu"]
+[ext_resource type="Script" path="res://scenes/GUI/unit_button.gd" id="2_sdugk"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_ic7y6"]
+
+[node name="UnitButton" type="PanelContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+theme = ExtResource("1_ausw1")
+script = ExtResource("2_sdugk")
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="."]
+layout_mode = 2
+texture = ExtResource("3_ic7y6")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="MarginContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(115, 112)
+layout_mode = 2
+texture = ExtResource("2_pdeuu")
+
+[node name="HBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_vertical = 4
+
+[node name="Name" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+text = "Unknown"
+vertical_alignment = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+
+[node name="Lv" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_font_sizes/font_size = 12
+text = "Lv.00"
+vertical_alignment = 2
+
+[node name="Role" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+text = "Unemployed"
+vertical_alignment = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+
+[node name="CompLbl" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Comp."
+
+[node name="CompCurrent" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+text = "00"
+vertical_alignment = 2
+
+[node name="Split" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+text = "/"
+vertical_alignment = 2
+
+[node name="CompCap" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+text = "00"
+vertical_alignment = 2
+
+[node name="TextureButton" type="TextureButton" parent="MarginContainer"]
+custom_minimum_size = Vector2(115, 112)
+layout_mode = 2

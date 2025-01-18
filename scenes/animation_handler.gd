@@ -1,4 +1,3 @@
-@tool
 extends Node
 
 signal sequence_complete
@@ -10,6 +9,7 @@ const ACTION_TYPE = Enums.ACTION_TYPE
 var animations = {}
 var targets = {}
 var activeAnims = {}
+var isInitiated = false
 var sequenceSteps = []
 
 func _ready():
@@ -48,7 +48,7 @@ func _on_gameboard_sequence_initiated(sequence):
 	var initiator = sequence.Rounds[0][0].keys()[0]
 	var initiate = sequence.Rounds[0][0].keys()[1]
 	var isSkipped = false
-	
+	isInitiated = true
 	for cycle in sequence.Rounds:
 		for action in sequence.Rounds[cycle]:
 			
@@ -57,11 +57,13 @@ func _on_gameboard_sequence_initiated(sequence):
 				var effectStep = false
 				var script = sequence.Rounds[cycle][action]
 				var isCrit = script[initiator][swing].Crit
-				var isGraze = script[initiate][swing].Graze
+				var isBarrier = script[initiate][swing].Barrier
 				#var isSlayer = script[initiator][swing].Slayer
 				for anim in animations:
-					animations[anim].animation_start.connect(self._on_animation_start.bind(anim))
-					animations[anim].animation_end.connect(self._on_animation_end.bind(anim))
+					if !animations[anim].animation_start.is_connected(self._on_animation_start.bind(anim)):
+						animations[anim].animation_start.connect(self._on_animation_start.bind(anim))
+					if !animations[anim].animation_end.is_connected(self._on_animation_end.bind(anim)):
+						animations[anim].animation_end.connect(self._on_animation_end.bind(anim))
 				
 				animations[initiate].set_if_death(script[initiate][swing].Dead)
 				
@@ -85,10 +87,10 @@ func _on_gameboard_sequence_initiated(sequence):
 					
 				
 				if script[initiator][swing].ActionType != ACTION_TYPE.FRIENDLY_SKILL:
-					animations[initiate].assign_defend(script[initiator][swing].Hit, script[initiator][swing].Dmg, isCrit, isGraze)
+					animations[initiate].assign_defend(script[initiator][swing].Hit, script[initiator][swing].Dmg, isCrit, isBarrier)
 					#print("Initiate: Defend animation called")
 				
-				animations[initiator].assign_action(script[initiator][swing].ActionType, script[initiator][swing].SkillId)
+				animations[initiator].assign_action(script[initiator][swing].Hit, script[initiator][swing].ActionType, script[initiator][swing].SkillId)
 				#print("Initiator: action passed, ", script[initiator][swing].ActionType)
 				
 				if script[initiator][swing].SkillId:
@@ -127,6 +129,7 @@ func _on_gameboard_sequence_initiated(sequence):
 		if isSkipped: break
 	
 	_clear_sequence()
+	emit_signal("sequence_complete")
 
 func _on_animation_start(player):
 	activeAnims[player] = true
@@ -137,6 +140,7 @@ func _on_animation_end(player):
 	for anim in activeAnims:
 		if activeAnims[anim]:
 			return
+	activeAnims.clear()
 	_progress_sequence()
 
 #func _check_if_continue():
@@ -148,15 +152,18 @@ func _on_animation_end(player):
 	
 func _progress_sequence():
 	var nextStep 
+	
 	if sequenceSteps.size() == 0: nextStep = "Complete"
 	else: nextStep = sequenceSteps.pop_front()
 	
 	for anim in animations:
 		match nextStep:
-			"Passives": animations[anim].play_passive_que()
-			"Actions": animations[anim].play_animation()
-			"Complete": emit_signal("animations_complete", false)
-			"Effects": animations[anim].play_effects_que()
+			"Passives": animations[anim].call_deferred("play_passive_que")
+			"Actions": animations[anim].call_deferred("play_animation")
+			"Complete": 
+				emit_signal("animations_complete", false)
+				break
+			"Effects": animations[anim].call_deferred("play_effects_que")
 
 func _on_pop_up_requested(unit):
 	var target = targets[unit]
@@ -167,15 +174,17 @@ func _on_target_fx_requested(unit):
 	animations[target].play_target_fx()
 
 func _clear_sequence():
-	
+	isInitiated = false
 	for anim in animations:
 		animations[anim].stop_all()
 		animations[anim].queue_free()
 	sequenceSteps.clear()
 	animations.clear()
+	activeAnims.clear()
 	print("Sequence cleared")
-	emit_signal("sequence_complete")
 
 
 func _scene_skipped():
-	emit_signal("animations_complete", true)
+	if isInitiated: 
+		activeAnims.clear()
+		emit_signal("animations_complete", true)

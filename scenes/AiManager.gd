@@ -51,13 +51,15 @@ func find_moves(state: BoardState):
 	var validMoves = []
 	
 	for unit in state.enemy:
+		var hasActed = unit.status.Acted
+		if hasActed:
+			continue
 		var unitCell = unit.cell
-		
 		var moves = get_valid_moves(unit, unit.cell, unit.unitData.Stats.Move, state)
 		if moves == null or moves.size() == 0:
 			continue
 		else:
-			validMoves.append({"Unit": unit, "Best Move": moves})
+			validMoves.append({"Unit": unit, "BestMove": moves})
 	var bestAction = find_best_action(validMoves)
 #	print(validMoves)
 #	print("Best?? ", validMoves)
@@ -69,14 +71,14 @@ func find_best_action(moves):
 	var bestMove = null
 	for move in moves:
 #		print(move)
-		if move["Best Move"]["value"] > bestValue:
-			bestValue = move["Best Move"]["value"]
+		if move["BestMove"]["Value"] > bestValue:
+			bestValue = move["BestMove"]["Value"]
 			bestMove = move
 	return bestMove
 	
-func get_valid_moves(unit, cell, move, state):
+func get_valid_moves(unit, cell, move, state): #Doesn't realize when a move is technically out of reach HERE
 	#This just runs the functions which actually compares all the possible moves before sending it up the pipeline
-	var path = aHex.find_all_paths(cell, move, unit.moveType, true)
+	var path = aHex.find_all_paths(cell, move, unit.unitData.MoveType, true)
 	var threat
 	var bestAttack = null
 	var bestMove = null
@@ -89,8 +91,13 @@ func get_valid_moves(unit, cell, move, state):
 	if validMoves != null:
 		bestMove = find_best_move(validMoves, unit, state, bestAttack)
 	waitValue = find_wait_value(unit, bestAttack, bestMove)
+	
+	#debug code DELETE HERE
+	if unit.unitId == "Cirno" : 
+		waitValue.Value = 190.0
+	
 #	print(unit, "'s ","Best Attack: ", bestAttack)
-#	print(unit, "'s ","Best Move: ", bestMove)
+#	print(unit, "'s ","BestMove: ", bestMove)
 #	print(unit, "'s ","Wait Value: ", waitValue)
 	var bestAction = find_best_of_set(bestAttack, bestMove, waitValue)
 #	print(unit, "'s ","Best Action: ", bestAction)
@@ -100,10 +107,9 @@ func get_valid_moves(unit, cell, move, state):
 			
 func find_best_of_set(attack, move, wait):
 	var bestMove = null
-	if attack != null and attack["value"] >= move["value"]:
-		if attack["value"] >= wait["value"]:
-			bestMove = attack
-	elif move!= null and move["value"] > wait["value"]:
+	if attack != null and attack["Value"] >= move["Value"] and attack["Value"] >= wait["Value"]:
+		bestMove = attack
+	elif move!= null and move["Value"] > wait["Value"]:
 		bestMove = move
 	else:
 		bestMove = wait
@@ -122,18 +128,18 @@ func find_wait_value(unit, bestAttack, bestMove):
 			tradeUp = true
 	if !tradeUp:
 		value += waitWeight
-	var waitAction = {"Action": "Wait", "value": value}
+	var waitAction = {"Action": "Wait", "Value": value}
 	return waitAction
 
 func find_best_move(validMoves, unit, state, bestAttack):
 	var movePairs = []
-	var curLife = unit.unitData.CurLife
+	var curLife = unit.activeStats.CurLife
 	var maxLife = unit.unitData.Stats.Life
 	var lifePrc:float = (maxLife - ((maxLife-curLife) / maxLife)) / 10
 #	var value:float = 0
 	for cell in validMoves:
 		if !state.occupied.has(cell):
-			movePairs.append({"Action": "Move","tile":Vector2i(cell), "value": terrainValues[Vector2i(cell)]})
+			movePairs.append({"Action": "Move","tile":Vector2i(cell), "Value": terrainValues[Vector2i(cell)]})
 	var bestValue:float = -INF
 	var bestMove
 #	var dmgTaken = 0
@@ -141,11 +147,11 @@ func find_best_move(validMoves, unit, state, bestAttack):
 #	var survRatio = 0
 	for pair in movePairs:
 #		print(pair)
-		if pair["value"] > terrainValues[Vector2i(unit.cell)]:
+		if pair["Value"] > terrainValues[Vector2i(unit.cell)]:
 			if lifePrc < survThresh:
-				pair["value"] = pair["value"] * ((((maxLife-curLife) / maxLife) + 1) * survWeight)
-		if pair["value"] > bestValue:
-			bestValue = pair["value"]
+				pair["Value"] = pair["Value"] * ((((maxLife-curLife) / maxLife) + 1) * survWeight)
+		if pair["Value"] > bestValue:
+			bestValue = pair["Value"]
 			bestMove = pair.duplicate()
 #	print("best: ", bestMove)
 	return bestMove
@@ -154,8 +160,8 @@ func find_best_attack(attacks):
 	var bestValue:float = -INF
 	var bestAttack = null
 	for attack in attacks:
-		if attack["value"] > bestValue:
-			bestValue = attack["value"]
+		if attack["Value"] > bestValue:
+			bestValue = attack["Value"]
 			bestAttack = attack.duplicate()
 	return bestAttack
 	
@@ -169,15 +175,15 @@ func find_valid_attacks(aiUnit, path, state):
 	for wep in aiInv:
 		var wepID = wep["ID"]
 		var ranges = [wepData[wepID].MinRange, wepData[wepID].MaxRange]
-		var threat = aHex.find_threat(path, ranges, aiUnit.moveType)
+		var threat = aHex.find_threat(path, ranges, aiUnit.unitData.MoveType)
 		for unit in state.player:
 			match wepData[wepID].Type:
-				"Physical":
+				Enums.DAMAGE_TYPE.PHYS:
 					targetDef = "Bar"
 					if (aiUnit.combatData.Dmg - unit.unitData.Stats.Bar <= 0):
 						continue
-				"Magic":
-					targetDef = "RES"
+				Enums.DAMAGE_TYPE.MAG:
+					targetDef = "Mag"
 					if (aiUnit.combatData.Dmg - unit.unitData.Stats.Mag <= 0):
 						continue
 			
@@ -190,20 +196,20 @@ func find_valid_attacks(aiUnit, path, state):
 					var attack = {}
 					if path.has(cell) and cell != unit.cell and !state.occupied.has(cell):
 						var safe = check_safe(aiUnit, unit, cell)
-						attack = {"Action": "Attack", "target" : unit, "launch" : Vector2i(cell), "safe": safe, "weapon": wep}
+						attack = {"Action": "Attack", "Target" : unit, "Launch" : Vector2i(cell), "Safe": safe, "Weapon": wep, "Skill": false}
 						var value = get_attack_value(aiUnit, attack, targetDef)
-#						print(attack, " ", value)
-						validAttacks.append({"Action": "Attack", "weapon": wep, "target" : unit, "launch" : Vector2i(cell), "value": value})
+						attack["Value"] = value
+						validAttacks.append(attack)
 	return validAttacks
 	
 func get_attack_value(aiUnit, attack, targetDef):
 	var value: float = 0
-#	print("StarT: ", value, " + ", playerValues[attack.target])
-	value += playerValues[attack.target]
+#	print("StarT: ", value, " + ", playerValues[attack.Target])
+	value += playerValues[attack.Target]
 #	print(value)
-#	print(" + ", terrainValues[attack.launch])
-	value += (terrainValues[attack.launch])
-	value -= (aHex.compute_cost(aiUnit.cell, attack.launch, aiUnit.moveType) / 100) 
+#	print(" + ", terrainValues[attack.Launch])
+	value += (terrainValues[attack.Launch])
+	value -= (aHex.compute_cost(aiUnit.cell, attack.Launch, aiUnit.unitData.MoveType) / 100) 
 #	print(value)
 #	print(" + ", enemyValues[aiUnit])
 #	value += enemyValues[aiUnit]
@@ -211,7 +217,7 @@ func get_attack_value(aiUnit, attack, targetDef):
 #	print(" + ", combat_values(aiUnit, attack, targetDef))
 	value += combat_values(aiUnit, attack, targetDef)
 #	print(value)
-	if attack.safe:
+	if attack.Safe:
 		value = value * safeBonus
 	return value
 	
@@ -221,9 +227,9 @@ func combat_values(aiUnit, attack, targetDef):
 
 	
 	var value: float
-	var target = attack.target
+	var target = attack.Target
 	var dmgDealt = aiUnit.combatData.Dmg - target.unitData.Stats[targetDef]
-	var remHP = attack.target.unitData.CurLife - dmgDealt
+	var remHP = attack.Target.activeStats.CurLife - dmgDealt
 	remHP = clampf(remHP, 0, 1000)
 	var dmgTaken = 0
 	if remHP == 0:
@@ -260,13 +266,13 @@ func combat_values(aiUnit, attack, targetDef):
 		"Magic":
 			dmgTaken = target.combatData.Dmg - aiUnit.unitData.Stats.Mag
 			
-	if aiUnit.unitData.CurLife - dmgTaken <= 0 and target.unitData.CurLife - dmgDealt > 0:
+	if aiUnit.activeStats.CurLife - dmgTaken <= 0 and target.activeStats.CurLife - dmgDealt > 0:
 		value = value * survWeight
 	return value
 	
 func check_safe(aiUnit, target, launch):
 	var wepData = UnitData.itemData
-	var distance = aHex.compute_cost(launch, target.cell, false, aiUnit.moveType,)
+	var distance = aHex.compute_cost(launch, target.cell, false, aiUnit.unitData.MoveType,)
 	var equip = target.get_equipped_weapon()
 	var wepID = equip["ID"]
 	var targetReach
@@ -318,12 +324,12 @@ func assign_unit_value(team):
 
 				oldValue += floorf(avgLv - unit.unitData.Profile.Level)
 #				
-				match unit.unitData.Profile.Class:
+				match unit.unitData.Profile.Role:
 					"Lady": oldValue += 10000
 				value = ((oldValue-(avgLv - 20))*newRange/oldRange) + 0
 				value = value * uWeight
 				if unit.is_in_group("Player"):
-					var lifeValue: float = ((unit.activeStats.Life - unit.unitData.CurLife) / unit.unitData.Stats.Life)
+					var lifeValue: float = ((unit.activeStats.Life - unit.activeStats.CurLife) / unit.unitData.Stats.Life)
 					lifeValue = lifeValue * ulWeight
 					value += lifeValue
 				if unit.is_in_group("Enemy"):

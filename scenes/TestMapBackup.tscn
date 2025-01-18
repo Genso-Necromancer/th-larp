@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://b2oy3uuua55oy" path="res://sprites/testGrass.png" id="1_bm6t5"]
 [ext_resource type="Texture2D" uid="uid://l2mr4yng7kji" path="res://backgrounds/FE1Map.png" id="2_mm0ai"]
-[ext_resource type="Script" path="res://scenes/BaseGameMap.gd" id="3_gafps"]
+[ext_resource type="Script" path="res://scenes/maps/BaseGameMap.gd" id="3_gafps"]
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/Unit.tscn" id="4_dmr5y"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5wf65"]

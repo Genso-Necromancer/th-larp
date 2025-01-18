@@ -294,7 +294,31 @@ func axial_substract(a, b):
 func axial_distance(a, b):
 	var vec = axial_substract(a, b)
 	return (abs(vec.x) + abs(vec.x + vec.y) + abs(vec.y)) / 2
-	
+
+func _get_offsets(x) -> Array:
+	# Calculate the offsets based on odd-q hexagon grid rules
+	var offsets := []
+	if fposmod(x, 2) == 0:
+		offsets = [
+			Vector2i(1, -1), 
+			Vector2i(1, 0), 
+			Vector2i(0, 1), 
+			Vector2i(-1, 0), 
+			Vector2i(-1, -1), 
+			Vector2i(0, -1)  
+		]
+	else:
+		# odd row
+		offsets = [
+			Vector2i(1, 0),  
+			Vector2i(1, 1),
+			Vector2i(0, 1), 
+			Vector2i(-1, 1), 
+			Vector2i(-1, 0),  
+			Vector2i(0, -1)   
+		]
+	return offsets
+
 # Override the get_neighbor_nodes method
 func get_neighbor_nodes(hex: Dictionary, attack: bool = false) -> Array:
 #	print("??")
@@ -302,31 +326,8 @@ func get_neighbor_nodes(hex: Dictionary, attack: bool = false) -> Array:
 	var q = hex.node.x
 	var _r = hex.node.y
 	
-	# Calculate the offsets based on odd-q hexagon grid rules
-	var offsets = []
-#	print(q)
-	if fposmod(q, 2) == 0:
-		
-#		print("Even")
-		offsets = [
-			Vector2i(1, -1),  # Top-Right
-			Vector2i(1, 0), # Bottom-Right
-			Vector2i(0, 1), # Bottom
-			Vector2i(-1, 0), # bottom-Left
-			Vector2i(-1, -1), # Top-Left
-			Vector2i(0, -1)   # Top
-		]
-	else:
-#		print("Odd")
-	# even row
-		offsets = [
-			Vector2i(1, 0),  # Top-Right
-			Vector2i(1, 1), # Bottom-Right
-			Vector2i(0, 1), # Bottom
-			Vector2i(-1, 1), # bottom-Left
-			Vector2i(-1, 0),  # Top-Left
-			Vector2i(0, -1)   # Top
-		]
+	
+	var offsets = _get_offsets(q)
 	
 	# Get the neighboring nodes based on the offsets
 	for offsetH in offsets:
@@ -354,29 +355,7 @@ func get_BFS_nhbr(hex: Vector2i, ignoreSolid: bool = false, justNhbrs = false) -
 	var _r = hex.y
 	
 	# Calculate the offsets based on odd-q hexagon grid rules
-	var offsets = []
-#	print(q)
-	if fposmod(q, 2) == 0:
-		
-#		print("Even")
-		offsets = [
-			Vector2i(1, -1),  # Top-Right
-			Vector2i(1, 0), # Bottom-Right
-			Vector2i(0, 1),# Bottom
-			Vector2i(-1, 0), # bottom-Left
-			Vector2i(-1, -1), # Top-Left
-			Vector2i(0, -1)   # Top
-		]
-	else:
-#		print("Odd")
-		offsets = [			
-			Vector2i(1, 0),  # Top-Right
-			Vector2i(1, 1), # Bottom-Right
-			Vector2i(0, 1), # Bottom
-			Vector2i(-1, 1), # bottom-Left
-			Vector2i(-1, 0),  # Top-Left
-			Vector2i(0, -1)   # Top
-		]
+	var offsets = _get_offsets(q)
 		
 		
 	if justNhbrs:
@@ -391,7 +370,7 @@ func get_BFS_nhbr(hex: Vector2i, ignoreSolid: bool = false, justNhbrs = false) -
 			neighbor += offsetH
 			
 		# Check if the neighbor is valid
-			if check_valid_nhbr(neighbor, false, ignoreSolid):
+			if check_valid_nhbr(neighbor, ignoreSolid,):
 				neighbors.append(neighbor)
 				
 		return neighbors
@@ -419,14 +398,14 @@ func resolve_shove(matchHex, targetHex, neighbors, distance): #for Shove, give t
 			shoveTo = neighbors[i]
 			break
 		i += 1
-	if check_valid_nhbr(shoveTo, true, false):
+	if check_valid_nhbr(shoveTo, false, true,):
 		isSlam = true
 		shoveStopper = shoveTo
 		shoveTo = targetHex
 	distance -= 1
 	while distance > 0 and !isSlam:
 		neighbors = get_BFS_nhbr(shoveTo, false, true)
-		if check_valid_nhbr(neighbors[i], true, false):
+		if check_valid_nhbr(neighbors[i], false, true,):
 			isSlam = true
 			shoveStopper = neighbors[i]
 		else:
@@ -461,7 +440,7 @@ func resolve_shove(matchHex, targetHex, neighbors, distance): #for Shove, give t
 #	var tossResult = {"Hex": tossTo, "Slam": isSlam, "UniColl": unitCollide}
 #	return tossResult
 
-func check_valid_nhbr(hex, checkSlam = false, ignoreSolid = true):
+func check_valid_nhbr(hex, ignoreSolid = true, checkSlam = false,):
 		# Check if the hex is valid
 		if checkSlam:
 			if is_valid_position(hex) and !is_solid_check(hex):
@@ -478,7 +457,7 @@ func check_valid_nhbr(hex, checkSlam = false, ignoreSolid = true):
 	
 func is_valid_position(neighbor): 
 	var valid
-	if neighbor.x > mapSize.x or neighbor.y > mapSize.y:
+	if neighbor.x >= mapSize.x or neighbor.y >= mapSize.y:
 		valid = false
 	elif neighbor.x < 0 or neighbor.y < 0:
 		valid = false
@@ -509,7 +488,7 @@ func find_range(current):
 	var unitRange = [minRange, maxRange]
 	return unitRange
 	
-func find_threat(walkable, unitRange, moveType = "Flat"):
+func find_threat(walkable, unitRange, moveType = Enums.MOVE_TYPE.FOOT):
 	var attackSpaces = []
 	var i = 1
 	var threatRange = []
@@ -537,7 +516,7 @@ func find_threat(walkable, unitRange, moveType = "Flat"):
 	
 	for tile in threatRange:
 		for cell in walkable:
-			var tileRange = compute_cost(cell, tile, moveType, false)
+			var tileRange = compute_cost(cell, tile, false, moveType,)
 			if tileRange >= minRange and !filteredThreatRange.has(tile):
 				filteredThreatRange.append(tile)
 	return filteredThreatRange
@@ -556,15 +535,94 @@ func find_distance(start, target, moveType: int = Enums.MOVE_TYPE.FOOT, attack:b
 	var path = find_path(start, target, moveType, attack)
 	path.pop_back()
 	return path.size()
+	
+#bullet.cell, bullet.move, bullet.facing, bullet.moveStyle
+#start:Vector2i,move:int,facing:int,moveStyle:String
+func get_danmaku_path(bullet) -> Array:
+	var path : Array
+	
+	var moveStyle = bullet.moveStyle
+	
+	match moveStyle:
+		"Line": path = _line(bullet)
+		
+	return path
+	
+	
+func _line(bullet) -> Array:
+	var path := []
+	var lastCell = bullet.cell
+	var move = bullet.move
+	var facing = bullet.facing
+	
+	for step in move:
+		var offSets = _get_offsets(lastCell.x)
+		var next = lastCell + offSets[facing]
+		if check_valid_nhbr(next, bullet.isPhasing,):
+			path.append(next)
+			lastCell = next
+		else: 
+			path.append(Vector2i(-1,-1))
+			break
+	print("Danmaku Path[",path,"]")
+	return path
+	
+func _weave(cell) -> Array:
+	var path := []
+	var point = cell
+	var endX = _find_closest_edge_x(cell)
+	
+	
+	if endX == 0:
+		endX = mapSize.x
+		while point.x < endX:
+			path.append(point)
+			point.x += 1
+			
+	else:
+		while point.x >= endX:
+			path.append(point)
+			point.x -= 1
+	print("Danmaku Path:",path)
+	return path
+	
+	
+func _find_closest_edge_x(cell):
+	var edge
+	if cell.x > (mapSize.x/2):
+		edge = mapSize.x
+	else:
+		edge = 0
+	
+	return edge
 
-#func find_goal(wakka, brother, sinsToxin):
-#	var goal
-#	var you = "Tidus"
-#	while goal != "Victory":
-#		if !brother.pop_back():
-#			match wakka:
-#				"Alright": continue
-#				"Hustle": goal = "victory"
-#	if sinsToxin.has(you):
-#		return
-#	return goal
+func find_goal(wakka, brother, sinsToxin, youSaySo):
+	var goal
+	var you = "Tidus"
+	var gotcha = 0
+	while goal != "Victory":
+		if !brother.pop_back():
+			match wakka[gotcha]:
+				"Alright": gotcha += 1
+				"Hustle": goal = "victory"
+	if youSaySo:
+		return goal
+	elif sinsToxin.has(you):
+		return
+	
+
+#danmaku pathing
+#func find_and_set_direction(cell, anchorCell):
+	#var offsets = _get_offsets(cell)
+	#var offsetSize = offsets.size()
+	#var current_move_vec 
+	#var norm_move_vec 
+	#var direction_id 
+	#
+	#lastGlbPosition = _sprite.global_position
+#
+	#current_move_vec = _sprite.global_position - lastGlbPosition
+	#lastGlbPosition = _sprite.global_position
+	#
+	#norm_move_vec = current_move_vec.normalized()
+	#direction_id = int(offsetSize * (norm_move_vec.rotated(PI / offsetSize).angle() + PI) / TAU)

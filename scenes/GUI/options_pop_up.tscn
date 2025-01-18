@@ -1,0 +1,63 @@
+[gd_scene load_steps=4 format=3 uid="uid://b2v4effpiibrw"]
+
+[ext_resource type="Theme" uid="uid://errgec2364nv" path="res://fonts/Izayoi_Theme_Tooltip.tres" id="1_ajvjo"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_j0sbk"]
+[ext_resource type="Script" path="res://scenes/GUI/options_pop_up.gd" id="1_m0u7l"]
+
+[node name="OptionsPopUp" type="Panel" node_paths=PackedStringArray("list", "firstFocus")]
+custom_minimum_size = Vector2(1920, 1080)
+offset_right = 70.0
+offset_bottom = 76.0
+mouse_force_pass_scroll_events = false
+theme = ExtResource("1_ajvjo")
+script = ExtResource("1_m0u7l")
+list = NodePath("OptionsPanel/MarginContainer/OptionsList")
+firstFocus = NodePath("OptionsPanel/MarginContainer/OptionsList/EquipBtn")
+
+[node name="OptionsPanel" type="PanelContainer" parent="."]
+layout_mode = 0
+offset_right = 70.0
+offset_bottom = 76.0
+size_flags_horizontal = 0
+theme = ExtResource("1_ajvjo")
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="OptionsPanel"]
+layout_mode = 2
+texture = ExtResource("1_j0sbk")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="OptionsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="OptionsList" type="VBoxContainer" parent="OptionsPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="EquipBtn" type="Button" parent="OptionsPanel/MarginContainer/OptionsList"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../UseBtn")
+text = "Equip"
+
+[node name="UnequipBtn" type="Button" parent="OptionsPanel/MarginContainer/OptionsList"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../UseBtn")
+text = "Unequip"
+
+[node name="UseBtn" type="Button" parent="OptionsPanel/MarginContainer/OptionsList"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../EquipBtn")
+focus_neighbor_right = NodePath(".")
+text = "Use"
+
+[connection signal="pressed" from="OptionsPanel/MarginContainer/OptionsList/EquipBtn" to="." method="_on_equip_btn_pressed"]
+[connection signal="pressed" from="OptionsPanel/MarginContainer/OptionsList/UnequipBtn" to="." method="_on_unequip_btn_pressed"]
+[connection signal="pressed" from="OptionsPanel/MarginContainer/OptionsList/UseBtn" to="." method="_on_use_btn_pressed"]

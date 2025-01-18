@@ -7,34 +7,76 @@ signal death_done
 signal unit_relocated
 signal exp_gained
 signal leveled_up
+signal post_complete
+signal turn_complete(unit)
+signal effect_complete
+
+signal item_targeting(item, unit)
+signal item_activated(item, unit, target)
 
 
+
+
+
+var defaultId := "UnitId"
 #Unit Parameters
+@export_category("Unit Parameters")
+@export_group("Base Parameters")
 @export var generate : bool = true ##Toggle on for randomly leveled stats based on growths, Toggle Off to use predefined stats
 #Profile
 								# Consider getting rid of one of these, or both. 
-@export var unitId := "unitID" #Should be automated in the system
+@export var unitId := "UnitId" ## Only change if unique unit
+@export var disabled := false:
+	get:
+		return disabled
+	set(value):
+		disabled = value
+		set_process(!value)
+
 var unitName := "" #Presented strings will eventually be taken from a seperate file
 @export var FACTION_ID := Enums.FACTION_ID.ENEMY
+@export_group("Generated Only")
 @export var SPEC_ID := Enums.SPEC_ID.FAIRY 
 @export var JOB_ID := Enums.JOB_ID.TRBLR
 @export var genLevel : int = 1
-@export var inventory: Array[String] = [] #revisit this for ease of selection
+@export_group("Spawn Parameters")
+@export var isForced := false
 @export_category("Animation Values")
-@export var moveSpeed := 150.0
+@export var moveSpeed := 200.0
 @export var shoveSpeed := 350.0
 @export var tossSpeed := 350.0
 
 @onready var _sprite: Sprite2D = $PathFollow2D/Sprite
 @onready var _animPlayer: AnimationPlayer = $PathFollow2D/Sprite/AnimationPlayer
 @onready var _pathFollow: PathFollow2D = $PathFollow2D
-@onready var map = get_parent()
 @onready var lifeBar = $PathFollow2D/Sprite/HPbar
+@onready var map = get_parent()
 
+#status effects
+@export_category("Conditions")
+@export var status : Dictionary = {"Acted":false, "Sleep":false}
+var sParam : Dictionary = {}
+
+@export_category("Inventory")
+var _items : String:
+	get:
+		return _items
+	set(value):
+		_items = "NONE"
+		_add_initial_item(value)
+		if value != "NONE":
+			print(value)
+			
+var inventory: Array[String]: #revisit this for ease of selection
+		get:
+			return inventory
+		set(value):
+			inventory = value
+			update_configuration_warnings()
+			notify_property_list_changed.call_deferred()
 
 var firstLoad := false
 var tick = 1
-
 var deployed : bool = false
 var forced : bool = false
 
@@ -42,21 +84,18 @@ var needDeath := false
 var deathFlag := false
 var killer : Unit
 var terrainData : Array
-
+var postSequenceFlags := {"Bars":false, "Death":false}
 
 #equip variables
-var natural  : Dictionary = {"ID": "NONE", "Equip": false, "DUR": -1, "Broken": false}
-var unarmed := {"ID": "NONE", "Equip": false, "DUR": -1, "Broken": false}
+var natural  : Dictionary = {"ID": "NONE", "Equip": false, "Dur": -1, "Broken": false}
+var unarmed := {"ID": "NONE", "Equip": false, "Dur": -1, "Broken": false}
 var tempSet = false
 
-#status effects
-@export var status : Dictionary = {"Acted":false, "Sleep":false}
-var sParam : Dictionary = {}
 
 #unit status
 var unitData : Dictionary
 #Call for pre-formualted combat stats
-var combatData := {"Dmg": 0, "Hit": 0, "Avoid": 0, "Graze": 0, "GrzPrc": 0, "Crit": 0, "CrtAvd": 0, "Resist": 0, "EffHit":0, "Bar": 0, "Type":Enums.DAMAGE_TYPE.PHYS, "CanMiss": true}
+var combatData := {"Dmg": 0, "Hit": 0, "Avoid": 0, "Barrier": 0, "GrzPrc": 0, "Crit": 0, "CrtAvd": 0, "Resist": 0, "EffHit":0, "Bar": 0, "Type":Enums.DAMAGE_TYPE.PHYS, "CanMiss": true}
 #base stats of the unit
 var baseStats := {}
 #aura owned by unit
@@ -69,7 +108,12 @@ var activeDebuffs := {}
 var activeEffects := []
 var activeAuras := {}
 
+#Unique NPC/Enemy params
+var isElite : bool = false
 
+#Danmaku
+var danmakuTypes := {}
+var masterOf : String
 
 ## Coordinates of the current cell the cursor moved to.
 var cell := Vector2i.ZERO:
@@ -84,15 +128,19 @@ var is_selected := false:
 		is_selected = value
 		if is_selected:
 			_animPlayer.play("selected")
+			#print(unitId,":", _animPlayer.current_animation,":","Selected")
 		elif status.Acted == false:
 			_animPlayer.play("idle")
+			#print(unitId,":", _animPlayer.current_animation,"Selected")
 		elif status.Acted == true:
 			_animPlayer.play("disabled")
+			#print(unitId,":", _animPlayer.current_animation,"Selected")
 
 #Animation Variables
 var isWalking := false
 var isShoved := false
 var isTossed := false
+var isHurt := false
 var cDir := ""
 var cAnim := ""
 var pathPaused := false
@@ -130,7 +178,9 @@ func _ready() -> void:
 #	#print("unit.gd:", unitId)
 	set_process(false)
 	_animPlayer.play("idle")
-	_generate_id()
+	#print(unitId,":", _animPlayer.current_animation,"Ready")
+	#if generate and !UnitData.unitData.has(unitId):
+		#_generate_id()
 	_load_stats()
 	_load_sprites()
 	_validate_skills()
@@ -141,41 +191,64 @@ func _ready() -> void:
 		pass
 	elif !map.map_ready.is_connected(self._on_test_map_map_ready):
 		map.map_ready.connect(self._on_test_map_map_ready)
-		
 	
+
 	
 	#Create the curve resource here because creating it in the editor prevents moving the unit
 	if not Engine.is_editor_hint():
 		curve = Curve2D.new()
-		
+	update_stats()
 	#move type debugging
 	#var testKey = UnitData.MOVE_TYPE.keys()[unitData.MoveType]
 	#print(str(unitName) + " Move Type: " + str(testKey))
-	
 
-func init_unit(unique:bool = !generate, newFaction := FACTION_ID, iD : String = "none"):
+func _get_property_list():
+	var properties = []
+	
+	properties.append({
+		"name" : "_items",
+		"type" : TYPE_STRING,
+		"hint" : PROPERTY_HINT_ENUM,
+		"hint_string" : _array_to_string(UnitData.get_item_keys())
+		#"hint_string" : _array_to_string(UnitData.get_item_keys())
+	})
+	
+	properties.append({
+		"name" : "inventory",
+		"type" : TYPE_ARRAY,
+		"hint" : PROPERTY_HINT_TYPE_STRING,
+		"hint_string" : "%d:" % [TYPE_STRING]
+	})
+		
+		
+	return properties
+
+func _array_to_string(arr: Array, seperator = ",") -> String:
+	var string = ""
+	for i in arr:
+		string += str(i)+seperator
+	return string
+
+func _add_initial_item(item):
+	if item != "NONE":
+		inventory.append(item)
+
+func init_unit(currentMap, unique:bool = !generate, newFaction := FACTION_ID, id : String = "none", elite = false, lv = genLevel, spec = SPEC_ID, job = JOB_ID):
 	FACTION_ID = newFaction
-	if iD != "none":
-		unitId = iD
+	isElite = elite
+	map = currentMap
+	if id != "none":
+		unitId = id
 	if unique:
 		generate = false
+	else:
+		generate = true
+		genLevel = lv
+		SPEC_ID = spec
+		JOB_ID = job
 	return self
 	#_load_stats()
 	#_load_sprites()
-
-
-func _generate_id():
-	var u := false
-	var c := 0
-	if unitId != "unitID":
-		u = true
-	while !u:
-		unitId = "yk" + str(c)
-		if UnitData.unitData.has(unitId):
-			c += 1
-		elif !UnitData.unitData.has(unitId):
-			UnitData.unitData[unitId] = {}
-			u = true
 
 
 func _process(delta: float) -> void:
@@ -193,9 +266,9 @@ func _process(delta: float) -> void:
 	if needDeath:
 		return
 	
-	if firstLoad:
-		firstLoad = false
-		update_stats()
+	#if firstLoad:
+		#firstLoad = false
+		#update_stats()
 
 
 
@@ -231,21 +304,12 @@ func _process_motion(delta):
 		current_move_vec = _sprite.global_position - lastGlbPosition
 		lastGlbPosition = _sprite.global_position
 		
-		
 		norm_move_vec = current_move_vec.normalized()
 		direction_id = int(directionsSize * (norm_move_vec.rotated(PI / directionsSize).angle() + PI) / TAU)
-		
-		
-		
-		#if cDir != directions[direction_id]:
-			#cDir = directions[direction_id]
-			#print(cDir, " ", _animPlayer.current_animation)
+	
 	
 		_animPlayer.play(str(directions[direction_id]))
 		
-		#if cAnim != _animPlayer.current_animation:
-			#cAnim = _animPlayer.current_animation
-			#print(cAnim)
 		
 	if _pathFollow != null and _pathFollow.progress_ratio >= 1.0:
 		#print("SHOULDN'T SEE BELOW 1.0 ",_pathFollow.progress_ratio)
@@ -264,7 +328,11 @@ func _process_motion(delta):
 			"shove": 
 				isShoved = false
 				revert_animation()
-			"toss": isTossed = false
+				emit_signal("effect_complete")
+			"toss": 
+				isTossed = false
+				emit_signal("effect_complete")
+		emit_signal("unit_relocated", originCell, cell, self)
 		
 
 
@@ -285,7 +353,8 @@ func walk_along(path: PackedVector2Array) -> void:
 	curve.add_point(Vector2.ZERO)
 	for point in path:
 		curve.add_point(map.map_to_local(point) - position)
-		
+	#print(curve.point_count)
+	print(path)
 	cell = path[-1]
 	
 #	print(path[-1])
@@ -304,7 +373,7 @@ func shove_unit(location):
 	else:
 		_animPlayer.play("shoved_right")
 	
-	print("Shoved: ", _animPlayer.current_animation)
+	#print("Shoved: ", _animPlayer.current_animation)
 	originCell = map.local_to_map(position)
 	curve.add_point(Vector2.ZERO)
 	for point in path:
@@ -312,6 +381,7 @@ func shove_unit(location):
 	cell = path[-1]
 	isShoved = true
 	emit_signal("unit_relocated", oldCell, cell, self)
+	
 	#position = map.map_to_local(cell)
 	#
 	#cell = map.local_to_map(position)
@@ -333,7 +403,7 @@ func toss_unit(location):
 	emit_signal("unit_relocated", oldCell, cell, self)
 
 
-func relocate_unit(location, gridUpdate = true): 
+func relocate_unit(location, gridUpdate = true):
 	var oldCell = cell
 	
 	cell = location
@@ -345,11 +415,36 @@ func relocate_unit(location, gridUpdate = true):
 	cell = map.local_to_map(position)
 	position = map.map_to_local(cell)
 
+func play_arrival(path):
+	var arrival : String
+	var tween = get_tree().create_tween()
+	var color = _sprite.get_self_modulate()
+	var delay = 1
+	pass
+	#print("MODULATION:",_sprite.get_self_modulate())
+	color.a = color.a - 1
+	_sprite.set_self_modulate(color)
+	color.a = color.a + 1
+	
+	
+	walk_along(path)
+	#print("MODULATION:",get_self_modulate())
+	tween.tween_property(_sprite, "self_modulate", color, delay).set_trans(Tween.TRANS_LINEAR)
+	#print("MODULATION:",get_self_modulate())
+	
+	
+	
+func play_animation(anim):
+	lastAnim = _animPlayer.current_animation
+	_animPlayer.play(anim)
+
+
 func revert_animation():
 	if _animPlayer.current_animation == lastAnim:
 		return
 	#print(lastAnim, " surely I will return to idle")
 	_animPlayer.play(lastAnim)
+	#print(unitId,":", _animPlayer.current_animation,"Revert")
 
 func toggle_path_pause():
 	pathPaused = !pathPaused
@@ -364,9 +459,23 @@ func return_original():
 func _load_stats():
 	var specKeys := Enums.SPEC_ID.keys()
 	var path : String
+	var tempTag
+	var genData
+	
 	if generate:
-		UnitData.stat_gen(JOB_ID, unitId, SPEC_ID)
-	unitData = UnitData.unitData[unitId]
+		genData = UnitData.stat_gen(JOB_ID, SPEC_ID)
+		if not Engine.is_editor_hint():
+			unitId = UnitData.generate_id()
+			UnitData.add_to_unitdata(genData, unitId)
+			unitData = UnitData.unitData[unitId]
+			
+		else:
+			unitData = genData
+			
+	else:
+		unitData = UnitData.unitData[unitId]
+	
+	
 	match FACTION_ID:
 		Enums.FACTION_ID.PLAYER: 
 			add_to_group("Player") #maybe redundant? can think of situations it isn't.
@@ -472,23 +581,39 @@ func status_duration_tick():
 func _load_sprites():
 	if !generate: 
 		_sprite.texture = unitData["Profile"]["Sprite"]
-		_sprite.self_modulate = Color(1,1,1)
 	else: 
 		_sprite.texture = UnitData.get_generated_sprite(SPEC_ID, JOB_ID)
-		_sprite.self_modulate = Color(1,0,0)
+	match FACTION_ID:
+		Enums.FACTION_ID.ENEMY: _sprite.self_modulate = Color.RED
+		Enums.FACTION_ID.PLAYER: _sprite.self_modulate = Color(1, 1, 1)
+	#print("MODULATION:",get_self_modulate())
+		
 	_pathFollow.rotates = false
 	_animPlayer.play("idle")
-	
+	#print(unitId,":", _animPlayer.current_animation,"Load Sprite")
 	
 func _init_inv():
 	var limit = unitData.MaxInv
-	if inventory.size() < 1:
+	var initInv = inventory
+	var rng = RandomNumberGenerator.new()
+	var usedIds = []
+	if FACTION_ID == Enums.FACTION_ID.PLAYER:
+		initInv = unitData.SpawnGear
+	if initInv.size() < 1:
 		return
-	for thing in inventory:
+	for thing in initInv:
+		
 		if unitData.Inv.size() >= limit:
 			break
+			
 		var dur = UnitData.itemData[thing].MaxDur
-		var newItem : Dictionary = {"ID": thing, "Equip": false, "DUR": dur, }
+		
+		var uId = rng.randi()
+		while usedIds.has(uId):
+			uId = rng.randi()
+		usedIds.append(uId)
+		
+		var newItem : Dictionary = {"ID": thing, "Equip": false, "Dur": dur, "UniqueId": uId,}
 		if UnitData.itemData.has(thing):
 			unitData.Inv.append(newItem)
 		else:
@@ -577,6 +702,9 @@ func get_visual_aura_range() -> int:
 
 func _on_aura_entered(area):
 	#print("Aura Entered: ", area)
+	if !area.aura:
+		return
+		
 	if area.aura.IsFriendly and area.master.FACTION_ID != FACTION_ID:
 		return
 	elif !area.aura.IsFriendly and area.master.FACTION_ID == FACTION_ID:
@@ -649,8 +777,8 @@ func set_temp_equip(i):
 	if tempWep == natural:
 		_equip_weapon(-2, true)
 	elif check_valid_equip(tempWep) and get_icat(tempWep).Main != "ACC":
-		print(i)
-		print(unitData.Inv)
+		#print(i)
+		#print(unitData.Inv)
 		_equip_weapon(i, true)
 		
 	update_stats()
@@ -688,7 +816,7 @@ func get_equipped_weapon(): #returns the currently equipped weapon within invent
 			wep = item
 			found = true
 			break
-	if !found and unitData.Weapons.Sub.has("NATURAL"):
+	if !found and unitData.Weapons.Sub and unitData.Weapons.Sub.has("NATURAL"):
 		wep = natural
 		_equip_weapon(-2)
 	elif !found:
@@ -705,7 +833,7 @@ func get_equipped_acc(): #returns the currently equipped accessories within inve
 		return false
 	return acc
 	
-func unequip(slot = 0):
+func unequip(slot = 0): #Stop taking drugs. Fix this up later, it makes no fucking sense. HERE
 	var item = unitData.Inv[slot]
 	var noweapon = false
 	
@@ -725,8 +853,11 @@ func unequip(slot = 0):
 			_remove_equip_effects(item)
 			item.Equip = false
 			
+			noweapon = true
 			for i in unitData.Inv:
-				if i.Equip: noweapon = true
+				if i.Equip: 
+					noweapon = false
+					break
 			
 	if noweapon and unitData.Weapons.Sub and unitData.Weapons.Sub.has("NATURAL"):
 		_equip_weapon(-2)
@@ -749,10 +880,9 @@ func _equip_acc(i : int):
 	if c >= limit:
 		unequip(first)
 	acc.Equip = true
-	
 	_add_equip_effects(acc)
 
-func _equip_weapon(index, isTemp = false):
+func _equip_weapon(index, isTemp = false) -> void:
 	var wep
 	
 	for item in unitData.Inv:
@@ -765,17 +895,18 @@ func _equip_weapon(index, isTemp = false):
 		-2: wep = natural
 		-1: wep = unarmed
 		_: 
-			if isTemp:
+			if unitData.Inv[index].Equip == true:
+				return
+			elif isTemp:
+				unitData.Inv[index].Equip = true
 				wep = unitData.Inv[index]
 			else:
+				unitData.Inv[index].Equip = true
 				wep = unitData.Inv.pop_at(index)
 				unitData.Inv.push_front(wep)
 			
-	if wep.Equip: return
-	
 	_add_equip_effects(wep)
-	wep.Equip = true
-	print(wep)
+	#print(wep)
 	
 func _add_equip_effects(item):
 	var iData = UnitData.itemData[item.ID]
@@ -807,7 +938,7 @@ func _remove_effect(effId):
 	
 func check_valid_equip(item : Dictionary, mode : int = 0): #Subweapons not fully implemented, Sub returns true regardless of which sub it is. There is no differentiation yet. 0 = Any, 1 = Weapon; 2 = Accessory
 	var iCat = get_icat(item) 
-	if item.DUR == 0:
+	if item.Dur == 0:
 		return false
 	if mode < 2 and iCat.Sub and unitData.Weapons.has(iCat.Sub):
 		return true
@@ -826,6 +957,18 @@ func get_icat(item) -> Dictionary:
 	if UnitData.itemData[item.ID].SubGroup:
 		iCat.Sub = UnitData.itemData[item.ID].SubGroup
 	return iCat
+
+
+func use_item(item):
+	var data = UnitData.itemData[item.ID]
+	if data.MinRange > 0 or data.MaxRange > 0:
+		emit_signal("item_targeting", item, self)
+	else: activate_item(item, self)
+
+
+func activate_item(item, target):
+	emit_signal("item_activated", item, self, target)
+	reduce_durability(item)
 	
 
 func reduce_durability(item : Dictionary, reduc : int = 1): ##Weapon only considered broken at 0 durability!!! -1 is unbreakable! If reduc value would put an item below 0, it is clamped to 0 and will break.
@@ -833,18 +976,19 @@ func reduce_durability(item : Dictionary, reduc : int = 1): ##Weapon only consid
 	var i = inv.find(item)
 	var maxDur = UnitData.itemData[item.ID].MaxDur
 	print("Durability reduction for: ", item)
-	if item.DUR == -1:
+	if item.Dur == -1:
 		print("Weapon is unbreakable")
 		return
-	item.DUR -= reduc
-	clampi(item.DUR, 0, maxDur)
-	print("Durability reduced to: ", item.DUR)
-	if item.DUR == 0 and item.Equip:
+	item.Dur -= reduc
+	clampi(item.Dur, 0, maxDur)
+	print("Durability reduced to: ", item.Dur)
+	if item.Dur == 0 and item.Equip:
 		print("Item Broken, unequipping")
 		unequip(i)
-	if item.DUR == 0 and UnitData.itemData[item.ID].Expendable:
+	if item.Dur == 0 and UnitData.itemData[item.ID].Expendable:
 		print("Queued item Deletion")
 		call_deferred("delete_item", item)
+		#delete_item(item)
 
 
 func delete_item(item):
@@ -880,7 +1024,7 @@ func _update_natural(passive):
 	
 	final.Dmg = base.Dmg + dmgScale
 	final.Hit = base.Hit + hitScale
-	final.Graze = base.Graze + grazeScale
+	final.Barrier = base.Barrier + grazeScale
 	final.Name = scaleType + str(tier)
 	UnitData.itemData[unitName] = final
 	natural.ID = unitName
@@ -953,7 +1097,7 @@ func update_combatdata():
 		combatData.Dmg = wep.Dmg
 	combatData.Hit = activeStats.Eleg * 2 + (wep.Hit + activeStats.Cha)
 	combatData.Avoid = activeStats.Cele * 2 + activeStats.Cha + terrainBonus
-	combatData.Graze = wep.Graze
+	combatData.Barrier = wep.Barrier
 	combatData.GrzPrc = activeStats.Eleg + activeStats.Bar
 	combatData.Crit = activeStats.Eleg + wep.Crit
 	combatData.CrtAvd = activeStats.Cha
@@ -1073,7 +1217,7 @@ func update_stats(): #GO BACK AND FINISH ACTIVE DEBUFFS AFTER THIS
 				effSort.append(effId)
 					
 		for effId in effSort:
-			var stat = UnitData.effectData[effId].SubType.to_pascal_case()
+			var stat = subKeys[UnitData.effectData[effId].SubType].to_pascal_case()
 			if UnitData.effectData[effId].Target == Enums.EFFECT_TARGET.EQUIPPED:
 				if buffTotal.has(stat): buffTotal[stat] += UnitData.effectData[effId].Value
 		
@@ -1104,27 +1248,59 @@ func update_stats(): #GO BACK AND FINISH ACTIVE DEBUFFS AFTER THIS
 		activeStats.Move = 0
 
 func on_sequence_concluded():
+	#check post-sequence event que?
 	update_life_bar()
 	check_death()
+	#finally allow turn completion?
+
+func danmaku_collision():
+	update_life_bar()
+	check_death()
+
+func confirm_post_sequence_flags(flag):
+	postSequenceFlags[flag] = true
+	for f in postSequenceFlags:
+		if !postSequenceFlags[f]:
+			return
+	_turn_complete()
+
+
+func _turn_complete():
+	postSequenceFlags.Bars = false
+	postSequenceFlags.Death = false
+	emit_signal("turn_complete", self)
+
 
 func update_sprite():
 	for condition in status:
 		if status[condition]:
 			if condition == "Sleep" or condition == "Acted":
 				_animPlayer.play("disabled")
+				#print(unitId,":", _animPlayer.current_animation,"Update Sprite")
 				return
 	if !isWalking and !isShoved and !needDeath:
 		_animPlayer.play("idle")
-
+		#print(unitId,":", _animPlayer.current_animation,"Update Sprite")
+		
+		
 func check_death():
 	if activeStats["CurLife"] <= 0:
 		run_death()
-		return
+	else:
+		confirm_post_sequence_flags("Death")
 
 func update_life_bar():
 	var tween = get_tree().create_tween()
+	if isHurt:
+		play_animation("Hit")
+		isHurt = false
+	tween.finished.connect(self._life_tween_finished)
 	tween.tween_property($PathFollow2D/Sprite/HPbar, "value", activeStats.CurLife, 0.5)
 	
+
+func _life_tween_finished():
+	revert_animation()
+	confirm_post_sequence_flags("Bars")
 		
 func update_composure_bar():
 	if activeStats.CurComp <= 0:
@@ -1140,6 +1316,8 @@ func apply_dmg(dmg : int, source : Unit):
 	
 	if dmg > 0 and status.Sleep:
 		cure_status("Sleep")
+	if dmg > 0:
+		isHurt = true
 	#return activeStats.CurLife
 	
 func apply_heal(heal := 0):
@@ -1212,9 +1390,12 @@ func check_status(condition:String):
 func set_acted(actState: bool):
 	status.Acted = actState
 	match status.Acted:
-		false: _animPlayer.play("idle")
+		false:
+			_animPlayer.play("idle")
+			#print(unitId,":", _animPlayer.current_animation,"Set Acted")
 		true: 
 			_animPlayer.play("disabled")
+			#print(unitId,":", _animPlayer.current_animation,"Set Acted")
 
 func _on_test_map_map_ready():
 	var coord = $PathFollow2D/Cell
@@ -1244,6 +1425,7 @@ func fade_out(duration: float):
 	_animPlayer.play("death")
 	await get_tree().create_timer(duration).timeout
 	$PathFollow2D/Sprite/HPbar.visible = false
+	confirm_post_sequence_flags("Death")
 	emit_signal("death_done", self)
 	
 	

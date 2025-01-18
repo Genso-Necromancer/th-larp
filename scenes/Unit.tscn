@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://x6dmleipd452"]
+[gd_scene load_steps=25 format=3 uid="uid://x6dmleipd452"]
 
 [ext_resource type="Script" path="res://scenes/Unit.gd" id="1_torj4"]
 [ext_resource type="Texture2D" uid="uid://bix6u63iahalq" path="res://sprites/FAIRY/TRBLRSpr.png" id="2_gvlpp"]
@@ -7,7 +7,22 @@
 [ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="4_qp4n5"]
 [ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="5_nwi43"]
 [ext_resource type="Script" path="res://scenes/HPbar.gd" id="7_x5rnn"]
-[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="8_y1qcc"]
+[ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="8_8niqs"]
+
+[sub_resource type="Animation" id="Animation_4s25y"]
+resource_name = "Hit"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PathFollow2D/Sprite:self_modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 0, 0, 1), Color(1, 0, 0, 0), Color(1, 0, 0, 1), Color(1, 0, 0, 0), Color(1, 0, 0, 1), Color(1, 0, 0, 0), Color(1, 0, 0, 1), Color(1, 0, 0, 0), Color(1, 0, 0, 1), Color(1, 0, 0, 0), Color(1, 0, 0, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_ldcs1"]
 length = 0.001
@@ -61,7 +76,7 @@ tracks/3/keys = {
 }
 tracks/4/type = "value"
 tracks/4/imported = false
-tracks/4/enabled = true
+tracks/4/enabled = false
 tracks/4/path = NodePath("PathFollow2D/Sprite:modulate")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
@@ -70,6 +85,18 @@ tracks/4/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Color(1, 1, 1, 1)]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("PathFollow2D/Sprite:self_modulate")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_14iwe"]
@@ -142,6 +169,18 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("PathFollow2D/Sprite:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-1, -36)]
 }
 
 [sub_resource type="Animation" id="Animation_vw2je"]
@@ -521,6 +560,7 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_u5bc7"]
 _data = {
+"Hit": SubResource("Animation_4s25y"),
 "RESET": SubResource("Animation_ldcs1"),
 "death": SubResource("Animation_14iwe"),
 "disabled": SubResource("Animation_n8or0"),
@@ -543,15 +583,15 @@ size = Vector2(84, 37.5)
 z_index = 2
 y_sort_enabled = true
 script = ExtResource("1_torj4")
-unitId = "yk0"
-moveSpeed = 250.0
+_items = "NONE"
+inventory = Array[String]([])
 
 [node name="PathFollow2D" type="PathFollow2D" parent="."]
 rotates = false
 loop = false
 
 [node name="Sprite" type="Sprite2D" parent="PathFollow2D"]
-self_modulate = Color(1, 0, 0, 1)
+self_modulate = Color(1, 1, 1, 0)
 position = Vector2(-1, -36)
 scale = Vector2(4, 4)
 texture = ExtResource("2_gvlpp")
@@ -568,7 +608,6 @@ libraries = {
 position = Vector2(0, 8)
 scale = Vector2(0.25, 0.25)
 collision_layer = 2
-collision_mask = 5
 script = ExtResource("3_mqts7")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PathFollow2D/Sprite/UnitArea"]
@@ -604,7 +643,7 @@ offset_left = -35.0
 offset_top = 16.0
 offset_right = 36.0
 offset_bottom = 42.0
-theme = ExtResource("8_y1qcc")
+theme = ExtResource("8_8niqs")
 theme_override_colors/font_color = Color(0.776471, 0, 0, 1)
 theme_override_font_sizes/font_size = 22
 text = "(0, 0)"
@@ -615,7 +654,7 @@ offset_left = -33.0
 offset_top = 40.0
 offset_right = 38.0
 offset_bottom = 66.0
-theme = ExtResource("8_y1qcc")
+theme = ExtResource("8_8niqs")
 theme_override_colors/font_color = Color(0.776471, 0, 0, 1)
 theme_override_font_sizes/font_size = 22
 text = "<null>"
