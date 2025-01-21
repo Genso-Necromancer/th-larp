@@ -1,14 +1,14 @@
 [gd_scene load_steps=12 format=3 uid="uid://dsqet8mutarh6"]
 
-[ext_resource type="Theme" uid="uid://vjf2mwcfssah" path="res://fonts/Izayoi_Theme_Trading.tres" id="1_4cys1"]
+[ext_resource type="Theme" uid="uid://ye48kx1r3u5" path="res://fonts/Izayoi_Theme_Profile_Core.tres" id="1_7goli"]
 [ext_resource type="Theme" uid="uid://errgec2364nv" path="res://fonts/Izayoi_Theme_Tooltip.tres" id="1_ajj6s"]
-[ext_resource type="Theme" uid="uid://b0xy887xpxwrs" path="res://fonts/Izayoi_Theme_Profile.tres" id="1_nwv25"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_83r3n"]
 [ext_resource type="Script" path="res://scenes/trade_screen.gd" id="2_xrvbo"]
 [ext_resource type="Texture2D" uid="uid://dqqimoeongvyg" path="res://sprites/character/debug/portrait_full.png" id="4_g8gfs"]
 [ext_resource type="FontFile" uid="uid://di48a300uqd6d" path="res://fonts/VenomMincho-DOOyR.ttf" id="5_8syax"]
-[ext_resource type="Texture2D" uid="uid://de0fc4ialpktg" path="res://sprites/UI/bag.png" id="6_e7w1n"]
+[ext_resource type="Theme" uid="uid://dpfc6p7ruw7wo" path="res://fonts/Izayoi_Theme_Items.tres" id="6_k4p7w"]
 [ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/inventory_panel.tscn" id="8_hil8c"]
+[ext_resource type="PackedScene" uid="uid://dfr2jdyxd14oy" path="res://scenes/GUI/convoy_pnl.tscn" id="9_fjgok"]
 [ext_resource type="PackedScene" uid="uid://b2v4effpiibrw" path="res://scenes/GUI/options_pop_up.tscn" id="9_htpwm"]
 [ext_resource type="PackedScene" uid="uid://b5pdi6fx5chy7" path="res://scenes/GUI/info_panel.tscn" id="10_pdk1d"]
 
@@ -22,7 +22,7 @@ grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 1
-theme = ExtResource("1_nwv25")
+theme = ExtResource("1_7goli")
 script = ExtResource("2_xrvbo")
 nFSize = 20
 iFSize = 20
@@ -138,7 +138,7 @@ theme_override_constants/separation = 150
 
 [node name="TradeBox1" type="VBoxContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer"]
 layout_mode = 2
-theme = ExtResource("1_4cys1")
+theme = ExtResource("6_k4p7w")
 
 [node name="NamePnl1" type="PanelContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1"]
 layout_mode = 2
@@ -169,7 +169,7 @@ layout_mode = 2
 [node name="TradeBox2" type="VBoxContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
-theme = ExtResource("1_4cys1")
+theme = ExtResource("6_k4p7w")
 
 [node name="NamePnl2" type="PanelContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2"]
 layout_mode = 2
@@ -194,248 +194,11 @@ theme_override_fonts/font = ExtResource("5_8syax")
 text = "Name"
 horizontal_alignment = 1
 
-[node name="TradePnl2" type="PanelContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2"]
-custom_minimum_size = Vector2(400, 500)
+[node name="TradePnl2" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2" instance=ExtResource("8_hil8c")]
 layout_mode = 2
 
-[node name="BackgroundCenter" type="NinePatchRect" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/TradePnl2"]
+[node name="ConvoyPnl" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer" instance=ExtResource("9_fjgok")]
 layout_mode = 2
-texture = ExtResource("6_e7w1n")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="MarginContainer" type="MarginContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/TradePnl2"]
-layout_mode = 2
-theme_override_constants/margin_left = 50
-theme_override_constants/margin_top = 120
-theme_override_constants/margin_right = 25
-theme_override_constants/margin_bottom = 125
-
-[node name="ItemList2" type="VBoxContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/TradePnl2/MarginContainer"]
-layout_mode = 2
-
-[node name="ConvoyPnl" type="PanelContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer"]
-custom_minimum_size = Vector2(225, 0)
-layout_mode = 2
-theme = ExtResource("1_4cys1")
-
-[node name="VBoxContainer" type="VBoxContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl"]
-layout_mode = 2
-theme_override_constants/separation = 0
-
-[node name="PanelContainer2" type="PanelContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer"]
-custom_minimum_size = Vector2(225, 40)
-layout_mode = 2
-
-[node name="BackgroundCenter" type="NinePatchRect" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2"]
-layout_mode = 2
-texture = ExtResource("2_83r3n")
-patch_margin_left = 16
-patch_margin_top = 12
-patch_margin_right = 16
-patch_margin_bottom = 12
-
-[node name="MarginContainer" type="MarginContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2"]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 6
-
-[node name="tabContainer" type="GridContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer"]
-layout_mode = 2
-theme_override_constants/h_separation = 15
-theme_override_constants/v_separation = 3
-columns = 5
-
-[node name="BladeBtn" type="Button" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer" groups=["convoyTabs"]]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_neighbor_left = NodePath("../GunBtn")
-focus_neighbor_top = NodePath(".")
-focus_neighbor_right = NodePath("../BluntBtn")
-focus_neighbor_bottom = NodePath("../GoheiBtn")
-text = "Blades"
-metadata/Category = "BLADE"
-metadata/NeedNeighbor = false
-
-[node name="BluntBtn" type="Button" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer" groups=["convoyTabs"]]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_neighbor_left = NodePath("../BladeBtn")
-focus_neighbor_top = NodePath(".")
-focus_neighbor_right = NodePath("../PoleBtn")
-focus_neighbor_bottom = NodePath("../BookBtn")
-text = "Blunt"
-metadata/Category = "BLUNT"
-metadata/NeedNeighbor = false
-
-[node name="PoleBtn" type="Button" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer" groups=["convoyTabs"]]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_neighbor_left = NodePath("../BluntBtn")
-focus_neighbor_top = NodePath(".")
-focus_neighbor_right = NodePath("../BowBtn")
-focus_neighbor_bottom = NodePath("../FanBtn")
-text = "Polearms
-"
-metadata/NeedNeighbor = false
-metadata/Category = "STICK"
-
-[node name="BowBtn" type="Button" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer" groups=["convoyTabs"]]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_neighbor_left = NodePath("../PoleBtn")
-focus_neighbor_top = NodePath(".")
-focus_neighbor_right = NodePath("../GunBtn")
-focus_neighbor_bottom = NodePath("../AccBtn")
-text = "Bows"
-metadata/NeedNeighbor = false
-metadata/Category = "BOW"
-
-[node name="GunBtn" type="Button" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer" groups=["convoyTabs"]]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_neighbor_left = NodePath("../BowBtn")
-focus_neighbor_top = NodePath(".")
-focus_neighbor_right = NodePath("../BladeBtn")
-focus_neighbor_bottom = NodePath("../ItemBtn")
-text = "Guns"
-metadata/NeedNeighbor = false
-metadata/Category = "GUN"
-
-[node name="GoheiBtn" type="Button" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer" groups=["convoyTabs"]]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_neighbor_left = NodePath("../ItemBtn")
-focus_neighbor_top = NodePath("../BladeBtn")
-focus_neighbor_right = NodePath("../BookBtn")
-focus_neighbor_bottom = NodePath("../BladeBtn")
-text = "Goheis"
-metadata/NeedNeighbor = true
-metadata/Category = "GOHEI"
-
-[node name="BookBtn" type="Button" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer" groups=["convoyTabs"]]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_neighbor_left = NodePath("../GoheiBtn")
-focus_neighbor_top = NodePath("../BluntBtn")
-focus_neighbor_right = NodePath("../FanBtn")
-focus_neighbor_bottom = NodePath("../BluntBtn")
-text = "Books"
-metadata/NeedNeighbor = true
-metadata/Category = "BOOK"
-
-[node name="FanBtn" type="Button" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer" groups=["convoyTabs"]]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_neighbor_left = NodePath("../BookBtn")
-focus_neighbor_top = NodePath("../PoleBtn")
-focus_neighbor_right = NodePath("../AccBtn")
-focus_neighbor_bottom = NodePath("../PoleBtn")
-text = "Fans"
-metadata/NeedNeighbor = true
-metadata/Category = "FAN"
-
-[node name="AccBtn" type="Button" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer" groups=["convoyTabs"]]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_neighbor_left = NodePath("../FanBtn")
-focus_neighbor_top = NodePath("../BowBtn")
-focus_neighbor_right = NodePath("../ItemBtn")
-focus_neighbor_bottom = NodePath("../BowBtn")
-text = "Acc."
-metadata/NeedNeighbor = true
-metadata/Category = "ACC"
-
-[node name="ItemBtn" type="Button" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer" groups=["convoyTabs"]]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 4
-focus_neighbor_left = NodePath("../AccBtn")
-focus_neighbor_top = NodePath("../GunBtn")
-focus_neighbor_right = NodePath("../GoheiBtn")
-focus_neighbor_bottom = NodePath("../GunBtn")
-text = "Items"
-metadata/NeedNeighbor = true
-metadata/Category = "ITEM"
-
-[node name="PanelContainer" type="PanelContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer"]
-layout_mode = 2
-
-[node name="BackgroundCenter" type="NinePatchRect" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer"]
-layout_mode = 2
-texture = ExtResource("2_83r3n")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="MarginContainer" type="MarginContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer"]
-custom_minimum_size = Vector2(0, 337)
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 8
-
-[node name="ScrollContainer" type="ScrollContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer"]
-custom_minimum_size = Vector2(0, 300)
-layout_mode = 2
-horizontal_scroll_mode = 0
-
-[node name="SupplyList" type="VBoxContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer"]
-layout_mode = 2
-
-[node name="SupplyCountPanel" type="PanelContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 4
-
-[node name="BackgroundCenter" type="NinePatchRect" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel"]
-layout_mode = 2
-texture = ExtResource("2_83r3n")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="MarginContainer" type="MarginContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="HBoxContainer" type="HBoxContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel/MarginContainer"]
-layout_mode = 2
-
-[node name="SupplyCount" type="Label" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel/MarginContainer/HBoxContainer"]
-layout_mode = 2
-text = "00"
-
-[node name="Divider" type="Label" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel/MarginContainer/HBoxContainer"]
-layout_mode = 2
-text = "/"
-
-[node name="SupplyCap" type="Label" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel/MarginContainer/HBoxContainer"]
-layout_mode = 2
-text = "00"
-
-[node name="ItemLabel" type="Label" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel/MarginContainer/HBoxContainer"]
-layout_mode = 2
-text = "Items"
 
 [node name="ItemInfoPanel" parent="TradeContainer/MarginContainer/TradeScreenVBox" instance=ExtResource("10_pdk1d")]
 layout_mode = 2

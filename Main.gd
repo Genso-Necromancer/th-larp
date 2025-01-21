@@ -22,6 +22,10 @@ enum GameState {
 	SCENE_ACTIVE
 } #state tags for easy swapping
 
+static var root := "user://"
+static var gameFolder := "thLARP"
+static var dataDir := root + gameFolder
+
 var gameBoard
 var newSlave : Array = []
 var activeState : GenericState
@@ -51,7 +55,7 @@ func _ready():
 #	gameBoard.queue_free()
 #	gui.queue_free()
 	load_scene(startScene)
-	
+	_check_directory()
 	
 func load_scene(scene):
 	add_child(scene)
@@ -87,27 +91,50 @@ func _unhandled_input(event: InputEvent) -> void: #Main picks up the inputs, the
 		activeState.mouse_pressed(event)
 	elif event is InputEventKey:
 		activeState.event_key(event)
+
+
+func _check_directory():
+	if not DirAccess.dir_exists_absolute(dataDir):
+		var dir = DirAccess.open(root)
+		dir.make_dir(gameFolder)
+	
+
+
+func _create_director(newDir : String) -> String:
+	var filePath : String = dataDir + "/" + newDir
+	var newPath : String
+	
+	if not DirAccess.dir_exists_absolute(filePath):
+		var dir = DirAccess.open(dataDir)
+		dir.make_dir(newDir)
 		
+	newPath = filePath + "/"
+	
+	return newPath
+
+
 	
 func take_screenshot(): ##ignore this, dev purpose only
 	var viewport = get_viewport()
+	var newDir := "screenshots"
+	var screenShotDir := _create_director(newDir)
 	if viewport:
 		await RenderingServer.frame_post_draw
 		var screenshot = viewport.get_texture().get_image()
 #		var image = ImageTexture.new()
 		var tag = 0
 		var fileName
-		
-
-#		image.create_from_image(screenshot)
-		fileName= ("screenshot%s.png" % [tag])
-		while is_screenshot_duplicate(fileName):
+		var time = str(Time.get_unix_time_from_system())
+		fileName = ("screenshot_" + time + ".png")
+		while is_file_duplicate(screenShotDir, fileName):
+			fileName = ("screenshot_"+ time + tag + ".png")
 			tag += 1
-			fileName= ("screenshot%s.png" % [tag])
-		screenshot.save_png("res://screenshots/screenshot%s.png" % [tag])
+		screenshot.save_png(screenShotDir + fileName)
+		if is_file_duplicate(screenShotDir, fileName):
+			print("ScreenShot:[",fileName,"]", " Saved to:[", screenShotDir,"]",)
 
-func is_screenshot_duplicate(fileName: String) -> bool: 
-	var dir := DirAccess.open("res://screenshots/")
+func is_file_duplicate(directory:String, fileName: String) -> bool: 
+	var dir := DirAccess.open(directory)
 	if dir:
 		dir.list_dir_begin()
 		var file = dir.get_next()

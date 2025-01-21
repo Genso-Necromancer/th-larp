@@ -44,7 +44,10 @@ enum sStates {
 	MANAGE,
 	BEGIN}
 
-var sState := sStates.HOME
+var sState := sStates.HOME:
+	set(value):
+		sState = value
+		print("sState Changed: ", sStates.keys()[value])
 
 var opWepX
 var opWepY
@@ -81,6 +84,9 @@ var forcedDep : Array = []
 var rosterInit : bool = false
 var unitObjs = Global.unitObjs
 var activeBtn : Node
+
+#focusTracking
+var prevFocus
 
 #trade variables
 var trade1 : Unit
@@ -249,32 +255,51 @@ func _snap_to_cursor(node): #bug gy save for later
 	
 
 func _on_gameboard_toggle_prof():
-	if sState < 4: toggle_profile()
+	if sState < 4 or sState > 7: 
+		toggle_profile()
+		
 			
 func toggle_profile(): #Needs filtering for while in set-up menu. Perhaps a filter function should be called first.
 	var profVis = unitProf.visible
 	if sState == sStates.HOME: #profile should not open on set up home menu
 		return
 		
-	if sState != sStates.BEGIN:
-		menuCursor.toggle_visible()
+	#if sState != sStates.BEGIN:
+		#menuCursor.toggle_visible()
 		
 	if profVis and Global.focusUnit != profFocus:
 		update_prof()
 		profFocus = Global.focusUnit
 	else:
 		if unitProf.visible == false:
+			prevFocus = get_viewport().gui_get_focus_owner()
+			if prevFocus:
+				prevFocus.release_focus()
 			update_prof()
+			menuCursor.visible = false
 			unitProf.visible = true
 			profFocus = Global.focusUnit
 			_change_state(GameState.GB_PROFILE)
 		else:
+			if sState != sStates.BEGIN and sState != sStates.FORM: 
+				menuCursor.visible = true
+			if prevFocus:
+				var button = prevFocus
+				button.call_deferred("grab_focus")
+			prevFocus = null
 			unitProf.visible = false
 			_change_state(mainCon.previousState)
 
+
+func toggle_tooltips():
+	unitProf.toggle_tooltips()
+	menuCursor.toggle_visible()
+
+
 func update_prof():
-	emit_signal("profile_called")
-		
+	unitProf.update_prof()
+
+
 func _on_gameboard_target_focused( mode : int, reach: Array = [-1, -1]):
 	_swap_to_forecast()
 	match mode:
@@ -352,10 +377,11 @@ func _load_assets():
 	rosterGrid = load("res://scenes/GUI/unit_roster.tscn").instantiate()
 	tradeScreen = load("res://scenes/trade_screen.tscn").instantiate()
 	unitProf = load("res://scenes/profile.tscn").instantiate()
-	add_child(unitProf)
-	add_child(tradeScreen)
-	add_child(rosterGrid)
+	
 	add_child(mapSetUp)
+	add_child(rosterGrid)
+	add_child(tradeScreen)
+	add_child(unitProf)
 	
 	
 	

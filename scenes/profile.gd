@@ -2,103 +2,125 @@ extends AspectRatioContainer
 
 class_name UnitProfile
 
-func _on_update_prof():
+signal tooltips_on(buttons)
+
+@onready var inventory := $ProfileMargin/ProfileHBox/SideBarMargin/SideBarVBox/InventoryPanel
+@onready var fBox := $ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/fBoxMargin/FeatLbVBox
+@onready var ttPopUp := $ProfileMargin/ProfileHBox/SideBarMargin/SideBarVBox/ItemInfoPanel
+@onready var fBlocker := $ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/Panel
+
+var tooltipMode:=false
+
+func _init():
+	self.visible = false
+
+func _ready():
+	toggle_blockers()
+	ttPopUp.visible = false
+	
+
+func update_prof():
 	var focusUnit = Global.focusUnit
-	var valid = false
-	_clear_inv()
-	if focusUnit:
-		valid = true
-	if !valid:
+	
+	if !focusUnit:
 		return
 	
 	var unitData = focusUnit.unitData
-	var unitStats = focusUnit.activeStats
-	var unitBuffs = focusUnit.activeBuffs
-
-	
+	#var unitStats = focusUnit.activeStats
+	#var unitBuffs = focusUnit.activeBuffs
+	_clear_skills()
 	focusUnit.update_stats()
-	if focusUnit.is_in_group("Enemy"):
-		$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitExp.set_text("00")
-	elif focusUnit.is_in_group("Player"):
-		$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitExp.set_text(str(unitData["Profile"]["EXP"]))
-	$M/HBoxContainer/G/NameBox/VBoxContainer/UnitName.set_text("[center]%s[/center]" % [focusUnit.unitName])
-	$M/HBoxContainer/PortraitBox/MC/MC/UnitPrt.set_texture(unitData["Profile"]["Prt"])
-	$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitLevel.set_text(str(unitData["Profile"]["Level"]))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitHp.set_text(str(unitStats.CurLife) + "/" + str(unitData.Stats.Life))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/LevelBox/VStats/UnitCmp.set_text(str(unitStats.CurComp) + "/" + str(unitData.Stats.Comp))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitStr.set_text(str(unitStats["Pwr"]))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitMag.set_text(str(unitStats["Mag"]))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitEle.set_text(str(unitStats["Eleg"]))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitCele.set_text(str(unitStats["Cele"]))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitBar.set_text(str(unitStats["Bar"]))
-	$M/HBoxContainer/G/StatBox/VBoxContainer/StatBox/VStats/UnitCha.set_text(str(unitStats["Cha"]))
-	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitAcc.set_text(str(focusUnit.combatData.Hit))
-	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitAvd.set_text(str(focusUnit.combatData.Avoid))
-	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitDmg.set_text(str(focusUnit.combatData.Dmg))
-	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitGrz.set_text(str(focusUnit.combatData.Barrier) + " (" + str(focusUnit.combatData.GrzPrc) + "%)")
-	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitCrit.set_text(str(focusUnit.combatData.Crit))
-	$M/HBoxContainer/InventoryBox/G2/VB/MC2/MC/VB/VStats/UnitCritAvd.set_text(str(focusUnit.combatData.CrtAvd))
+	_update_inventory(focusUnit)
+	_update_features(focusUnit)
+	_update_portrait(unitData["Profile"]["FullPrt"])
+	get_tree().call_group("ProfileLabels", "you_need_to_update_yourself_NOW", focusUnit)
 	
-	_fill_inv(focusUnit)
 
-func _fill_skills(unit):
-	pass
-		
-func _fill_inv(unit):
-	unit.update_stats()
-	var invPanel = $M/HBoxContainer/InventoryBox/MC2/MC/InvGrid
-	var eqpLabel = $M/HBoxContainer/InventoryBox/MC2/VB/BG/MC/Eqp
-	var equipped = unit.get_equipped_weapon()
-	var id = equipped.ID
-	var dur = equipped.Dur
-	var maxDur = UnitData.itemData[id].MaxDur
-	var iName = UnitData.itemData[id].Name
-	var unitInv = unit.unitData.Inv
-	var durString : String
-	var subProf = unit.unitData.Weapons.Sub
-	
-	if dur <= -1 or maxDur <= -1:
-		durString = str(" --")
-	else:
-		durString = str(" [" + str(dur) + "/" + str(maxDur)+"]")
-	
-	eqpLabel.set_text(str(iName) + durString)
-	eqpLabel.set_meta("data_key", id)
-	
-	if subProf and subProf.has("NATURAL") and id != unit.natural.ID:
-		var item = unit.natural
-		id = item.ID
-		var iStats = UnitData.itemData[id]
-		var l = Label.new()
-		
-		dur = item.Dur
-		maxDur = iStats.MaxDur
-		iName = iStats.Name
-		durString = str(" --")
-		_add_item_label(invPanel,l,iName,durString,id)
-	
-	for item in unitInv:
-		if item.Equip:
-			continue
-		var iStats = UnitData.itemData[item.ID]
-		var l = Label.new()
-		dur = item.Dur
-		maxDur = iStats.MaxDur
-		iName = iStats.Name
-		
-		if dur <= -1 or maxDur <= -1:
-			durString = str(" --")
-		else:
-			durString = str(" [" + str(dur) + "/" + str(maxDur)+"]")
-		_add_item_label(invPanel,l,iName,durString,id)
+func _update_portrait(path : String):
+	var texture = load(path)
+	var portrait := $ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin/UnitPrt
+	if !texture:
+		texture = load("res://sprites/ERROR.png")
+	portrait.set_texture(texture)
 
-func _add_item_label(panel, label, iName, durString, id):
-	label.set_text(str(iName) + durString)
-	label.set_meta("data_key", id)
-	panel.add_child(label)
+func _update_status(unitStatus):
+	var grid := $ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin/StatusTrayMargin/StatusGridMargin/StatusGrid
+	
 
-func _clear_inv():
-	var inv = $M/HBoxContainer/InventoryBox/MC2/MC/InvGrid
-	var children = inv.get_children()
-	for child in children:
-		child.queue_free()
+func _update_inventory(unit) -> Array:
+	inventory.set_meta("Unit", unit)
+	inventory.clear_items()
+	var itembuttons :Array = inventory.fill_items()
+	
+	return itembuttons
+
+
+func _update_features(unit) -> Array:
+	var skills = unit.unitData.Skills
+	var sData = UnitData.skillData
+	var passives = unit.unitData.Passives
+	var pData = UnitData.passiveData
+	var sPath = load("res://scenes/GUI/skill_button.tscn")
+	var pPath = load("res://scenes/GUI/passive_button.tscn")
+	var skillButtons :Array =[]
+	var passiveButtons : Array =[]
+	var s : SkillButton
+	var p : PassiveButton
+	var buttons : Array = []
+	
+	for passive in passives:
+		p = generate_passivebutton(pPath, pData[passive])
+		passiveButtons.append(p)
+		fBox.add_child(p)
+	
+	for skill in skills:
+		s = generate_skillbutton(sPath, sData[skill])
+		skillButtons.append(s)
+		fBox.add_child(s)
+		
+	buttons = [skillButtons, passiveButtons]
+	return buttons
+		
+		
+func generate_skillbutton(path, data) -> SkillButton:
+	var b : SkillButton
+	b = path.instantiate()
+	b.set_item_text(data.SkillName, str(data.Cost))
+	b.set_item_icon(data.Icon)
+	return b
+
+
+func generate_passivebutton(path, data) -> PassiveButton:
+	var b : PassiveButton
+	b = path.instantiate()
+	b.set_passive_text(data)
+	b.set_passive_icon(data)
+	return b
+
+#func _update_passives(unit):
+	#_clear_skills()
+	#var skills = unit.unitData.Skills
+	#var data = UnitData.skillData
+	#var path = load("res://scenes/GUI/skill_button.tscn")
+	#var skillButtons :Array = []
+	#var b : SkillButton
+	#for skill in skills:
+		#b = path.instantiate()
+		#b.set_item_text(data[skill].SkillName, str(data[skill].Cost))
+		#b.set_item_icon(data[skill].Icon)
+		#fBox.add_child(b)
+		#skillButtons.append(b)
+
+		
+func _clear_skills():
+	for kid in fBox.get_children():
+		fBox.remove_child(kid)
+		kid.queue_free()
+
+#tool tip code
+func toggle_tooltips():
+	toggle_blockers()
+
+func toggle_blockers():
+	fBlocker.visible = !fBlocker.visible
+	inventory.toggle_blocker()

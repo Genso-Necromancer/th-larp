@@ -95,8 +95,8 @@
 			<entry id = "unit_name_reimu"><![CDATA[Reimu Hakuri]]></entry>
 			<!-- species -->
 			<entry id = "species_name_fairy"><![CDATA[Fairy]]></entry>
-			<entry id = "species_name_human"><![CDATA[Vampire]]></entry>
-			<entry id = "species_name_vampire"><![CDATA[Human]]></entry>
+			<entry id = "species_name_human"><![CDATA[Human]]></entry>
+			<entry id = "species_name_vampire"><![CDATA[Vampire]]></entry>
 			<entry id = "species_name_magician"><![CDATA[Magician]]></entry>
 			<entry id = "species_name_dragon"><![CDATA[Dragon]]></entry>
 			<entry id = "species_name_youkai"><![CDATA[Youkai]]></entry>

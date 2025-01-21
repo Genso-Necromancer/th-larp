@@ -16,16 +16,15 @@ signal trd_focus_changed
 #Node references
 @onready var box1 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1
 @onready var box2 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2
-@onready var list1 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1/TradePnl1/MarginContainer/ItemList1
-@onready var list2 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/TradePnl2/MarginContainer/ItemList2
+@onready var list1 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1/TradePnl1
+@onready var list2 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/TradePnl2
 @onready var sprite1 = $CharacterArtGroup/MarginContainer/PrtPnl1/MarginContainer/UnitPrt1
 @onready var sprite2 = $CharacterArtGroup/MarginContainer/PrtPnl2/MarginContainer/UnitPrt2
 @onready var prtPanel1 = $CharacterArtGroup/MarginContainer/PrtPnl1
 @onready var prtPanel2 = $CharacterArtGroup/MarginContainer/PrtPnl2
 @onready var infoPanel = $TradeContainer/MarginContainer/TradeScreenVBox/ItemInfoPanel
 @onready var supplyPanel = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl
-@onready var supplyList = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer/MarginContainer/ScrollContainer/SupplyList
-@onready var tabContainer = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer
+#@onready var tabContainer = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer
 @onready var optionsPop = $OptionsPopUp
 @onready var effTitle = $TradeContainer/MarginContainer/TradeScreenVBox/ItemInfoPanel/MarginContainer/VBoxContainer/EffectTitleBox
 
@@ -36,6 +35,7 @@ var secondUnit : Unit
 
 #cursorTracking
 var lastClicked : BaseButton
+var swapIndx = null
 
 #trade states
 enum tStates {
@@ -62,13 +62,6 @@ enum tabTypes {
 	ACC,
 	ITEM
 }
-var openTab := tabTypes.BLADE:
-	set(value):
-		if tabTypes.find_key(value) == null:
-			print("Invalid Tab Enum")
-			return
-		openTab = value
-		_change_tab()
 		
 
 #Supply Tracking
@@ -204,7 +197,7 @@ func open_supply_menu(unit): #HERE
 	_reparent_info(1)
 	tState = tStates.SUPPLY
 	list1.set_meta("Unit", unit)
-	openTab = tab
+	_change_tab(tab)
 
 
 func _close_supply_menu():
@@ -214,7 +207,7 @@ func _close_supply_menu():
 	_hide_sprites()
 	toggle_visible()
 	_clear_item_list(list1)
-	_clear_item_list(supplyList)
+	_clear_item_list(supplyPanel)
 	tState = tStates.DEFAULT
 	emit_signal("trade_closed")
 	
@@ -283,9 +276,9 @@ func get_buttons() -> Array:
 	var children : Array
 	
 	match tState:
-		tStates.TRADE: children = list1.get_children() + list2.get_children()
-		tStates.SUPPLY: children = list1.get_children() + list2.get_children() + supplyList.get_children() + tabContainer.get_children()
-		tStates.MANAGE:  children = list1.get_children()
+		tStates.TRADE: children = list1.itemList.get_children() + list2.itemList.get_children()
+		tStates.SUPPLY: children = list1.itemList.get_children() + list2.itemList.get_children() + supplyPanel.itemList.get_children() + supplyPanel.tabs
+		tStates.MANAGE:  children = list1.itemList.get_children()
 		
 	
 	for child in children:
@@ -298,76 +291,38 @@ func get_buttons() -> Array:
 	return btns
 	
 func get_items(list) -> Array:
-	var items = list.get_children()
+	var items = list.itemList.get_children()
 	return items
 	
 func _fill_item_list(list):
-	var unit = list.get_meta("Unit")
-	var inv = unit.unitData.Inv
-	var i = 0
-	var bPath = load("res://scenes/GUI/item_button.tscn")
-	for item in inv:
-		var itemData = UnitData.itemData[item.ID]
-		var b = bPath.instantiate()
-		var dur = item.Dur
-		var mDur = itemData.MaxDur
-		var durString
-		if dur == -1 or mDur == -1:
-			durString = str(" --")
-		else:
-			durString = str(" [" + str(dur) + "/" + str(mDur)+"]")
-			
-		b.set_item_text(str(itemData.Name), durString, iFSize)
-		b.set_item_icon(itemData.Icon)
-		b.set_meta_data(item, unit, i, itemData.Trade)
-		if tState == tStates.TRADE and !itemData.Trade:
-			b.state = "Disabled"
-		i += 1
-		#does this work still like this? HERE
-		#b.get_button().set_focus_neighbor(SIDE_LEFT, b.get_path_to(b.get_button()))
-		#b.get_button().set_focus_neighbor(SIDE_RIGHT, b.get_path_to(b.get_button()))
-		list.add_child(b)
+	var isTrade = false
+	if tState == tStates.TRADE:
+		isTrade = true
+	var items = list.fill_items(isTrade)
+	for b in items:
 		_connect_item(b.get_button())
-		b.add_to_group("unitInv")
 	
 		
-func _fill_supply_list(s):
-	var tabKeys = tabTypes.keys()
-	var supply = UnitData.supply[tabKeys[s]]
-	var i = 0
-	var bPath = load("res://scenes/GUI/item_button.tscn")
-	for item in supply:
-		var itemData = UnitData.itemData[item.ID]
-		var b = bPath.instantiate()
-		var dur = item.Dur
-		var mDur = itemData.MaxDur
-		var durString
-		if dur == -1 or mDur == -1:
-			durString = str(" --")
-		else:
-			durString = str(" [" + str(dur) + "/" + str(mDur)+"]")
-		b.set_item_text(str(itemData.Name), durString, iFSize)
-		b.set_item_icon(itemData.Icon)
-		b.set_meta_data(item, "Supply", i, itemData.Trade)
-		i += 1
-		supplyList.add_child(b)
+func _connect_supply(items):
+	for b in items:
 		_connect_item(b.get_button(), true)
-		b.add_to_group("convoyInv")
-		
+
+
 func _clear_item_list(list):
-	var btns = list.get_children()
-	for b in btns:
-		list.remove_child(b)
-		b.queue_free()
+	list.clear_items()
 	
-func _refresh_list(useLastItem := false, resetList :VBoxContainer = list1):
+	
+func _refresh_list(useLastItem := false, resetList = list1):
 	var lists := []
 	var i : int
 	if tState == tStates.SUPPLY: 
-		_sort_supply()
+		_connect_supply(supplyPanel.sort_supply())
 	if box1.visible: lists.append(list1)
 	if box2.visible: lists.append(list2)
-	if useLastItem and firstBtn:
+	if useLastItem and swapIndx:
+		i = swapIndx
+		swapIndx = null
+	elif useLastItem and firstBtn:
 		i = firstBtn.get_meta("Index")
 	for l in lists:
 		_clear_item_list(l)
@@ -386,13 +341,13 @@ func _assign_neighbors():
 	var neighbor
 	var isConvoy : bool = false
 	if tState == tStates.SUPPLY: 
-		neighbor = supplyList
+		neighbor = supplyPanel
 		isConvoy = true
 	else: neighbor = list2
 	var l1Empty = false
 	var l2Empty = false
-	var size1 = list1.get_children().size()
-	var size2 = neighbor.get_children().size()
+	var size1 = list1.itemList.get_children().size()
+	var size2 = neighbor.itemList.get_children().size()
 	
 	if size2 == 0:
 		l2Empty = true
@@ -416,7 +371,7 @@ func _assign_neighbors():
 func _assign_vertical_neighbors(list, isConvoy = false):
 	var i = 0
 	var n = 0
-	var btns = list.get_children()
+	var btns : Array = list.itemList.get_children()
 	var size1 = btns.size()
 	var iMax1 = size1 - 1
 	
@@ -447,12 +402,14 @@ func _assign_vertical_neighbors(list, isConvoy = false):
 func _assign_horizontal_neighbors(empty):
 	var neighbor
 	if tState == tStates.SUPPLY:
-		neighbor = supplyList
+		neighbor = supplyPanel
 	else: neighbor = list2
-	var i = 0
-	var n = 0
-	var btns1 = list1.get_children()
-	var btns2 = neighbor.get_children()
+	var i := 0
+	var n := 0
+	var btns1 : Array = list1.itemList.get_children()
+	var btns2 : Array = neighbor.itemList.get_children()
+	
+	
 	var size2 = btns2.size()
 	var iMax2 = size2 - 1
 	var nList = btns2
@@ -471,9 +428,9 @@ func _assign_horizontal_neighbors(empty):
 func _assign_tab_neighbor():
 	#var tabKeys = tabTypes.keys()
 	#var supply = UnitData.supply[tabKeys[openTab]]
-	var tabs = tabContainer.get_children()
-	var supplyHasItems = supplyList.get_child_count()
-	var unitHasItems = list1.get_child_count()
+	var tabs = supplyPanel.tabs
+	var supplyHasItems = supplyPanel.itemList.get_children()
+	var unitHasItems = list1.itemList.get_children()
 	
 	
 	for tab in tabs:
@@ -481,10 +438,10 @@ func _assign_tab_neighbor():
 		if !tab.get_meta("NeedNeighbor"):
 			continue
 		if supplyHasItems:
-			var n = supplyList.get_child(0)
+			var n = supplyPanel.itemList.get_child(0)
 			tab.focus_neighbor_bottom = tab.get_path_to(n.button)
 		elif unitHasItems: 
-			var n = list1.get_child(0)
+			var n = list1.itemList.get_child(0)
 			tab.focus_neighbor_bottom = tab.get_path_to(n.button)
 		else:
 			tab.focus_neighbor_bottom = tab.get_path_to(tab)
@@ -492,7 +449,7 @@ func _assign_tab_neighbor():
 
 func increment_tabs(isIncrease, inc = 1): #Not yet used. tab incrementing hotkey
 	var tabSize = tabTypes.size()
-	var newTab = openTab
+	var newTab = supplyPanel.openTab
 	if !isIncrease:
 		inc = inc - (inc * 2)
 	newTab += inc
@@ -500,19 +457,18 @@ func increment_tabs(isIncrease, inc = 1): #Not yet used. tab incrementing hotkey
 		newTab = 0
 	elif newTab < 0:
 		newTab = tabSize
-	
-	openTab = newTab
+	_change_tab(newTab)
 		
 
-func _change_tab():
-	_clear_item_list(supplyList)
+func _change_tab(newTab):
+	supplyPanel.openTab = newTab
 	call_deferred("_refresh_list")
 	#_refresh_list()
 	
 
 
 func _connect_tabs():
-	var tabs = tabContainer.get_children()
+	var tabs = supplyPanel.tabs
 	for t in tabs:
 		t.pressed.connect(self._on_tab_pressed.bind(t))
 
@@ -689,7 +645,7 @@ func _trade_select(b):
 		firstBtn = b
 		emit_signal("item_selected", b)
 	else:
-		
+		swapIndx = b.get_meta("Index")
 		_trade_initiated(firstBtn, b)
 	
 	
@@ -711,8 +667,8 @@ func _give_select(b) -> void:
 	if item == unit.get_equipped_weapon():
 		wasEquipped = true
 	
-	if iType != tabTypes.find_key(openTab):
-		openTab = tabTypes.get(iType)
+	if iType != tabTypes.find_key(supplyPanel.openTab):
+		_change_tab(tabTypes.get(iType))
 	supplyInv.append(item)
 	
 	inv.remove_at(iInd)
@@ -753,7 +709,7 @@ func _take_select(b):
 		#_find_valid_cursor_focus(supplyList, iInd)
 		
 	#_refresh_list()
-	call_deferred("_refresh_list", true, supplyList)
+	call_deferred("_refresh_list", true, supplyPanel)
 	_refresh_count()
 
 
@@ -761,7 +717,7 @@ func regress_trade():
 	match tState:
 		tStates.DEFAULT: _close_supply_menu()
 		tStates.TRADE:
-			if firstBtn:
+			if firstBtn and is_instance_valid(firstBtn):
 				_item_deselected(true)
 			else:
 				_close_trade_menu()
@@ -771,25 +727,24 @@ func regress_trade():
 
 
 func _item_deselected(snap = false):
-	var b = firstBtn
 	firstBtn.state = "Default"
 	_remove_empty()
 	if snap:
-		b.call_deferred("grab_focus")
+		firstBtn.call_deferred("grab_focus")
 	firstBtn = null
  
 
 func _find_valid_cursor_focus(l, i):
-	var btns = l.get_children()
+	var btns = l.itemList.get_children()
 	var newFocus = null
 	var backup = 0
 	
 	while btns.size() < 1:
 		match backup:
-			0: btns = list1.get_children()
-			1: btns = list2.get_children()
-			2: btns = supplyList.get_children()
-			3: btns = tabContainer.get_children()
+			0: btns = list1.itemList.get_children()
+			1: btns = list2.itemList.get_children()
+			2: btns = supplyPanel.itemList.get_children()
+			3: btns = supplyPanel.tabs
 			_: return
 		backup += 1
 	
@@ -807,8 +762,8 @@ func _find_valid_cursor_focus(l, i):
 	
 	
 func find_cursor_destionation(b):
-	var children1 = list1.get_children()
-	var children2 = list2.get_children()
+	var children1 = list1.itemList.get_children()
+	var children2 = list2.itemList.get_children()
 	
 	if children1.has(b):
 		return children2[0]
@@ -819,38 +774,23 @@ func find_cursor_destionation(b):
 	
 	
 func _add_empty(unit, list):
-	var b = load("res://scenes/GUI/item_button.tscn").instantiate()
-	
-	var i = list.get_children().size()
-	b.set_item_text("", "", iFSize)
-	b.toggle_icon()
-	b.set_meta_data(false, unit, i, true)
-	list.add_child(b)
+	var b : ItemButton = list.add_empty(unit)
 	_connect_item(b.get_button())
+	_assign_neighbors()
 	emit_signal("new_btn_added", b.get_button())
 	#b.add_to_group("unitInv")
 	
 	
 func _remove_empty():
-	var btns1 = get_trade_list(1).get_children()
-	var btns2 = get_trade_list(2).get_children()
-	for b in btns1:
-		if b.get_meta("Item"):
-			continue
-		else:
-			b.queue_free()
-	for b in btns2:
-		if b.get_meta("Item"):
-			continue
-		else:
-			b.queue_free()
-	_reindex_buttons(btns1)
-	_reindex_buttons(btns2)
+	list1.remove_empty()
+	list2.remove_empty()
+	list1.reindex_buttons()
+	list2.reindex_buttons()
 
 
 func _check_i_space(unit, list):
 	var iLimit = unit.unitData.MaxInv
-	var iCount = list.get_children().size()
+	var iCount = list.itemList.get_children().size()
 	
 	if iCount < iLimit:
 		return true
@@ -862,13 +802,7 @@ func _trade_initiated(b1, b2):
 	_swap_items(b1, b2)
 	_item_deselected()
 	
-	
-func _reindex_buttons(btns):
-	var i = 0
-	for b in btns:
-		b.set_meta("Index", i)
-		i += 1
-	
+
 
 func _swap_items(b1, b2):
 	var unit1 = b1.get_meta("Unit")
@@ -876,15 +810,16 @@ func _swap_items(b1, b2):
 	var i1 = b1.get_meta("Index")
 	var inv1 = unit1.unitData.Inv
 	
-	var btns1 = list1.get_children()
+	var btns1 = list1.itemList.get_children()
 	var unit2 = b2.get_meta("Unit")
 	var item2 = b2.get_meta("Item")
 	var i2 = b2.get_meta("Index")
+	
 	var inv2 = unit2.unitData.Inv
 	
 	#var btns2 = get_trade_list(2).get_children()
 	var home
-	var destination
+	#var destination
 	
 	
 	
@@ -892,22 +827,22 @@ func _swap_items(b1, b2):
 		home = list1
 	else:
 		home = list2
-	if btns1.has(b2):
-		destination = list1
-	else:
-		destination = list2
-		
-	b1.set_meta("Unit", unit2)
-	b2.set_meta("Unit", unit1)
-	home.remove_child(b1)
-	destination.remove_child(b2)
-	destination.add_child(b1)
-	destination.move_child(b1, i2)
+	#if btns1.has(b2):
+		#destination = list1
+	#else:
+		#destination = list2
+		#
+	#b1.set_meta("Unit", unit2)
+	#b2.set_meta("Unit", unit1)
+	#home.remove_child(b1)
+	#destination.remove_child(b2)
+	#destination.add_child(b1)
+	#destination.move_child(b1, i2)
 	
 	
 	if item2:
-		home.add_child(b2)
-		home.move_child(b2, i1)
+		#home.add_child(b2)
+		#home.move_child(b2, i1)
 		inv1[i1] = item2.duplicate()
 		inv2[i2] = item1.duplicate()
 	else:
@@ -921,7 +856,7 @@ func _swap_items(b1, b2):
 		
 	_remove_empty()
 	#_refresh_list()
-	call_deferred("_refresh_list")
+	call_deferred("_refresh_list", true)
 	
 	#print("Inv1: " + str(inv1) + "
 	#Inv2: " + str(inv2))
@@ -937,48 +872,11 @@ func _get_first_valid_category() -> int:
 			break
 	return valid
 
-func _sort_supply():
-	var tabKeys = tabTypes.keys()
-	var supply = UnitData.supply[tabKeys[openTab]]
-	supply.sort_custom(_sort_items)
-	_clear_item_list(supplyList)
-	_fill_supply_list(openTab)
-	
-	
-func _sort_items(a, b):
-	var itemData = UnitData.itemData
-	var aName = itemData[a.ID].Name
-	var bName = itemData[b.ID].Name
-	var aDur = a.Dur
-	var bDur = b.Dur
-	var checkDur = false
-	if aName < bName:
-		return true
-	elif aName == bName:
-		checkDur = true
-	else:
-		return false
-	if checkDur and aDur > bDur:
-		return true
-	else:
-		return false
-
-
-
-#func _toggle_group_filter(group, enable = false):
-	#var nodes = get_tree().get_nodes_in_group(group)
-	#for node in nodes:
-		##var mode = node.get_mouse_filter()
-		#if enable:
-			#node.set_mouse_filter(0)
-		#else: 
-			#node.set_mouse_filter(2)
-
 
 func _on_tab_pressed(b):
 	var c = b.get_meta("Category")
 	lastClicked = b
-	openTab = tabTypes[c]
+	_change_tab(tabTypes[c])
 
 #func _on_use_btn_pressed():
 	#var item = firstBtn.get_meta("Item")

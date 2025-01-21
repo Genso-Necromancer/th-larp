@@ -1,7 +1,8 @@
-[gd_resource type="Theme" load_steps=17 format=3 uid="uid://errgec2364nv"]
+[gd_resource type="Theme" load_steps=18 format=3 uid="uid://errgec2364nv"]
 
 [ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="1_myb4q"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_tj7sl"]
+[ext_resource type="FontFile" uid="uid://c2km1ktr8iwsb" path="res://fonts/Marcellus/Marcellus-sc.regular.otf" id="3_4q0w2"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_s7ira"]
 
@@ -66,7 +67,7 @@ expand_margin_bottom = 6.0
 
 [resource]
 default_base_scale = 1.0
-default_font = ExtResource("1_myb4q")
+default_font = ExtResource("3_4q0w2")
 Button/colors/font_color = Color(0.87451, 0.87451, 0.87451, 1)
 Button/colors/font_disabled_color = Color(0.255659, 0.255659, 0.255659, 1)
 Button/colors/font_focus_color = Color(0.776471, 0.67451, 0.247059, 1)

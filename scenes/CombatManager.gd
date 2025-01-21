@@ -193,7 +193,7 @@ func _evaluate_clash(a, t, action):
 		results["CanDmg"] = true
 		match aData.Type:
 			Enums.DAMAGE_TYPE.PHYS:
-				d = tAct.Bar
+				d = tAct.Def
 			Enums.DAMAGE_TYPE.MAG:
 				d = tAct.Mag
 			Enums.DAMAGE_TYPE.TRUE:
@@ -210,10 +210,10 @@ func _evaluate_clash(a, t, action):
 	
 	if !skillId:
 		results["Barrier"] = results.Dmg - tData.Barrier
-		results["GrzPrc"] = tData.GrzPrc
+		results["BarPrc"] = tData.BarPrc
 	else:
 		results["Barrier"] = false
-		results["GrzPrc"] = false
+		results["BarPrc"] = false
 		
 		
 	if _speed_check(a, t) and !skillId:
@@ -382,7 +382,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 	var unitCd : Dictionary 
 	var targetCd : Dictionary = target.combatData
 	#var augment : Dictionary
-	var def : int
+	var DRes : int
 	var critDmg : int = 0
 	var grzDef : int = 0
 	var slayerMulti := 1
@@ -446,8 +446,8 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 				slayerMulti = Global.slayerMulti
 		#check units passive procs
 		
-		#determine def used
-		def = targetCd.Def[unitCd.Type]
+		#determine DRes used
+		DRes = targetCd.DRes[unitCd.Type]
 
 		
 		
@@ -483,8 +483,8 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			return outcome
 			
 		#check for Barrier
-		print("Rolling for Barrier. Chance: ", str(targetCd.GrzPrc))
-		if get_roll() <= targetCd.GrzPrc:
+		print("Rolling for Barrier. Chance: ", str(targetCd.BarPrc))
+		if get_roll() <= targetCd.BarPrc:
 			grzDef = targetCd.Barrier
 			
 			print("Barrierd. Barrier Reduction: ", grzDef)
@@ -524,7 +524,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 				elif critDmg:
 					outcome[unit][swingIndx].Crit = critDmg
 					
-				finalDmg = (((unitCd.Dmg + critDmg) - (def + finalBarrier)) * slayerMulti)
+				finalDmg = (((unitCd.Dmg + critDmg) - (DRes + finalBarrier)) * slayerMulti)
 				finalDmg = clampi(finalDmg, 0, 9999)
 				outcome[unit][swingIndx].Dmg = finalDmg
 				target.apply_dmg(finalDmg, unit)
@@ -810,7 +810,7 @@ func warp_to(target, cell):
 func _factor_dmg(target, effect) -> int:
 	var targetCd = target.combatData
 	var dmg
-	dmg = effect.Value - targetCd.Def[effect.SubType]
+	dmg = effect.Value - targetCd.DRes[effect.SubType]
 	return dmg
 
 func _factor_healing(actor, target, effect) -> int:

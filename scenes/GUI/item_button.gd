@@ -20,19 +20,20 @@ var state : String = "Enabled" :
 	get:
 		return state
 
-func set_item_text(string : String, durability : String, fSize : int = 0):
+func set_item_text(string : String, durability : String):
 	var n = $HBoxContainer/HBoxContainer/Name
 	var d = $HBoxContainer/Durability
 	n.set_text(string)
-	
+	if durability == "-1":
+		durability = ""
 	d.set_text(durability)
-	if fSize:
-		n.add_theme_font_size_override("font_size", fSize)
-		d.add_theme_font_size_override("font_size", fSize)
+	#if fSize:
+		#n.add_theme_font_size_override("font_size", fSize)
+		#d.add_theme_font_size_override("font_size", fSize)
 	
-func set_item_icon(icon : CompressedTexture2D):
+func set_item_icon(icon : String):
 	var i = $HBoxContainer/HBoxContainer/Icon
-	i.set_texture(icon)
+	i.set_texture(load(icon))
 	
 
 func toggle_icon():
@@ -82,13 +83,15 @@ func _font_state_change(value : String):
 		l.add_theme_color_override("font_hover_pressed_color", fColor)
 
 func set_meta_data(item, unit, index, canTrade):
+	var isEquipped := false
 	set_meta("Item", item)
 	set_meta("Unit", unit)
 	set_meta("Index", index)
 	set_meta("CanTrade", canTrade)
-	if item.Equip:
+	if item and item.Equip:
+		isEquipped = true
 		_set_equipped(true)
-		
+	set_meta("Equipped", isEquipped)
 
 func _set_equipped(isEquipped):
 	var icon = $HBoxContainer/HBoxContainer/Icon/Equpped

@@ -17,6 +17,7 @@ static func get_named_unit_data():
 				"Profile": {
 					"UnitName": "Remilia",
 					"Prt": load(("res://sprites/RemiliaPrt.png")),
+					"FullPrt":"res://sprites/character/remilia/portrait_full.png",
 					"Sprite": load(("res://sprites/RemiliaTest.png")),
 					"Level": 1,
 					"EXP": 0,
@@ -24,14 +25,14 @@ static func get_named_unit_data():
 					"Species": SPEC_ID.VAMPIRE,
 					},
 				"Stats": {
-					"Move": 4,
+					"Move": 5,
 					"Life": 22,
 					"Comp": 100,
 					"Pwr": 15,
 					"Mag": 6,
 					"Eleg": 6,
 					"Cele": 6,
-					"Bar": 5,
+					"Def": 5,
 					"Cha": 8
 					},
 				"Growths": {
@@ -42,7 +43,7 @@ static func get_named_unit_data():
 					"Mag": 1,
 					"Eleg": 0.4,
 					"Cele": 0.4,
-					"Bar": 0.2,
+					"Def": 0.2,
 					"Cha": 0.6
 					},
 				"Caps": {
@@ -53,7 +54,7 @@ static func get_named_unit_data():
 					"Mag": 20,
 					"Eleg": 20,
 					"Cele": 20,
-					"Bar": 20,
+					"Def": 20,
 					"Cha": 20
 					},
 				"MaxInv": 6,
@@ -78,6 +79,7 @@ static func get_named_unit_data():
 				"Profile": {
 					"UnitName": "Sakuya",
 					"Prt": load(("res://sprites/SakuyaPrt.png")),
+					"FullPrt":"res://sprites/character/sakuya/portrait_full.png",
 					"Sprite": load(("res://sprites/SakuyaTest.png")),
 					"Level": 1,
 					"EXP": 0,
@@ -85,14 +87,14 @@ static func get_named_unit_data():
 					"Species": SPEC_ID.HUMAN,
 					},
 				"Stats": {
-					"Move": 4,
+					"Move": 6,
 					"Life": 19,
 					"Comp": 100,
 					"Pwr": 7,
 					"Mag": 2,
 					"Eleg": 7,
 					"Cele": 8,
-					"Bar": 4,
+					"Def": 4,
 					"Cha": 7
 					},
 				"Growths": {
@@ -103,7 +105,7 @@ static func get_named_unit_data():
 					"Mag": 0.2,
 					"Eleg": 0.55,
 					"Cele": 0.55,
-					"Bar": 0.2,
+					"Def": 0.2,
 					"Cha": 0.7
 					},
 				"Caps": {
@@ -114,14 +116,14 @@ static func get_named_unit_data():
 					"Mag": 20,
 					"Eleg": 20,
 					"Cele": 20,
-					"Bar": 20,
+					"Def": 20,
 					"Cha": 20
 					},
 				"MaxInv": 6,
 				"Inv":[],
 				"SpawnGear":["SLVKNF","PWRELIX","DGR","TESTACC",],
-				"Skills":["ST05", "AttackTest1"],
-				"Passives":[],
+				"Skills":["ST05","LockedCorpse"],
+				"Passives":["NightPerson",],
 				"Weapons": {
 					"Blade": true,
 					"Blunt": false,
@@ -139,6 +141,7 @@ static func get_named_unit_data():
 				"Profile": {
 					"UnitName": "Patchouli",
 					"Prt": load(("res://sprites/PatchouliPrt.png")),
+					"FullPrt":"res://sprites/character/patchouli/portrait_full.png",
 					"Sprite": load(("res://sprites/RemiliaTest.png")),
 					"Level": 1,
 					"EXP": 0,
@@ -153,7 +156,7 @@ static func get_named_unit_data():
 					"Mag": 7,
 					"Eleg": 6,
 					"Cele": 3,
-					"Bar": 1,
+					"Def": 1,
 					"Cha": 6
 					},
 				"Growths": {
@@ -164,7 +167,7 @@ static func get_named_unit_data():
 					"Mag": 0.2,
 					"Eleg": 0.55,
 					"Cele": 0.55,
-					"Bar": 0.2,
+					"Def": 0.2,
 					"Cha": 0.7
 					},
 				"Caps": {
@@ -175,7 +178,7 @@ static func get_named_unit_data():
 					"Mag": 20,
 					"Eleg": 20,
 					"Cele": 20,
-					"Bar": 20,
+					"Def": 20,
 					"Cha": 20
 					},
 				"MaxInv": 6,
@@ -199,6 +202,7 @@ static func get_named_unit_data():
 				"Profile": {
 					"UnitName": "Meiling",
 					"Prt": load(("res://sprites/MeilingPrt.png")),
+					"FullPrt":"res://sprites/character/meiling/portrait_full.png",
 					"Sprite": load(("res://sprites/RemiliaTest.png")),
 					"Level": 1,
 					"EXP": 0,
@@ -213,7 +217,7 @@ static func get_named_unit_data():
 					"Mag": 2,
 					"Eleg": 6,
 					"Cele": 3,
-					"Bar": 6,
+					"Def": 6,
 					"Cha": 4
 					},
 				"Growths": {
@@ -224,7 +228,7 @@ static func get_named_unit_data():
 					"Mag": 0.2,
 					"Eleg": 0.55,
 					"Cele": 0.55,
-					"Bar": 0.2,
+					"Def": 0.2,
 					"Cha": 0.7
 					},
 				"Caps": {
@@ -235,7 +239,7 @@ static func get_named_unit_data():
 					"Mag": 20,
 					"Eleg": 20,
 					"Cele": 20,
-					"Bar": 20,
+					"Def": 20,
 					"Cha": 20
 					},
 				"MaxInv": 6,
@@ -260,6 +264,7 @@ static func get_named_unit_data():
 				"Profile": {
 					"UnitName": "Reimu",
 					"Prt": load(("res://sprites/ReimuPrt.png")),
+					"FullPrt":"res://sprites/character/reimu/portrait_full.png",
 					"Sprite": load(("res://sprites/SakuyaTest.png")),
 					"Level": 1,
 					"EXP": 0,
@@ -274,7 +279,7 @@ static func get_named_unit_data():
 					"Mag": 2,
 					"Eleg": 7,
 					"Cele": 8,
-					"Bar": 4,
+					"Def": 4,
 					"Cha": 7
 					},
 				"Growths": {
@@ -285,7 +290,7 @@ static func get_named_unit_data():
 					"Mag": 0.2,
 					"Eleg": 0.55,
 					"Cele": 0.55,
-					"Bar": 0.2,
+					"Def": 0.2,
 					"Cha": 0.7
 					},
 				"Caps": {
@@ -296,7 +301,7 @@ static func get_named_unit_data():
 					"Mag": 20,
 					"Eleg": 20,
 					"Cele": 20,
-					"Bar": 20,
+					"Def": 20,
 					"Cha": 20
 					},
 				"MaxInv": 6,
@@ -321,6 +326,7 @@ static func get_named_unit_data():
 				"Profile": {
 					"UnitName": "Cirno",
 					"Prt": load(("res://sprites/SakuyaPrt.png")),
+					"FullPrt":"res://sprites/character/cirno/portrait_full.png",
 					"Sprite": load(("res://sprites/SakuyaTest.png")),
 					"Level": 4,
 					"EXP": 0,
@@ -335,7 +341,7 @@ static func get_named_unit_data():
 					"Mag": 2,
 					"Eleg": 7,
 					"Cele": 8,
-					"Bar": 4,
+					"Def": 4,
 					"Cha": 7
 					},
 				"Growths": {
@@ -346,7 +352,7 @@ static func get_named_unit_data():
 					"Mag": 0.2,
 					"Eleg": 0.55,
 					"Cele": 0.55,
-					"Bar": 0.2,
+					"Def": 0.2,
 					"Cha": 0.7
 					},
 				"Caps": {
@@ -357,7 +363,7 @@ static func get_named_unit_data():
 					"Mag": 20,
 					"Eleg": 20,
 					"Cele": 20,
-					"Bar": 20,
+					"Def": 20,
 					"Cha": 20
 					},
 				"MaxInv": 6,
@@ -393,7 +399,7 @@ static func get_spec(specInd):
 					"Mag": 1,
 					"Eleg": 0,
 					"Cele": 2,
-					"Bar": 0,
+					"Def": 0,
 					"Cha": 2
 					},
 				"Growths": {
@@ -404,7 +410,7 @@ static func get_spec(specInd):
 					"Mag": 0.1,
 					"Eleg": 0.0,
 					"Cele": 0.1,
-					"Bar": 0.0,
+					"Def": 0.0,
 					"Cha": 0.1
 					},
 				"Caps": {
@@ -415,7 +421,7 @@ static func get_spec(specInd):
 					"Mag": 0,
 					"Eleg": 0,
 					"Cele": 0,
-					"Bar": 0,
+					"Def": 0,
 					"Cha": 0
 					}
 					},
@@ -434,7 +440,7 @@ static func get_spec(specInd):
 					"Mag": 0,
 					"Eleg": 1,
 					"Cele": 0,
-					"Bar": 1,
+					"Def": 1,
 					"Cha": 1
 					},
 				"Growths": {
@@ -445,7 +451,7 @@ static func get_spec(specInd):
 					"Mag": 0.1,
 					"Eleg": 0.1,
 					"Cele": 0.0,
-					"Bar": 0.0,
+					"Def": 0.0,
 					"Cha": 0.0
 					},
 				"Caps": {
@@ -456,7 +462,7 @@ static func get_spec(specInd):
 					"Mag": 0,
 					"Eleg": 0,
 					"Cele": 0,
-					"Bar": 0,
+					"Def": 0,
 					"Cha": 0
 					}
 					},
@@ -478,7 +484,7 @@ static func get_job(jobInd):
 					"Mag": 0,
 					"Eleg": 4,
 					"Cele": 2,
-					"Bar": 4,
+					"Def": 4,
 					"Cha": 0
 					},
 				"Growths": {
@@ -489,7 +495,7 @@ static func get_job(jobInd):
 					"Mag": -0.1,
 					"Eleg": 0.2,
 					"Cele": 0.0,
-					"Bar": 0.2,
+					"Def": 0.2,
 					"Cha": 0.0
 					},
 				"Caps": {
@@ -500,7 +506,7 @@ static func get_job(jobInd):
 					"Mag": 20,
 					"Eleg": 20,
 					"Cele": 20,
-					"Bar": 20,
+					"Def": 20,
 					"Cha": 20
 					}
 					},
@@ -528,7 +534,7 @@ static func get_job(jobInd):
 					"Mag": 0,
 					"Eleg": 4,
 					"Cele": 5,
-					"Bar": 0,
+					"Def": 0,
 					"Cha": 0
 					},
 				"Growths": {
@@ -539,7 +545,7 @@ static func get_job(jobInd):
 					"Mag": -0.1,
 					"Eleg": 0.2,
 					"Cele": 0.45,
-					"Bar": 0.2,
+					"Def": 0.2,
 					"Cha": 0.0
 					},
 				"Caps": {
@@ -550,7 +556,7 @@ static func get_job(jobInd):
 					"Mag": 20,
 					"Eleg": 20,
 					"Cele": 20,
-					"Bar": 20,
+					"Def": 20,
 					"Cha": 20
 					}
 					},
@@ -568,9 +574,12 @@ static func get_job(jobInd):
 					}
 				}
 
-static func get_art(prtName):
-	
-	var p = {"Prt":load(("res://sprites/%sPrt.png" % [prtName]))}
+static func get_art(unit):
+	#"Prt":load(("res://sprites/character/%s/Prt.png" % [unit])),
+	var p = {
+		"Prt":load(("res://sprites/%sPrt.png" % [unit])),
+		"FullPrt":load(("res://sprites/character/%s/FullPrt.png" % [unit]))
+		}
 	return p
 	
 static func load_generated_sprite(species, job):
@@ -604,7 +613,7 @@ static func get_terrain_costs():
 static func get_items():
 	var iData = {"NONE":{
 				"Name":"--",
-				"Icon": load(("res://sprites/gungnir.png")),
+				"Icon": "res://sprites/gungnir.png",
 				"Type": Enums.DAMAGE_TYPE.PHYS,
 				"Level": 1,
 				"Dmg": 0,
@@ -621,7 +630,7 @@ static func get_items():
 				## Weapons
 				"GNG":{
 				"Name":"Gungnir",
-				"Icon": load(("res://sprites/gungnir.png")),
+				"Icon": "res://sprites/gungnir.png",
 				"Type": Enums.DAMAGE_TYPE.PHYS,
 				"Level": -1,
 				"Dmg": 15,
@@ -638,7 +647,7 @@ static func get_items():
 				
 				"SLVKNF":{
 				"Name":"Silver Knife",
-				"Icon": load(("res://sprites/gungnir.png")),
+				"Icon": "res://sprites/gungnir.png",
 				"Type": Enums.DAMAGE_TYPE.PHYS,
 				"Level": 1,
 				"Dmg": 24,
@@ -655,7 +664,7 @@ static func get_items():
 				
 				"CLB": {
 				"Name":"Club",
-				"Icon": load(("res://sprites/gungnir.png")),
+				"Icon": "res://sprites/gungnir.png",
 				"Type": Enums.DAMAGE_TYPE.PHYS,
 				"Level": 1,
 				"Dmg": 7,
@@ -672,7 +681,7 @@ static func get_items():
 				
 				"DGR": {
 				"Name":"Dagger",
-				"Icon": load(("res://sprites/gungnir.png")),
+				"Icon": "res://sprites/gungnir.png",
 				"Type": Enums.DAMAGE_TYPE.PHYS,
 				"Level": 1,
 				"Dmg": 4,
@@ -689,7 +698,7 @@ static func get_items():
 				
 				"THKN":{
 				"Name":"Throwing Knife",
-				"Icon": load(("res://sprites/gungnir.png")),
+				"Icon": "res://sprites/gungnir.png",
 				"Type": Enums.DAMAGE_TYPE.PHYS,
 				"Level": 1,
 				"Dmg": 3,
@@ -706,7 +715,7 @@ static func get_items():
 				
 				"BK":{
 				"Name":"Book",
-				"Icon": load(("res://sprites/gungnir.png")),
+				"Icon": "res://sprites/gungnir.png",
 				"Type": Enums.DAMAGE_TYPE.PHYS,
 				"Level": 1,
 				"Dmg": 1,
@@ -723,7 +732,7 @@ static func get_items():
 				
 				"NaturalMartial":{
 				"Name": "PUNCH",
-				"Icon": load(("res://sprites/gungnir.png")),
+				"Icon": "res://sprites/gungnir.png",
 				"Type": Enums.DAMAGE_TYPE.PHYS,
 				"Level": -1,
 				"Dmg": 0,
@@ -743,7 +752,7 @@ static func get_items():
 				
 				"SMPLGOHEI": {
 				"Name":"Simple Gohei",
-				"Icon": load(("res://sprites/gungnir.png")),
+				"Icon": "res://sprites/gungnir.png",
 				"Type": Enums.DAMAGE_TYPE.PHYS,
 				"Level": 1,
 				"Dmg": 5,
@@ -761,7 +770,7 @@ static func get_items():
 				## Consumables
 				"PZA":{
 				"Name":"Pizza",
-				"Icon": load(("res://sprites/gungnir.png")),
+				"Icon": "res://sprites/gungnir.png",
 				"Category": "ITEM",
 				"MaxDur": 3,
 				"Use": true,
@@ -769,7 +778,7 @@ static func get_items():
 				
 				"PWRELIX":{
 				"Name":"Power Elixir",
-				"Icon": load(("res://sprites/gungnir.png")),
+				"Icon": "res://sprites/gungnir.png",
 				"Category": "ITEM",
 				"MaxDur": 1,
 				"Use": true,
@@ -777,7 +786,7 @@ static func get_items():
 				## Accessories
 				"TESTACC":{
 				"Name": "STR Ring",
-				"Icon": load(("res://sprites/gungnir.png")),
+				"Icon": "res://sprites/gungnir.png",
 				"Category": "ACC",
 				"Equip": true,
 				"Effects": ["PwrAcc01"] },
@@ -862,6 +871,15 @@ static func get_effects():
 				"Stack": true,
 				"DurationType": Enums.DURATION_TYPE.TURN,
 			},
+			"DebuffMove04":{
+				"Type": Enums.EFFECT_TYPE.DEBUFF,
+				"SubType": Enums.SUB_TYPE.MOVE, 
+				"Target": Enums.EFFECT_TARGET.TARGET,
+				"Value": 4,
+				"Duration": 1,
+				"Stack": false,
+				"DurationType": Enums.DURATION_TYPE.TURN,
+			},
 			"SlowTime05": {
 			"Target": "Global",
 			"OnHit": false,
@@ -898,7 +916,7 @@ static func get_skills():
 	skills = {
 		"LifeStealRem":{
 			"SkillName": "Scarlet Thirst",
-			"Icon": load(("res://sprites/gungnir.png")),
+			"Icon": "res://sprites/icons/features/camp_skill_danmaku_mg.png",
 			"Augment": true, #Set true if weapon stats should be used instead.
 			##Only if Augment
 			"WepCat": Enums.WEAPON_CATEGORY.STICK, #Set to required weapon category, or sub type, for skill use.
@@ -915,7 +933,7 @@ static func get_skills():
 		},
 		"EnemyShove1":{
 			"SkillName": "Shove",
-			"Icon": load(("res://sprites/gungnir.png")),
+			"Icon": "res://sprites/icons/features/yuugi.ability.one.png",
 			"CanCrit": false,
 			"CanDmg": false,
 			"Hit": 95,
@@ -924,7 +942,7 @@ static func get_skills():
 		},
 		"EnemyToss1":{
 			"SkillName": "Toss",
-			"Icon": load(("res://sprites/gungnir.png")),
+			"Icon": "res://sprites/icons/features/yuugi.ability.five.png",
 			"Target": "Enemy",
 			"CanCrit": false,
 			"Hit": 65,
@@ -934,7 +952,7 @@ static func get_skills():
 		},
 		"Rest": {
 			"SkillName": "Rest",
-			"Icon": load(("res://sprites/gungnir.png")),
+			"Icon": "res://sprites/icons/features/yuugi.ability.two.png",
 			"Target": "Self",
 			"CanMiss": false, 
 			"CanCrit": false,
@@ -947,7 +965,7 @@ static func get_skills():
 		},
 		"SlayFairy": {
 			"SkillName": "Fairy Slayer",
-			"Icon": load(("res://sprites/gungnir.png")),
+			"Icon": "res://sprites/icons/features/miko.ability.four.png",
 			"Augment": true,
 			"Type": false,
 			"Cost": 5,
@@ -957,7 +975,7 @@ static func get_skills():
 		},
 		"FireBasic": {
 			"SkillName": "Fire Ball",
-			"Icon": load(("res://sprites/gungnir.png")),
+			"Icon": "res://sprites/icons/features/camp_skill_bomb_brew_mg.png",
 			"Augment": false,
 			"Type": Enums.DAMAGE_TYPE.MAG,
 			"Hit": 70,
@@ -972,14 +990,26 @@ static func get_skills():
 		"ST05": {
 		"SkillId": "ST05",
 		"SkillName": "Slow Time",
-		"Icon": load(("res://sprites/gungnir.png")),
+		"Icon": "res://sprites/icons/features/camp_skill_luna_dial.png",
 		"Target": "Self", #Enemy, Self, Ally
 		"CanMiss": true,
 		"Hit": 0,
 		"RangeMin": 0,
 		"RangeMax": 0,
-		"Cost": 0,
+		"Cost": 10,
 		"Effects": ["SlowTime05"]
+		},
+		"LockedCorpse": {
+		"SkillId": "LockedCorpse",
+		"SkillName": "Locked Corpse",
+		"Icon": "res://sprites/icons/features/maid.ability.six.png",
+		"Target": "Enemy", #Enemy, Self, Ally
+		"CanMiss": true,
+		"Hit": 100,
+		"RangeMin": 1,
+		"RangeMax": 3,
+		"Cost": 20,
+		"Effects": ["DebuffMove04"]
 		}
 	}
 	return skills
@@ -988,26 +1018,38 @@ static func get_passives():
 	var passives = {
 		"RemAura":{
 			"Type": Enums.PASSIVE_TYPE.AURA,
-			"Icon": load(("res://sprites/gungnir.png")),
+			"NameDay":"Charisma",
+			"NameNight":"Terror",
+			"IconDay": "res://sprites/icons/features/magician.ability.four.png",
+			"IconNight": "res://sprites/icons/features/maid.ability.four.png",
 			"IsTimeSens": true,
 			Enums.TIME.DAY: "Charisma",
 			Enums.TIME.NIGHT: "Terror",
 		},
 		"Fated":{
 			"Type": Enums.PASSIVE_TYPE.FATED,
-			"Icon": load(("res://sprites/gungnir.png")),
+			"Name":"Fated",
+			"Icon": "res://sprites/icons/features/maid.ability.two.png",
 			"Value": 10
 		},
 		"Martial":{
 			"Type": Enums.PASSIVE_TYPE.SUB_WEAPON,
+			"Name":"Unarmed Strike",
 			"SubType": Enums.WEAPON_CATEGORY.NATURAL,
-			"Icon": load(("res://sprites/gungnir.png")),
+			"Icon": "res://sprites/icons/features/yuugi.ability.five.png",
 			"String": "NaturalMartial",
 		},
 		"DodgeAura":{
 			"Type": Enums.PASSIVE_TYPE.AURA,
-			"Icon": load(("res://sprites/gungnir.png")),
+			"Name":"Plot Armor",
+			"Icon": "res://sprites/icons/features/miko.ability.six.png",
 			"Aura": "AdjAvd",
+		},
+		"NightPerson":{
+			"Type": Enums.PASSIVE_TYPE.NIGHT_PROT,
+			"Name":"Night Owl",
+			"Icon": "res://sprites/icons/features/maid.ability.five.png",
+			"SubType": Enums.SPEC_ID.HUMAN,
 		},
 	}
 	return passives
@@ -1043,18 +1085,18 @@ static func get_time_mods():
 							"Mag": -2,
 							"Eleg": 0,
 							"Cele": 0,
-							"Bar": -2,
+							"Def": -2,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
 							"Barrier": 0, 
-							"GrzPrc": 0, 
+							"BarPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
-							"Def": 0,
+							"DRes": 0,
 							"MoveType": Enums.MOVE_TYPE.FOOT,
 						},
 						Enums.TIME.NIGHT:{
@@ -1065,18 +1107,18 @@ static func get_time_mods():
 							"Mag": 0,
 							"Eleg": 0,
 							"Cele": 0,
-							"Bar": 0,
+							"Def": 0,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
 							"Barrier": 0, 
-							"GrzPrc": 0, 
+							"BarPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
-							"Def": 0,
+							"DRes": 0,
 							"MoveType": Enums.MOVE_TYPE.FLY,
 						}
 		},
@@ -1089,18 +1131,18 @@ static func get_time_mods():
 							"Mag": 0,
 							"Eleg": 0,
 							"Cele": 0,
-							"Bar": 0,
+							"Def": 0,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
 							"Barrier": 0, 
-							"GrzPrc": 0, 
+							"BarPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
-							"Def": 0,
+							"DRes": 0,
 						},
 						Enums.TIME.NIGHT:{
 							"Move": 0,
@@ -1110,18 +1152,18 @@ static func get_time_mods():
 							"Mag": 0,
 							"Eleg": 0,
 							"Cele": 0,
-							"Bar": 0,
+							"Def": 0,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
 							"Barrier": 0, 
-							"GrzPrc": 0, 
+							"BarPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
-							"Def": 0,
+							"DRes": 0,
 						}
 		},
 		Enums.SPEC_ID.DRAGON:{
@@ -1133,18 +1175,18 @@ static func get_time_mods():
 							"Mag": 0,
 							"Eleg": 0,
 							"Cele": 0,
-							"Bar": 0,
+							"Def": 0,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
 							"Barrier": 0, 
-							"GrzPrc": 0, 
+							"BarPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
-							"Def": 0,
+							"DRes": 0,
 						},
 						Enums.TIME.NIGHT:{
 							"Move": 0,
@@ -1154,18 +1196,18 @@ static func get_time_mods():
 							"Mag": 0,
 							"Eleg": 0,
 							"Cele": 0,
-							"Bar": 0,
+							"Def": 0,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
 							"Barrier": 0, 
-							"GrzPrc": 0, 
+							"BarPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
-							"Def": 0,
+							"DRes": 0,
 						}
 		},
 		Enums.SPEC_ID.MAGICIAN:{
@@ -1177,18 +1219,18 @@ static func get_time_mods():
 							"Mag": 0,
 							"Eleg": 0,
 							"Cele": 0,
-							"Bar": 0,
+							"Def": 0,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
 							"Barrier": 0, 
-							"GrzPrc": 0, 
+							"BarPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
-							"Def": 0,
+							"DRes": 0,
 						},
 						Enums.TIME.NIGHT:{
 							"Move": 0,
@@ -1198,18 +1240,18 @@ static func get_time_mods():
 							"Mag": 0,
 							"Eleg": 0,
 							"Cele": 0,
-							"Bar": 0,
+							"Def": 0,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
 							"Barrier": 0, 
-							"GrzPrc": 0, 
+							"BarPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
-							"Def": 0,
+							"DRes": 0,
 						}
 		},
 		Enums.SPEC_ID.FAIRY:{
@@ -1221,18 +1263,18 @@ static func get_time_mods():
 							"Mag": 0,
 							"Eleg": 0,
 							"Cele": 0,
-							"Bar": 0,
+							"Def": 0,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
 							"Barrier": 0, 
-							"GrzPrc": 0, 
+							"BarPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
-							"Def": 0,
+							"DRes": 0,
 						},
 						Enums.TIME.NIGHT:{
 							"Move": 0,
@@ -1242,18 +1284,18 @@ static func get_time_mods():
 							"Mag": 0,
 							"Eleg": 0,
 							"Cele": 0,
-							"Bar": 0,
+							"Def": 0,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
 							"Barrier": 0, 
-							"GrzPrc": 0, 
+							"BarPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
-							"Def": 0,
+							"DRes": 0,
 						}
 		},
 		Enums.SPEC_ID.YOUKAI:{
@@ -1265,18 +1307,18 @@ static func get_time_mods():
 							"Mag": 0,
 							"Eleg": 0,
 							"Cele": 0,
-							"Bar": 0,
+							"Def": 0,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
 							"Barrier": 0, 
-							"GrzPrc": 0, 
+							"BarPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
-							"Def": 0,
+							"DRes": 0,
 						},
 						Enums.TIME.NIGHT:{
 							"Move": 0,
@@ -1286,18 +1328,18 @@ static func get_time_mods():
 							"Mag": 0,
 							"Eleg": 0,
 							"Cele": 0,
-							"Bar": 0,
+							"Def": 0,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"Avoid": 0, 
 							"Barrier": 0, 
-							"GrzPrc": 0, 
+							"BarPrc": 0, 
 							"Crit": 0, 
 							"CrtAvd": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
-							"Def": 0,
+							"DRes": 0,
 						}
 		},
 	}

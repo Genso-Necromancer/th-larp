@@ -95,7 +95,7 @@ var tempSet = false
 #unit status
 var unitData : Dictionary
 #Call for pre-formualted combat stats
-var combatData := {"Dmg": 0, "Hit": 0, "Avoid": 0, "Barrier": 0, "GrzPrc": 0, "Crit": 0, "CrtAvd": 0, "Resist": 0, "EffHit":0, "Bar": 0, "Type":Enums.DAMAGE_TYPE.PHYS, "CanMiss": true}
+var combatData := {"Dmg": 0, "Hit": 0, "Avoid": 0, "Barrier": 0, "BarPrc": 0, "Crit": 0, "CrtAvd": 0, "Resist": 0, "EffHit":0, "Def": 0, "Type":Enums.DAMAGE_TYPE.PHYS, "CanMiss": true}
 #base stats of the unit
 var baseStats := {}
 #aura owned by unit
@@ -500,6 +500,7 @@ func _load_stats():
 	baseStats = unitData.Stats.duplicate(true)
 	activeStats["CurLife"] = baseStats.Life
 	activeStats["CurComp"] = baseStats.Comp
+	activeStats["MoveType"] = unitData.MoveType
 	update_stats()
 	_init_inv()
 	firstLoad = true
@@ -652,6 +653,22 @@ func check_passives():
 				_update_natural(p)
 	validate_auras(valid)
 
+func check_time_prot() -> bool:
+	var passives = unitData.Passives
+	var pData = UnitData.passiveData
+	var validTime
+	Global.timeOfDay
+	for id in passives:
+		var p = pData[id]
+		match p.Type:
+			Enums.PASSIVE_TYPE.NIGHT_PROT:
+				validTime = Enums.TIME.NIGHT
+			Enums.PASSIVE_TYPE.DAY_PROT:
+				validTime = Enums.TIME.DAY
+			_: continue
+		if p.SubType == SPEC_ID and Global.timeOfDay == validTime:
+			return true
+	return false
 
 func search_passive_id(type):
 	var highest = 0
@@ -1098,7 +1115,7 @@ func update_combatdata():
 	combatData.Hit = activeStats.Eleg * 2 + (wep.Hit + activeStats.Cha)
 	combatData.Avoid = activeStats.Cele * 2 + activeStats.Cha + terrainBonus
 	combatData.Barrier = wep.Barrier
-	combatData.GrzPrc = activeStats.Eleg + activeStats.Bar
+	combatData.BarPrc = activeStats.Eleg + activeStats.Def
 	combatData.Crit = activeStats.Eleg + wep.Crit
 	combatData.CrtAvd = activeStats.Cha
 	combatData.CompRes = (activeStats.Cha / 2) + (activeStats.Eleg / 2)
@@ -1110,11 +1127,11 @@ func update_combatdata():
 	combatData.CritBase = activeStats.Eleg
 	combatData.Resist = activeStats.Cha * 2
 	combatData.EffHit = activeStats.Cha
-	combatData.Def = {Enums.DAMAGE_TYPE.PHYS: activeStats.Bar, Enums.DAMAGE_TYPE.MAG: activeStats.Mag, Enums.DAMAGE_TYPE.TRUE: 0}
+	combatData.DRes = {Enums.DAMAGE_TYPE.PHYS: activeStats.Def, Enums.DAMAGE_TYPE.MAG: activeStats.Mag, Enums.DAMAGE_TYPE.TRUE: 0}
 	combatData.CanMiss = true
 	if status.Sleep:
 		combatData.Avoid = 0
-		combatData.GrzPrc = 0
+		combatData.BarPrc = 0
 		
 	
 func get_skill_combat_stats(skillId, augmented := false):
@@ -1195,7 +1212,9 @@ func update_stats(): #GO BACK AND FINISH ACTIVE DEBUFFS AFTER THIS
 		for stat in statKeys:
 			stat = stat.to_pascal_case()
 			buffTotal[stat] = 0
-			if timeMod.has(stat):
+			if timeMod.has(stat) and check_time_prot():
+				buffTotal[stat] += clampi(timeMod[stat], 0, 999999)
+			elif timeMod.has(stat):
 				buffTotal[stat] += timeMod[stat]
 		
 		for aura in activeAuras:
@@ -1225,16 +1244,17 @@ func update_stats(): #GO BACK AND FINISH ACTIVE DEBUFFS AFTER THIS
 			if !buffTotal.has(stat):
 				continue
 			match stat:
-				"Def": 
-					modifiedStats["Def"][Enums.DAMAGE_TYPE.PHYS] += buffTotal[stat]
-					modifiedStats["Def"][Enums.DAMAGE_TYPE.MAG] += buffTotal[stat]
-				"PhysDef": modifiedStats["Def"][Enums.DAMAGE_TYPE.PHYS] += buffTotal[stat]
-				"MagDef": modifiedStats["Def"][Enums.DAMAGE_TYPE.MAG] += buffTotal[stat]
+				"DRes": 
+					modifiedStats["DRes"][Enums.DAMAGE_TYPE.PHYS] += buffTotal[stat]
+					modifiedStats["DRes"][Enums.DAMAGE_TYPE.MAG] += buffTotal[stat]
+				"PhysDef": modifiedStats["DRes"][Enums.DAMAGE_TYPE.PHYS] += buffTotal[stat]
+				"MagDef": modifiedStats["DRes"][Enums.DAMAGE_TYPE.MAG] += buffTotal[stat]
 				"CanMiss": continue
 				_: modifiedStats[stat] = baseValues[stat] + buffTotal[stat]
-				
+		
+		
 		if timeMod.MoveType: #HERE need sprite swap for fly/foot movement changes
-			unitData.MoveType = timeMod.MoveType
+			modifiedStats["MoveType"] = timeMod.MoveType
 			
 		if !baseUpdated:
 			update_combatdata()
@@ -1326,7 +1346,7 @@ func apply_heal(heal := 0):
 	
 func apply_composure(comp := 0):
 	activeStats.CurComp -= comp
-	activeStats.CurComp = clampi(activeStats.CurComp, -activeStats.Comp, activeStats.Comp)
+	activeStats.CurComp = clampi(activeStats.CurComp, 0, activeStats.Comp)
 
 func cure_status(cureType, ignoreCurable = false): #Unnest this someday? I dunno, eat shit.
 	var statusKeys : Array = Enums.SUB_TYPE.keys()

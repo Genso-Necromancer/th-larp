@@ -1,7 +1,7 @@
 [gd_resource type="Theme" load_steps=11 format=3 uid="uid://bi2ve4mbgqqd0"]
 
 [ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="1_bu1ma"]
-[ext_resource type="FontFile" uid="uid://di48a300uqd6d" path="res://fonts/VenomMincho-DOOyR.ttf" id="2_tjkb5"]
+[ext_resource type="FontFile" uid="uid://c2km1ktr8iwsb" path="res://fonts/Marcellus/Marcellus-sc.regular.otf" id="3_ok1g0"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_s7ira"]
 
@@ -21,7 +21,7 @@
 
 [resource]
 default_base_scale = 1.0
-default_font = ExtResource("2_tjkb5")
+default_font = ExtResource("3_ok1g0")
 default_font_size = 32
 Button/colors/font_color = Color(0.760784, 0.760784, 0.760784, 1)
 Button/colors/font_disabled_color = Color(0.255659, 0.255659, 0.255659, 1)
@@ -39,7 +39,7 @@ Button/colors/icon_pressed_color = Color(1, 1, 1, 1)
 Button/constants/h_separation = 2
 Button/constants/outline_size = 0
 Button/font_sizes/font_size = 32
-Button/fonts/font = ExtResource("2_tjkb5")
+Button/fonts/font = ExtResource("3_ok1g0")
 Button/styles/disabled = SubResource("StyleBoxEmpty_s7ira")
 Button/styles/focus = SubResource("StyleBoxEmpty_t31wv")
 Button/styles/hover = SubResource("StyleBoxEmpty_xxmco")
@@ -48,7 +48,7 @@ Button/styles/pressed = SubResource("StyleBoxEmpty_rfvx0")
 Fonts/fonts/normal = ExtResource("1_bu1ma")
 HSeparator/styles/separator = SubResource("StyleBoxEmpty_uptd2")
 Label/font_sizes/font_size = 20
-Label/fonts/font = ExtResource("1_bu1ma")
+Label/fonts/font = ExtResource("3_ok1g0")
 MarginContainer/constants/margin_bottom = 4
 MarginContainer/constants/margin_left = 4
 MarginContainer/constants/margin_right = 4

@@ -80,7 +80,7 @@ func _toggle_lv_margin(status, results, unitName):
 	$PanelContainer/LvUpMargin/Vbox/Stats/UnitMag.text = str(oldStats.Mag)
 	$PanelContainer/LvUpMargin/Vbox/Stats/UnitEle.text = str(oldStats.Eleg)
 	$PanelContainer/LvUpMargin/Vbox/Stats/UnitCele.text = str(oldStats.Cele)
-	$PanelContainer/LvUpMargin/Vbox/Stats/UnitBar.text = str(oldStats.Bar)
+	$PanelContainer/LvUpMargin/Vbox/Stats/UnitBar.text = str(oldStats.Def)
 	$PanelContainer/LvUpMargin/Vbox/Stats/UnitCha.text = str(oldStats.Cha)
 	$PanelContainer/LvUpMargin/Vbox/Header/Increase.text = ""
 	$PanelContainer/LvUpMargin/Vbox/HPCmpBox/IncreaseHP.text = ""
@@ -121,7 +121,7 @@ func _increase_stat(index, report, increases):
 		"Cele":
 			$PanelContainer/LvUpMargin/Vbox/Stats/UnitCele.text = str(statUp)
 			$PanelContainer/LvUpMargin/Vbox/Stats/Increase4.text = ("+" + str(increases[stat]))
-		"Bar":
+		"Def":
 			$PanelContainer/LvUpMargin/Vbox/Stats/UnitBar.text = str(statUp)
 			$PanelContainer/LvUpMargin/Vbox/Stats/Increase5.text = ("+" + str(increases[stat]))
 		"Cha":

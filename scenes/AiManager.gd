@@ -179,8 +179,8 @@ func find_valid_attacks(aiUnit, path, state):
 		for unit in state.player:
 			match wepData[wepID].Type:
 				Enums.DAMAGE_TYPE.PHYS:
-					targetDef = "Bar"
-					if (aiUnit.combatData.Dmg - unit.unitData.Stats.Bar <= 0):
+					targetDef = "Def"
+					if (aiUnit.combatData.Dmg - unit.unitData.Stats.Def <= 0):
 						continue
 				Enums.DAMAGE_TYPE.MAG:
 					targetDef = "Mag"
@@ -246,7 +246,7 @@ func combat_values(aiUnit, attack, targetDef):
 		var accValue = accScore/100
 		accValue = accValue - 0.5
 		accValue = accValue * accScale
-		var grazeProc:float  = target.combatData.GrzPrc
+		var grazeProc:float  = target.combatData.BarPrc
 		var grazeScore: float = (grazeProc / 100)
 		if grazeScore < 1:
 #			print("grz: ", grazeScore)
@@ -262,7 +262,7 @@ func combat_values(aiUnit, attack, targetDef):
 			
 	match target.combatData.Type:
 		"Physical":
-			dmgTaken = target.combatData.Dmg - aiUnit.unitData.Stats.Bar
+			dmgTaken = target.combatData.Dmg - aiUnit.unitData.Stats.Def
 		"Magic":
 			dmgTaken = target.combatData.Dmg - aiUnit.unitData.Stats.Mag
 			

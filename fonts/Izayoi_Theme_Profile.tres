@@ -1,7 +1,9 @@
-[gd_resource type="Theme" load_steps=10 format=3 uid="uid://b0xy887xpxwrs"]
+[gd_resource type="Theme" load_steps=13 format=3 uid="uid://b0xy887xpxwrs"]
 
 [ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="1_a0q8r"]
 [ext_resource type="FontFile" uid="uid://di48a300uqd6d" path="res://fonts/VenomMincho-DOOyR.ttf" id="2_5q814"]
+[ext_resource type="Texture2D" uid="uid://dag4xsl06ghpa" path="res://sprites/UI/spacer.png" id="2_cd1yy"]
+[ext_resource type="FontFile" uid="uid://ckgxohqlgjy7p" path="res://fonts/Quintessential/Quintessential.otf" id="3_1m8xx"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_s7ira"]
 
@@ -13,14 +15,23 @@
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rfvx0"]
 
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_j4xed"]
+texture = ExtResource("2_cd1yy")
+texture_margin_left = 7.0
+texture_margin_top = 5.0
+texture_margin_right = 7.0
+texture_margin_bottom = 7.0
+expand_margin_top = 1.0
+expand_margin_right = 1.0
+region_rect = Rect2(0, 0, 74, 14)
+
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_y8ifr"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_63pdl"]
 
 [resource]
 default_base_scale = 1.0
-default_font = ExtResource("1_a0q8r")
-default_font_size = 12
+default_font = ExtResource("3_1m8xx")
 Button/colors/font_color = Color(0.87451, 0.87451, 0.87451, 1)
 Button/colors/font_disabled_color = Color(0.255659, 0.255659, 0.255659, 1)
 Button/colors/font_focus_color = Color(0.776471, 0.67451, 0.247059, 1)
@@ -44,8 +55,10 @@ Button/styles/hover = SubResource("StyleBoxEmpty_kl6js")
 Button/styles/normal = SubResource("StyleBoxEmpty_hsiuf")
 Button/styles/pressed = SubResource("StyleBoxEmpty_rfvx0")
 Fonts/fonts/normal = ExtResource("1_a0q8r")
-Label/colors/font_color = Color(0, 0, 0, 1)
-Label/font_sizes/font_size = 25
+HSeparator/constants/separation = 0
+HSeparator/styles/separator = SubResource("StyleBoxTexture_j4xed")
+Label/colors/font_color = Color(0.117647, 0.129412, 0.160784, 1)
+Label/font_sizes/font_size = 15
 MarginContainer/constants/margin_bottom = 15
 MarginContainer/constants/margin_left = 15
 MarginContainer/constants/margin_right = 15
@@ -55,3 +68,4 @@ PanelContainer/styles/panel = SubResource("StyleBoxEmpty_63pdl")
 RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
 RichTextLabel/font_sizes/normal_font_size = 26
 RichTextLabel/fonts/normal_font = ExtResource("2_5q814")
+VBoxContainer/constants/separation = 0

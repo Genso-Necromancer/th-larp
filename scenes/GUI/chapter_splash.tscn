@@ -1,8 +1,24 @@
-[gd_scene load_steps=8 format=3 uid="uid://bufey13fhtkyt"]
+[gd_scene load_steps=9 format=3 uid="uid://bufey13fhtkyt"]
 
 [ext_resource type="Theme" uid="uid://beha4ndul0p5x" path="res://fonts/Izayoi_Theme_Chapter_Title.tres" id="1_r5dw1"]
-[ext_resource type="FontFile" uid="uid://di48a300uqd6d" path="res://fonts/VenomMincho-DOOyR.ttf" id="2_2g6p0"]
 [ext_resource type="Script" path="res://scenes/GUI/chapter_splash.gd" id="2_8ba2g"]
+[ext_resource type="FontFile" uid="uid://ckgxohqlgjy7p" path="res://fonts/Quintessential/Quintessential.otf" id="3_cibj8"]
+[ext_resource type="FontFile" uid="uid://b4in3wjmpvqcv" path="res://fonts/NewRocker/new-rocker.regular.otf" id="3_udq14"]
+
+[sub_resource type="Animation" id="Animation_e8am0"]
+resource_name = "FadeOut"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
 
 [sub_resource type="Animation" id="Animation_x0qh2"]
 resource_name = "RESET"
@@ -119,21 +135,6 @@ tracks/7/keys = {
 "values": [Vector2(0, 100), Vector2(0, 200)]
 }
 
-[sub_resource type="Animation" id="Animation_e8am0"]
-resource_name = "FadeOut"
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:modulate")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 1),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
-}
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_v3od1"]
 _data = {
 "FadeOut": SubResource("Animation_e8am0"),
@@ -155,14 +156,15 @@ offset_bottom = 1080.0
 mouse_filter = 2
 
 [node name="Panel" type="Panel" parent="PanelContainer"]
+self_modulate = Color(1, 1, 1, 0.235294)
 layout_mode = 2
 mouse_filter = 2
 
 [node name="TitleNode" type="Control" parent="."]
 anchors_preset = 0
-offset_left = -800.0
+offset_left = 600.0
 offset_top = 317.0
-offset_right = -760.0
+offset_right = 640.0
 offset_bottom = 357.0
 mouse_filter = 2
 metadata/_edit_use_anchors_ = true
@@ -179,43 +181,43 @@ mouse_filter = 2
 alignment = 1
 
 [node name="ChLb" type="Label" parent="TitleNode/ChPanel/ChHBox"]
-self_modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65098, 0.545098, 0, 1)
-theme_override_fonts/font = ExtResource("2_2g6p0")
 text = "Chapter "
 
 [node name="ChNum" type="Label" parent="TitleNode/ChPanel/ChHBox"]
-self_modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.65098, 0.545098, 0, 1)
-theme_override_fonts/font = ExtResource("2_2g6p0")
+theme_override_fonts/font = ExtResource("3_cibj8")
 text = "%s"
 
 [node name="TitlePanel" type="PanelContainer" parent="TitleNode"]
 layout_mode = 2
+offset_top = 100.0
 offset_right = 763.0
-offset_bottom = 132.0
+offset_bottom = 232.0
 mouse_filter = 2
 
 [node name="ChTitle" type="Label" parent="TitleNode/TitlePanel"]
-self_modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.784314, 0.784314, 0.784314, 1)
+theme_override_fonts/font = ExtResource("3_udq14")
 theme_override_font_sizes/font_size = 50
 text = "Chapter Title"
 horizontal_alignment = 1
 
 [node name="TimePanel" type="PanelContainer" parent="TitleNode"]
-offset_top = 100.0
+layout_mode = 0
+offset_top = 200.0
 offset_right = 763.0
-offset_bottom = 231.996
+offset_bottom = 331.995
 mouse_filter = 2
 
 [node name="ChTime" type="Label" parent="TitleNode/TimePanel"]
-self_modulate = Color(1, 1, 1, 0)
+self_modulate = Color(1, 1, 1, 0.866894)
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_fonts/font = ExtResource("3_udq14")
 theme_override_font_sizes/font_size = 50
 text = "00:00 AM"
 horizontal_alignment = 1
