@@ -138,6 +138,8 @@ theme_override_constants/separation = 150
 
 [node name="TradeBox1" type="VBoxContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
 theme = ExtResource("6_k4p7w")
 
 [node name="NamePnl1" type="PanelContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1"]
@@ -168,7 +170,8 @@ layout_mode = 2
 
 [node name="TradeBox2" type="VBoxContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 0
+size_flags_vertical = 0
 theme = ExtResource("6_k4p7w")
 
 [node name="NamePnl2" type="PanelContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2"]
@@ -200,8 +203,10 @@ layout_mode = 2
 [node name="ConvoyPnl" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer" instance=ExtResource("9_fjgok")]
 layout_mode = 2
 
-[node name="ItemInfoPanel" parent="TradeContainer/MarginContainer/TradeScreenVBox" instance=ExtResource("10_pdk1d")]
+[node name="InfoPanel" parent="TradeContainer/MarginContainer/TradeScreenVBox" instance=ExtResource("10_pdk1d")]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
 
 [node name="OptionsPopUp" parent="." instance=ExtResource("9_htpwm")]
 layout_mode = 0

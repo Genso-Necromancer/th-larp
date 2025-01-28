@@ -1,0 +1,122 @@
+[gd_scene load_steps=2 format=3 uid="uid://dkpjc285qkmks"]
+
+[sub_resource type="GDScript" id="GDScript_iiqn5"]
+script/source = "extends CombatDisplay
+
+class_name FeatureDisplay
+
+
+func format_for_passive(control:Control, _unit:Unit) -> Array:
+	var mainTT := $MainTT
+	
+	var id : StringName = control.get_meta(\"ID\")
+	var dataPath = UnitData.passiveData[id]
+	var activeRefs := []
+	var string : String = _format_passive_tooltip(dataPath)
+	
+	mainTT.visible = true
+	activeRefs.append(mainTT)
+	mainTT.set_text(string)
+	
+	return activeRefs
+
+
+func _format_passive_tooltip(data: Dictionary) -> String:
+	var converted : Dictionary = data.duplicate()
+	var enumKeys : Array = Enums.PASSIVE_TYPE.keys()
+	var finished : String
+	var working : String = \"\"
+	working = StringGetter.get_string(\"lore_\" + Enums.PASSIVE_TYPE.keys()[data.Type].to_snake_case())
+
+	match data.Type:
+		Enums.PASSIVE_TYPE.AURA: 
+			var aura : String
+			var morph : String
+			var reverseTime : String
+			var timeRule : String
+			var restrict : String
+			match Global.timeOfDay:
+					Enums.TIME.NIGHT:
+						aura = data.Night
+						morph = data.Day
+						restrict = \"night\"
+						reverseTime = \"day\"
+					Enums.TIME.DAY:
+						aura = data.Day
+						morph = data.Night
+						restrict = \"day\"
+						reverseTime = \"night\"
+			if data.Night and data.Day:
+				timeRule = StringGetter.get_string(\"lore_morph_\" + reverseTime)
+				timeRule = timeRule.format({\"Morph\":\"[color=#FFD700]\"+StringGetter.get_string(\"passive_name_\"+morph.to_snake_case())+\"[/color]\"})
+			elif data.IsTimeSens:
+				timeRule = StringGetter.get_string(\"lore_restrict_\" + restrict)
+			else: aura = data.Aura
+			
+			
+		
+			
+			var auraData = UnitData.auraData[aura]
+			if auraData.Range > 1:
+				converted[\"Range\"] = StringGetter.get_string(\"lore_range\")
+			else: converted[\"Range\"] = StringGetter.get_string(\"lore_range_adjacent\")
+			converted.Range = converted.Range.format(auraData)
+			converted[\"TargetTeam\"] = StringGetter.get_string(\"lore_\" + Enums.TARGET_TEAM.keys()[auraData.TargetTeam].to_snake_case())
+			var first := true
+			converted[\"Effects\"] = \"\"
+			for eff in auraData.Effects:
+				if !first:
+					first = false
+					converted.Effects += \" & \"
+				converted.Effects += StringGetter.get_effect_string(eff)
+			converted[\"Target\"] = StringGetter.get_string(\"lore_aura_\" + Enums.EFFECT_TARGET.keys()[auraData.Target].to_snake_case())
+			converted.Aura = converted.Target.format(converted)
+			if timeRule: 
+				converted.Aura += \"\\n\" + timeRule
+				
+		Enums.PASSIVE_TYPE.VANTAGE: pass
+		Enums.PASSIVE_TYPE.NIGHT_PROT: pass
+		Enums.PASSIVE_TYPE.DAY_PROT: pass
+		Enums.PASSIVE_TYPE.STAT_CHANGE: pass
+		Enums.PASSIVE_TYPE.RESPONSE: pass
+		Enums.PASSIVE_TYPE.FATED: pass
+		Enums.PASSIVE_TYPE.SUB_WEAPON:  converted.SubType = StringGetter.get_string(\"lore_\" + Enums.WEAPON_CATEGORY.keys()[data.SubType].to_snake_case())
+	
+	
+		#time sense check later
+	
+	converted.RuleType = StringGetter.get_string(\"lore_\" + Enums.RULE_TYPE.keys()[data.get(\"RuleType\",0)].to_snake_case())
+	
+	match data.get(\"RuleType\",0):
+		Enums.RULE_TYPE.SELF_SPEC: enumKeys = Enums.SPEC_ID.keys()
+		Enums.RULE_TYPE.TIME: enumKeys = Enums.TIME.keys()
+		Enums.RULE_TYPE.TARGET_SPEC: enumKeys = Enums.SPEC_ID.keys()
+
+	converted.Rule = StringGetter.get_string(\"lore_\" + enumKeys[data.get(\"Rule\",0)].to_snake_case())
+	converted.RuleType = converted.RuleType.format(converted)
+	finished = working.format(converted)
+	
+	
+	return finished
+"
+
+[node name="PassiveDisplayMargin" type="MarginContainer"]
+offset_right = 469.0
+offset_bottom = 116.0
+theme_override_constants/margin_left = 49
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 36
+script = SubResource("GDScript_iiqn5")
+
+[node name="MainTT" type="RichTextLabel" parent="."]
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+deselect_on_focus_loss_enabled = false
+drag_and_drop_selection_enabled = false

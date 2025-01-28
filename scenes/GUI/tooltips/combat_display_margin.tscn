@@ -1,0 +1,121 @@
+[gd_scene load_steps=2 format=3 uid="uid://4giunn2hnq6e"]
+
+[sub_resource type="GDScript" id="GDScript_jbmfh"]
+script/source = "extends MarginContainer
+
+class_name CombatDisplay
+
+#@onready var titleDefault :String = nameTitle.get_text()
+@export var buffColor : Color = Color(0.392, 0.584, 0.929)
+@export var debuffColor : Color = Color(0.357, 0.141, 0.549)
+@export var key1 : String
+@export var key2 : String
+
+func format_for_tooltip(control:Control, unit:Unit) -> Array:
+	
+	var mainTT:= $MainVBox/MainTT
+	var formTT := $MainVBox/FormulaTT
+	var type : StringName = control.get_meta(\"ToolTip\")
+	var stringGet = StringGetter
+	var stringPath:= \"lore_\"
+	var dataPath = unit[key2][type]
+	var activeRefs := []
+	var string : String = \"\"
+	var formula : String
+	var fString : String = \"\"
+	var wep = UnitData.itemData[unit.get_equipped_weapon().ID]
+	string = stringGet.get_string((stringPath+type))
+	mainTT.visible = true
+	activeRefs.append(mainTT)
+	mainTT.set_text(string)
+	formTT.visible = true
+	activeRefs.append(formTT)
+	fString = str(type,\": \",unit[key1][type],\" %s\") % _generate_formula([(unit[key1][type] - unit[key2][type])])
+	
+	match type:
+		\"Dmg\": pass
+		\"Hit\": pass
+		\"Graze\": pass
+		\"Barrier\":
+			var barprc: String = stringGet.get_string(stringPath+\"barprc\")
+			var appended = str(mainTT.get_text(), \"\\n\", barprc)
+			mainTT.set_text(appended)
+			var bPFormula: String = _generate_formula([(unit[key1][\"BarPrc\"] - unit[key2][\"BarPrc\"])])
+			fString = fString + str(\"\\n\",\"Barrier Chance: \",unit[key2].BarPrc,\"%% %s\") % bPFormula
+		\"Crit\": pass
+		\"Luck\": pass
+		\"Resist\" : pass
+		\"EffHit\": pass
+		\"DRes\": pass
+		
+	
+	formTT.set_text(fString)
+	
+	return activeRefs
+
+
+func _generate_formula(params:Array):
+	var string: String = \"(%s)\"
+	var formula: String = \"\"
+	for p in params:
+		var color: String = \"[color=%s]\"
+		var value :String = \"%+-d\" % p
+		if p == 0:
+			continue
+		elif value.begins_with(\"+\"): 
+			color = color % buffColor.to_html(true)
+		else: 
+			color = color % debuffColor.to_html(true)
+		value = color+value+\"[/color]\"
+		formula += value
+	if formula != \"\": 
+		string = string % formula
+		
+	else: 
+		string = string % \"+0\"
+	
+	return string
+"
+
+[node name="CombatDisplayMargin" type="MarginContainer"]
+visible = false
+offset_right = 469.0
+offset_bottom = 74.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_constants/margin_left = 49
+theme_override_constants/margin_top = 25
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 36
+script = SubResource("GDScript_jbmfh")
+buffColor = Color(0.392157, 0.584314, 0.929412, 1)
+debuffColor = Color(0.356863, 0.141176, 0.54902, 1)
+key1 = "baseCombat"
+key2 = "combatData"
+
+[node name="MainVBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="FormulaTT" type="RichTextLabel" parent="MainVBox"]
+visible = false
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+bbcode_enabled = true
+text = "Combat Profile Tool Tip"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+
+[node name="MainTT" type="RichTextLabel" parent="MainVBox"]
+visible = false
+custom_minimum_size = Vector2(400, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+bbcode_enabled = true
+text = "Combat Profile Tool Tip"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false

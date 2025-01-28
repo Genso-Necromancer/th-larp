@@ -1,238 +1,151 @@
-[gd_scene load_steps=5 format=3 uid="uid://b5pdi6fx5chy7"]
+[gd_scene load_steps=13 format=3 uid="uid://b5pdi6fx5chy7"]
 
 [ext_resource type="Theme" uid="uid://errgec2364nv" path="res://fonts/Izayoi_Theme_Tooltip.tres" id="1_q35yw"]
+[ext_resource type="Script" path="res://scenes/GUI/info_panel.gd" id="2_3ju1g"]
 [ext_resource type="Texture2D" uid="uid://b1sb6wysp4b0a" path="res://sprites/UI/tool_tip_bubble.png" id="2_vmh6d"]
-[ext_resource type="PackedScene" uid="uid://cv74wrcjpasmr" path="res://scenes/GUI/value_label.tscn" id="3_81j03"]
-[ext_resource type="Script" path="res://scenes/EffectList.gd" id="4_g02x8"]
+[ext_resource type="PackedScene" uid="uid://63n00lxo2oxf" path="res://scenes/GUI/tooltips/item_display_margin.tscn" id="4_gtm1e"]
+[ext_resource type="PackedScene" uid="uid://bi4unq8mpucas" path="res://scenes/GUI/tooltips/tooltip_display.tscn" id="9_hgpe6"]
 
-[node name="ItemInfoPanel" type="PanelContainer"]
-custom_minimum_size = Vector2(442, 187)
+[sub_resource type="Animation" id="Animation_5g3yv"]
+resource_name = "Close"
+length = 0.2
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"_tween_min_size"
+}]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_ma7y6"]
+resource_name = "Open"
+length = 0.3
+tracks/0/type = "method"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"values": [{
+"args": [],
+"method": &"_tween_min_size"
+}]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_1f6fx"]
+resource_name = "RESET"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_mqi45"]
+_data = {
+"Close": SubResource("Animation_5g3yv"),
+"Open": SubResource("Animation_ma7y6"),
+"RESET": SubResource("Animation_1f6fx")
+}
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_3ger1"]
+animation = &"Open"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_xn1x1"]
+animation = &"Close"
+
+[sub_resource type="AnimationNodeBlendSpace1D" id="AnimationNodeBlendSpace1D_k0a7b"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_3ger1")
+blend_point_0/pos = -1.0
+blend_point_1/node = SubResource("AnimationNodeAnimation_xn1x1")
+blend_point_1/pos = 1.0
+
+[node name="InfoPanel" type="PanelContainer"]
+custom_minimum_size = Vector2(200, 150)
+layout_direction = 1
+offset_right = 200.0
+offset_bottom = 150.0
 size_flags_horizontal = 4
-size_flags_vertical = 4
+size_flags_vertical = 0
+mouse_filter = 2
 theme = ExtResource("1_q35yw")
+script = ExtResource("2_3ju1g")
 
 [node name="BackgroundCenter" type="NinePatchRect" parent="."]
 layout_mode = 2
 texture = ExtResource("2_vmh6d")
-patch_margin_left = 48
+patch_margin_left = 80
 patch_margin_top = 56
-patch_margin_right = 34
-patch_margin_bottom = 43
+patch_margin_right = 58
+patch_margin_bottom = 59
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="ToolTipContainer" type="MarginContainer" parent="."]
+visible = false
 layout_mode = 2
-theme_override_constants/margin_left = 45
+size_flags_horizontal = 4
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_constants/margin_left = 58
 theme_override_constants/margin_top = 30
-theme_override_constants/margin_right = 30
-theme_override_constants/margin_bottom = 30
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="ToolTipContainer"]
 layout_mode = 2
-theme_override_constants/separation = 10
+size_flags_horizontal = 4
+size_flags_vertical = 0
+mouse_filter = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 5
-
-[node name="Lv" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(100, 20)
-layout_mode = 2
-text = "Lvl:"
-horizontal_alignment = 1
-
-[node name="LvValue" parent="MarginContainer/VBoxContainer/HBoxContainer" groups=["ValueLabels"] instance=ExtResource("3_81j03")]
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-metadata/Key = "Level"
-metadata/Type = "Item"
-
-[node name="Type" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(100, 20)
-layout_mode = 2
-text = "Type:"
-horizontal_alignment = 1
-
-[node name="TypeValue" parent="MarginContainer/VBoxContainer/HBoxContainer" groups=["ValueLabels"] instance=ExtResource("3_81j03")]
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-metadata/Key = "Category"
-metadata/Type = "Item"
-
-[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/h_separation = 5
-theme_override_constants/v_separation = 10
-columns = 6
-
-[node name="Might" type="Label" parent="MarginContainer/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(100, 20)
-layout_mode = 2
-text = "Damage:"
-horizontal_alignment = 1
-
-[node name="MightValue" parent="MarginContainer/VBoxContainer/GridContainer" groups=["ValueLabels"] instance=ExtResource("3_81j03")]
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-metadata/Key = "Dmg"
-metadata/Type = "Item"
-
-[node name="Accuracy" type="Label" parent="MarginContainer/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(100, 20)
-layout_mode = 2
-text = "Hit:"
-horizontal_alignment = 1
-
-[node name="AccuracyValue" parent="MarginContainer/VBoxContainer/GridContainer" groups=["ValueLabels"] instance=ExtResource("3_81j03")]
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-metadata/Key = "Hit"
-metadata/Type = "Item"
-
-[node name="Crit" type="Label" parent="MarginContainer/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(100, 20)
-layout_mode = 2
-text = "Crit:"
-horizontal_alignment = 1
-
-[node name="CritValue" parent="MarginContainer/VBoxContainer/GridContainer" groups=["ValueLabels"] instance=ExtResource("3_81j03")]
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-metadata/Key = "Crit"
-metadata/Type = "Item"
-
-[node name="Barrier" type="Label" parent="MarginContainer/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(100, 20)
-layout_mode = 2
-text = "Barrier:"
-horizontal_alignment = 1
-
-[node name="BarrierValue" parent="MarginContainer/VBoxContainer/GridContainer" groups=["ValueLabels"] instance=ExtResource("3_81j03")]
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-metadata/Key = "Barrier"
-metadata/Type = "Item"
-
-[node name="Range" type="Label" parent="MarginContainer/VBoxContainer/GridContainer"]
-custom_minimum_size = Vector2(100, 20)
-layout_mode = 2
-text = "Range:"
-horizontal_alignment = 1
-
-[node name="RangeValue" parent="MarginContainer/VBoxContainer/GridContainer" groups=["ValueLabels"] instance=ExtResource("3_81j03")]
-custom_minimum_size = Vector2(40, 0)
-layout_mode = 2
-metadata/Key = "Range"
-metadata/Type = "Item"
-
-[node name="EffectTitleBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="ItemDisplayMargin" parent="ToolTipContainer/VBoxContainer" instance=ExtResource("4_gtm1e")]
+visible = false
 layout_mode = 2
 
-[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer/EffectTitleBox"]
-self_modulate = Color(1, 1, 1, 0)
+[node name="ToolTipDisplay" parent="ToolTipContainer/VBoxContainer" instance=ExtResource("9_hgpe6")]
+clip_contents = false
+custom_minimum_size = Vector2(250, 0)
 layout_mode = 2
+size_flags_horizontal = 1
+size_flags_vertical = 2
+mouse_filter = 2
 
-[node name="EffectLb" type="Label" parent="MarginContainer/VBoxContainer/EffectTitleBox"]
-layout_mode = 2
-text = "Effects"
-horizontal_alignment = 1
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_mqi45")
+}
 
-[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer/EffectTitleBox"]
-self_modulate = Color(1, 1, 1, 0)
-layout_mode = 2
-
-[node name="EffectContainer" type="MarginContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 42
-
-[node name="EffectList" type="HBoxContainer" parent="MarginContainer/VBoxContainer/EffectContainer" groups=["EffectList"]]
-layout_mode = 2
-theme_override_constants/separation = 20
-alignment = 1
-script = ExtResource("4_g02x8")
-metadata/Type = "Item"
-
-[node name="TargetBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList"]
-layout_mode = 2
-
-[node name="TargetLb" type="Label" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/TargetBox"]
-layout_mode = 2
-text = "Target
-"
-
-[node name="HSeparator2" type="HSeparator" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/TargetBox"]
-self_modulate = Color(1, 1, 1, 0)
-layout_mode = 2
-
-[node name="TargetContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/TargetBox"]
-layout_mode = 2
-
-[node name="VSeparator" type="VSeparator" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList" groups=["EffectSeparators"]]
-layout_mode = 2
-
-[node name="SelfBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList"]
-layout_mode = 2
-
-[node name="SelfLb" type="Label" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/SelfBox"]
-layout_mode = 2
-text = "Self"
-
-[node name="HSeparator3" type="HSeparator" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/SelfBox"]
-self_modulate = Color(1, 1, 1, 0)
-layout_mode = 2
-
-[node name="SelfContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/SelfBox"]
-layout_mode = 2
-
-[node name="VSeparator2" type="VSeparator" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList" groups=["EffectSeparators"]]
-layout_mode = 2
-
-[node name="GlobalBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList"]
-layout_mode = 2
-
-[node name="GlobalLb" type="Label" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/GlobalBox"]
-layout_mode = 2
-text = "Global"
-
-[node name="HSeparator4" type="HSeparator" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/GlobalBox"]
-self_modulate = Color(1, 1, 1, 0)
-layout_mode = 2
-
-[node name="GlobalContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/GlobalBox"]
-layout_mode = 2
-
-[node name="VSeparator3" type="VSeparator" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList" groups=["EffectSeparators"]]
-layout_mode = 2
-
-[node name="PassiveBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList"]
-layout_mode = 2
-
-[node name="PassiveLb" type="Label" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/PassiveBox"]
-layout_mode = 2
-text = "Passives"
-
-[node name="HSeparator5" type="HSeparator" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/PassiveBox"]
-self_modulate = Color(1, 1, 1, 0)
-layout_mode = 2
-
-[node name="PassiveContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/PassiveBox"]
-layout_mode = 2
-
-[node name="VSeparator4" type="VSeparator" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList" groups=["EffectSeparators"]]
-layout_mode = 2
-
-[node name="SkillBox" type="VBoxContainer" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList"]
-layout_mode = 2
-
-[node name="SkillLb" type="Label" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/SkillBox"]
-layout_mode = 2
-text = "Skills"
-
-[node name="HSeparator5" type="HSeparator" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/SkillBox"]
-self_modulate = Color(1, 1, 1, 0)
-layout_mode = 2
-
-[node name="SkillContainer" type="GridContainer" parent="MarginContainer/VBoxContainer/EffectContainer/EffectList/SkillBox"]
-layout_mode = 2
+[node name="AnimationTree" type="AnimationTree" parent="AnimationPlayer"]
+root_node = NodePath("../..")
+libraries = {
+"": SubResource("AnimationLibrary_mqi45")
+}
+tree_root = SubResource("AnimationNodeBlendSpace1D_k0a7b")
+anim_player = NodePath("..")
+parameters/blend_position = -1.0

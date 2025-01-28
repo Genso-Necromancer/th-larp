@@ -47,9 +47,9 @@ func init_roster(forcedDep, depLimit):
 			filled += 1
 		else:
 			b.set_state("Undeployed")
-			
 		grid.add_child(b)
 		unitBars.append(b)
+		b.button.add_to_group("RosterUnitBars")
 	update_deploy_count(filled)
 
 func update_deploy_count(count):
@@ -101,6 +101,13 @@ func close_unit_manager():
 func _switch_trade_mode():
 	close_unit_manager()
 	
+
+func set_bar_focus(canFocus:bool) ->void:
+	if !visible: return
+	if canFocus:
+		get_tree().call_group("RosterUnitBars","set_focus_mode", Control.FOCUS_ALL)
+	else:
+		get_tree().call_group("RosterUnitBars","set_focus_mode", Control.FOCUS_NONE)
 
 	
 func _connect_manager_btns(manager):

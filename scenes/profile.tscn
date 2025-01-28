@@ -1,14 +1,16 @@
-[gd_scene load_steps=15 format=3 uid="uid://cxjo0fdu14w3o"]
+[gd_scene load_steps=17 format=3 uid="uid://cxjo0fdu14w3o"]
 
 [ext_resource type="Theme" uid="uid://b0xy887xpxwrs" path="res://fonts/Izayoi_Theme_Profile.tres" id="1_vrbhg"]
-[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_sedhl"]
 [ext_resource type="Script" path="res://scenes/profile.gd" id="2_wouk2"]
 [ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="3_x6e7x"]
 [ext_resource type="Texture2D" uid="uid://bgjprqmkgf6df" path="res://sprites/UI/character_profile.png" id="3_yd7vf"]
 [ext_resource type="Texture2D" uid="uid://dbq2i73drb6df" path="res://sprites/character/sakuya/portrait_full.png" id="5_8rabj"]
+[ext_resource type="Script" path="res://scenes/status_tray.gd" id="5_543hk"]
+[ext_resource type="Texture2D" uid="uid://dt8g5xp8171gn" path="res://sprites/UI/ui_status_tray.png" id="6_6pukg"]
 [ext_resource type="FontFile" uid="uid://byluxrpq7rwkq" path="res://fonts/JimNightshade/JimNightshade.otf" id="6_cj8vs"]
 [ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/inventory_panel.tscn" id="6_uhtry"]
 [ext_resource type="Script" path="res://scenes/LabelValue.gd" id="7_2r62x"]
+[ext_resource type="Script" path="res://scenes/status_grid.gd" id="7_2xdcq"]
 [ext_resource type="PackedScene" uid="uid://b5pdi6fx5chy7" path="res://scenes/GUI/info_panel.tscn" id="7_rfpg3"]
 [ext_resource type="Theme" uid="uid://ye48kx1r3u5" path="res://fonts/Izayoi_Theme_Profile_Core.tres" id="8_w8r0x"]
 [ext_resource type="FontFile" uid="uid://dia8fvtnbbel2" path="res://fonts/Kalam/Kalam-Light.otf" id="9_ce1yi"]
@@ -25,6 +27,7 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+mouse_filter = 0
 theme = ExtResource("1_vrbhg")
 alignment_vertical = 2
 script = ExtResource("2_wouk2")
@@ -35,8 +38,8 @@ layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_8x012")
 
 [node name="ProfileMargin" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(1920, 1080)
 layout_mode = 2
-size_flags_horizontal = 4
 theme_override_constants/margin_left = 100
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
@@ -47,6 +50,7 @@ layout_mode = 2
 
 [node name="ProfileContainer" type="PanelContainer" parent="ProfileMargin/ProfileHBox"]
 layout_mode = 2
+mouse_filter = 1
 
 [node name="BackgroundContainer" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer"]
 layout_mode = 2
@@ -86,12 +90,13 @@ size_flags_vertical = 8
 theme_override_constants/margin_left = 275
 theme_override_constants/margin_right = 50
 theme_override_constants/margin_bottom = 100
+script = ExtResource("5_543hk")
 
 [node name="SpriteBG" type="NinePatchRect" parent="ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin/StatusTrayMargin"]
-visible = false
 custom_minimum_size = Vector2(108, 8)
 layout_mode = 2
-texture = ExtResource("2_sedhl")
+mouse_filter = 1
+texture = ExtResource("6_6pukg")
 patch_margin_left = 16
 patch_margin_top = 16
 patch_margin_right = 16
@@ -108,9 +113,11 @@ theme_override_constants/margin_bottom = 8
 [node name="StatusGrid" type="GridContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin/StatusTrayMargin/StatusGridMargin"]
 layout_mode = 2
 columns = 6
+script = ExtResource("7_2xdcq")
 
 [node name="DataMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 420
 theme_override_constants/margin_top = 77
 theme_override_constants/margin_right = 150
@@ -146,6 +153,7 @@ custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
+mouse_filter = 1
 theme_override_fonts/font = ExtResource("6_cj8vs")
 theme_override_font_sizes/font_size = 25
 text = "%s"
@@ -158,13 +166,17 @@ key1 = &"unitName"
 
 [node name="HSeparator" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/NameMargin/NameVBox"]
 layout_mode = 2
+mouse_filter = 1
 
-[node name="Label" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/NameMargin/NameVBox"]
+[node name="NameLb" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/NameMargin/NameVBox" groups=["ProfileTT", "ToolTipLabels"]]
 layout_mode = 2
 size_flags_horizontal = 4
+focus_mode = 2
+mouse_filter = 1
 theme_override_font_sizes/font_size = 15
 text = "Character Name"
 horizontal_alignment = 1
+metadata/ToolTip = &"UnitName"
 
 [node name="MetaStatsMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer"]
 layout_mode = 2
@@ -183,6 +195,7 @@ size_flags_vertical = 8
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 size_flags_vertical = 8
+mouse_filter = 1
 theme_override_fonts/font = ExtResource("6_cj8vs")
 theme_override_font_sizes/font_size = 25
 text = "%s"
@@ -194,16 +207,22 @@ key3 = &"Role"
 
 [node name="HSeparator" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/ClassVBox"]
 layout_mode = 2
+mouse_filter = 1
 
-[node name="Label" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/ClassVBox"]
+[node name="RoleLb" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/ClassVBox" groups=["ProfileTT", "ToolTipLabels"]]
 layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 2
+mouse_filter = 1
 theme_override_font_sizes/font_size = 15
 text = "Role"
 horizontal_alignment = 1
+metadata/ToolTip = &"Role"
 
 [node name="VSeparator" type="VSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox"]
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 2
+mouse_filter = 1
 theme_override_constants/separation = 25
 
 [node name="SpeciesVBox" type="VBoxContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox"]
@@ -214,6 +233,7 @@ size_flags_vertical = 8
 custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 size_flags_vertical = 8
+mouse_filter = 1
 theme_override_fonts/font = ExtResource("6_cj8vs")
 theme_override_font_sizes/font_size = 25
 text = "%s"
@@ -225,16 +245,22 @@ key3 = &"Species"
 
 [node name="HSeparator" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/SpeciesVBox"]
 layout_mode = 2
+mouse_filter = 1
 
-[node name="Label" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/SpeciesVBox"]
+[node name="SpeciesLb" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/SpeciesVBox" groups=["ProfileTT", "ToolTipLabels"]]
 layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 2
+mouse_filter = 1
 theme_override_font_sizes/font_size = 15
 text = "Species"
 horizontal_alignment = 1
+metadata/ToolTip = &"Species"
 
 [node name="VSeparator2" type="VSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox"]
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 2
+mouse_filter = 1
 theme_override_constants/separation = 18
 
 [node name="LvVBox" type="VBoxContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox"]
@@ -246,6 +272,7 @@ size_flags_vertical = 8
 custom_minimum_size = Vector2(31, 0)
 layout_mode = 2
 size_flags_vertical = 8
+mouse_filter = 1
 theme_override_fonts/font = ExtResource("9_ce1yi")
 theme_override_font_sizes/font_size = 25
 text = "%s"
@@ -257,14 +284,19 @@ key3 = &"Level"
 
 [node name="HSeparator" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/LvVBox"]
 layout_mode = 2
+mouse_filter = 1
 
-[node name="Label" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/LvVBox"]
+[node name="LevelLb" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/LvVBox" groups=["ProfileTT", "ToolTipLabels"]]
 layout_mode = 2
+size_flags_horizontal = 4
 size_flags_vertical = 0
+focus_mode = 2
+mouse_filter = 1
 theme_override_font_sizes/font_size = 15
 text = "Lv."
 horizontal_alignment = 1
 vertical_alignment = 2
+metadata/ToolTip = &"Level"
 
 [node name="MidMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox"]
 layout_mode = 2
@@ -290,6 +322,7 @@ theme_override_constants/separation = 0
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
+mouse_filter = 1
 theme_override_font_sizes/font_size = 25
 text = "Stats"
 horizontal_alignment = 1
@@ -298,10 +331,12 @@ vertical_alignment = 2
 [node name="HSeparator" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MidMargin/MidHBox/TitleMargin/StatTitleVBox"]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
+mouse_filter = 1
 
 [node name="VSeparator" type="VSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MidMargin/MidHBox"]
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 2
+mouse_filter = 1
 theme_override_constants/separation = 93
 
 [node name="XPMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MidMargin/MidHBox"]
@@ -321,6 +356,7 @@ alignment = 1
 custom_minimum_size = Vector2(31, 15)
 layout_mode = 2
 size_flags_vertical = 0
+mouse_filter = 1
 theme_override_fonts/font = ExtResource("9_ce1yi")
 theme_override_font_sizes/font_size = 20
 text = "%s"
@@ -333,17 +369,22 @@ key3 = &"EXP"
 [node name="HSeparator" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MidMargin/MidHBox/XPMargin/XPVBox"]
 layout_mode = 2
 size_flags_vertical = 0
+mouse_filter = 1
 
-[node name="Label" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MidMargin/MidHBox/XPMargin/XPVBox"]
+[node name="XPLb" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MidMargin/MidHBox/XPMargin/XPVBox" groups=["ProfileTT", "ToolTipLabels"]]
 layout_mode = 2
+size_flags_horizontal = 4
 size_flags_vertical = 0
+focus_mode = 2
+mouse_filter = 1
 text = "XP"
 horizontal_alignment = 1
+metadata/ToolTip = &"EXP"
 
 [node name="CoreMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox"]
 layout_mode = 2
 theme = ExtResource("8_w8r0x")
-theme_override_constants/margin_left = 29
+theme_override_constants/margin_left = 1
 theme_override_constants/margin_top = 0
 
 [node name="CoreVBox" type="VBoxContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin"]
@@ -356,8 +397,9 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="DerivedMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(226, 236)
 layout_mode = 2
-theme_override_constants/margin_left = -10
+theme_override_constants/margin_left = 55
 theme_override_constants/margin_top = 19
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
@@ -366,73 +408,92 @@ theme_override_constants/margin_bottom = 0
 layout_mode = 2
 
 [node name="VTags" type="VBoxContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox"]
+custom_minimum_size = Vector2(57, 217)
 layout_mode = 2
 theme_override_constants/separation = -3
 
-[node name="UnitAcc" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags"]
-custom_minimum_size = Vector2(86, 26)
+[node name="UnitAcc" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 text = "Hit:"
 horizontal_alignment = 2
 vertical_alignment = 1
+metadata/ToolTip = &"Hit"
 
-[node name="UnitAVD" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags"]
-custom_minimum_size = Vector2(86, 26)
+[node name="UnitAVD" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
 focus_neighbor_bottom = NodePath("../UnitDmg")
+focus_mode = 2
+mouse_filter = 1
 text = "Graze:"
 horizontal_alignment = 2
 vertical_alignment = 1
+metadata/ToolTip = &"Graze"
 
-[node name="UnitDmg" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags"]
-custom_minimum_size = Vector2(86, 26)
+[node name="UnitDmg" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
 focus_neighbor_bottom = NodePath("../UnitBar")
+focus_mode = 2
+mouse_filter = 1
 text = "Damage:"
 horizontal_alignment = 2
 vertical_alignment = 1
+metadata/ToolTip = &"Dmg"
 
-[node name="UnitCrit" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags"]
-custom_minimum_size = Vector2(86, 26)
+[node name="UnitCrit" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 text = "Crit:"
 horizontal_alignment = 2
 vertical_alignment = 1
+metadata/ToolTip = &"Crit"
 
-[node name="UnitCrtAvd" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags"]
-custom_minimum_size = Vector2(86, 26)
+[node name="UnitCrtAvd" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 text = "Luck:"
 horizontal_alignment = 2
 vertical_alignment = 1
+metadata/ToolTip = &"Luck"
 
-[node name="EffLn" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags"]
-custom_minimum_size = Vector2(0, 26)
+[node name="EffLn" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 text = "Effect:"
 horizontal_alignment = 2
 vertical_alignment = 1
+metadata/ToolTip = &"EffHit"
 
-[node name="ResLb" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags"]
-custom_minimum_size = Vector2(0, 26)
+[node name="ResLb" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 text = "Resist:"
 horizontal_alignment = 2
 vertical_alignment = 1
+metadata/ToolTip = &"Resist"
 
-[node name="UnitBar" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags"]
-custom_minimum_size = Vector2(86, 26)
+[node name="UnitBar" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 text = "Barrier:"
 horizontal_alignment = 2
 vertical_alignment = 1
+metadata/ToolTip = &"Barrier"
 
-[node name="MoveTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags"]
-custom_minimum_size = Vector2(0, 26)
+[node name="MoveTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 text = "Move:"
 horizontal_alignment = 2
 vertical_alignment = 1
+metadata/ToolTip = &"Move"
 
 [node name="VStats" type="VBoxContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox"]
 custom_minimum_size = Vector2(97, 217)
@@ -443,6 +504,7 @@ theme_override_constants/separation = -1
 [node name="Acc" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
+mouse_filter = 1
 text = "%s"
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
@@ -452,15 +514,17 @@ key2 = &"Hit"
 [node name="Graze" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
+mouse_filter = 1
 text = "%s"
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
 key1 = &"combatData"
-key2 = &"Avoid"
+key2 = &"Graze"
 
 [node name="Dmg" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
+mouse_filter = 1
 text = "%s"
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
@@ -470,6 +534,7 @@ key2 = &"Dmg"
 [node name="Crit" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
+mouse_filter = 1
 text = "%s"
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
@@ -479,15 +544,17 @@ key2 = &"Crit"
 [node name="Luck" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
+mouse_filter = 1
 text = "%s"
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
 key1 = &"combatData"
-key2 = &"CrtAvd"
+key2 = &"Luck"
 
 [node name="Effect" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
+mouse_filter = 1
 text = "+%s%%"
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
@@ -497,6 +564,7 @@ key2 = &"EffHit"
 [node name="Resist" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
+mouse_filter = 1
 text = "%s%%"
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
@@ -511,7 +579,8 @@ theme_override_constants/separation = 0
 [node name="Bar" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats/BarHBox" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
-text = "-%s"
+mouse_filter = 1
+text = "%s"
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
 key1 = &"combatData"
@@ -520,11 +589,12 @@ key2 = &"Barrier"
 [node name="BarPrc" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats/BarHBox" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
+mouse_filter = 1
 text = "(%s%%)"
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
 key1 = &"combatData"
-key2 = &"Barrier"
+key2 = &"BarPrc"
 
 [node name="MoveHBox" type="HBoxContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats"]
 custom_minimum_size = Vector2(97, 24)
@@ -536,6 +606,7 @@ size_flags_vertical = 0
 custom_minimum_size = Vector2(22, 24)
 layout_mode = 2
 size_flags_vertical = 0
+mouse_filter = 1
 text = "%s"
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
@@ -547,15 +618,18 @@ iconDir = "res://sprites/icons/move_types"
 [node name="VSeparator" type="VSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats/MoveHBox"]
 self_modulate = Color(1, 1, 1, 0)
 layout_mode = 2
+mouse_filter = 1
 
-[node name="MoveType" type="TextureRect" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats/MoveHBox"]
+[node name="MoveType" type="TextureRect" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VStats/MoveHBox" groups=["ActiveTT", "ToolTipLabels"]]
 custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+focus_mode = 2
 texture = ExtResource("3_x6e7x")
 expand_mode = 1
 metadata/MoveType = &""
+metadata/ToolTip = &"MoveType"
 
 [node name="StatMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -570,7 +644,7 @@ theme_override_constants/separation = 8
 
 [node name="HPCompMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox"]
 layout_mode = 2
-theme_override_constants/margin_left = -11
+theme_override_constants/margin_left = -30
 theme_override_constants/margin_top = 2
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
@@ -592,17 +666,21 @@ custom_minimum_size = Vector2(150, 31)
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="UnitHpTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox"]
+[node name="UnitHpTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 theme_override_font_sizes/font_size = 20
-text = "Health:"
+text = "Life:"
 horizontal_alignment = 2
+metadata/ToolTip = &"Life"
 
 [node name="Hp" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(34, 10)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
+mouse_filter = 1
 theme_override_colors/font_color = Color(0.670588, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 2
@@ -616,6 +694,7 @@ key2 = &"CurLife"
 
 [node name="Split" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox"]
 layout_mode = 2
+mouse_filter = 1
 theme_override_font_sizes/font_size = 20
 text = "/"
 horizontal_alignment = 2
@@ -625,6 +704,7 @@ custom_minimum_size = Vector2(34, 10)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
+mouse_filter = 1
 theme_override_colors/font_color = Color(0.670588, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 2
@@ -647,16 +727,20 @@ custom_minimum_size = Vector2(175, 31)
 layout_mode = 2
 size_flags_horizontal = 0
 
-[node name="UnitCmpTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/CompMargin/VBoxContainer2"]
+[node name="UnitCmpTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/CompMargin/VBoxContainer2" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 theme_override_font_sizes/font_size = 20
 text = "Composure:"
+metadata/ToolTip = &"Comp"
 
 [node name="Composure" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/CompMargin/VBoxContainer2" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(31, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
+mouse_filter = 1
 theme_override_colors/font_color = Color(0.741176, 0.764706, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 2
@@ -671,6 +755,7 @@ key2 = &"CurComp"
 
 [node name="Split" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/CompMargin/VBoxContainer2"]
 layout_mode = 2
+mouse_filter = 1
 theme_override_font_sizes/font_size = 20
 text = "/"
 horizontal_alignment = 2
@@ -679,6 +764,7 @@ horizontal_alignment = 2
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
+mouse_filter = 1
 theme_override_colors/font_color = Color(0.741176, 0.764706, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 2
@@ -692,8 +778,8 @@ key2 = &"Comp"
 [node name="StatBlockMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox"]
 custom_minimum_size = Vector2(196, 147)
 layout_mode = 2
-theme_override_constants/margin_left = 9
-theme_override_constants/margin_top = 3
+theme_override_constants/margin_left = 21
+theme_override_constants/margin_top = 4
 theme_override_constants/margin_right = 0
 theme_override_constants/margin_bottom = 0
 
@@ -705,45 +791,58 @@ theme_override_constants/separation = 70
 layout_mode = 2
 
 [node name="VTags" type="VBoxContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox"]
+custom_minimum_size = Vector2(67, 144)
 layout_mode = 2
 theme_override_constants/separation = -3
 
-[node name="UnitStrTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags"]
-custom_minimum_size = Vector2(100, 24)
+[node name="UnitStrTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
 focus_neighbor_bottom = NodePath("../UnitMagTag")
+focus_mode = 2
+mouse_filter = 1
 text = "Power:"
 horizontal_alignment = 2
+metadata/ToolTip = &"Pwr"
 
-[node name="UnitMagTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags"]
-custom_minimum_size = Vector2(100, 21)
+[node name="UnitMagTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 text = "Magic:"
 horizontal_alignment = 2
+metadata/ToolTip = &"Mag"
 
-[node name="UnitElegTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags"]
-custom_minimum_size = Vector2(100, 21)
+[node name="UnitElegTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 text = "Elegance:"
 horizontal_alignment = 2
+metadata/ToolTip = &"Eleg"
 
-[node name="UnitCeleTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags"]
-custom_minimum_size = Vector2(100, 21)
+[node name="UnitCeleTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 text = "Celerity:"
 horizontal_alignment = 2
+metadata/ToolTip = &"Cele"
 
-[node name="UnitDefTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags"]
-custom_minimum_size = Vector2(100, 21)
+[node name="UnitDefTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 text = "Defense:"
 horizontal_alignment = 2
+metadata/ToolTip = &"Def"
 
-[node name="UnitChaTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags"]
-custom_minimum_size = Vector2(100, 21)
+[node name="UnitChaTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_mode = 2
+mouse_filter = 1
 text = "Charisma:"
 horizontal_alignment = 2
+metadata/ToolTip = &"Cha"
 
 [node name="VStats" type="VBoxContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox"]
 layout_mode = 2
@@ -753,6 +852,7 @@ theme_override_constants/separation = -3
 [node name="Str" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(22, 26)
 layout_mode = 2
+mouse_filter = 1
 text = "%s"
 vertical_alignment = 2
 script = ExtResource("7_2r62x")
@@ -762,6 +862,7 @@ key2 = &"Pwr"
 [node name="Mag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(22, 26)
 layout_mode = 2
+mouse_filter = 1
 text = "%s"
 vertical_alignment = 2
 script = ExtResource("7_2r62x")
@@ -771,6 +872,7 @@ key2 = &"Mag"
 [node name="Ele" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(22, 26)
 layout_mode = 2
+mouse_filter = 1
 text = "%s"
 vertical_alignment = 2
 script = ExtResource("7_2r62x")
@@ -780,6 +882,7 @@ key2 = &"Eleg"
 [node name="Cele" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(22, 26)
 layout_mode = 2
+mouse_filter = 1
 text = "%s"
 vertical_alignment = 2
 script = ExtResource("7_2r62x")
@@ -789,6 +892,7 @@ key2 = &"Cele"
 [node name="Def" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(22, 26)
 layout_mode = 2
+mouse_filter = 1
 text = "%s"
 vertical_alignment = 2
 script = ExtResource("7_2r62x")
@@ -798,6 +902,7 @@ key2 = &"Def"
 [node name="Cha" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VStats" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(22, 26)
 layout_mode = 2
+mouse_filter = 1
 text = "%s"
 vertical_alignment = 2
 script = ExtResource("7_2r62x")
@@ -811,6 +916,7 @@ layout_mode = 2
 [node name="UnitStr" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VBonus"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
+mouse_filter = 1
 theme_override_colors/font_color = Color(0, 0.839216, 0, 1)
 theme_override_font_sizes/font_size = 20
 text = "+2"
@@ -818,6 +924,7 @@ text = "+2"
 [node name="UnitMag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VBonus"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
+mouse_filter = 1
 theme_override_colors/font_color = Color(0.823529, 0, 0, 1)
 theme_override_font_sizes/font_size = 20
 text = "-5"
@@ -825,26 +932,30 @@ text = "-5"
 [node name="UnitEle" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VBonus"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
+mouse_filter = 1
 theme_override_font_sizes/font_size = 20
 
 [node name="UnitCele" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VBonus"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
+mouse_filter = 1
 theme_override_font_sizes/font_size = 20
 
 [node name="UnitDef" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VBonus"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
+mouse_filter = 1
 theme_override_font_sizes/font_size = 20
 
 [node name="UnitCha" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VBonus"]
 custom_minimum_size = Vector2(10, 10)
 layout_mode = 2
+mouse_filter = 1
 theme_override_font_sizes/font_size = 20
 
 [node name="FeaturesMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox"]
 layout_mode = 2
-theme_override_constants/margin_left = 29
+theme_override_constants/margin_left = 50
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 31
 theme_override_constants/margin_bottom = 0
@@ -864,6 +975,7 @@ alignment = 1
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 8
+mouse_filter = 1
 theme_override_font_sizes/font_size = 25
 text = "Features"
 horizontal_alignment = 1
@@ -873,11 +985,13 @@ vertical_alignment = 2
 custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 size_flags_horizontal = 4
+mouse_filter = 1
 theme_override_constants/separation = 6
 
 [node name="fBoxPanel" type="PanelContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox"]
 custom_minimum_size = Vector2(314, 296)
 layout_mode = 2
+mouse_filter = 1
 
 [node name="fBoxMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel"]
 layout_mode = 2
@@ -892,6 +1006,7 @@ theme_override_constants/separation = 6
 
 [node name="FeatLbVBox2" type="VBoxContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 0
 alignment = 2
 
@@ -904,6 +1019,7 @@ text_overrun_behavior = 1
 
 [node name="HSeparator" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 6
 
 [node name="Skill2" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
@@ -915,6 +1031,7 @@ text_overrun_behavior = 1
 
 [node name="HSeparator2" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 6
 
 [node name="Skill3" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
@@ -926,6 +1043,7 @@ text_overrun_behavior = 1
 
 [node name="HSeparator3" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 6
 
 [node name="Skill4" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
@@ -937,6 +1055,7 @@ text_overrun_behavior = 1
 
 [node name="HSeparator4" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 6
 
 [node name="Skill5" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
@@ -948,6 +1067,7 @@ text_overrun_behavior = 1
 
 [node name="HSeparator5" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 6
 
 [node name="Skill6" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
@@ -959,6 +1079,7 @@ text_overrun_behavior = 1
 
 [node name="HSeparator6" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 6
 
 [node name="Skill7" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
@@ -970,6 +1091,7 @@ text_overrun_behavior = 1
 
 [node name="HSeparator7" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 6
 
 [node name="Skill8" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
@@ -981,32 +1103,35 @@ text_overrun_behavior = 1
 
 [node name="HSeparator8" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/FeatLbVBox2"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 6
 
-[node name="Panel" type="Panel" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel"]
-visible = false
-self_modulate = Color(1, 1, 1, 0)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_8x012")
-
 [node name="SideBarMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox"]
+custom_minimum_size = Vector2(472, 967)
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_constants/margin_top = 100
 
 [node name="SideBarVBox" type="VBoxContainer" parent="ProfileMargin/ProfileHBox/SideBarMargin"]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 0
 size_flags_vertical = 0
 
 [node name="InventoryPanel" parent="ProfileMargin/ProfileHBox/SideBarMargin/SideBarVBox" instance=ExtResource("6_uhtry")]
 layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 1
 _style = "Profile"
 
-[node name="ItemInfoPanel" parent="ProfileMargin/ProfileHBox/SideBarMargin/SideBarVBox" instance=ExtResource("7_rfpg3")]
+[node name="infoNode" type="Control" parent="."]
 layout_mode = 2
+mouse_filter = 2
 
-[node name="VBoxContainer" parent="ProfileMargin/ProfileHBox/SideBarMargin/SideBarVBox/ItemInfoPanel/MarginContainer" index="0"]
+[node name="InfoPanel" parent="infoNode" instance=ExtResource("7_rfpg3")]
 visible = false
-
-[editable path="ProfileMargin/ProfileHBox/SideBarMargin/SideBarVBox/ItemInfoPanel"]
+layout_mode = 2
+offset_left = 471.0
+offset_right = 609.0
+offset_bottom = 115.0
+mouse_filter = 1
+isRoaming = true

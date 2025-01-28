@@ -1,16 +1,25 @@
 extends Label
-class_name ValueLabel
+class_name ItemStatLabel
 
 @export var default := "--"
+@export var partner : Label
 
-func update_value(source):
-	var type = get_meta("Type")
+
+func update_value(source, type: String):
 	
 	match type:
-		"Unit": _set_basic_text(UnitData.unitData[source])
-		"Item": _set_basic_text(UnitData.itemData[source])
-		"Skill": _set_basic_text(UnitData.skillData[source])
-		"Passive": _set_basic_text(UnitData.passiveData[source])
+		"Item": 
+			_set_basic_text(UnitData.itemData[source])
+		"Skill": 
+
+			_set_basic_text(UnitData.skillData[source])
+			
+	if get_text() == "--": _set_pairing_visibility(false)
+	else: _set_pairing_visibility(true)
+
+func _set_pairing_visibility(isVisible: bool):
+	visible = isVisible
+	partner.visible = isVisible
 
 
 func _set_basic_text(data):
@@ -22,16 +31,16 @@ func _set_basic_text(data):
 	
 	if !data or !data.keys().has(key):
 		string = default
-	elif key == "Effect" and data[key]:
-		_set_as_effect(data)
 	elif key == "MinRange" or key == "MaxRange":
 		string = _get_range_format(data)
 	elif key == "Level" and data[key] == -1:
 		string = "Unique"
+	elif key == "Category": string = StringGetter.get_string("type_" + str(data[key]).to_snake_case())
 	elif data[key]: string = str(data[key])
 	else: string = default
 	
 	set_text(string)
+
 
 
 func _get_range_format(data) -> String:
@@ -47,7 +56,3 @@ func _get_range_format(data) -> String:
 		format = format % [minR, maxR]
 		
 	return format
-
-
-func _set_as_effect(data):
-	pass

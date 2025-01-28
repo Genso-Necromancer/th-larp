@@ -1,0 +1,18 @@
+[gd_scene load_steps=2 format=3 uid="uid://bi4unq8mpucas"]
+
+[ext_resource type="Script" path="res://scenes/GUI/tooltips/tooltip_display.gd" id="1_8qhcw"]
+
+[node name="ToolTipDisplay" type="RichTextLabel"]
+visible = false
+custom_minimum_size = Vector2(400, 0)
+offset_left = 49.0
+offset_top = 52.0
+offset_right = 449.0
+offset_bottom = 52.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+script = ExtResource("1_8qhcw")

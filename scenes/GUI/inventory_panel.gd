@@ -62,11 +62,6 @@ func _ready_style():
 		_set_style_style(_style)
 
 
-func toggle_blocker():
-	var blocker := $Control/InventoryMargin/Panel
-	if blocker and is_instance_valid(blocker):
-		blocker.visible = !blocker.visible
-
 
 func fill_items(isTrade : = false) -> Array:
 	var unit = get_meta("Unit")
@@ -108,10 +103,11 @@ func _generate_item_button(bPath, item : Dictionary, i : int, unit : Unit, isTra
 	b.set_item_text(str(itemData.Name), durString)
 	b.set_item_icon(itemData.Icon)
 	b.set_meta_data(item, unit, i, itemData.Trade)
+	b.get_button().add_to_group("ItemTT")
 	if isTrade and !itemData.Trade:
 		b.state = "Disabled"
 	elif _style == _styles[1] and !unit.check_valid_equip(item):
-		b.state == "Disabled"
+		b.state = "Disabled"
 	
 	#does this work still like this? HERE
 	#b.get_button().set_focus_neighbor(SIDE_LEFT, b.get_path_to(b.get_button()))
@@ -153,7 +149,7 @@ func remove_empty():
 	#var i := 0
 	#var killList := []
 	#while i < items.size():
-		#if items[i].get_meta("Item"):
+		#if items[i].button.get_meta("Item"):
 			#continue
 		#else:
 			#killList.append(i)
@@ -163,7 +159,7 @@ func remove_empty():
 		#var b = items.pop_at(k)
 		#b.queue_free()
 	for b in itemList.get_children():
-		if b.get_meta("Item"):
+		if b.button.get_meta("Item"):
 			continue
 		else:
 			itemList.remove_child(b)
@@ -179,7 +175,8 @@ func reindex_buttons():
 
 func clear_items():
 	if equipContainer and equipContainer.get_children().size() > 0:
-		equipContainer.get_child(0).queue_free()
+		for kid in equipContainer.get_children():
+			kid.queue_free()
 	for b in itemList.get_children():
 		itemList.remove_child(b)
 		b.queue_free()

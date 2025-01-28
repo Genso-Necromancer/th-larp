@@ -95,8 +95,9 @@ var tempSet = false
 #unit status
 var unitData : Dictionary
 #Call for pre-formualted combat stats
-var combatData := {"Dmg": 0, "Hit": 0, "Avoid": 0, "Barrier": 0, "BarPrc": 0, "Crit": 0, "CrtAvd": 0, "Resist": 0, "EffHit":0, "Def": 0, "Type":Enums.DAMAGE_TYPE.PHYS, "CanMiss": true}
+var combatData := {"Dmg": 0, "Hit": 0, "Graze": 0, "Barrier": 0, "BarPrc": 0, "Crit": 0, "Luck": 0, "Resist": 0, "EffHit":0, "DRes": 0, "Type":Enums.DAMAGE_TYPE.PHYS, "CanMiss": true}
 #base stats of the unit
+var baseCombat := {}
 var baseStats := {}
 #aura owned by unit
 var unitAuras := {}
@@ -533,7 +534,7 @@ func set_buff(effId, effect):
 			i += 1
 			newId = effId + str(i)
 		effId = newId
-	if effect.Duration == -1:
+	if effect.DurationType == Enums.DURATION_TYPE.PERMANENT:
 		var stat : String = statKeys[effect.SubType]
 		unitData.Stats[stat] += effect.Value
 	else:
@@ -645,13 +646,21 @@ func check_passives():
 		var p = pData[id]
 		match p.Type:
 			Enums.PASSIVE_TYPE.AURA:
-				var aura = p.Aura
-				if p.IsTimeSens: aura = p[Global.timeOfDay]
-				valid.append(aura)
-				load_aura(aura)
+				valid.append(_assign_auras(p))
 			Enums.PASSIVE_TYPE.SUB_WEAPON:
 				_update_natural(p)
 	validate_auras(valid)
+
+
+func _assign_auras(passive:Dictionary) -> StringName:
+	var aura : StringName 
+	match passive.RuleType:
+		Enums.RULE_TYPE.MORPH: aura = passive[Enums.TIME.keys()[Global.timeOfDay].to_pascal_case()]
+		Enums.RULE_TYPE.TIME: 
+			if passive.Rule == Global.timeOfDay: aura = passive.Aura
+		_: aura = passive.Aura
+	load_aura(aura)
+	return aura
 
 func check_time_prot() -> bool:
 	var passives = unitData.Passives
@@ -666,7 +675,7 @@ func check_time_prot() -> bool:
 			Enums.PASSIVE_TYPE.DAY_PROT:
 				validTime = Enums.TIME.DAY
 			_: continue
-		if p.SubType == SPEC_ID and Global.timeOfDay == validTime:
+		if p.Rule == SPEC_ID and Global.timeOfDay == validTime:
 			return true
 	return false
 
@@ -721,17 +730,25 @@ func _on_aura_entered(area):
 	#print("Aura Entered: ", area)
 	if !area.aura:
 		return
-		
-	if area.aura.IsFriendly and area.master.FACTION_ID != FACTION_ID:
-		return
-	elif !area.aura.IsFriendly and area.master.FACTION_ID == FACTION_ID:
-		return
-	elif area.aura.SelfOnly:
+	
+	match area.aura.TargetTeam:
+		Enums.TARGET_TEAM.ALLY:
+			if area.master.FACTION_ID != Enums.FACTION_ID.ENEMY and FACTION_ID == Enums.FACTION_ID.NPC:
+				pass
+			elif area.master.FACTION_ID != FACTION_ID:
+				return
+		Enums.TARGET_TEAM.ENEMY:
+			if area.master.FACTION_ID == FACTION_ID:
+				return
+	
+	if area.aura.Target == Enums.EFFECT_TARGET.SELF:
 		return
 	elif !activeAuras.has(area):
 		activeAuras[area] = area.aura.Effects.duplicate()
-		#print("Active Aura Effects: ", activeAuras)
+		
 	update_stats()
+	
+	
 	
 	
 func _on_aura_exited(area):
@@ -743,24 +760,32 @@ func _on_aura_exited(area):
 
 func _on_self_aura_entered(area, ownArea):
 	var effectData = UnitData.effectData
-	print("on_self_aura_entered: ", area.master)
-	if ownArea.aura.IsFriendly and area.master.FACTION_ID != FACTION_ID:
-		return
-	elif !ownArea.aura.IsFriendly and area.master.FACTION_ID == FACTION_ID:
-		return
-	elif ownArea.aura.SelfOnly:
+	#print("on_self_aura_entered: ", area.master)
+	match ownArea.aura.TargetTeam:
+		Enums.TARGET_TEAM.ALLY:
+			if area.master.FACTION_ID != Enums.FACTION_ID.ENEMY and FACTION_ID == Enums.FACTION_ID.NPC:
+				pass
+			elif area.master.FACTION_ID != FACTION_ID:
+				return
+		Enums.TARGET_TEAM.ENEMY:
+			if area.master.FACTION_ID == FACTION_ID:
+				return
+	
+	if ownArea.aura.Target == Enums.EFFECT_TARGET.SELF:
 		if !activeAuras.has(ownArea):
 			activeAuras[ownArea] = ownArea.aura.Effects.duplicate()
 		else: 
 			for effId in ownArea.aura.Effects:
 				if effectData[effId].Stack:
 					activeAuras[ownArea].append(effId)
+	
+	
 	update_stats()
-	print("Active Aura Effects: ", activeAuras)
+	#print("Active Aura Effects: ", activeAuras)
 		
 
 func _on_self_aura_exited(area, ownArea):
-	print("on_self_aura_exited: ", area.master)
+	#print("on_self_aura_exited: ", area.master)
 	if activeAuras.has(ownArea) and activeAuras[ownArea].size() > 0:
 		activeAuras[ownArea].pop_back()
 	if activeAuras.has(ownArea) and activeAuras[ownArea].size() <= 0:
@@ -965,6 +990,8 @@ func check_valid_equip(item : Dictionary, mode : int = 0): #Subweapons not fully
 		return true
 	elif mode == 2 and iCat.Main == "ACC":
 		return true
+	elif mode < 2 and iCat.Main == "ITEM":
+		return true
 	else:
 		return false
 		
@@ -1113,11 +1140,11 @@ func update_combatdata():
 	elif wep.Type == Enums.DAMAGE_TYPE.TRUE:
 		combatData.Dmg = wep.Dmg
 	combatData.Hit = activeStats.Eleg * 2 + (wep.Hit + activeStats.Cha)
-	combatData.Avoid = activeStats.Cele * 2 + activeStats.Cha + terrainBonus
+	combatData.Graze = activeStats.Cele * 2 + activeStats.Cha + terrainBonus
 	combatData.Barrier = wep.Barrier
 	combatData.BarPrc = activeStats.Eleg + activeStats.Def
 	combatData.Crit = activeStats.Eleg + wep.Crit
-	combatData.CrtAvd = activeStats.Cha
+	combatData.Luck = activeStats.Cha
 	combatData.CompRes = (activeStats.Cha / 2) + (activeStats.Eleg / 2)
 	combatData.CompRes = clampi(combatData.CompRes, -200, 75)
 	combatData.CompBonus = activeStats.Cha / 4
@@ -1130,9 +1157,9 @@ func update_combatdata():
 	combatData.DRes = {Enums.DAMAGE_TYPE.PHYS: activeStats.Def, Enums.DAMAGE_TYPE.MAG: activeStats.Mag, Enums.DAMAGE_TYPE.TRUE: 0}
 	combatData.CanMiss = true
 	if status.Sleep:
-		combatData.Avoid = 0
+		combatData.Graze = 0
 		combatData.BarPrc = 0
-		
+	baseCombat = combatData.duplicate()
 	
 func get_skill_combat_stats(skillId, augmented := false):
 	var skill = UnitData.skillData[skillId]
@@ -1206,7 +1233,9 @@ func update_stats(): #GO BACK AND FINISH ACTIVE DEBUFFS AFTER THIS
 		buffTotal.clear()
 		if baseUpdated:
 			statKeys = combatData.keys()
-			modifiedStats = combatData
+			modifiedStats = combatData 
+			#This updates activeStats, and leaves base stats alone.
+			#It does not do the same for combatData, it directly buffs it with no seperation.
 			baseValues = combatData
 			
 		for stat in statKeys:
@@ -1453,7 +1482,7 @@ func update_terrain_data(data : Array):
 	terrainData = data
 	
 func update_terrain_bonus():
-#	print(combatData.Avoid)
+#	print(combatData.Graze)
 	var bonus = 0
 	if deployed:
 		var i = find_nested(terrainData, Vector2i(cell))

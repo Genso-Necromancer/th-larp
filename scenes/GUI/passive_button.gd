@@ -32,7 +32,3 @@ func set_passive_icon(data:Dictionary):
 	iconTx.set_texture(load(icon))
 
 
-func set_meta_data(passive, unit, index, _canTrade):
-	set_meta("Passive", passive)
-	set_meta("Unit", unit)
-	set_meta("Index", index)

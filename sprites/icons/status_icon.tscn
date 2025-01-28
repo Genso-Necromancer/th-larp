@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://d1ps52un0najt"]
+
+[ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="1_7pir1"]
+[ext_resource type="Script" path="res://sprites/icons/status_icon.gd" id="2_njref"]
+
+[node name="StatusIcon" type="TextureRect" groups=["StatusTT"]]
+custom_minimum_size = Vector2(20, 20)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1900.0
+offset_bottom = -1060.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 2
+texture = ExtResource("1_7pir1")
+expand_mode = 1
+script = ExtResource("2_njref")
+metadata/Status = ""

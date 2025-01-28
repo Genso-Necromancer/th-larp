@@ -1,0 +1,304 @@
+[gd_scene load_steps=4 format=3 uid="uid://63n00lxo2oxf"]
+
+[ext_resource type="Script" path="res://scenes/GUI/ItemDisplayMargin.gd" id="1_enshq"]
+[ext_resource type="PackedScene" uid="uid://cv74wrcjpasmr" path="res://scenes/GUI/value_label.tscn" id="2_qy6v3"]
+[ext_resource type="Script" path="res://scenes/EffectList.gd" id="3_ts733"]
+
+[node name="ItemDisplayMargin" type="MarginContainer"]
+self_modulate = Color(1, 1, 1, 0)
+size_flags_horizontal = 4
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+script = ExtResource("1_enshq")
+
+[node name="ToolTipVBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="StatPanel" type="PanelContainer" parent="ToolTipVBox"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ToolTipVBox/StatPanel"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ToolTipVBox/StatPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+alignment = 1
+
+[node name="Lv" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 9
+text = "Lvl:"
+horizontal_alignment = 1
+
+[node name="LvValue" parent="ToolTipVBox/StatPanel/VBoxContainer/HBoxContainer" node_paths=PackedStringArray("partner") groups=["ValueLabels"] instance=ExtResource("2_qy6v3")]
+custom_minimum_size = Vector2(20, 13)
+layout_mode = 2
+theme_type_variation = &"ValueLabel"
+horizontal_alignment = 0
+vertical_alignment = 1
+partner = NodePath("../Lv")
+metadata/Key = "Level"
+metadata/Type = "Item"
+
+[node name="Type" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 9
+text = "Type:"
+horizontal_alignment = 1
+
+[node name="TypeValue" parent="ToolTipVBox/StatPanel/VBoxContainer/HBoxContainer" node_paths=PackedStringArray("partner") groups=["ValueLabels"] instance=ExtResource("2_qy6v3")]
+custom_minimum_size = Vector2(46, 13)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"ValueLabel"
+text = "Natural"
+horizontal_alignment = 0
+vertical_alignment = 1
+partner = NodePath("../Type")
+metadata/Key = "Category"
+metadata/Type = "Item"
+
+[node name="Cost" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 9
+text = "Cost:"
+horizontal_alignment = 1
+
+[node name="CostValue" parent="ToolTipVBox/StatPanel/VBoxContainer/HBoxContainer" node_paths=PackedStringArray("partner") groups=["ValueLabels"] instance=ExtResource("2_qy6v3")]
+custom_minimum_size = Vector2(46, 13)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"ValueLabel"
+text = "00"
+horizontal_alignment = 0
+vertical_alignment = 1
+partner = NodePath("../Cost")
+metadata/Key = "Cost"
+metadata/Type = "Item"
+
+[node name="GridContainer" type="GridContainer" parent="ToolTipVBox/StatPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_constants/h_separation = 5
+theme_override_constants/v_separation = 10
+columns = 6
+
+[node name="Might" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Damage:"
+horizontal_alignment = 1
+
+[node name="MightValue" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer" node_paths=PackedStringArray("partner") groups=["ValueLabels"] instance=ExtResource("2_qy6v3")]
+custom_minimum_size = Vector2(20, 13)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"ValueLabel"
+text = "--
+"
+partner = NodePath("../Might")
+metadata/Key = "Dmg"
+metadata/Type = "Item"
+
+[node name="Accuracy" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Hit:"
+horizontal_alignment = 1
+
+[node name="AccuracyValue" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer" node_paths=PackedStringArray("partner") groups=["ValueLabels"] instance=ExtResource("2_qy6v3")]
+custom_minimum_size = Vector2(20, 13)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"ValueLabel"
+partner = NodePath("../Accuracy")
+metadata/Key = "Hit"
+metadata/Type = "Item"
+
+[node name="Crit" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Crit:"
+horizontal_alignment = 1
+
+[node name="CritValue" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer" node_paths=PackedStringArray("partner") groups=["ValueLabels"] instance=ExtResource("2_qy6v3")]
+custom_minimum_size = Vector2(20, 13)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"ValueLabel"
+partner = NodePath("../Crit")
+metadata/Key = "Crit"
+metadata/Type = "Item"
+
+[node name="Barrier" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Barrier:"
+horizontal_alignment = 1
+
+[node name="BarrierValue" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer" node_paths=PackedStringArray("partner") groups=["ValueLabels"] instance=ExtResource("2_qy6v3")]
+custom_minimum_size = Vector2(20, 13)
+layout_mode = 2
+theme_type_variation = &"ValueLabel"
+partner = NodePath("../Barrier")
+metadata/Key = "Barrier"
+metadata/Type = "Item"
+
+[node name="Range" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Range:"
+horizontal_alignment = 1
+
+[node name="RangeValue" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer" node_paths=PackedStringArray("partner") groups=["ValueLabels"] instance=ExtResource("2_qy6v3")]
+custom_minimum_size = Vector2(20, 13)
+layout_mode = 2
+theme_type_variation = &"ValueLabel"
+partner = NodePath("../Range")
+metadata/Key = "Range"
+metadata/Type = "Item"
+
+[node name="EffectTitleBox" type="VBoxContainer" parent="ToolTipVBox/StatPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+
+[node name="HSeparator" type="HSeparator" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectTitleBox"]
+visible = false
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+
+[node name="EffectLb" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectTitleBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Effects"
+horizontal_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectTitleBox"]
+visible = false
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+
+[node name="EffectContainer" type="MarginContainer" parent="ToolTipVBox/StatPanel/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 42
+
+[node name="EffectList" type="VBoxContainer" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer" groups=["EffectList"]]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 9
+alignment = 1
+script = ExtResource("3_ts733")
+metadata/Type = "Item"
+
+[node name="TargetBox" type="VBoxContainer" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList"]
+layout_mode = 2
+
+[node name="TargetLb" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/TargetBox"]
+layout_mode = 2
+text = "Target
+"
+
+[node name="HSeparator2" type="HSeparator" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/TargetBox"]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+
+[node name="TargetContainer" type="GridContainer" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/TargetBox"]
+visible = false
+layout_mode = 2
+
+[node name="VSeparator" type="HSeparator" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList" groups=["EffectSeparators"]]
+layout_mode = 2
+
+[node name="SelfBox" type="VBoxContainer" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList"]
+layout_mode = 2
+
+[node name="SelfLb" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/SelfBox"]
+layout_mode = 2
+text = "Self"
+
+[node name="HSeparator3" type="HSeparator" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/SelfBox"]
+visible = false
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+
+[node name="SelfContainer" type="GridContainer" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/SelfBox"]
+layout_mode = 2
+
+[node name="VSeparator2" type="HSeparator" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList" groups=["EffectSeparators"]]
+layout_mode = 2
+
+[node name="GlobalBox" type="VBoxContainer" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList"]
+layout_mode = 2
+
+[node name="GlobalLb" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/GlobalBox"]
+layout_mode = 2
+text = "Global"
+
+[node name="HSeparator4" type="HSeparator" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/GlobalBox"]
+visible = false
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+
+[node name="GlobalContainer" type="GridContainer" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/GlobalBox"]
+layout_mode = 2
+
+[node name="VSeparator3" type="VSeparator" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList" groups=["EffectSeparators"]]
+visible = false
+layout_mode = 2
+
+[node name="PassiveBox" type="VBoxContainer" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList"]
+visible = false
+layout_mode = 2
+
+[node name="PassiveLb" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/PassiveBox"]
+layout_mode = 2
+text = "Passives"
+
+[node name="HSeparator5" type="HSeparator" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/PassiveBox"]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+
+[node name="PassiveContainer" type="GridContainer" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/PassiveBox"]
+layout_mode = 2
+
+[node name="VSeparator4" type="VSeparator" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList" groups=["EffectSeparators"]]
+visible = false
+layout_mode = 2
+
+[node name="SkillBox" type="VBoxContainer" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList"]
+visible = false
+layout_mode = 2
+
+[node name="SkillLb" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/SkillBox"]
+layout_mode = 2
+text = "Skills"
+
+[node name="HSeparator5" type="HSeparator" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/SkillBox"]
+self_modulate = Color(1, 1, 1, 0)
+layout_mode = 2
+
+[node name="SkillContainer" type="GridContainer" parent="ToolTipVBox/StatPanel/VBoxContainer/EffectContainer/EffectList/SkillBox"]
+layout_mode = 2

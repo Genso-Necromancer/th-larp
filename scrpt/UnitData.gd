@@ -53,6 +53,8 @@ func _ready():
 
 func _load_unique_units():
 	unitData = pStats.get_named_unit_data()
+	#for unit in unitData:
+		#unitData[unit]["DataType"] = Enums.DATA_TYPE.UNIT
 	
 func _load_items():
 	var rawData = pStats.get_items()
@@ -60,25 +62,25 @@ func _load_items():
 	
 	for key in keys:
 		itemData[key] = {
-		"Name":"None",
-		"Icon":load(("res://sprites/gungnir.png")),
-		"Type":"None",
-		"Target": 0,
-		"Dmg":0,
-		"Hit":0,
-		"Crit":0,
-		"Barrier":0,
-		"MinRange":0,
-		"MaxRange":0,
-		"Category":"ITEM",
-		"MaxDur":-1,
-		"SubGroup":false,
-		"Use":false,
-		"Equip":false,
-		"Expendable": true,
-		"Trade": true,
-		"Personal": false,
-		"Effects":{},
+			"Name":"None",
+			"Icon":load(("res://sprites/gungnir.png")),
+			"Type":"",
+			"Target": 0,
+			"Dmg":0,
+			"Hit":0,
+			"Crit":0,
+			"Barrier":0,
+			"MinRange":0,
+			"MaxRange":0,
+			"Category":"ITEM",
+			"MaxDur":-1,
+			"SubGroup":false,
+			"Use":false,
+			"Equip":false,
+			"Expendable": true,
+			"Trade": true,
+			"Personal": false,
+			"Effects":{},
 		}
 		var innerKeys = rawData[key].keys()
 		for iKey in innerKeys:
@@ -90,30 +92,31 @@ func _load_skills():
 	
 	for key in keys:
 		skillData[key] = {
-		"SkillId": key,
-		"SkillName": "no_name",
-		"Icon": load(("res://sprites/gungnir.png")),
-		"Augment": false, #Set true if weapon stats should be used.
-		"Target": "Enemy", #Enemy, Self, Ally, Self+(This is Self and Ally), Other(Enemy or Ally, not Self)
-		"CanMiss": true, #default true
-		"CanCrit": true,
-		"CanDmg": true,
-		##Only if Augment
-		"WepCat": Enums.WEAPON_CATEGORY.ANY, #Set to required weapon category, or sub type, for skill use.
-		"BonusMinRange": 0,
-		"BonusMaxRange": 0,
-		##If !augment, these are the parameters used as if it was a weapon. If Augment, these values are added as bonus/penalty if altered.
-		"Hit": 0, #Int only. negative values acceptable for Hit penalties to the skill
-		"Dmg": 0, #set an int value for damage, set false to prevent dealing damage
-		"Crit": 0, #set an int value for crit bonus, set false to prevent crits
-		"Type": Enums.DAMAGE_TYPE.PHYS, #use enum types. Set False if augment should use weapon's type.
-		##Used regardless of Augment
-		"RangeMin": 1, #if 0, ignored by Augment. Set value to require specific weapon reach.
-		"RangeMax": 1,
-		"Cost": 0,
-		"Effects": [], #any attacking effects for an augment skill must be set to instant.
-		"RuleType": false,
-		"Rule": false,
+			"SkillId": key,
+			"SkillName": "no_name",
+			"Icon": load(("res://sprites/gungnir.png")),
+			"Category": Enums.CATEGORY.NONE,
+			"Augment": false, #Set true if weapon stats should be used.
+			"Target": "Enemy", #Enemy, Self, Ally, Self+(This is Self and Ally), Other(Enemy or Ally, not Self)
+			"CanMiss": true, #default true
+			"CanCrit": true,
+			"CanDmg": true,
+			##Only if Augment
+			"WepCat": Enums.WEAPON_CATEGORY.ANY, #Set to required weapon category, or sub type, for skill use.
+			"BonusMinRange": 0,
+			"BonusMaxRange": 0,
+			##If !augment, these are the parameters used as if it was a weapon. If Augment, these values are added as bonus/penalty if altered.
+			"Hit": 0, #Int only. negative values acceptable for Hit penalties to the skill
+			"Dmg": 0, #set an int value for damage, set false to prevent dealing damage
+			"Crit": 0, #set an int value for crit bonus, set false to prevent crits
+			"Type": Enums.DAMAGE_TYPE.PHYS, #use enum types. Set False if augment should use weapon's type.
+			##Used regardless of Augment
+			"RangeMin": 1, #if 0, ignored by Augment. Set value to require specific weapon reach.
+			"RangeMax": 1,
+			"Cost": 0,
+			"Effects": [], #any attacking effects for an augment skill must be set to instant.
+			"RuleType": false,
+			"Rule": false,
 		}
 		var innerKeys = rawData[key].keys()
 		for iKey in innerKeys:
@@ -125,7 +128,7 @@ func _load_effects():
 	
 	for key in keys:
 			effectData[key] = {
-				"Type": Enums.EFFECT_TYPE,
+				"Type": Enums.EFFECT_TYPE.NONE,
 				"SubType": false, #Use Enums.SUB_TYPE. For Damage, use Damage Enums. Just how it's gotta be.
 				"Target": Enums.EFFECT_TARGET.TARGET, #Self, Target, Global, Equipped
 				"Instant": false, #only set for effects that should occur before an augment skill is rolled.
@@ -178,11 +181,11 @@ func _load_time_mods():
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
-							"Avoid": 0, 
+							"Graze": 0, 
 							"Barrier": 0, 
 							"BarPrc": 0, 
 							"Crit": 0, 
-							"CrtAvd": 0, 
+							"Luck": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
 							"DRes": 0,
@@ -202,11 +205,11 @@ func _load_time_mods():
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
-							"Avoid": 0, 
+							"Graze": 0, 
 							"Barrier": 0, 
 							"BarPrc": 0, 
 							"Crit": 0, 
-							"CrtAvd": 0, 
+							"Luck": 0, 
 							"Resist": 0, 
 							"EffHit":0, 
 							"DRes": 0,
@@ -228,8 +231,8 @@ func _load_aura_data():
 			auraData[key] = {
 						"Range": 0,
 						"IsSelf": false,
-						"IsFriendly": true,
-						"SelfOnly": false,
+						"TeamTarget": Enums.TARGET_TEAM.ALLY,
+						"Target": Enums.EFFECT_TARGET.TARGET,
 						"Effects":[]
 }
 			var innerKeys = rawData[key].keys()
@@ -241,15 +244,17 @@ func _load_passive_data():
 	
 	for key in rawData:
 			passiveData[key] = {
-			"Type": Enums.PASSIVE_TYPE,
-			"SubType": false,
-			"Icon": load(("res://sprites/gungnir.png")),
-			"Value": 0,
-			"String": false,
-			"IsTimeSens": false,
-			"Aura": false,
-			Enums.TIME.DAY: false,
-			Enums.TIME.NIGHT: false,
+				"Type": Enums.PASSIVE_TYPE,
+				"SubType": false,
+				"Icon": load(("res://sprites/gungnir.png")),
+				"Value": 0,
+				"String": false,
+				"IsTimeSens": false,
+				"Aura": false,
+				"Day": false,
+				"Night": false,
+				"RuleType": Enums.RULE_TYPE.NONE,
+				"Rule": 0,
 		}
 			var innerKeys = rawData[key].keys()
 			for iKey in innerKeys:

@@ -1,8 +1,11 @@
-[gd_resource type="Theme" load_steps=18 format=3 uid="uid://errgec2364nv"]
+[gd_resource type="Theme" load_steps=21 format=3 uid="uid://errgec2364nv"]
 
 [ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="1_myb4q"]
+[ext_resource type="StyleBox" uid="uid://b6tkex5esqmrn" path="res://scenes/GUI/underline_pencil.tres" id="2_ewdjb"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_tj7sl"]
+[ext_resource type="FontFile" uid="uid://cuuir1uibmfis" path="res://fonts/Marcellus/Marcellus.otf" id="3_3ugx4"]
 [ext_resource type="FontFile" uid="uid://c2km1ktr8iwsb" path="res://fonts/Marcellus/Marcellus-sc.regular.otf" id="3_4q0w2"]
+[ext_resource type="FontFile" uid="uid://dia8fvtnbbel2" path="res://fonts/Kalam/Kalam-Light.otf" id="4_anco3"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_s7ira"]
 
@@ -68,7 +71,8 @@ expand_margin_bottom = 6.0
 [resource]
 default_base_scale = 1.0
 default_font = ExtResource("3_4q0w2")
-Button/colors/font_color = Color(0.87451, 0.87451, 0.87451, 1)
+default_font_size = 20
+Button/colors/font_color = Color(0, 0, 0, 1)
 Button/colors/font_disabled_color = Color(0.255659, 0.255659, 0.255659, 1)
 Button/colors/font_focus_color = Color(0.776471, 0.67451, 0.247059, 1)
 Button/colors/font_hover_color = Color(0.898039, 0.788235, 0.352941, 1)
@@ -91,8 +95,8 @@ Button/styles/hover = SubResource("StyleBoxEmpty_kl6js")
 Button/styles/normal = SubResource("StyleBoxEmpty_hsiuf")
 Button/styles/pressed = SubResource("StyleBoxEmpty_rfvx0")
 Fonts/fonts/normal = ExtResource("1_myb4q")
+HSeparator/styles/separator = ExtResource("2_ewdjb")
 Label/colors/font_color = Color(0, 0, 0, 1)
-Label/font_sizes/font_size = 15
 MarginContainer/constants/margin_bottom = 15
 MarginContainer/constants/margin_left = 15
 MarginContainer/constants/margin_right = 15
@@ -100,7 +104,7 @@ MarginContainer/constants/margin_top = 15
 Panel/styles/panel = SubResource("StyleBoxEmpty_y8ifr")
 PanelContainer/styles/panel = SubResource("StyleBoxEmpty_63pdl")
 RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
-RichTextLabel/font_sizes/normal_font_size = 15
+RichTextLabel/fonts/normal_font = ExtResource("3_3ugx4")
 TabContainer/font_sizes/font_size = 30
 TabContainer/styles/panel = SubResource("StyleBoxTexture_e1sws")
 TabContainer/styles/tab_disabled = SubResource("StyleBoxEmpty_hms6d")
@@ -109,3 +113,5 @@ TabContainer/styles/tab_hovered = SubResource("StyleBoxEmpty_xt31t")
 TabContainer/styles/tab_selected = SubResource("StyleBoxEmpty_vycte")
 TabContainer/styles/tab_unselected = SubResource("StyleBoxEmpty_vqy87")
 TabContainer/styles/tabbar_background = SubResource("StyleBoxTexture_r8o0u")
+ValueLabel/base_type = &"Label"
+ValueLabel/fonts/font = ExtResource("4_anco3")

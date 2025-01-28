@@ -1,4 +1,4 @@
-extends HBoxContainer
+extends VBoxContainer
 class_name EffectList
 
 var path = preload("res://scenes/GUI/effect_label.tscn")
@@ -59,11 +59,11 @@ func _set_item_text(data) -> void:
 	if globEff.size() > 0:
 		_add_effect_labels(globEff, 2)
 	
-	if skillEff.size() > 0:
-		_add_effect_labels(globEff, 3)
-	
-	if passEff.size() > 0:
-		_add_effect_labels(globEff, 4)
+	#if skillEff.size() > 0:
+		#_add_effect_labels(globEff, 3)
+	#
+	#if passEff.size() > 0:
+		#_add_effect_labels(globEff, 4)
 	
 
 

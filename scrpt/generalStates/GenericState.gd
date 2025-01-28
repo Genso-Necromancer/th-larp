@@ -61,8 +61,7 @@ func _handle_held_key(event: InputEvent, bind):
 	var shouldMove := event.is_pressed()
 	if event.is_echo():
 		shouldMove = shouldMove and timer.is_stopped()
-		timer.wait_time -= 0.05
-		timer.wait_time = clampf(timer.wait_time, 0.05, 0.2)
+		timer.wait_time -= clampf(timer.wait_time-0.05, 0.00, 0.2)
 	elif !event.is_echo():
 		timer.wait_time = uiCooldown
 	if not shouldMove:

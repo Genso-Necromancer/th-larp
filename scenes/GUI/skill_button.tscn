@@ -14,6 +14,7 @@ size_flags_horizontal = 0
 size_flags_vertical = 4
 theme = ExtResource("1_li3j2")
 script = ExtResource("2_fcxm4")
+type = "Skill"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2

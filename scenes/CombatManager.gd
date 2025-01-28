@@ -183,7 +183,7 @@ func _evaluate_clash(a, t, action):
 	if skillId:
 		results["CanMiss"] = skill.CanMiss
 	else: results["CanMiss"] = true
-	results["Hit"] = aData.Hit - tData.Avoid
+	results["Hit"] = aData.Hit - tData.Graze
 	results.Hit = clampi(results.Hit, 0, 1000)
 	
 	if skillId and !skill.CanDmg:
@@ -205,7 +205,7 @@ func _evaluate_clash(a, t, action):
 		results["CanCrit"] = false
 	else:
 		results["CanCrit"] = true
-		results["Crit"] = aData.Crit - tData.CrtAvd
+		results["Crit"] = aData.Crit - tData.Luck
 		results.Crit = clampi(results.Crit, 0, 1000)
 	
 	if !skillId:
@@ -453,11 +453,11 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 		
 		
 		#check accuracy
-		print("Rolling for Hit. Chance: ", str(unitCd.Hit - targetCd.Avoid))
+		print("Rolling for Hit. Chance: ", str(unitCd.Hit - targetCd.Graze))
 		if skillData and !skillData.CanMiss:
 			outcome[unit][swingIndx].Hit = true
 			print("Was True Hit")
-		elif get_roll() <= unitCd.Hit - targetCd.Avoid:
+		elif get_roll() <= unitCd.Hit - targetCd.Graze:
 			outcome[unit][swingIndx].Hit = true
 			print("Hit Success")
 		elif fate and get_roll() <= pData[fate].Value:
@@ -495,8 +495,8 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 		
 		if skillData and !skillData.CanCrit:
 			pass
-		elif  get_roll() <= unitCd.Crit - targetCd.CrtAvd:
-			print("Rolling for Crit. Chance: ", str(unitCd.Crit - targetCd.CrtAvd))
+		elif  get_roll() <= unitCd.Crit - targetCd.Luck:
+			print("Rolling for Crit. Chance: ", str(unitCd.Crit - targetCd.Luck))
 			critDmg = _get_crit_damage(unit)
 			print("Crit Success. Crit Dmg: ", critDmg)
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.CRIT)

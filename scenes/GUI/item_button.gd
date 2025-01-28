@@ -2,7 +2,8 @@ extends PanelContainer
 class_name ItemButton
 
 @onready var button = $ButtonLayer
-
+@export var type :String = "Item"
+var metaSet := false
 
 var disabled := false :
 	set(value):
@@ -20,6 +21,11 @@ var state : String = "Enabled" :
 	get:
 		return state
 
+
+func _ready():
+	_set_button_meta()
+	
+
 func set_item_text(string : String, durability : String):
 	var n = $HBoxContainer/HBoxContainer/Name
 	var d = $HBoxContainer/Durability
@@ -27,6 +33,7 @@ func set_item_text(string : String, durability : String):
 	if durability == "-1":
 		durability = ""
 	d.set_text(durability)
+	
 	#if fSize:
 		#n.add_theme_font_size_override("font_size", fSize)
 		#d.add_theme_font_size_override("font_size", fSize)
@@ -82,16 +89,30 @@ func _font_state_change(value : String):
 		l.add_theme_color_override("font_focus_color", fColor)
 		l.add_theme_color_override("font_hover_pressed_color", fColor)
 
-func set_meta_data(item, unit, index, canTrade):
+func set_meta_data(item, unit, index, canTrade:=false):
 	var isEquipped := false
+	if item is Dictionary: set_meta("ID", item.ID)
+	else: set_meta("ID", item)
 	set_meta("Item", item)
 	set_meta("Unit", unit)
 	set_meta("Index", index)
 	set_meta("CanTrade", canTrade)
-	if item and item.Equip:
+	if item is Dictionary and item.Equip:
 		isEquipped = true
 		_set_equipped(true)
 	set_meta("Equipped", isEquipped)
+	metaSet = true
+
+func _set_button_meta():
+	if metaSet:
+		button.set_meta("Type", type)
+		button.set_meta("ID", get_meta("ID"))
+		button.set_meta("Item", get_meta("Item"))
+		button.set_meta("Unit", get_meta("Unit"))
+		button.set_meta("Index", get_meta("Index"))
+		button.set_meta("CanTrade", get_meta("CanTrade"))
+		button.set_meta("Equipped", get_meta("Equipped"))
+
 
 func _set_equipped(isEquipped):
 	var icon = $HBoxContainer/HBoxContainer/Icon/Equpped

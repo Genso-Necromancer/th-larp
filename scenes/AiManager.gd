@@ -240,7 +240,7 @@ func combat_values(aiUnit, attack, targetDef):
 #		print(target.unitData.Stats.Life)
 #		print(value)
 		value = value * dmgWeight
-	var accScore = aiUnit.combatData.Hit - target.combatData.Avoid
+	var accScore = aiUnit.combatData.Hit - target.combatData.Graze
 	accScore = clampf(accScore, 0, 1000)
 	if accScore != 0:
 		var accValue = accScore/100

@@ -22,11 +22,11 @@ signal trd_focus_changed
 @onready var sprite2 = $CharacterArtGroup/MarginContainer/PrtPnl2/MarginContainer/UnitPrt2
 @onready var prtPanel1 = $CharacterArtGroup/MarginContainer/PrtPnl1
 @onready var prtPanel2 = $CharacterArtGroup/MarginContainer/PrtPnl2
-@onready var infoPanel = $TradeContainer/MarginContainer/TradeScreenVBox/ItemInfoPanel
+@onready var infoPanel = $TradeContainer/MarginContainer/TradeScreenVBox/InfoPanel
 @onready var supplyPanel = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl
 #@onready var tabContainer = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer
 @onready var optionsPop = $OptionsPopUp
-@onready var effTitle = $TradeContainer/MarginContainer/TradeScreenVBox/ItemInfoPanel/MarginContainer/VBoxContainer/EffectTitleBox
+#@onready var effTitle = $TradeContainer/MarginContainer/TradeScreenVBox/ItemInfoPanel/MarginContainer/VBoxContainer/EffectTitleBox
 
 #Trade tracking
 var firstBtn : ItemButton
@@ -79,12 +79,13 @@ func _ready():
 
 
 func _init():
-	toggle_visible()
+	visible = false
 
 
 func toggle_visible():
-	var isVis = visible
-	visible = !isVis
+	visible = !visible
+	infoPanel.call_deferred("open_popup")
+	infoPanel.toggle_focus_signal()
 
 
 func _hide_panels():
@@ -100,7 +101,7 @@ func _connect_signals():
 	self.new_btn_added.connect(parent._connect_btn_to_cursor)
 	self.trade_closed.connect(parent._on_trade_closed)
 	self.item_list_filled.connect(parent._on_item_list_filled)
-	get_viewport().gui_focus_changed.connect(self._update_item_info)
+	
 	self.trd_focus_changed.connect(parent._on_trd_focus_changed)
 	
 
@@ -570,7 +571,7 @@ func _open_item_options(b):
 	#var list = $SupplyOpPnl2/MarginContainer/supplyOpList
 	#var eBtn = $SupplyOpPnl2/MarginContainer/supplyOpList/EquipBtn
 	#var uBtn = $SupplyOpPnl2/MarginContainer/supplyOpList/UseBtn
-	#var item = b.get_meta("Item")
+	#var item = b.button.get_meta("Item")
 	#var usable = false
 	#var equippable = false
 	#firstBtn = b
@@ -651,7 +652,7 @@ func _trade_select(b):
 	
 func _give_select(b) -> void:
 	var unit = b.get_meta("Unit")
-	var item = b.get_meta("Item")
+	var item = b.button.get_meta("Item")
 	var iData = UnitData.itemData[item.ID]
 	var iType = iData.Category.to_upper()
 	var iInd = b.get_meta("Index")
@@ -690,7 +691,7 @@ func _give_select(b) -> void:
 	
 func _take_select(b): 
 	var unit = firstUnit
-	var item = b.get_meta("Item")
+	var item = b.button.get_meta("Item")
 	var iData = UnitData.itemData[item.ID]
 	var iType = iData.Category.to_upper()
 	var iInd = b.get_meta("Index")
@@ -806,13 +807,13 @@ func _trade_initiated(b1, b2):
 
 func _swap_items(b1, b2):
 	var unit1 = b1.get_meta("Unit")
-	var item1 = b1.get_meta("Item")
+	var item1 = b1.button.get_meta("Item")
 	var i1 = b1.get_meta("Index")
 	var inv1 = unit1.unitData.Inv
 	
 	var btns1 = list1.itemList.get_children()
 	var unit2 = b2.get_meta("Unit")
-	var item2 = b2.get_meta("Item")
+	var item2 = b2.button.get_meta("Item")
 	var i2 = b2.get_meta("Index")
 	
 	var inv2 = unit2.unitData.Inv
@@ -879,7 +880,7 @@ func _on_tab_pressed(b):
 	_change_tab(tabTypes[c])
 
 #func _on_use_btn_pressed():
-	#var item = firstBtn.get_meta("Item")
+	#var item = firstBtn.button.get_meta("Item")
 	#
 	#emit_signal("trd_item_used",firstUnit, item)
 	#_refresh_list()
@@ -887,7 +888,7 @@ func _on_tab_pressed(b):
 
 
 #func _on_equip_btn_pressed():
-	#var item = firstBtn.get_meta("Item")
+	#var item = firstBtn.button.get_meta("Item")
 	#var i = firstBtn.get_meta("Index")
 	#var isEquipped = false
 	#var unequip = false
@@ -904,20 +905,7 @@ func _on_tab_pressed(b):
 	#_close_item_manage()
 
 
-func _update_item_info(button) -> void: #No Effect Tool Tip generation yet HERE
-	var b := button.get_parent() as ItemButton
-	if !b or !b.get_meta("Item"):
-		return
-	var itemId : String = ""
-	
-	itemId = b.get_meta("Item").ID
-	
-	if UnitData.itemData[itemId].Effects:
-		effTitle.visible = true
-	else: 
-		effTitle.visible = false
-	get_tree().call_group("EffectList", "update_effects", itemId)
-	get_tree().call_group("ValueLabels", "update_value", itemId)
+
 	
 	
 	

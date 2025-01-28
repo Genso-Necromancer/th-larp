@@ -31,7 +31,7 @@ func _process(_delta):
 
 func _on_gui_focused_changed(f):
 	$PanelContainer/focus.set_text("Current Focus: [" + str(f) + "]")
-	print("Current Focus: [" + str(f) + "]")
+	#print("Current Focus: [" + str(f) + "]")
 #func position_has_obstacle(obstacle_position):
 	#return board.position_has_obstacle(obstacle_position) or board.position_has_unit(obstacle_position)
 #

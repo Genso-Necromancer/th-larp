@@ -14,7 +14,7 @@ func validate_buttons(b) -> bool:
 	var eq = $OptionsPanel/MarginContainer/OptionsList/EquipBtn
 	var use = $OptionsPanel/MarginContainer/OptionsList/UseBtn
 	var unEq = $OptionsPanel/MarginContainer/OptionsList/UnequipBtn
-	item = b.get_meta("Item")
+	item = b.button.get_meta("Item")
 	unit = b.get_meta("Unit")
 	index = b.get_meta("Index")
 	var itemData = UnitData.itemData[item.ID]

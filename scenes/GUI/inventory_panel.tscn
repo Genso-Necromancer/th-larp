@@ -7,6 +7,8 @@
 
 [node name="TradePnl" type="PanelContainer" node_paths=PackedStringArray("itemList", "equipContainer", "styleNodes")]
 custom_minimum_size = Vector2(423, 506)
+size_flags_horizontal = 4
+size_flags_vertical = 0
 theme = ExtResource("1_hbvl4")
 script = ExtResource("2_1levr")
 itemList = NodePath("Control/InventoryMargin/VBoxContainer/ItemList1")
@@ -38,7 +40,6 @@ layout_mode = 2
 layout_mode = 2
 offset_right = 450.0
 offset_bottom = 500.0
-pivot_offset = Vector2(225, 0)
 theme_override_constants/margin_left = 55
 theme_override_constants/margin_top = 48
 theme_override_constants/margin_right = 25
@@ -57,7 +58,3 @@ theme_override_constants/margin_top = 6
 custom_minimum_size = Vector2(370, 215)
 layout_mode = 2
 theme_override_constants/separation = 8
-
-[node name="Panel" type="Panel" parent="Control/InventoryMargin"]
-visible = false
-layout_mode = 2

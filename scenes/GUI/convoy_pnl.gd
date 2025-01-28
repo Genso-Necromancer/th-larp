@@ -48,7 +48,7 @@ func fill_items(_isTrade := false) -> Array:
 		if dur == -1 or mDur == -1:
 			durString = str(" --")
 		else:
-			durString = str(" [" + str(dur) + "/" + str(mDur)+"]")
+			durString = str(dur) + "/" + str(mDur)
 		b.set_item_text(str(itemData.Name), durString)
 		b.set_item_icon(itemData.Icon)
 		b.set_meta_data(item, "Supply", i, itemData.Trade)

@@ -123,6 +123,7 @@ func _ready():
 	SignalTower.prompt_accepted.connect(_on_prompt_accepted)
 	menuCursor.visible = false
 	foreCast.visible = false
+	_connect_asset_signals()
 	_load_turn_tracker()
 	
 func update_labels(): #Use this to cascade assigning strings from XML to all hard loaded buttons HERE
@@ -255,49 +256,58 @@ func _snap_to_cursor(node): #bug gy save for later
 	
 
 func _on_gameboard_toggle_prof():
-	if sState < 4 or sState > 7: 
-		toggle_profile()
+	toggle_profile()
 		
 			
-func toggle_profile(): #Needs filtering for while in set-up menu. Perhaps a filter function should be called first.
-	var profVis = unitProf.visible
-	if sState == sStates.HOME: #profile should not open on set up home menu
+func toggle_profile() -> void: 
+	if sState < 3 or sState > 7:  #profile should not open in these states.
 		return
 		
 	#if sState != sStates.BEGIN:
 		#menuCursor.toggle_visible()
-		
-	if profVis and Global.focusUnit != profFocus:
+	
+	if unitProf.visible and Global.focusUnit != profFocus:
 		update_prof()
 		profFocus = Global.focusUnit
+	elif unitProf.toolTipMode:
+		toggle_tooltips()
+	elif !unitProf.visible:
+		prevFocus = get_viewport().gui_get_focus_owner()
+		
+		if prevFocus:
+			prevFocus.release_focus()
+		update_prof()
+		_resignal_menuCursor_array(unitProf.focusLabels, 2)
+		menuCursor.visible = false
+		unitProf.toggle_profile()
+		profFocus = Global.focusUnit
+		rosterGrid.set_bar_focus(false)
+		_change_state(GameState.GB_PROFILE)
 	else:
-		if unitProf.visible == false:
-			prevFocus = get_viewport().gui_get_focus_owner()
-			if prevFocus:
-				prevFocus.release_focus()
-			update_prof()
-			menuCursor.visible = false
-			unitProf.visible = true
-			profFocus = Global.focusUnit
-			_change_state(GameState.GB_PROFILE)
-		else:
-			if sState != sStates.BEGIN and sState != sStates.FORM: 
-				menuCursor.visible = true
-			if prevFocus:
-				var button = prevFocus
-				button.call_deferred("grab_focus")
-			prevFocus = null
-			unitProf.visible = false
-			_change_state(mainCon.previousState)
-
-
-func toggle_tooltips():
-	unitProf.toggle_tooltips()
-	menuCursor.toggle_visible()
+		_strip_menuCursor(false, unitProf.focusLabels)
+		rosterGrid.set_bar_focus(true)
+		if sState != sStates.BEGIN and sState != sStates.FORM: 
+			menuCursor.visible = true
+		if prevFocus:
+			var button = prevFocus
+			button.call_deferred("grab_focus")
+		prevFocus = null
+		unitProf.toggle_profile()
+		_change_state(mainCon.previousState)
 
 
 func update_prof():
 	unitProf.update_prof()
+	
+	
+func toggle_tooltips():
+	unitProf.toggle_controller_mode()
+
+func _on_profile_tooltips_on():
+	menuCursor.visible = true
+	
+func _on_profile_tooltips_off():
+	menuCursor.visible = false
 
 
 func _on_gameboard_target_focused( mode : int, reach: Array = [-1, -1]):
@@ -384,7 +394,9 @@ func _load_assets():
 	add_child(unitProf)
 	
 	
-	
+func _connect_asset_signals():
+	unitProf.tooltips_on.connect(self._on_profile_tooltips_on)
+	unitProf.tooltips_off.connect(self._on_profile_tooltips_off)
 
 #SetUp Buttons
 func _on_btn_deploy_pressed():
@@ -469,7 +481,7 @@ func _on_gameboard_deploy_toggled(deployed):
 	depCount = deployed
 	rosterGrid.update_deploy_count(deployed)
 
-func _roster_mouse_entered(unit):
+func _roster_focus_entered(unit):
 	Global.focusUnit = unit
 	update_prof()
 
@@ -480,8 +492,8 @@ func _connect_unit_btn(bar):
 	if !b.pressed.is_connected(self._roster_btn_pressed.bind(bar)):
 		b.pressed.connect(self._roster_btn_pressed.bind(bar))
 	
-	if !b.mouse_entered.is_connected(self._roster_mouse_entered.bind(unit)):
-		b.mouse_entered.connect(self._roster_mouse_entered.bind(unit))
+	if !b.focus_entered.is_connected(self._roster_focus_entered.bind(unit)):
+		b.focus_entered.connect(self._roster_focus_entered.bind(unit))
 
 
 #Menu cursor reparenting and resignaling
@@ -515,7 +527,7 @@ func _resignal_menuCursor_array(btns:Array, mode:= 0):
 	for b in btns:
 		_connect_btn_to_cursor(b)
 		
-	while btns.size() > i and btns[i].disabled == true:
+	while btns.size() > i and !btns[i].visible:
 		i += 1
 	
 	match mode:
@@ -539,8 +551,10 @@ func _connect_btn_to_cursor(b):
 	
 	
 	
-func _strip_menuCursor(p = menuCursor.menu_parent):
-	var btns = p.get_children()
+func _strip_menuCursor(p = menuCursor.menu_parent, array: Array = []):
+	var btns 
+	if array.size()>0: btns = array
+	else: btns = p.get_children()
 	for b in btns:
 		if b.mouse_entered.is_connected(self._on_mouse_entered.bind(b)): 
 			b.mouse_entered.disconnect(self._on_mouse_entered.bind(b))

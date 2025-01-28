@@ -1,5 +1,7 @@
 extends Node
 
+#class_name StringGetter
+
 func get_string(id) -> String:
 	return _parse_xml("string", id)
 
@@ -67,7 +69,7 @@ func mash_test():
 	var base = get_template("effect_chance")
 	var efName = get_string("name_sleep")
 	var chance = 100
-	var varArray : Array
+	var varArray : Array = []
 	varArray.append(efName)
 	varArray.append(chance)
 	var s : String = mash_string(base, varArray)
@@ -120,7 +122,7 @@ func get_combat_effect_string(effId, cmbData) -> String: #Time to create the str
 	return s
 	
 	
-func get_effect_string(effId) -> String: 
+func get_effect_string(effId) -> String: #Needs reworking, see tooltip parser for help. Doesn't even include effect rule types
 	var effect = UnitData.effectData[effId]
 	#var proc = cmbData.Effects[effId].Proc
 	#var value = cmbData.Effects[effId].Value
@@ -140,7 +142,7 @@ func get_effect_string(effId) -> String:
 		s = s % [subType]
 		
 	#Check if Value: "Buff Power #"
-	if effVal and effVal > 0:
+	if effVal and effVal != 0:
 		var v
 		var path := "value_template"
 		if typeof(effVal) == Variant.Type.TYPE_FLOAT:
@@ -159,11 +161,30 @@ func get_effect_string(effId) -> String:
 		durationType = effect.DurationType
 	else: durationType = Enums.DURATION_TYPE.TURN
 	
-	if effect.Duration > 0:
+	if durationType == Enums.DURATION_TYPE.PERMANENT:
+		var durKeys = Enums.DURATION_TYPE.keys()
+		var durationPath = "duration_%s" % [durKeys[durationType].to_lower()]
+		var durationString = get_string(durationPath)
+		s = durationString % [s]
+		
+	elif effect.Duration > 0:
 		var durKeys = Enums.DURATION_TYPE.keys()
 		var durationPath = "duration_%s" % [durKeys[durationType].to_lower()]
 		var durationString = get_string(durationPath)
 		s = get_template("duration_template") % [s, effect.Duration, durationString]
+		
+	
+	if effect.get("RuleType", false):
+		var value
+		var ruleKey = Enums.RULE_TYPE.keys()[effect.RuleType].to_snake_case()
+		match effect.RuleType:
+			Enums.RULE_TYPE.TIME: value = ("time_" + Enums.TIME.keys()[effect.Rule].to_snake_case())
+			Enums.RULE_TYPE.TARGET_SPEC: value = ("species_name_" + Enums.SPEC_ID.keys()[effect.Rule].to_snake_case())
+			Enums.RULE_TYPE.SELF_SPEC: value = ("species_name_" + Enums.SPEC_ID.keys()[effect.Rule].to_snake_case())
+			Enums.RULE_TYPE.MORPH: value = ("time_" + Enums.TIME.keys()[Global.timeOfDay].to_snake_case())
+		s += " " + StringGetter.get_string("effect_" + ruleKey)
+		s = s.format({"Rule":StringGetter.get_string(str(value))})
+
 	
 	return s
 
