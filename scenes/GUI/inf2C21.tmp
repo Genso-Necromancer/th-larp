@@ -2,7 +2,7 @@
 
 [ext_resource type="Theme" uid="uid://errgec2364nv" path="res://fonts/Izayoi_Theme_Tooltip.tres" id="1_q35yw"]
 [ext_resource type="Script" path="res://scenes/GUI/info_panel.gd" id="2_3ju1g"]
-[ext_resource type="Texture2D" uid="uid://dt8g5xp8171gn" path="res://sprites/UI/ui_status_tray.png" id="3_06ogc"]
+[ext_resource type="Texture2D" uid="uid://b1sb6wysp4b0a" path="res://sprites/UI/tool_tip_bubble.png" id="2_vmh6d"]
 [ext_resource type="PackedScene" uid="uid://63n00lxo2oxf" path="res://scenes/GUI/tooltips/item_display_margin.tscn" id="4_gtm1e"]
 [ext_resource type="PackedScene" uid="uid://bi4unq8mpucas" path="res://scenes/GUI/tooltips/tooltip_display.tscn" id="9_hgpe6"]
 
@@ -101,18 +101,22 @@ script = ExtResource("2_3ju1g")
 
 [node name="BackgroundCenter" type="NinePatchRect" parent="."]
 layout_mode = 2
-texture = ExtResource("3_06ogc")
-region_rect = Rect2(0, 0, 48, 48)
-patch_margin_left = 5
-patch_margin_top = 1
-patch_margin_right = 5
-patch_margin_bottom = 5
+texture = ExtResource("2_vmh6d")
+patch_margin_left = 80
+patch_margin_top = 56
+patch_margin_right = 58
+patch_margin_bottom = 59
 
 [node name="ToolTipContainer" type="MarginContainer" parent="."]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
 mouse_filter = 2
+theme_override_constants/margin_left = 58
+theme_override_constants/margin_top = 30
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 40
 
 [node name="VBoxContainer" type="VBoxContainer" parent="ToolTipContainer"]
 layout_mode = 2
@@ -121,10 +125,10 @@ size_flags_vertical = 0
 mouse_filter = 2
 
 [node name="ItemDisplayMargin" parent="ToolTipContainer/VBoxContainer" instance=ExtResource("4_gtm1e")]
+visible = false
 layout_mode = 2
 
 [node name="ToolTipDisplay" parent="ToolTipContainer/VBoxContainer" instance=ExtResource("9_hgpe6")]
-visible = true
 clip_contents = false
 custom_minimum_size = Vector2(250, 0)
 layout_mode = 2

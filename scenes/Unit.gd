@@ -934,20 +934,25 @@ func _equip_weapon(index, isTemp = false) -> void:
 			unequip(i)
 	
 	match index:
-		-2: wep = natural
-		-1: wep = unarmed
+		-2: 
+			wep = natural
+			
+		-1: 
+			wep = unarmed
+			
 		_: 
 			if unitData.Inv[index].Equip == true:
 				return
 			elif isTemp:
-				unitData.Inv[index].Equip = true
+				#unitData.Inv[index].Equip = true
 				wep = unitData.Inv[index]
 			else:
-				unitData.Inv[index].Equip = true
+				#unitData.Inv[index].Equip = true
 				wep = unitData.Inv.pop_at(index)
 				unitData.Inv.push_front(wep)
-			
-	_add_equip_effects(wep)
+	if wep.ID != "NONE": 
+		wep.Equip = true
+		_add_equip_effects(wep)
 	#print(wep)
 	
 func _add_equip_effects(item):
@@ -1406,7 +1411,8 @@ func _clear_status_fx(condition):
 		if kid is AnimatedSprite2D and kid.get_animation() == condition.to_pascal_case():
 			kid.queue_free()
 	
-func set_status(effect): #I wish I could inflict sleep status on myself
+func set_status(effect): #Missing a check for "duration type", same goes for ticking the duration
+	#I wish I could inflict sleep status on myself
 	var fxPath = "res://scenes/animations/status_effects/animated_sprite_%s.tscn"
 	var sprite = $PathFollow2D/Sprite
 	var hp = $PathFollow2D/Sprite/HPbar

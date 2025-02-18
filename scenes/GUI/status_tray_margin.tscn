@@ -1,0 +1,36 @@
+[gd_scene load_steps=4 format=3 uid="uid://b011nm5up2wry"]
+
+[ext_resource type="Script" path="res://scenes/status_tray.gd" id="1_4fos0"]
+[ext_resource type="Texture2D" uid="uid://dt8g5xp8171gn" path="res://sprites/UI/ui_status_tray.png" id="2_dii2q"]
+[ext_resource type="Script" path="res://scenes/status_grid.gd" id="3_ujxmf"]
+
+[node name="StatusTrayMargin" type="MarginContainer"]
+size_flags_horizontal = 0
+size_flags_vertical = 8
+theme_override_constants/margin_left = 275
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 100
+script = ExtResource("1_4fos0")
+
+[node name="SpriteBG" type="NinePatchRect" parent="."]
+custom_minimum_size = Vector2(108, 8)
+layout_mode = 2
+mouse_filter = 1
+texture = ExtResource("2_dii2q")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="StatusGridMargin" type="MarginContainer" parent="."]
+custom_minimum_size = Vector2(150, 100)
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="StatusGrid" type="GridContainer" parent="StatusGridMargin"]
+layout_mode = 2
+columns = 6
+script = ExtResource("3_ujxmf")

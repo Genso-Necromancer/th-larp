@@ -18,7 +18,7 @@ var _style : String = "NONE" :
 			_set_style_style(_style)
 		
 			
-const _styles: Array[String] = ["Trade", "Profile"]
+const _styles: Array[String] = ["Trade", "Profile", "Preview"]
 
 var items : Array = []
 
@@ -51,6 +51,7 @@ func _set_style_style(mode:String):
 				styleNodes[0].visible = true
 			_styles[1]:
 				styleNodes[1].visible = true
+				
 
 
 func _ready(): 

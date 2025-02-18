@@ -156,9 +156,12 @@
 			<entry id = "time_night"><![CDATA[[color=#230f8c]Night[/color]]]></entry>
 			<!-- Tool Tips: labels -->
 			<entry id = "effect_label"><![CDATA[Effects]]></entry>
-			<!-- Skill Types -->
-			<entry id = "augment_skill"><![CDATA[Weapon Augment]]></entry>
+			<entry id = "remaining_label"><![CDATA[Remaining: {Duration} {DurationType}]]></entry>
 			
+			<!-- Tool Tips: Skill Types -->
+			<entry id = "augment_skill"><![CDATA[Weapon Augment]]></entry>
+			<!-- Tool Tips: Status Conditions -->
+			<entry id = "status_sleep"><![CDATA[[color=#5F9EA0]Sleep[/color]]]></entry>
 			
 			<!-- OLD: Need Vetting -->
 			<entry id = "lore_night_prot"><![CDATA[{RuleType}, negate {Rule} stat penalties at [color=#230f8c]Night[/color].]]></entry>

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bi60x7j8wy2fa"
-path="res://.godot/imported/gold_test_6.png-f60fcf9c4b9e04675f9b2fc1c010097e.ctex"
+uid="uid://dwlnwcdgwc6de"
+path="res://.godot/imported/PlaceHolderModTiles.png-28b7a0cd00b5439e141b9325857a5606.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/tiles/gold_test_6.png"
-dest_files=["res://.godot/imported/gold_test_6.png-f60fcf9c4b9e04675f9b2fc1c010097e.ctex"]
+source_file="res://sprites/tiles/PlaceHolderModTiles.png"
+dest_files=["res://.godot/imported/PlaceHolderModTiles.png-28b7a0cd00b5439e141b9325857a5606.ctex"]
 
 [params]
 

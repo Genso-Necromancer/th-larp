@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://1qfx0p1pwk21"
-path="res://.godot/imported/gold_test_3.png-1a7c1c96ae68160200bb025df7800f31.ctex"
+uid="uid://bksmyj30srka5"
+path="res://.godot/imported/TileSetPlaceHolder.png-f7beaad778cc04a57b689e7e5177da8c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/tiles/gold_test_3.png"
-dest_files=["res://.godot/imported/gold_test_3.png-1a7c1c96ae68160200bb025df7800f31.ctex"]
+source_file="res://sprites/tiles/TileSetPlaceHolder.png"
+dest_files=["res://.godot/imported/TileSetPlaceHolder.png-f7beaad778cc04a57b689e7e5177da8c.ctex"]
 
 [params]
 

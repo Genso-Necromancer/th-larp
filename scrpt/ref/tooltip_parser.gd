@@ -150,15 +150,8 @@ func get_skill(data:Dictionary) -> String:
 		working += ruleString
 	elif effectString:
 		working += effectString
-		
-	var catch := 0
-	while "{" in working:
-		working = working.format(converted)
-		catch += 1
-		if catch >10:
-			break
-		
-	finished = working
+	
+	finished = _mash_together(working, converted)
 	return finished
 	
 	
@@ -204,7 +197,7 @@ func get_combat(unit:Unit, keyStat:String) -> String:
 	return string
 
 
-func _generate_stat_tt(unit, keyBase:String, keyTotal:String, keyStat: String) -> String:
+func _generate_stat_tt(unit:Unit, keyBase:String, keyTotal:String, keyStat: String) -> String:
 	var string : String
 	var fString : String = ""
 	var finished : String
@@ -268,4 +261,31 @@ func _generate_formula(params:Array):
 	else: 
 		string = string % "+0"
 	
+	return string
+
+
+func get_status(unit:Unit, status:String) -> String:
+	var sParams = unit.sParam
+	var parts := {}
+	var working : String
+	var finished : String
+	working += "{Status}"
+	parts["Status"] = StringGetter.get_string("status_"+status.to_snake_case())
+	if sParams.get(status,false):
+		working += "\n" + StringGetter.get_string("remaining_label")
+		parts["Duration"] = str(sParams[status].get("Duration", ""))
+		var durationType = Enums.DURATION_TYPE.keys()[sParams[status].DurationType]
+		parts["DurationType"] = StringGetter.get_string("duration_"+durationType.to_snake_case())
+	
+	finished = _mash_together(working, parts)
+	return finished
+
+
+func _mash_together(string: String, stringDick : Dictionary) -> String:
+	var catch := 0
+	while "{" in string:
+		string = string.format(stringDick)
+		catch += 1
+		if catch >10:
+			break
 	return string

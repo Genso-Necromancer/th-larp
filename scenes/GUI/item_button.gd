@@ -4,6 +4,7 @@ class_name ItemButton
 @onready var button = $ButtonLayer
 @export var type :String = "Item"
 var metaSet := false
+@export var isIconMode := false
 
 var disabled := false :
 	set(value):
@@ -26,8 +27,9 @@ func _ready():
 	_set_button_meta()
 	
 
+
 func set_item_text(string : String, durability : String):
-	var n = $HBoxContainer/HBoxContainer/Name
+	var n = $HBoxContainer/Name
 	var d = $HBoxContainer/Durability
 	n.set_text(string)
 	if durability == "-1":
@@ -39,12 +41,12 @@ func set_item_text(string : String, durability : String):
 		#d.add_theme_font_size_override("font_size", fSize)
 	
 func set_item_icon(icon : String):
-	var i = $HBoxContainer/HBoxContainer/Icon
+	var i = $HBoxContainer/Icon
 	i.set_texture(load(icon))
 	
 
 func toggle_icon():
-	var i = $HBoxContainer/HBoxContainer/Icon
+	var i = $HBoxContainer/Icon
 	var vis = i.visible
 	i.visible = !vis
 
@@ -77,7 +79,7 @@ func _verify_state(value) -> String:
 
 func _font_state_change(value : String):
 	var fColor : Color
-	var labels = [$HBoxContainer/HBoxContainer/Name, $HBoxContainer/Durability]
+	var labels = [$HBoxContainer/Name, $HBoxContainer/Durability]
 	match value:
 		"Enabled": fColor = Color(1,1,1)
 		"Disabled": fColor = Color(0.278, 0.278, 0.278)
@@ -115,5 +117,5 @@ func _set_button_meta():
 
 
 func _set_equipped(isEquipped):
-	var icon = $HBoxContainer/HBoxContainer/Icon/Equpped
+	var icon = $HBoxContainer/Icon/Equpped
 	icon.visible = isEquipped

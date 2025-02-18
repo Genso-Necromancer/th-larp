@@ -5,7 +5,12 @@ extends Node
 
 
 
-var focusUnit : Unit
+var focusUnit : Unit:
+	set(value):
+		focusUnit = value
+		SignalTower.emit_signal("focus_unit_changed", value)
+	get:
+		return focusUnit
 var aiTarget : Unit
 var activeUnit : Unit
 var timeOfDay := Enums.TIME.DAY

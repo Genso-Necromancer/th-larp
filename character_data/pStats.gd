@@ -875,7 +875,7 @@ static func get_effects():
 				"Type": Enums.EFFECT_TYPE.DEBUFF,
 				"SubType": Enums.SUB_TYPE.MOVE, 
 				"Target": Enums.EFFECT_TARGET.TARGET,
-				"Value": 4,
+				"Value": -4,
 				"Duration": 1,
 				"Stack": false,
 				"DurationType": Enums.DURATION_TYPE.TURN,
@@ -891,10 +891,9 @@ static func get_effects():
 				"Value": -0.5
 			},
 			"Pizza01": {
-			"Target": "Self",
-			"OnHit": false,
-			"Proc": -1,
-			"Heal": 2
+				"Type": Enums.EFFECT_TYPE.HEAL,
+				"Target": Enums.EFFECT_TARGET.SELF,
+				"Value": 8, #use 0-2 float for time speed up/slow down.	
 			},
 			"PwrBuff01":{
 				"Type": Enums.EFFECT_TYPE.BUFF,

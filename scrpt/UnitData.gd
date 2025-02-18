@@ -137,7 +137,7 @@ func _load_effects():
 				"Duration": 0, #Unit turns the effect lasts, -1 causes the effect to be permanent. Duration is ignored entirely for on-equip effects of items.
 				"DurationType": false,
 				"Stack": false, #True for infinite stacking, soft limit by duration Not necessary for permanent effects. Ignored for on-equip effects.
-				"Value": 0, #use 0-2 float for time speed up/slow down.
+				"Value": 0, #use 0-2 float for time speed up/slow down. #USE NEGATIVE VALUES FOR DEBUFFS, OR YOU BUFF THEM
 				#Effect STATUS/BUFF/DEBUFF
 				"Curable": true, #For buffs/debuffs. Dictates if effects can remove them.
 				#Effect: HEAL

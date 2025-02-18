@@ -205,8 +205,6 @@ layout_mode = 2
 
 [node name="InfoPanel" parent="TradeContainer/MarginContainer/TradeScreenVBox" instance=ExtResource("10_pdk1d")]
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 0
 
 [node name="OptionsPopUp" parent="." instance=ExtResource("9_htpwm")]
 layout_mode = 0

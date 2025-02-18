@@ -19,7 +19,7 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8x012"]
 bg_color = Color(0, 0, 0, 0.45098)
 
-[node name="ProfileAspect" type="AspectRatioContainer"]
+[node name="ProfileAspect" type="AspectRatioContainer" node_paths=PackedStringArray("inventory", "fBox", "infoPanel", "statusTray")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -31,6 +31,10 @@ mouse_filter = 0
 theme = ExtResource("1_vrbhg")
 alignment_vertical = 2
 script = ExtResource("2_wouk2")
+inventory = NodePath("ProfileMargin/ProfileHBox/SideBarMargin/SideBarVBox/InventoryPanel")
+fBox = NodePath("ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/fBoxMargin/FeatLbVBox")
+infoPanel = NodePath("infoNode/InfoPanel")
+statusTray = NodePath("ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin/StatusTrayMargin")
 
 [node name="Panel" type="Panel" parent="."]
 custom_minimum_size = Vector2(1920, 0)
@@ -83,7 +87,7 @@ texture = ExtResource("5_8rabj")
 expand_mode = 1
 stretch_mode = 4
 
-[node name="StatusTrayMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin"]
+[node name="StatusTrayMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin" node_paths=PackedStringArray("statusGrid")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
@@ -91,6 +95,7 @@ theme_override_constants/margin_left = 275
 theme_override_constants/margin_right = 50
 theme_override_constants/margin_bottom = 100
 script = ExtResource("5_543hk")
+statusGrid = NodePath("StatusGridMargin/StatusGrid")
 
 [node name="SpriteBG" type="NinePatchRect" parent="ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin/StatusTrayMargin"]
 custom_minimum_size = Vector2(108, 8)
@@ -212,6 +217,7 @@ mouse_filter = 1
 [node name="RoleLb" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/ClassVBox" groups=["ProfileTT", "ToolTipLabels"]]
 layout_mode = 2
 size_flags_horizontal = 4
+focus_neighbor_bottom = NodePath("../../../../../../CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags/UnitAcc")
 focus_mode = 2
 mouse_filter = 1
 theme_override_font_sizes/font_size = 15
@@ -250,6 +256,7 @@ mouse_filter = 1
 [node name="SpeciesLb" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/SpeciesVBox" groups=["ProfileTT", "ToolTipLabels"]]
 layout_mode = 2
 size_flags_horizontal = 4
+focus_neighbor_bottom = NodePath("../../../../../../CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox/UnitHpTag")
 focus_mode = 2
 mouse_filter = 1
 theme_override_font_sizes/font_size = 15
@@ -375,6 +382,8 @@ mouse_filter = 1
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
+focus_neighbor_left = NodePath("../../../../../MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/SpeciesVBox/SpeciesLb")
+focus_neighbor_bottom = NodePath("../../../../../CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox/UnitHpTag")
 focus_mode = 2
 mouse_filter = 1
 text = "XP"
@@ -414,6 +423,9 @@ theme_override_constants/separation = -3
 
 [node name="UnitAcc" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_top = NodePath("../../../../../../../../MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/ClassVBox/RoleLb")
+focus_neighbor_right = NodePath("../../../../StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox/UnitHpTag")
+focus_neighbor_bottom = NodePath("../UnitAVD")
 focus_mode = 2
 mouse_filter = 1
 text = "Hit:"
@@ -423,6 +435,8 @@ metadata/ToolTip = &"Hit"
 
 [node name="UnitAVD" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_top = NodePath("../UnitAcc")
+focus_neighbor_right = NodePath("../../../../StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox/UnitHpTag")
 focus_neighbor_bottom = NodePath("../UnitDmg")
 focus_mode = 2
 mouse_filter = 1
@@ -433,7 +447,9 @@ metadata/ToolTip = &"Graze"
 
 [node name="UnitDmg" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
-focus_neighbor_bottom = NodePath("../UnitBar")
+focus_neighbor_top = NodePath("../UnitAVD")
+focus_neighbor_right = NodePath("../../../../StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox/UnitHpTag")
+focus_neighbor_bottom = NodePath("../UnitCrit")
 focus_mode = 2
 mouse_filter = 1
 text = "Damage:"
@@ -443,6 +459,9 @@ metadata/ToolTip = &"Dmg"
 
 [node name="UnitCrit" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_top = NodePath("../UnitDmg")
+focus_neighbor_right = NodePath("../../../../StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitStrTag")
+focus_neighbor_bottom = NodePath("../UnitCrtAvd")
 focus_mode = 2
 mouse_filter = 1
 text = "Crit:"
@@ -452,6 +471,9 @@ metadata/ToolTip = &"Crit"
 
 [node name="UnitCrtAvd" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_top = NodePath("../UnitCrit")
+focus_neighbor_right = NodePath("../../../../StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitMagTag")
+focus_neighbor_bottom = NodePath("../EffLb")
 focus_mode = 2
 mouse_filter = 1
 text = "Luck:"
@@ -459,8 +481,11 @@ horizontal_alignment = 2
 vertical_alignment = 1
 metadata/ToolTip = &"Luck"
 
-[node name="EffLn" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
+[node name="EffLb" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_top = NodePath("../UnitCrtAvd")
+focus_neighbor_right = NodePath("../../../../StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitElegTag")
+focus_neighbor_bottom = NodePath("../ResLb")
 focus_mode = 2
 mouse_filter = 1
 text = "Effect:"
@@ -470,6 +495,9 @@ metadata/ToolTip = &"EffHit"
 
 [node name="ResLb" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_top = NodePath("../EffLb")
+focus_neighbor_right = NodePath("../../../../StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitCeleTag")
+focus_neighbor_bottom = NodePath("../UnitBar")
 focus_mode = 2
 mouse_filter = 1
 text = "Resist:"
@@ -479,6 +507,9 @@ metadata/ToolTip = &"Resist"
 
 [node name="UnitBar" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["CombatTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_top = NodePath("../ResLb")
+focus_neighbor_right = NodePath("../../../../StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitDefTag")
+focus_neighbor_bottom = NodePath("../MoveTag")
 focus_mode = 2
 mouse_filter = 1
 text = "Barrier:"
@@ -488,6 +519,8 @@ metadata/ToolTip = &"Barrier"
 
 [node name="MoveTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/DerivedMargin/DerivedStatsHBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_top = NodePath("../UnitBar")
+focus_neighbor_right = NodePath("../../VStats/MoveHBox/MoveType")
 focus_mode = 2
 mouse_filter = 1
 text = "Move:"
@@ -625,6 +658,9 @@ custom_minimum_size = Vector2(20, 20)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+focus_neighbor_left = NodePath("../../../VTags/MoveTag")
+focus_neighbor_top = NodePath("../../../VTags/UnitBar")
+focus_neighbor_right = NodePath("../../../../../StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitChaTag")
 focus_mode = 2
 texture = ExtResource("3_x6e7x")
 expand_mode = 1
@@ -668,6 +704,9 @@ size_flags_horizontal = 0
 
 [node name="UnitHpTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_left = NodePath("../../../../../../../DerivedMargin/DerivedStatsHBox/VTags/UnitAcc")
+focus_neighbor_top = NodePath("../../../../../../../../../../../MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/SpeciesVBox/SpeciesLb")
+focus_neighbor_bottom = NodePath("../../../CompMargin/VBoxContainer2/UnitCmpTag")
 focus_mode = 2
 mouse_filter = 1
 theme_override_font_sizes/font_size = 20
@@ -729,6 +768,8 @@ size_flags_horizontal = 0
 
 [node name="UnitCmpTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/CompMargin/VBoxContainer2" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_top = NodePath("../../../HPMargin/HpVBox/UnitHpTag")
+focus_neighbor_bottom = NodePath("../../../../../StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitStrTag")
 focus_mode = 2
 mouse_filter = 1
 theme_override_font_sizes/font_size = 20
@@ -797,6 +838,8 @@ theme_override_constants/separation = -3
 
 [node name="UnitStrTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_left = NodePath("../../../../../../../DerivedMargin/DerivedStatsHBox/VTags/UnitCrit")
+focus_neighbor_top = NodePath("../../../../../HPCompMargin/HpCompVBox/CompMargin/VBoxContainer2/UnitCmpTag")
 focus_neighbor_bottom = NodePath("../UnitMagTag")
 focus_mode = 2
 mouse_filter = 1
@@ -806,6 +849,9 @@ metadata/ToolTip = &"Pwr"
 
 [node name="UnitMagTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_left = NodePath("../../../../../../../DerivedMargin/DerivedStatsHBox/VTags/UnitCrtAvd")
+focus_neighbor_top = NodePath("../UnitStrTag")
+focus_neighbor_bottom = NodePath("../UnitElegTag")
 focus_mode = 2
 mouse_filter = 1
 text = "Magic:"
@@ -814,6 +860,9 @@ metadata/ToolTip = &"Mag"
 
 [node name="UnitElegTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_left = NodePath("../../../../../../../DerivedMargin/DerivedStatsHBox/VTags/EffLb")
+focus_neighbor_top = NodePath("../UnitMagTag")
+focus_neighbor_bottom = NodePath("../UnitCeleTag")
 focus_mode = 2
 mouse_filter = 1
 text = "Elegance:"
@@ -822,6 +871,9 @@ metadata/ToolTip = &"Eleg"
 
 [node name="UnitCeleTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_left = NodePath("../../../../../../../DerivedMargin/DerivedStatsHBox/VTags/ResLb")
+focus_neighbor_top = NodePath("../UnitElegTag")
+focus_neighbor_bottom = NodePath("../UnitDefTag")
 focus_mode = 2
 mouse_filter = 1
 text = "Celerity:"
@@ -830,6 +882,9 @@ metadata/ToolTip = &"Cele"
 
 [node name="UnitDefTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_left = NodePath("../../../../../../../DerivedMargin/DerivedStatsHBox/VTags/UnitBar")
+focus_neighbor_top = NodePath("../UnitCeleTag")
+focus_neighbor_bottom = NodePath("../UnitChaTag")
 focus_mode = 2
 mouse_filter = 1
 text = "Defense:"
@@ -838,6 +893,8 @@ metadata/ToolTip = &"Def"
 
 [node name="UnitChaTag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
+focus_neighbor_left = NodePath("../../../../../../../DerivedMargin/DerivedStatsHBox/VStats/MoveHBox/MoveType")
+focus_neighbor_top = NodePath("../UnitDefTag")
 focus_mode = 2
 mouse_filter = 1
 text = "Charisma:"
@@ -1133,5 +1190,4 @@ layout_mode = 2
 offset_left = 471.0
 offset_right = 609.0
 offset_bottom = 115.0
-mouse_filter = 1
 isRoaming = true

@@ -2,7 +2,7 @@ extends MarginContainer
 
 class_name StatusTray
 
-@onready var statusGrid := $StatusGridMargin/StatusGrid
+@export var statusGrid : StatusGrid
 
 func _ready():
 	visible = false

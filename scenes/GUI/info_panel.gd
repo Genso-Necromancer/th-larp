@@ -1,5 +1,6 @@
 extends PanelContainer
 
+class_name InfoPanel
 
 #@onready var effTitle := $ToolTipContainer/ItemDisplayMargin/VBoxContainer/EffectTitleBox
 #@onready var effCon := $ToolTipContainer/ItemDisplayMargin/VBoxContainer/EffectContainer
@@ -153,6 +154,9 @@ func _update_info(control:Control) -> void:
 		"PassivesTT":
 			var data = UnitData.passiveData[control.get_meta("ID")]
 			toolTip = parser.get_passive(data)
+			
+		"StatusTT":
+			toolTip = parser.get_status(unit, control.get_meta("ID"))
 			
 			
 	activeRefs.append(tt.display_tooltip(toolTip))

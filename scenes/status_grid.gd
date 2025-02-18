@@ -1,6 +1,7 @@
 extends GridContainer
 
 class_name StatusGrid
+
 var icons := []
 
 func check_status(unit:Unit):

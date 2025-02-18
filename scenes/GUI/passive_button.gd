@@ -4,10 +4,18 @@ class_name PassiveButton
 
 
 func set_passive_text(data:Dictionary):
-	var pName := $HBoxContainer/HBoxContainer/Name
-	var pCost := $HBoxContainer/Cost
+	var pName := $HBoxContainer2/Name
+	var pCost := $HBoxContainer2/Cost
 	var string : String
 	var cost := ""
+	
+	if isIconMode:
+		pName.visible = false
+		pCost.visible = false
+	else:
+		pName.visible = true
+		pCost.visible = true
+	
 	
 	if data.IsTimeSens:
 		match Global.timeOfDay:
@@ -21,7 +29,7 @@ func set_passive_text(data:Dictionary):
 	
 	
 func set_passive_icon(data:Dictionary):
-	var iconTx := $HBoxContainer/HBoxContainer/Icon
+	var iconTx := $HBoxContainer2/Icon
 	var icon : String
 	if data.IsTimeSens:
 		match Global.timeOfDay:

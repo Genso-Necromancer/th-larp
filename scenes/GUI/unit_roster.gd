@@ -3,6 +3,8 @@ class_name UnitRoster
 
 signal trade_requested
 
+@onready var unitPreview := $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/UnitPreviewPanel
+
 var unitButton = preload("res://scenes/GUI/unit_button.tscn")
 var unitMngrPL = preload("res://scenes/GUI/unit_manager.tscn")
 var unitManager
@@ -13,14 +15,18 @@ func _init():
 	toggle_visible()
 
 
+func _ready():
+	SignalTower.focus_unit_changed.connect(self._on_focus_changed)
+
 func toggle_visible():
 	var isVis = visible
 	visible = !isVis
+	
 
 func init_roster(forcedDep, depLimit):
 	var grid = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/GridContainer
 	var capLabel = $PanelContainer/MarginContainer/VBoxContainer/PanelContainer/MarginContainer/HBoxContainer/CapLabel
-	var sideBar = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/SideBar
+	var sideBar = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/UnitPreviewPanel/SideBar
 	#var first: Button = null
 	var units = UnitData.rosterData
 	var filled = 0
@@ -51,6 +57,7 @@ func init_roster(forcedDep, depLimit):
 		unitBars.append(b)
 		b.button.add_to_group("RosterUnitBars")
 	update_deploy_count(filled)
+	unitPreview.toggle_vis()
 
 func update_deploy_count(count):
 	var countLabel = $PanelContainer/MarginContainer/VBoxContainer/PanelContainer/MarginContainer/HBoxContainer/CountLabel
@@ -91,16 +98,19 @@ func _font_state_change(node, state := ""):
 	node.add_theme_color_override("font_focus_color", fColor)
 	node.add_theme_color_override("font_hover_pressed_color", fColor)
 
+
 func open_unit_manager() -> Control:
 	unitManager.visible = true
 	return unitManager.buttonBox
 
+
 func close_unit_manager():
 	unitManager.visible = false
-	
+
+
 func _switch_trade_mode():
 	close_unit_manager()
-	
+
 
 func set_bar_focus(canFocus:bool) ->void:
 	if !visible: return
@@ -109,7 +119,11 @@ func set_bar_focus(canFocus:bool) ->void:
 	else:
 		get_tree().call_group("RosterUnitBars","set_focus_mode", Control.FOCUS_NONE)
 
-	
+
 func _connect_manager_btns(manager):
 	var p = get_parent()
 	manager.connect_buttons(p)
+
+
+func _on_focus_changed(_unit:Unit):
+	unitPreview.update_prof()

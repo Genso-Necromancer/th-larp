@@ -16,4 +16,4 @@ focus_mode = 2
 texture = ExtResource("1_7pir1")
 expand_mode = 1
 script = ExtResource("2_njref")
-metadata/Status = ""
+metadata/ID = ""
