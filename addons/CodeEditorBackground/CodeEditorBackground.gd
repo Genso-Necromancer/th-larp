@@ -46,7 +46,7 @@ func _exit_tree() -> void:
 
 
 func changed(script: Script) -> void:
-	cse = get_editor_interface().get_script_editor().get_current_editor()
+	cse = EditorInterface.get_script_editor().get_current_editor()
 	se = cse.get_child(0).get_child(0).get_child(0)
 	var bg = TextureRect.new()
 	

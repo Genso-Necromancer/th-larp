@@ -1,4 +1,6 @@
-extends Control
+extends AspectRatioContainer
+
+class_name ActionMenu
 
 signal jobs_done_act
 signal action_selected(selection)
@@ -422,8 +424,3 @@ func _progress_state(newState):
 func _regress_state():
 	var returnState = prevState.pop_back()
 	state = returnState
-
-
-
-	
-	

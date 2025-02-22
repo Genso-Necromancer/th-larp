@@ -426,6 +426,7 @@ static func get_spec(specInd):
 					}
 					},
 			"Passives":[],
+			"Skills":[],
 			"MoveType": MOVE_TYPE.FLY
 				}
 		SPEC_ID.YOUKAI:
@@ -467,6 +468,7 @@ static func get_spec(specInd):
 					}
 					},
 			"Passives":[],
+			"Skills":[],
 			"MoveType": MOVE_TYPE.FOOT
 				}
 	
@@ -511,6 +513,7 @@ static func get_job(jobInd):
 					}
 					},
 				"Passives":[],
+				"Skills":[],
 				"Weapons": {
 					"Blade": false,
 					"Blunt": true,
@@ -561,6 +564,7 @@ static func get_job(jobInd):
 					}
 					},
 				"Passives":[],
+				"Skills":[],
 				"Weapons": {
 					"Blade": true,
 					"Blunt": false,
@@ -589,27 +593,108 @@ static func load_generated_sprite(species, job):
 	var jobPath : String = jobKeys[job]
 	var s = load(("res://sprites/%s/%sSpr.png" % [specPath, jobPath]))
 	return s
-
-static func get_terrain_costs():
-	var terrainCost : Dictionary = {
-		Enums.MOVE_TYPE.FOOT: {
-			"Flat": 1,
-			"Fort": 2,
-			"Hill": 3
-			},
-		Enums.MOVE_TYPE.FLY:{
-			"Flat": 1,
-			"Fort": 1,
-			"Hill": 1
-			},
-		Enums.MOVE_TYPE.RANGER:{
-			"Flat": 1,
-			"Fort": 2,
-			"Hill": 2
-		}
-}
-	return terrainCost
 	
+	
+static func get_terrain_data():
+	var terrainData : Dictionary = {
+			"Flat":{
+				},
+			"River":{
+				"GrzBonus": 10,
+				"DefBonus": 0,
+				Enums.MOVE_TYPE.FOOT: 3,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 2,
+				},
+			"Water":{
+				"GrzBonus": 20,
+				"DefBonus": 0,
+				Enums.MOVE_TYPE.FOOT: 5,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 5,
+				},
+			"Sanzu":{
+				"GrzBonus": 20,
+				"DefBonus": 0,
+				Enums.MOVE_TYPE.FOOT: 5,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 5,
+				},
+			"HotSpring":{
+				"GrzBonus": 0,
+				"DefBonus": 0,
+				Enums.MOVE_TYPE.FOOT: 1,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 1,
+				},
+			"Rough":{
+				"GrzBonus": 20,
+				"DefBonus": 3,
+				Enums.MOVE_TYPE.FOOT: 1,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 0.5,
+				},
+			"HellSand":{
+				"GrzBonus": 20,
+				"DefBonus": 3,
+				Enums.MOVE_TYPE.FOOT: 2,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 2,
+				},
+			"Fort":{
+				"GrzBonus": 20,
+				"DefBonus": 3,
+				Enums.MOVE_TYPE.FOOT: 2,
+				Enums.MOVE_TYPE.FLY: 1,
+				Enums.MOVE_TYPE.RANGER: 2,
+			},
+			"Hill":{
+				"GrzBonus": 10,
+				"HitBonus": 10,
+				Enums.MOVE_TYPE.FOOT: 2,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 1,
+				},
+			"Woodland":{
+				"GrzBonus": 15,
+				"DefBonus": 1,
+				Enums.MOVE_TYPE.FOOT: 1,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 0.5,
+				},
+			"House":{
+				"GrzBonus": 10,
+				"DefBonus": 0,
+				Enums.MOVE_TYPE.FOOT: 1,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 1,
+				},
+			"Shop":{
+				"GrzBonus": 10,
+				"DefBonus": 0,
+				Enums.MOVE_TYPE.FOOT: 1,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 1,
+				},
+			"Wall":{
+				Enums.MOVE_TYPE.FOOT: 99,
+				Enums.MOVE_TYPE.FLY: 99,
+				Enums.MOVE_TYPE.RANGER: 99,
+				},
+			"WallShoot":{
+				Enums.MOVE_TYPE.FOOT: 99,
+				Enums.MOVE_TYPE.FLY: 99,
+				Enums.MOVE_TYPE.RANGER: 99,
+				},
+			"WallFly":{
+				Enums.MOVE_TYPE.FOOT: 99,
+				Enums.MOVE_TYPE.FLY: 1,
+				Enums.MOVE_TYPE.RANGER: 99,
+				},
+}
+	return terrainData
+
+
 static func get_items():
 	var iData = {"NONE":{
 				"Name":"--",

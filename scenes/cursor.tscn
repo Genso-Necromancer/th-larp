@@ -1,8 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://de42f2dvbgkri"]
+[gd_scene load_steps=6 format=3 uid="uid://de42f2dvbgkri"]
 
 [ext_resource type="Script" path="res://scenes/cursor.gd" id="1_2u41f"]
 [ext_resource type="Texture2D" uid="uid://4lca2aumdu2g" path="res://sprites/testCursor.png" id="1_k2b8o"]
 [ext_resource type="Texture2D" uid="uid://c47hmdyuaj0xn" path="res://sprites/highlightBlue.png" id="3_h7uqh"]
+[ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="4_k0n2u"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_adkd7"]
 radius = 22.0907
@@ -41,3 +42,13 @@ input_pickable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_adkd7")
+
+[node name="Cell" type="Label" parent="."]
+offset_left = -68.0
+offset_top = -145.0
+offset_right = 64.0
+offset_bottom = -119.0
+theme = ExtResource("4_k0n2u")
+theme_override_colors/font_color = Color(0.568627, 0.541176, 0, 1)
+theme_override_font_sizes/font_size = 22
+text = "(0, 0)"

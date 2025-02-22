@@ -18,6 +18,7 @@ var skillData : = {}
 var effectData := {}
 var timeModData := {}
 var itemData := {}
+var terrainData := {}
 
 var passiveData := {}
 var auraData := {}
@@ -25,7 +26,7 @@ var rosterData := []
 
 var supply = {}
 var npcInv = {}
-var terrainCosts = {}
+
 var rosterOnce := false
 
 
@@ -41,7 +42,7 @@ func _ready():
 	itemData = {}
 	_load_unique_units()
 	_load_items()
-	terrainCosts = pStats.get_terrain_costs()
+	_load_terrain_data()
 	_load_skills()
 	_load_effects()
 	_load_time_mods()
@@ -239,6 +240,7 @@ func _load_aura_data():
 			for iKey in innerKeys:
 				auraData[key][iKey] = rawData[key][iKey]
 				
+				
 func _load_passive_data():
 	var rawData = pStats.get_passives()
 	
@@ -259,6 +261,30 @@ func _load_passive_data():
 			var innerKeys = rawData[key].keys()
 			for iKey in innerKeys:
 				passiveData[key][iKey] = rawData[key][iKey]
+
+
+func _load_terrain_data():
+	var rawData = pStats.get_terrain_data()
+	
+	for key in rawData:
+			terrainData[key] = {
+				"GrzBonus": 0,
+				"DefBonus": 0,
+				"PwrBonus": 0,
+				"MagBonus": 0,
+				"HitBonus": 0,
+				"Special": 0,
+				"HpRegen": 0,
+				"CompRegen": 0,
+				"Price": 0,
+				Enums.MOVE_TYPE.FOOT: 0,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER:0,
+			}
+			var innerKeys = rawData[key].keys()
+			for iKey in innerKeys:
+				terrainData[key][iKey] = rawData[key][iKey]
+
 
 func get_generated_sprite(species, job):
 	var s = pStats.load_generated_sprite(species, job)
@@ -284,6 +310,7 @@ func stat_gen(job :int, spec : int):
 		groupedStats[group] = totalStats
 	var genname = "%s %s" % [specKeys[sData["Spec"]].to_pascal_case(), jData["Role"]]
 	var combinePassives = sData["Passives"] + jData["Passives"]
+	var combineSkills = sData["Skills"] + jData["Skills"]
 	#combinePassives.merge(jData["Passives"])
 	genData = groupedStats
 	genData["Profile"] = {"UnitName" : genname}
@@ -297,6 +324,7 @@ func stat_gen(job :int, spec : int):
 	genData["MaxInv"] = 6
 	genData["Inv"] = []
 	genData["Passives"] = combinePassives
+	genData["Skills"] = combineSkills
 	genData["Weapons"] = jData.Weapons
 	genData["MoveType"] = sData["MoveType"]
 	return genData

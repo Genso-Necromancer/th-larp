@@ -41,6 +41,7 @@ var unitName := "" #Presented strings will eventually be taken from a seperate f
 @export var genLevel : int = 1
 @export_group("Spawn Parameters")
 @export var isForced := false
+@export var isActive := true
 @export_category("Animation Values")
 @export var moveSpeed := 200.0
 @export var shoveSpeed := 350.0
@@ -83,7 +84,7 @@ var forced : bool = false
 var needDeath := false
 var deathFlag := false
 var killer : Unit
-var terrainData : Array
+var terrainTags: Dictionary = {"TerrainType1": "", "TerrainType2": "", "TerrainId1": "", "TerrainId2": ""}
 var postSequenceFlags := {"Bars":false, "Death":false}
 
 #equip variables
@@ -92,10 +93,12 @@ var unarmed := {"ID": "NONE", "Equip": false, "Dur": -1, "Broken": false}
 var tempSet = false
 
 
-#unit status
+#unit base data
 var unitData : Dictionary
 #Call for pre-formualted combat stats
 var combatData := {"Dmg": 0, "Hit": 0, "Graze": 0, "Barrier": 0, "BarPrc": 0, "Crit": 0, "Luck": 0, "Resist": 0, "EffHit":0, "DRes": 0, "Type":Enums.DAMAGE_TYPE.PHYS, "CanMiss": true}
+var isAmbushing := false
+
 #base stats of the unit
 var baseCombat := {}
 var baseStats := {}
@@ -125,7 +128,7 @@ var originCell
 
 # Toggles the "selected" animation on the unit.
 var is_selected := false:
-	set(value):
+	set(value): #Buggy, causes idling when hovering unit after selecting and choosing movement
 		is_selected = value
 		if is_selected:
 			_animPlayer.play("selected")
@@ -649,6 +652,7 @@ func check_passives():
 				valid.append(_assign_auras(p))
 			Enums.PASSIVE_TYPE.SUB_WEAPON:
 				_update_natural(p)
+				
 	validate_auras(valid)
 
 
@@ -1134,20 +1138,20 @@ func get_crit_dmg_effects():
 
 func update_combatdata():
 	#no catch for empty inv!!!!! HERE Wait, isn't there one? setting it to Null, and then having null translate to "NONE" when all null instances could just be "NONE" is retarded. Fix this, you god damned retard.
-	var terrainBonus = update_terrain_bonus()
+	var tBonus = update_terrain_bonus()
 	var wep = UnitData.itemData[get_equipped_weapon().ID]
 	
 	combatData.Type = wep.Type
 	if wep.Type == Enums.DAMAGE_TYPE.PHYS:
-		combatData.Dmg = wep.Dmg + activeStats.Pwr
+		combatData.Dmg = wep.Dmg + activeStats.Pwr + tBonus.PwrBonus
 	elif wep.Type == Enums.DAMAGE_TYPE.MAG:
-		combatData.Dmg = wep.Dmg + activeStats.Mag
+		combatData.Dmg = wep.Dmg + activeStats.Mag + tBonus.MagBonus
 	elif wep.Type == Enums.DAMAGE_TYPE.TRUE:
 		combatData.Dmg = wep.Dmg
-	combatData.Hit = activeStats.Eleg * 2 + (wep.Hit + activeStats.Cha)
-	combatData.Graze = activeStats.Cele * 2 + activeStats.Cha + terrainBonus
+	combatData.Hit = activeStats.Eleg * 2 + (wep.Hit + activeStats.Cha + tBonus.HitBonus)
+	combatData.Graze = activeStats.Cele * 2 + activeStats.Cha + tBonus.GrzBonus
 	combatData.Barrier = wep.Barrier
-	combatData.BarPrc = activeStats.Eleg + activeStats.Def
+	combatData.BarPrc = activeStats.Eleg + activeStats.Def + tBonus.DefBonus
 	combatData.Crit = activeStats.Eleg + wep.Crit
 	combatData.Luck = activeStats.Cha
 	combatData.CompRes = (activeStats.Cha / 2) + (activeStats.Eleg / 2)
@@ -1484,19 +1488,33 @@ func fade_out(duration: float):
 	emit_signal("death_done", self)
 	
 	
-func update_terrain_data(data : Array):
-	terrainData = data
+func update_terrain_data():
+	terrainTags = get_parent().get_terrain_tags(cell)
 	
-func update_terrain_bonus():
+	
+func update_terrain_bonus() -> Dictionary:
 #	print(combatData.Graze)
-	var bonus = 0
-	if deployed:
-		var i = find_nested(terrainData, Vector2i(cell))
-		if i != -1:
-			bonus = terrainData[i][2]
-		return bonus
-	else:
-		return 0
+	
+	var tVal := {"GrzBonus": 0, "DefBonus": 0, "PwrBonus": 0, "MagBonus": 0, "HitBonus": 0,}
+	var terrainData = UnitData.terrainData
+	if !isActive or activeStats.MoveType == Enums.MOVE_TYPE.FLY: return tVal
+	
+	if terrainTags.TerrainType1:
+		for bonus in tVal:
+			tVal[bonus] += terrainData[terrainTags.TerrainType1][bonus]
+			
+	if terrainTags.TerrainType2:
+		for bonus in tVal:
+			tVal[bonus] += terrainData[terrainTags.TerrainType2][bonus]
+	
+	return tVal
+	#if deployed:
+		#var i = find_nested(terrainData, Vector2i(cell))
+		#if i != -1:
+			#bonus = terrainData[i][2]
+		#return bonus
+	#else:
+		#return 0
 
 	
 func find_nested(array, value):

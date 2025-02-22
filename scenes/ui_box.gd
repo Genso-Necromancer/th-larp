@@ -1,6 +1,5 @@
 extends TileMap
 @export var grid: Resource
-var _pathfinder: PathFinder
 var ui_size := PackedVector2Array()
 var actions = get_tree().get_nodes_in_group("ActionLabels")
 @onready var textWidth = (get_node(actions).size.y + 16) / 16

@@ -1,3 +1,4 @@
+@tool
 extends Node
 
 #class_name StringGetter
@@ -191,7 +192,7 @@ func get_effect_string(effId) -> String: #Needs reworking, see tooltip parser fo
 		
 func mash_string(base: String, variables: Array) -> String:
 	var s : String
-	var dud : String
+	var dud : String = ""
 	s = base % variables
 	if s == dud :
 		s = base

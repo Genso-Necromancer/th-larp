@@ -73,10 +73,10 @@ texture_progress = ExtResource("5_nwi43")
 script = ExtResource("7_x5rnn")
 
 [node name="Cell" type="Label" parent="PathFollow2D"]
-offset_left = -35.0
-offset_top = 16.0
-offset_right = 36.0
-offset_bottom = 42.0
+offset_left = -68.0
+offset_top = 15.0
+offset_right = 64.0
+offset_bottom = 41.0
 theme = ExtResource("8_8niqs")
 theme_override_colors/font_color = Color(0.776471, 0, 0, 1)
 theme_override_font_sizes/font_size = 22

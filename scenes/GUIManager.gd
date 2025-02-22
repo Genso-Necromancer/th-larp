@@ -34,15 +34,19 @@ signal action_selected
 #states
 enum sStates {
 	HOME,
-	DEPLOY,
 	FORM,
-	ROSTER,
-	UNITOP,
-	TRDSEEK,
 	TRADING,
+	UNITOP,
 	SUPPLY,
+	TRDSEEK,
+	DEPLOY,
 	MANAGE,
-	BEGIN}
+	BEGIN,
+	ROSTER,
+	
+	
+	
+	}
 
 var sState := sStates.HOME:
 	set(value):
@@ -260,7 +264,7 @@ func _on_gameboard_toggle_prof():
 		
 			
 func toggle_profile() -> void: 
-	if sState < 3 or sState > 7:  #profile should not open in these states.
+	if sState < 6:  #profile should not open in these states.
 		return
 		
 	#if sState != sStates.BEGIN:
@@ -700,6 +704,7 @@ func _on_action_menu_action_selected(selection):
 			
 			
 func _on_gameboard_unit_move_ended(unit):
+	#_change_state(GameState.GB_ACTION_MENU)
 	actMenu.open_action_menu(unit)
 	
 func _on_gameboard_unit_deselected():

@@ -10,6 +10,7 @@ signal tooltips_off
 @export var infoPanel : InfoPanel
 @export var statusTray : StatusTray
 @export var isPreview : bool = false
+@export var initialFocus : Label
 
 
 #@onready var inventory := $ProfileMargin/ProfileHBox/SideBarMargin/SideBarVBox/InventoryPanel
@@ -169,7 +170,8 @@ func _clear_skills():
 #tool tip code
 func toggle_tooltips(control = false):
 	toolTipMode = !toolTipMode
-	if !control and toolTipMode: focusLabels[0].call_deferred("grab_focus")
+	if !control and toolTipMode: 
+		initialFocus.call_deferred("grab_focus")
 	#elif toolTipMode: control.call_deferred("grab_focus")
 	
 	

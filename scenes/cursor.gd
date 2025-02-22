@@ -10,6 +10,17 @@ signal jobs_done_crsr
 var canter = false
 # Coordinates of the current cell the cursor is hovering.
 var cell := Vector2i.ZERO
+var tick = 1
+
+func _process(_delta):
+	if tick == 0:
+		var coord = $Cell
+		coord.set_text(str(cell))
+		tick = 1
+	else:
+		tick -= 1
+
+
 
 #func _ready():
 	#var parent = get_parent()

@@ -13,7 +13,7 @@ var default : String = get_text()
 
 func you_need_to_update_yourself_NOW(unit):
 	var newValue
-	if key3: newValue = unit[key1][key2][key3]
+	if key3: newValue = unit[key1][key2].get(key3, 0)
 	elif key2: newValue = unit[key1][key2]
 	else: newValue = unit[key1]
 	

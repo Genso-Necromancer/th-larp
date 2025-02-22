@@ -57,6 +57,18 @@ func _ready():
 	print(mapSize)
 	emit_signal("map_ready")
 
+
+func get_active_units() -> Dictionary:
+	var unitList := {}
+	for child in get_children():
+		var unit := child as Unit
+		if not unit:
+			continue
+		elif unit.isActive:
+			unitList[unit.cell] = unit
+	return unitList
+
+
 func get_objectives() -> Array:
 	var objectives: Array = ["This is a Test", "Of The Emergency Broadcast", "System."]
 	return objectives
@@ -76,41 +88,84 @@ func hex_centered(grid_position: Vector2i) -> Vector2i:
 	var tileCenter = grid_position * tileSize + tileSize / 2
 	return tileCenter
 
-func get_movement_cost(cell):
+func get_movement_cost(cell, moveType):
+	var base = get_cell_tile_data(0, cell)
+	var mod = get_cell_tile_data(1, cell)
+	var baseTile
+	var modTile 
+	var costData = UnitData.terrainData
+	var cost := 0.0
 	
-	var tileData = get_cell_tile_data(1, cell)
-	var type
-	if !tileData == null: 
-		
-		type = tileData.get_custom_data("terrainType")
-		
-	else: type = "Flat"
-	return type
+	if base: baseTile = base.get_custom_data("TerrainType")
+	if mod: modTile = mod.get_custom_data("TerrainType")
+	cost += costData[baseTile][moveType]
+	if modTile: cost += costData[modTile][moveType]
+	return cost
 	
-func get_bonus(cell):
+func get_bonus(cell): # WHOOPS BROKEN
 	var bonus = 0
 	var tileData = get_cell_tile_data(1, cell)
-	if !tileData == null: 
-			bonus = tileData.get_custom_data("terrainBonus")
+	#if !tileData == null: 
+			#bonus = tileData.get_custom_data("terrainBonus")
 	return bonus
 
+
+func get_terrain_tags(cell:Vector2i) -> Dictionary:
+	var terrainTags: Dictionary = {"TerrainType1": "", "TerrainType2": "", "TerrainId1": "", "TerrainId2": ""}
+	var type1 = get_cell_tile_data(0, cell)
+	var type2 = get_cell_tile_data(1, cell)
+	var id1 = get_cell_tile_data(0, cell)
+	var id2 = get_cell_tile_data(1, cell)
+	
+	if type1: 
+		terrainTags.TerrainType1 = type1.get_meta("TerrainType", "")
+	if type2:
+		terrainTags.TerrainType2 = type2.get_meta("TerrainType", "")
+	if id1:
+		terrainTags.TerrainId1 = id1.get_meta("TerrainId", "")
+	if id2:
+		terrainTags.TerrainId2 = id2.get_meta("TerrainId", "")
+		
+	return terrainTags
+
 func get_deployment_cells():
-	var triggerCells = get_used_cells(2)
+	var triggerCells = get_used_cells(3)
 	var deploymentCells = []
 	for cell in triggerCells:
-		var tileData = get_cell_tile_data(2, cell)
-		if tileData.get_custom_data("trigger") == "deployCell":
+		var tileData = get_cell_tile_data(3, cell)
+		if tileData.get_custom_data("Trigger") == "deployCell":
 			deploymentCells.append(cell)
 	return deploymentCells
 
+
+func get_walls() -> Dictionary:
+	var walls := {}
+	var noGo := []
+	var shootOver := []
+	var flyOver := []
+	var modCells := get_used_cells(1)
+	for cell in modCells:
+		var tileData = get_cell_tile_data(1, cell)
+		var type : StringName = tileData.get_custom_data("TerrainType")
+		match type:
+			"Wall": noGo.append(cell)
+			"WallShoot": shootOver.append(cell)
+			"WallFly": flyOver.append(cell)
+		
+		walls["Wall"] = noGo
+		walls["WallShoot"] = shootOver
+		walls["WallFly"] = flyOver
+	return walls
+
+
 func get_forced_deploy(): #make sure there is equal units assigned as forced as there are forced cells!
 	var i = 0
-	var triggerCells = get_used_cells(2)
+	var triggerCells = get_used_cells(3)
 	var forcedCells = []
 	var forcedDeploy = {}
 	for cell in triggerCells:
-		var tileData = get_cell_tile_data(2, cell)
-		if tileData.get_custom_data("trigger") == "forcedCell":
+		var tileData = get_cell_tile_data(3, cell)
+		if tileData.get_custom_data("Trigger") == "forcedCell":
 			forcedCells.append(cell)
 	for unit in forcedUnits:
 		if i > forcedCells.size()+1:
@@ -121,7 +176,7 @@ func get_forced_deploy(): #make sure there is equal units assigned as forced as 
 	return forcedDeploy
 
 func hide_deployment():
-	set_layer_enabled(2, false)
+	set_layer_enabled(3, false)
 	
 
 

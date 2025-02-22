@@ -20,7 +20,7 @@ signal post_queue_cleared
 signal continue_queue
 signal danmaku_pathing_complete
 
-signal walk_complete
+
 signal map_loaded(map)
 signal skill_target_canceled
 signal forecast_confirmed
@@ -48,6 +48,7 @@ var units := {}
 var danmaku := {}
 var danmakuMotion := []
 var collisionQue := []
+
 
 #these are used to store references to actual units that are passed around this class and those it controls
 var focusUnit : Unit :
@@ -79,11 +80,6 @@ var storedCell : Vector2i = Vector2i(-1,-1)
 
 #variables related to the active map in use
 var currMap: GameMap
-var mapSize
-var mapCellSize
-var mapRect
-var terrainData := []
-
 var warpTarget
 var deathList = []
 var turnLoss = []
@@ -104,12 +100,12 @@ var unitObjs : Dictionary = Global.unitObjs
 var defineUnits = false
 
 #related to pathfinding
-var hexStar: AHexGrid2D
+#var hexStar: AHexGrid2D #HEX REF
 var walkableCells = []
-var solidsArray = []
-var walkable_rect : Rect2
+var solidsArray = [] #Deprecated, remove after fixing FIX
 var unitMoving = false
 var snapPath = null
+var pathingArray := []
 
 #game turns
 var turnOrder = []
@@ -170,6 +166,7 @@ var cursorCell := Vector2i.ZERO:
 		cursorCell = region_clamp(value)
 
 		cursor.position = currMap.map_to_local(cursorCell)
+		cursor.cell = cursorCell
 #		print(cursor.position)
 		_on_cursor_moved(cursorCell)
 #		cTimer.start()
@@ -255,8 +252,8 @@ func on_map_ready():
 func _initialize_new_map():
 	_connect_general_signals()
 	currMap = _get_current_map()
-	_initialize_terrain_data()
-	_initialize_hexstar()
+	#_initialize_terrain_data()
+	#_initialize_hexstar() #HEX REF
 	units.clear()
 	_set_game_time()
 	_store_enemy_units()
@@ -268,23 +265,23 @@ func _initialize_new_map():
 	_cursor_toggle(false)
 	emit_signal("map_loaded", currMap)
 	
-func _initialize_terrain_data():
-	terrainData.clear()
-	var tiles0 = currMap.get_used_cells(0) #terrainData
-	for tile in tiles0: 
-		terrainData.append([tile, currMap.get_movement_cost(tile), currMap.get_bonus(tile)])
+#func _initialize_terrain_data():
+	#terrainData.clear()
+	#var tiles0 = currMap.get_used_cells(0) #terrainData
+	#for tile in tiles0: 
+		#terrainData.append([tile, currMap.get_movement_cost(tile), currMap.get_bonus(tile)])
 	
-func _initialize_hexstar():
-	mapRect = currMap.get_used_rect() #initializing hexStar
-	mapSize = mapRect.size
-	#mapCellSize = currMap.tileSize
+#func _initialize_hexstar() ->: #HEX REF
+	#mapRect = currMap.get_used_rect() #initializing hexStar
+	#mapSize = mapRect.size
+	##mapCellSize = currMap.tileSize
+	#
+	##start up pathfinder
+	#hexStar = AHexGrid2D.new(currMap)
+	##hexStar.tileSize = mapCellSize
 	
-	#start up pathfinder
-	hexStar = AHexGrid2D.new(currMap)
-	#hexStar.tileSize = mapCellSize
-	
-func get_hex_star() -> AHexGrid2D:
-	return hexStar
+#func get_hex_star() -> AHexGrid2D: #HEX REF
+	#return hexStar
 	
 func _store_enemy_units():
 	units.clear()
@@ -411,12 +408,12 @@ func checkSun():
 		#else: units.erase(unit)
 		
 func _init_gamestate():
-	boardState.update_map_data(terrainData)
+	#boardState.update_map_data(terrainData)
 	boardState.update_unit_data(units)
 	
 	
-func _update_unit_terrain(unit):
-	unit.update_terrain_data(terrainData)
+func _update_unit_terrain(unit): #HERE BROKEN
+	unit.update_terrain_data()
 	
 			
 			
@@ -437,77 +434,71 @@ func is_occupied(cell: Vector2i) -> bool:
 
 
 ## Returns an array of cells a given unit can walk using the flood fill algorithm.
-func get_region_rect(region: Array) -> Rect2:
-	var minPos = Vector2i(INF, INF)
-	var maxPos = Vector2i(-INF, -INF)
+##SHIT DONT WORK FOR FUCK
+func get_region_rect(region: Array) -> Rect2i:
+	var minPos = Vector2i.MAX
+	var maxPos = Vector2i.MIN
 	
 	for hex in region:
-		minPos.x = min(minPos.x, hex.x)
-		minPos.y = min(minPos.y, hex.y)
-		maxPos.x = max(maxPos.x, hex.x)
-		maxPos.y = max(maxPos.y, hex.y)
-	var rectSize = maxPos - minPos
-	return Rect2(minPos, rectSize)
-
-
-#Initializes the astar style pathfinding class
-func init_hexStar_terrain(attack: bool = false):
-	solidsArray.clear()
-	solidsArray = []
-	hexStar.size = mapRect.size
-	#hexStar.cell_size = mapCellSize
-	#units are split between factions, then it's opposing faction is considered "solid"
-	##Plans to allow for flying units to go 'over' opposing units in the future possibly, not currently implemented
-	var team = null
-	if !mainCon.state == GameState.GB_AI_TURN:
-		if activeUnit.is_in_group("Player"):
-			team = "Player"
-		if activeUnit.is_in_group("Enemy"):
-			team = "Enemy"
-	else:
-		team = "Enemy"
-	if !attack:
-		for y in mapRect.size.y:
-			for x in mapRect.size.x:
-					var unit = Vector2i(x,y)
-					var friendly = false
-					if unit == null:
-						continue
-					if units.has(unit):
-							if units[unit].is_in_group(team):
-								friendly = true
-					if units.has(Vector2i(x,y)) and !friendly:
-						solidsArray.append(Vector2i(x,y))
-		if solidsArray.size() > 0:
-			hexStar.set_solid(solidsArray, units)
-	else:
-		hexStar.set_solid(solidsArray, units)
-				
-		
-func _init_hexStar_danmaku():
-	solidsArray.clear()
-	solidsArray = []
-	hexStar.set_solid(solidsArray, units)
+		minPos = _minv(minPos, hex)
+		maxPos = _maxv(maxPos, hex)
 	
-		
-func get_walkable_cells(unit: Unit) -> Array:
-	#Possibly unnecessary. 
-	#It's convienent to just call using only unit variable and let the function split the necessary info
-	return _flood_fill(unit.cell, unit.activeStats.Move, unit.unitData.MoveType)
+	#for hex in region:
+		#minPos.x = min(minPos.x, hex.x)
+		#minPos.y = min(minPos.y, hex.y)
+		#maxPos.x = max(maxPos.x, hex.x)
+		#maxPos.y = max(maxPos.y, hex.y)
+	var rectSize = maxPos - minPos
+	var rect = Rect2i(minPos, rectSize)
+	#var exp = Vector2i(maxPos.x+1,maxPos.y+1)
+	#rect = rect.expand(exp)
+	return rect
 
-func _flood_fill(cell: Vector2i, max_distance: int, moveType : int, terrain: bool = true, attack: bool = false) -> Array:
-	#initializes pathfinder, calls floodfill pathfind and visual displays it all at once
-	init_hexStar_terrain(attack)
-#	print(moveType)
-	var path = hexStar.find_all_paths(cell, max_distance, moveType, terrain)
+
+func _maxv(a:Vector2i, b:Vector2i) -> Vector2i:
+	var al = a.length()
+	var bl = b.length()
+	
+	return b if a < b else a
+	
+
+func _minv(a:Vector2i, b:Vector2i) -> Vector2i:
+	var al = a.length()
+	var bl = b.length()
+	
+	return b if a > b else a
+
+
+func get_walkable_cells(unit: Unit) -> Array: #Pathing
+	var hexStar = AHexGrid2D.new(currMap)
+	var path = hexStar.find_all_unit_paths(unit)
+	
 	return path
 
-func get_path_to_cell(cell, current, moveType: int = Enums.MOVE_TYPE.FOOT):
-	#this might be a bit unnecessary after changes. does not have convience of "get_walkable_cells"
-	return hexStar.find_path(cell, current, moveType)
 
-func is_within_bounds(cell_coordinates: Vector2i) -> bool:
+func _update_walkable_range(moveRemain:int = 0):
+	var hexStar = AHexGrid2D.new(currMap)
+	var newArea :Array = hexStar.find_remaining_unit_paths(activeUnit, pathingArray[-1], moveRemain)
+	unitOverlay.clear()
+	unitOverlay.draw(newArea)
+
+
+func _update_pathing_array(wayPoint:Vector2i): #Pathing
+	var path := []
+	var start : Vector2i = activeUnit.cell
+	if pathingArray: start = pathingArray[-1]
+	path = get_path_to_cell(start, wayPoint, activeUnit)
+	pathingArray.append_array(path)
+	
+	
+func get_path_to_cell(start:Vector2i, end:Vector2i, unit = false): #Pathing
+	var hexStar = AHexGrid2D.new(currMap)
+	return hexStar.find_path(start, end, unit) #HEX REF
+
+
+func is_within_bounds(cell_coordinates: Vector2i) -> bool: #Pathing
 	#Keeps the map cursor in bounds
+	var mapSize = currMap
 	var valid
 	if cell_coordinates.x > mapSize.x and cell_coordinates.y > mapSize.y:
 		valid = false
@@ -530,13 +521,17 @@ func select_cell(): #DEFAULT STATE: If a cell has a valid unit, selects it
 		pass #TO-DO: seperate selection that just toggles a unit's movement and reach
 		
 
-func _move_active_unit(new_cell: Vector2i, enemy: bool = false, enemyPath = null) -> void:
+func _move_active_unit(new_cell: Vector2i, enemy: bool = false, enemyPath = null) -> void: #pathing related
 	# Updates the units dictionary with the target position for the unit and asks the activeUnit to walk to it.
 #	print("move_active: ", new_cell)
 	var path = null
 	if !new_cell == activeUnit.cell and !enemy:
 		if is_occupied(new_cell) or not new_cell in walkableCells:
 			return
+	
+	if !enemy:
+		_change_state(GameState.ACCEPT_PROMPT)
+	
 	if !new_cell == activeUnit.cell:
 		#print("it's walkable")
 		# warning-ignore:return_value_discarded
@@ -549,9 +544,12 @@ func _move_active_unit(new_cell: Vector2i, enemy: bool = false, enemyPath = null
 		activeUnit.walk_along(path)
 		unitMoving = true
 		await activeUnit.walk_finished
+		pathingArray.clear()
 		unitMoving = false
 		
+		
 	if !enemy:
+		_change_state(GameState.GB_ACTION_MENU)
 		emit_signal("unit_move_ended", activeUnit)
 	else:
 		emit_signal("aimove_finished")
@@ -568,7 +566,7 @@ func _select_unit(cell: Vector2i, isAi = false) -> void:
 	#activeUnit.save_equip()
 	activeUnit.is_selected = true
 	walkableCells = get_walkable_cells(activeUnit)
-	walkable_rect = get_region_rect(walkableCells)
+	
 	unitOverlay.draw(walkableCells)
 	if !isAi: _change_state(GameState.GB_SELECTED)
 	emit_signal("unit_selected", units[cell])
@@ -579,7 +577,7 @@ func _deselect_active_unit(confirm) -> void:
 	# Deselects the active unit, clearing the cells overlay and interactive path drawing
 	#confirm is used to let the game know if this is a temporary movement(can be canceled by player) 
 	#or a confirmed move so it knows to retain previous position or update the units dictionary
-
+	
 
 	if activeUnit != null and units.has(activeUnit.cell):
 		if !confirm: 
@@ -600,6 +598,7 @@ func _deselect_active_unit(confirm) -> void:
 	_clear_active_unit()
 	unitOverlay.clear()
 	unitPath.stop()
+	pathingArray.clear()
 	
 	
 func on_unit_relocated(oldCell, newCell, unit): #updates unit locations with it's new location
@@ -609,10 +608,11 @@ func on_unit_relocated(oldCell, newCell, unit): #updates unit locations with it'
 
 
 func on_danmaku_relocated(oldCell, newCell, bullet): #updates unit locations with it's new location
+	var hexStar = AHexGrid2D.new(currMap)
 	if danmaku.has(oldCell):
 		danmaku.erase(oldCell)
 	danmaku[newCell] = bullet
-	bullet.set_path(hexStar.get_danmaku_path(bullet))
+	bullet.set_path(hexStar.get_danmaku_path(bullet)) #HEX REF
 	if danmakuMotion.has(bullet):
 		danmakuMotion.erase(bullet)
 
@@ -662,12 +662,13 @@ func _resume_danmaku_phase():
 
 func grab_target(cell): #HERE Add "Action" compatability
 	#Called to assign values based on unit at cursor's coordinate
+	var hexStar = AHexGrid2D.new(currMap)
 	if not units.has(cell):
 		print("oops")
 		return
 	var mode : int
 	targetUnit = units[cell]
-	var distance := hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit.unitData.MoveType, false)
+	var distance := hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit) #HEX REF
 	var reach := [distance, distance]
 	if activeAction.Weapon:
 		combatManager.get_forecast(activeUnit, targetUnit, activeAction)
@@ -687,17 +688,17 @@ func _clear_active_unit() -> void:
 	walkableCells.clear()
 
 
-		
-func select_destination(): #SELECTED STATE
+func select_destination(): #SELECTED STATE Pathing Related
 	var isOccupied = is_occupied(cursorCell)
 	var isWalkable = walkableCells.has(cursorCell)
-	if !isOccupied and isWalkable:
-		_change_state(GameState.GB_ACTION_MENU)
-
+	var moveRemain :int = activeUnit.activeStats.Move - pathingArray.size()
+	if !isOccupied and isWalkable and moveRemain > 0 and !pathingArray.has(cursorCell):
+		_update_pathing_array(cursorCell)
+		moveRemain = activeUnit.activeStats.Move - pathingArray.size()
+		_update_walkable_range(moveRemain)
+	elif pathingArray[-1] == cursorCell:
 		_move_active_unit(cursorCell)
 	elif cursorCell == activeUnit.cell:
-		_change_state(GameState.GB_ACTION_MENU)
-
 		emit_signal("unit_move_ended", activeUnit)
 
 func select_formation_cell():
@@ -941,37 +942,32 @@ func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMO
 
 
 
-func _on_cursor_moved(new_cell: Vector2i) -> void:
+func _on_cursor_moved(new_cell: Vector2i) -> void: #Pathing
 	# Updates the dynamic visual path if there's an active and selected unit.
 #	print(currMap.map_to_local(new_cell))
 #	print(new_cell)
-	var drawPath = false
+	
+	var area = get_region_rect(walkableCells)
+	var path := []
+	
+	area = area.abs()
+	
 	if units.has(new_cell) and units[new_cell] == null: #safety measure, catches any uncleared cell storage that slips through the cracks
 		units.erase(new_cell)
-	#if is_occupied(new_cell): #let's the game know what unit is the player's focus, and remains as such until a new unit is focused.
-		#focusUnit = units[new_cell]
 	
-	if activeUnit and activeUnit.is_selected and mainCon.state == GameState.GB_SELECTED:
-		drawPath = true
-		
-	if !drawPath:
+	if !activeUnit or !activeUnit.is_selected or mainCon.state != GameState.GB_SELECTED:
 		return
-	elif !walkableCells.has(new_cell):
-		return
+	elif pathingArray and walkableCells.has(new_cell):
+		path = pathingArray + get_path_to_cell(pathingArray[-1], new_cell, activeUnit)
+	elif walkableCells.has(new_cell):
+		path = get_path_to_cell(activeUnit.cell, new_cell, activeUnit)
 	elif new_cell == activeUnit.cell:
 		unitPath.clear()
 	else:
-		var path = get_path_to_cell(activeUnit.cell, new_cell, activeUnit.unitData.MoveType)
-		unitPath.draw(path)
-#	match mainCon.state:
-#		mainCon.GameState.GB_SELECTED:
-#			if new_cell == activeUnit.cell:
-#				unitPath.clear()
-#			if activeUnit and activeUnit.is_selected:
-#				if !walkableCells.has(new_cell):
-#					return
-#				var path = get_path_to_cell(activeUnit.cell, new_cell, activeUnit.unitData.MoveType)
-#				unitPath.draw(path)
+		return
+		
+	unitPath.draw(path)
+
 
 func on_directional_press(direction: Vector2i):
 	var nextCell = cursorCell + direction
@@ -1044,20 +1040,22 @@ func warp_targeting(unit, wRange):
 	_change_state(GameState.GB_WARP)
 	
 func _draw_range(unit : Unit, maxRange : int, minRange := 0):
-	#draws a visual representation of a unit's attack range, and binds the cursor within this space(snapPath)
-	var path = _flood_fill(unit.cell, maxRange, unit.unitData.MoveType, false, true)
 	
-	if path.size() != 1 and minRange > 0:
-		minRange = minRange - 1
-		minRange = clampi(minRange, 0, 1000)
-		var invalid = _flood_fill(unit.cell, minRange, unit.unitData.MoveType, false, true)
-		path = hexStar.trim_path(path, invalid)
+	#draws a visual representation of a unit's attack range, and binds the cursor within this space(snapPath)
+	#var path = hexStar.find_all_paths(unit.cell, maxRange,)
+	#if path.size() != 1 and minRange > 0:
+		#minRange = minRange - 1
+		#minRange = clampi(minRange, 0, 1000)
+		#var invalid = hexStar.find_all_paths(unit.cell, minRange,)
+		#path = hexStar.trim_path(path, invalid) #HEX REF
+	var path = _get_cells_in_range(unit.cell, maxRange, minRange,)
 	snapPath = path
 	bump_cursor()
 	unitOverlay.draw_attack(path)
 	unitPath.stop()
 	
-func _get_cells_in_range(cell : Vector2i, maxRange : int, minRange : int):
+func _get_cells_in_range(cell : Vector2i, maxRange : int, minRange : int): #HEX REF
+	var hexStar = AHexGrid2D.new(currMap)
 	var path = hexStar.find_all_paths(cell, maxRange)
 	if path.size() != 1 and minRange > 0:
 		minRange = minRange - 1
@@ -1179,7 +1177,7 @@ func toggle_extra_info():
 func region_clamp(grid_position: Vector2i) -> Vector2i:
 	#Keeps cursor inside temporary boundaries without messing with it's map boundaries
 	var out := grid_position
-	
+	var mapSize = currMap.get_used_rect().size
 	if snapPath != null:
 		if !snapPath.has(grid_position):
 			return cursorCell
@@ -1197,11 +1195,12 @@ func bump_cursor():
 	var bumpTo
 	var shortest = 1000
 	var bumpFound = false
+	var hexStar = AHexGrid2D.new(currMap)
 	if !snapPath.has(cursorCell):
 		seek = true
 	if seek:
 		for cell in snapPath:
-			var distance = hexStar.find_distance(cursorCell, cell, Enums.MOVE_TYPE.FOOT, true)
+			var distance = hexStar.find_distance(cursorCell, cell)
 			if units.has(cell) and distance < shortest:
 				bumpTo = cell
 				shortest = distance
@@ -1216,9 +1215,10 @@ func find_next_best_cell(currentCell, nextCell): #it's still pretty jank, but at
 	var shortestNext = 1000
 	var shortestCurrent = 1000
 	var nextBest
+	var hexStar = AHexGrid2D.new(currMap)
 	for cell in snapPath:
-		var distanceNext = hexStar.find_distance(nextCell, cell, Enums.MOVE_TYPE.FOOT, true)
-		var distanceCurrent= hexStar.find_distance(currentCell, cell, Enums.MOVE_TYPE.FOOT, true)
+		var distanceNext = hexStar.find_distance(nextCell, cell)
+		var distanceCurrent= hexStar.find_distance(currentCell, cell)
 		if distanceNext <= shortestNext and distanceCurrent <= shortestCurrent and cell != currentCell:
 			shortestNext = distanceNext
 			shortestCurrent = distanceCurrent
@@ -1413,7 +1413,6 @@ func start_ai_turn(aiFaction):
 	aiNeedAct = false
 	_change_state(GameState.GB_AI_TURN)
 	#Gets the ball rolling for the AI to take actions
-	init_hexStar_terrain(false) #HERE Shouldn't really be initializing here, the "solids" could be different for each unit checked. So either this will give false positives, or it's redundant.
 	if boardState.enemy.size() > 0:
 		var result = ai.get_move(boardState)
 		print_rich("[color=green]AI MOVE[/color]:",result)
@@ -1433,7 +1432,7 @@ func ai_attack(result): #HERE..... EVENTUALLY. So fuckin out of date.
 	var skill = result.BestMove.Skill
 	var wInd = actor.unitData.Inv.find(weapon)
 	#var combatResults
-	var path = get_path_to_cell(actor.cell, destination, actor.unitData.MoveType)
+	var path = get_path_to_cell(actor.cell, destination, actor)
 	activeUnit = actor
 	aiTarget = target
 	activeAction = {"Weapon": weapon, "Skill": skill}
@@ -1463,7 +1462,7 @@ func ai_move(result):
 	var actor = result["Unit"]
 	var destination = Vector2i(result.BestMove["tile"])
 	_select_unit(actor.cell)
-	var path = get_path_to_cell(actor.cell, destination, actor.unitData.MoveType)
+	var path = get_path_to_cell(actor.cell, destination, actor)
 	if actor.cell != destination:
 		_move_active_unit(destination, true, path)
 		await self.aimove_finished
@@ -1553,6 +1552,7 @@ func _deploy_unit(unit, forced = false, spawnLoc = Vector2i(0,0)):
 		spawnLoc = _first_available_dep_cell()
 	if filledSlots < depCap:
 		unit.visible = true
+		unit.isActive = true
 		unit.relocate_unit(spawnLoc)
 		filledSlots += 1
 		_update_roster_label()
@@ -1563,6 +1563,7 @@ func _undeploy_unit(unit, ini = false):
 	var spawnLoc = Vector2i(0,0)
 	if !unit.forced:
 		unit.visible = false
+		unit.isActive = false
 		_remove_from_grid(unit)
 		unit.relocate_unit(spawnLoc, false)
 	else:
@@ -1720,7 +1721,7 @@ func _progress_danmaku_path():
 func spawn_danmaku(bullets: Array, range: int, anchor: Vector2i, anchorType: String) -> Array:
 	var results := []
 	var region := []
-	_init_hexStar_danmaku()
+	#_init_hexStar_danmaku()
 	region = _get_cells_in_range(anchor, range, range)
 	_snap_cursor(anchor)
 	for bullet in bullets:
@@ -1751,6 +1752,7 @@ func set_danmaku_facing(bullet,spawnPoint, anchor, type):
 	var difference : Vector2i =  anchor - spawnPoint
 	#var directions := ["TopRight","BottomRight","Bottom","BottomLeft","TopLeft","Top"]
 	var i : int
+	var hexStar = AHexGrid2D.new(currMap)
 	offsets = hexStar._get_offsets(spawnPoint.x)
 	i = offsets.find(difference)
 	
@@ -1766,12 +1768,13 @@ func set_danmaku_facing(bullet,spawnPoint, anchor, type):
 	bullet.set_facing(i)
 	
 
-	
-func spawn_unit(unit: Unit, cell):
+
+func spawn_unit(unit: Unit, cell): #Uses solidsArray, which is deprecated FIX
 	var isForced = unit.forced
 	var maxed = false
 	var adjustedCell = cell
 	var path = [Vector2i(cell.x-1, cell.y)]
+	var mapSize = currMap.get_used_rect().size
 	if !isForced and units.has(cell):
 		print("No Valid Space to Spawn Unit")
 		return false
@@ -1815,6 +1818,7 @@ func spawn_raw_unit(unitPackage : Dictionary):
 	var isForced = unitPackage.IsForced
 	var maxed = false
 	var adjustedCell = cell
+	var mapSize = currMap.get_used_rect().size
 	
 	if !isForced and units.has(cell):
 		print("No Valid Space to Spawn Unit")

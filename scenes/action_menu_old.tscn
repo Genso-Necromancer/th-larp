@@ -1,8 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://2ggl8hw7vq8n"]
+[gd_scene load_steps=4 format=3 uid="uid://cvy4qgw5qey2i"]
 
-[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_rcm7k"]
-[ext_resource type="Script" path="res://scenes/ActionMenu.gd" id="2_mxnac"]
-[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="4_cpge4"]
+[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_jtngf"]
+[ext_resource type="Script" path="res://scenes/GUI/ActionMenu.gd" id="2_hm4hr"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_v6swc"]
 
 [node name="ActionMenu" type="Control"]
 layout_mode = 3
@@ -20,8 +20,8 @@ grow_vertical = 2
 size_flags_horizontal = 8
 size_flags_vertical = 8
 mouse_filter = 1
-theme = ExtResource("4_cpge4")
-script = ExtResource("2_mxnac")
+theme = ExtResource("1_jtngf")
+script = ExtResource("2_hm4hr")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 layout_mode = 1
@@ -63,7 +63,7 @@ theme_override_constants/margin_bottom = 6
 
 [node name="BackgroundCenter" type="NinePatchRect" parent="VFlowContainer/ActComCon/Count"]
 layout_mode = 2
-texture = ExtResource("1_rcm7k")
+texture = ExtResource("3_v6swc")
 patch_margin_left = 16
 patch_margin_top = 16
 patch_margin_right = 16
@@ -80,8 +80,12 @@ theme_override_constants/margin_bottom = 10
 
 [node name="ActionContainer" type="VBoxContainer" parent="VFlowContainer/ActComCon/Count/ActionBox"]
 layout_mode = 2
-theme = ExtResource("4_cpge4")
+theme = ExtResource("1_jtngf")
 theme_override_constants/separation = 0
+
+[node name="TalkBtn" type="Button" parent="VFlowContainer/ActComCon/Count/ActionBox/ActionContainer"]
+layout_mode = 2
+text = "Talk"
 
 [node name="AtkBtn" type="Button" parent="VFlowContainer/ActComCon/Count/ActionBox/ActionContainer"]
 layout_mode = 2
@@ -91,7 +95,7 @@ focus_neighbor_top = NodePath("../WaitBtn")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../SklBtn")
 mouse_filter = 1
-theme = ExtResource("4_cpge4")
+theme = ExtResource("1_jtngf")
 action_mode = 0
 text = "Attack"
 
@@ -102,9 +106,17 @@ focus_neighbor_top = NodePath("../AtkBtn")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../ItmBtn")
 mouse_filter = 1
-theme = ExtResource("4_cpge4")
+theme = ExtResource("1_jtngf")
 action_mode = 0
 text = "Skill"
+
+[node name="OpenBtn" type="Button" parent="VFlowContainer/ActComCon/Count/ActionBox/ActionContainer"]
+layout_mode = 2
+text = "Open"
+
+[node name="StealBtn" type="Button" parent="VFlowContainer/ActComCon/Count/ActionBox/ActionContainer"]
+layout_mode = 2
+text = "Steal"
 
 [node name="ItmBtn" type="Button" parent="VFlowContainer/ActComCon/Count/ActionBox/ActionContainer"]
 layout_mode = 2
@@ -131,7 +143,7 @@ focus_neighbor_top = NodePath("../TrdBtn")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../AtkBtn")
 mouse_filter = 1
-theme = ExtResource("4_cpge4")
+theme = ExtResource("1_jtngf")
 action_mode = 0
 text = "Wait"
 
@@ -144,7 +156,7 @@ layout_mode = 2
 focus_neighbor_top = NodePath("../../ActionContainer/SklBtn")
 focus_neighbor_bottom = NodePath("../../ActionContainer/AtkBtn")
 mouse_filter = 1
-theme = ExtResource("4_cpge4")
+theme = ExtResource("1_jtngf")
 action_mode = 0
 text = "End"
 
@@ -152,13 +164,13 @@ text = "End"
 visible = false
 layout_direction = 2
 layout_mode = 2
-theme = ExtResource("4_cpge4")
+theme = ExtResource("1_jtngf")
 
 [node name="SkillContainer" type="VBoxContainer" parent="VFlowContainer/ActComCon/Count/ActionBox"]
 visible = false
 layout_direction = 2
 layout_mode = 2
-theme = ExtResource("4_cpge4")
+theme = ExtResource("1_jtngf")
 
 [node name="ItmComCon" type="AspectRatioContainer" parent="VFlowContainer"]
 visible = false
@@ -174,7 +186,7 @@ metadata/_edit_use_anchors_ = true
 
 [node name="BackgroundCenter" type="NinePatchRect" parent="VFlowContainer/ItmComCon/MarginContainer"]
 layout_mode = 2
-texture = ExtResource("1_rcm7k")
+texture = ExtResource("3_v6swc")
 patch_margin_left = 16
 patch_margin_top = 16
 patch_margin_right = 16
@@ -190,7 +202,7 @@ theme_override_constants/margin_bottom = 10
 
 [node name="AuxContainer" type="VBoxContainer" parent="VFlowContainer/ItmComCon/MarginContainer/MarginContainer"]
 layout_mode = 2
-theme = ExtResource("4_cpge4")
+theme = ExtResource("1_jtngf")
 theme_override_constants/separation = 0
 
 [node name="EqpBtn" type="Button" parent="VFlowContainer/ItmComCon/MarginContainer/MarginContainer/AuxContainer"]
@@ -201,7 +213,7 @@ focus_neighbor_top = NodePath("../UseBtn")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../UnEqpBtn")
 mouse_filter = 1
-theme = ExtResource("4_cpge4")
+theme = ExtResource("1_jtngf")
 disabled = true
 action_mode = 0
 text = "Equip"
@@ -214,7 +226,7 @@ focus_neighbor_top = NodePath("../EqpBtn")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../UseBtn")
 mouse_filter = 1
-theme = ExtResource("4_cpge4")
+theme = ExtResource("1_jtngf")
 disabled = true
 action_mode = 0
 text = "Unequip"
@@ -227,7 +239,7 @@ focus_neighbor_top = NodePath("../UnEqpBtn")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../EqpBtn")
 mouse_filter = 1
-theme = ExtResource("4_cpge4")
+theme = ExtResource("1_jtngf")
 disabled = true
 action_mode = 0
 text = "Use"

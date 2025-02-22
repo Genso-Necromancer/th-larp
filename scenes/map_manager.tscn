@@ -40,7 +40,6 @@ mapCursorPath = NodePath("../../Gameboard/Cursor")
 [connection signal="unit_deselected" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_unit_deselected"]
 [connection signal="unit_move_ended" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_unit_move_ended"]
 [connection signal="unit_selected" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_unit_selected"]
-[connection signal="walk_complete" from="Gameboard" to="." method="_on_gameboard_walk_complete"]
 [connection signal="combat_resolved" from="Gameboard/CombatManager" to="Gameboard" method="_on_combat_manager_combat_resolved"]
 [connection signal="forecast_updated" from="Gameboard/CombatManager" to="CanvasLayer/GUIManager/CombatForecast" method="update_fc"]
 [connection signal="time_factor_changed" from="Gameboard/CombatManager" to="Gameboard" method="_on_combat_manager_time_factor_changed"]

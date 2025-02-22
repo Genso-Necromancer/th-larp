@@ -16,12 +16,10 @@ var fateChance = 15
 
 #var canReach = false
 var gameBoard
-var aHex
 
 func init_manager():
 	#link up dependancies
 	gameBoard = get_parent()
-	aHex = gameBoard.hexStar
 
 #FORECAST FUNCTIONS
 
@@ -786,8 +784,8 @@ func start_relocation(actor, target, effect): #determines method of relocation, 
 func shove_or_toss_unit(actor, target, reach, pivotHex, matchHex, mode = 0):
 	#Toss:[1] Grab Actor's Cell and Target's Cell. Look through Actor's Neighbors for a match with Target's cell. Adjust position in array to the opposite directional hex and move Target there.
 	#Shove:[0] The same principle, except you are searching the Target's neighbors for the Actor's Cell and moving them to the opposite cell of that.
-	
-	var neighbors = aHex.get_BFS_nhbr(pivotHex, false, true)
+	var aHex = AHexGrid2D.new(gameBoard.currMap)
+	var neighbors = aHex.get_BFS_nhbr(pivotHex, true)
 	var shoveResult = aHex.resolve_shove(matchHex, target.cell, neighbors, reach)
 	var slamDmg = Global.slamage + actor.activeStats.Pwr + (shoveResult.Travel * 2)
 	

@@ -4,7 +4,7 @@ var player := []
 var enemy := []
 var terrainData
 var unitData = UnitData.unitData
-var aHex : AHexGrid2D
+
 var threatArray = []
 var BoardState
 var lvCap = 20
@@ -31,7 +31,6 @@ var terrainValues = {}
 func init_ai():
 	#link up dependancies
 	gameBoard = get_parent()
-	aHex = gameBoard.hexStar
 
 
 func get_move(state: BoardState):
@@ -78,7 +77,8 @@ func find_best_action(moves):
 	
 func get_valid_moves(unit, cell, move, state): #Doesn't realize when a move is technically out of reach HERE
 	#This just runs the functions which actually compares all the possible moves before sending it up the pipeline
-	var path = aHex.find_all_paths(cell, move, unit.unitData.MoveType, true)
+	var aHex = AHexGrid2D.new(gameBoard.currMap)
+	var path = aHex.find_all_unit_paths(unit)
 	var threat
 	var bestAttack = null
 	var bestMove = null
@@ -172,10 +172,11 @@ func find_valid_attacks(aiUnit, path, state):
 	var aiInv = aiUnit.unitData.Inv
 	var wepData = UnitData.itemData
 	var targetDef
+	var aHex = AHexGrid2D.new(gameBoard.currMap)
 	for wep in aiInv:
 		var wepID = wep["ID"]
 		var ranges = [wepData[wepID].MinRange, wepData[wepID].MaxRange]
-		var threat = aHex.find_threat(path, ranges, aiUnit.unitData.MoveType)
+		var threat = aHex.find_threat(path, ranges)
 		for unit in state.player:
 			match wepData[wepID].Type:
 				Enums.DAMAGE_TYPE.PHYS:
@@ -204,12 +205,13 @@ func find_valid_attacks(aiUnit, path, state):
 	
 func get_attack_value(aiUnit, attack, targetDef):
 	var value: float = 0
+	var aHex = AHexGrid2D.new(gameBoard.currMap)
 #	print("StarT: ", value, " + ", playerValues[attack.Target])
 	value += playerValues[attack.Target]
 #	print(value)
 #	print(" + ", terrainValues[attack.Launch])
 	value += (terrainValues[attack.Launch])
-	value -= (aHex.compute_cost(aiUnit.cell, attack.Launch, aiUnit.unitData.MoveType) / 100) 
+	value -= (aHex.compute_cost(aiUnit.cell, attack.Launch, aiUnit) / 100) 
 #	print(value)
 #	print(" + ", enemyValues[aiUnit])
 #	value += enemyValues[aiUnit]
@@ -272,7 +274,8 @@ func combat_values(aiUnit, attack, targetDef):
 	
 func check_safe(aiUnit, target, launch):
 	var wepData = UnitData.itemData
-	var distance = aHex.compute_cost(launch, target.cell, false, aiUnit.unitData.MoveType,)
+	var aHex = AHexGrid2D.new(gameBoard.currMap)
+	var distance = aHex.find_distance(launch, target.cell,)
 	var equip = target.get_equipped_weapon()
 	var wepID = equip["ID"]
 	var targetReach
