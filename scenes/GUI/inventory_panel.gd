@@ -54,7 +54,7 @@ func _set_style_style(mode:String):
 				
 
 
-func _ready(): 
+func _ready():
 	if not Engine.is_editor_hint():
 		_ready_style()
 
@@ -64,9 +64,10 @@ func _ready_style():
 
 
 
-func fill_items(isTrade : = false) -> Array:
+func fill_items(isTrade : = false, reach = [0,0]) -> Array:
 	var unit = get_meta("Unit")
 	var inv = unit.unitData.Inv
+	var iData = UnitData.itemData
 	var i := 0
 	var bPath = load("res://scenes/GUI/item_button.tscn")
 	var equipped = unit.get_equipped_weapon()
@@ -82,11 +83,18 @@ func fill_items(isTrade : = false) -> Array:
 	for item in inv:
 		if _style == _styles[1] and item == displayItem:
 			continue
+		if !reach[0]: pass
+		elif !unit.check_valid_equip(item): continue
+		elif iData[item.ID].MinRange > reach[0] or iData[item.ID].MaxRange < reach[1]: 
+			continue
+			
 		b = _generate_item_button(bPath, item, i, unit, isTrade)
 		
 		_add_item(b)
 		i += 1
 	return items
+	
+
 
 
 func _generate_item_button(bPath, item : Dictionary, i : int, unit : Unit, isTrade : bool) -> ItemButton:
@@ -182,3 +190,9 @@ func clear_items():
 		itemList.remove_child(b)
 		b.queue_free()
 	items.clear()
+
+func get_item_buttons() -> Array:
+	var buttons := []
+	for i in items:
+		buttons.append(i.button)
+	return buttons

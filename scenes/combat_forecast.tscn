@@ -5,55 +5,46 @@
 [ext_resource type="Script" path="res://scenes/combat_forecast.gd" id="2_npc5x"]
 [ext_resource type="Script" path="res://scenes/animation_handler.gd" id="5_knule"]
 
-[node name="CombatForecast" type="Control"]
-layout_mode = 3
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -576.0
-offset_right = 576.0
-offset_bottom = 648.0
+[node name="CombatForecast" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
 size_flags_vertical = 0
-mouse_filter = 1
 theme = ExtResource("1_jeq77")
 script = ExtResource("2_npc5x")
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
-custom_minimum_size = Vector2(1920, 1080)
 layout_mode = 2
-offset_left = -384.0
-offset_top = -128.0
-offset_right = 1536.0
-offset_bottom = 952.0
 size_flags_horizontal = 3
-mouse_filter = 2
 
 [node name="Dimmer" type="ColorRect" parent="PanelContainer"]
 layout_mode = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.545098)
 
-[node name="ForecastBox" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -110.0
-offset_top = 194.0
-offset_right = 110.0
-offset_bottom = 330.0
-grow_horizontal = 2
-
-[node name="StatRow" type="HBoxContainer" parent="ForecastBox"]
+[node name="ForecastMargin" type="MarginContainer" parent="."]
 layout_mode = 2
+theme_override_constants/margin_top = 100
+
+[node name="ForecastBox" type="VBoxContainer" parent="ForecastMargin"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
 alignment = 1
 
-[node name="AtkPanel" type="PanelContainer" parent="ForecastBox/StatRow"]
-custom_minimum_size = Vector2(70, 0)
+[node name="StatRow" type="HBoxContainer" parent="ForecastMargin/ForecastBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+alignment = 1
+
+[node name="AtkPanel" type="PanelContainer" parent="ForecastMargin/ForecastBox/StatRow"]
+custom_minimum_size = Vector2(83, 0)
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastBox/StatRow/AtkPanel"]
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 texture = ExtResource("1_3ryf8")
@@ -62,33 +53,28 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="AMa" type="MarginContainer" parent="ForecastBox/StatRow/AtkPanel"]
+[node name="AMa" type="MarginContainer" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/margin_left = 8
 theme_override_constants/margin_top = 8
 
-[node name="MC" type="MarginContainer" parent="ForecastBox/StatRow/AtkPanel/AMa"]
-layout_mode = 2
-
-[node name="bg?" type="TextureRect" parent="ForecastBox/StatRow/AtkPanel/AMa/MC"]
-layout_mode = 2
-
-[node name="AVB" type="VBoxContainer" parent="ForecastBox/StatRow/AtkPanel/AMa"]
+[node name="AVB" type="VBoxContainer" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
 
-[node name="NAME" type="Label" parent="ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+[node name="NAME" type="Label" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
 custom_minimum_size = Vector2(60, 0)
 layout_mode = 2
+size_flags_horizontal = 8
 theme = ExtResource("1_jeq77")
-text = "Null"
+text = "null"
 
-[node name="LIFE" type="RichTextLabel" parent="ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+[node name="LIFE" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
 custom_minimum_size = Vector2(24, 10)
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 9
 theme = ExtResource("1_jeq77")
 theme_override_font_sizes/normal_font_size = 0
 bbcode_enabled = true
@@ -102,40 +88,40 @@ hint_underlined = false
 deselect_on_focus_loss_enabled = false
 text_direction = 1
 
-[node name="ACC" type="Label" parent="ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+[node name="ACC" type="Label" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 9
 theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 1
 
-[node name="DMG" type="Label" parent="ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+[node name="DMG" type="Label" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 9
 theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 1
 
-[node name="CRIT" type="Label" parent="ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+[node name="CRIT" type="Label" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 9
 theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 1
 
-[node name="BLANK" type="Label" parent="ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+[node name="Weapon" type="Label" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
 layout_mode = 2
-size_flags_horizontal = 4
+size_flags_horizontal = 9
 theme = ExtResource("1_jeq77")
 horizontal_alignment = 1
 
-[node name="Labels" type="PanelContainer" parent="ForecastBox/StatRow"]
+[node name="Labels" type="PanelContainer" parent="ForecastMargin/ForecastBox/StatRow"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastBox/StatRow/Labels"]
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/StatRow/Labels"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 texture = ExtResource("1_3ryf8")
@@ -144,7 +130,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="Margin" type="MarginContainer" parent="ForecastBox/StatRow/Labels"]
+[node name="Margin" type="MarginContainer" parent="ForecastMargin/ForecastBox/StatRow/Labels"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/margin_left = 4
@@ -152,50 +138,57 @@ theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ForecastBox/StatRow/Labels/Margin"]
+[node name="VBoxContainer" type="VBoxContainer" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
 
-[node name="BLANK" type="Label" parent="ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+[node name="BLANK" type="Label" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
 custom_minimum_size = Vector2(0, 8)
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 horizontal_alignment = 1
 
-[node name="LIFELB" type="Label" parent="ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+[node name="LIFELB" type="Label" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 text = "Life"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ACCLB" type="Label" parent="ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+[node name="ACCLB" type="Label" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 text = "Accuracy"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DMGLB" type="Label" parent="ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+[node name="DMGLB" type="Label" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 text = "Damage"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CRITLB" type="Label" parent="ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+[node name="CRITLB" type="Label" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 text = "Crit"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TargetPanel" type="PanelContainer" parent="ForecastBox/StatRow"]
-custom_minimum_size = Vector2(70, 0)
+[node name="WepLb" type="Label" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+text = "Weapon"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TargetPanel" type="PanelContainer" parent="ForecastMargin/ForecastBox/StatRow"]
+custom_minimum_size = Vector2(83, 0)
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastBox/StatRow/TargetPanel"]
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 texture = ExtResource("1_3ryf8")
@@ -204,24 +197,24 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="TMa" type="MarginContainer" parent="ForecastBox/StatRow/TargetPanel"]
+[node name="TMa" type="MarginContainer" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_right = 8
 
-[node name="TVB" type="VBoxContainer" parent="ForecastBox/StatRow/TargetPanel/TMa"]
+[node name="TVB" type="VBoxContainer" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
 
-[node name="NAME" type="Label" parent="ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+[node name="NAME" type="Label" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 2
 
-[node name="LIFE" type="RichTextLabel" parent="ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+[node name="LIFE" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
 custom_minimum_size = Vector2(15, 10)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -236,7 +229,7 @@ meta_underlined = false
 hint_underlined = false
 deselect_on_focus_loss_enabled = false
 
-[node name="ACC" type="Label" parent="ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+[node name="ACC" type="Label" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
 custom_minimum_size = Vector2(15, 10)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -244,7 +237,7 @@ theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 1
 
-[node name="DMG" type="Label" parent="ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+[node name="DMG" type="Label" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
 custom_minimum_size = Vector2(15, 10)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -252,7 +245,7 @@ theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 1
 
-[node name="CRIT" type="Label" parent="ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+[node name="CRIT" type="Label" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
 custom_minimum_size = Vector2(15, 10)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -260,23 +253,24 @@ theme = ExtResource("1_jeq77")
 text = "Null"
 horizontal_alignment = 1
 
-[node name="BLANK" type="Label" parent="ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+[node name="Weapon" type="Label" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
 custom_minimum_size = Vector2(15, 0)
 layout_mode = 2
 size_flags_horizontal = 4
 theme = ExtResource("1_jeq77")
 horizontal_alignment = 1
 
-[node name="EffectRow" type="HBoxContainer" parent="ForecastBox"]
-visible = false
+[node name="EffectRow" type="HBoxContainer" parent="ForecastMargin/ForecastBox"]
 layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
 alignment = 1
 
-[node name="AtkEfPanel" type="PanelContainer" parent="ForecastBox/EffectRow"]
+[node name="AtkEfPanel" type="PanelContainer" parent="ForecastMargin/ForecastBox/EffectRow"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastBox/EffectRow/AtkEfPanel"]
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/EffectRow/AtkEfPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 texture = ExtResource("1_3ryf8")
@@ -285,7 +279,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="AMa" type="MarginContainer" parent="ForecastBox/EffectRow/AtkEfPanel"]
+[node name="AMa" type="MarginContainer" parent="ForecastMargin/ForecastBox/EffectRow/AtkEfPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/margin_left = 4
@@ -293,16 +287,16 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 10
 
-[node name="AVB" type="VBoxContainer" parent="ForecastBox/EffectRow/AtkEfPanel/AMa"]
+[node name="AVB" type="VBoxContainer" parent="ForecastMargin/ForecastBox/EffectRow/AtkEfPanel/AMa"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
 
-[node name="Labels2" type="PanelContainer" parent="ForecastBox/EffectRow"]
+[node name="Labels2" type="PanelContainer" parent="ForecastMargin/ForecastBox/EffectRow"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastBox/EffectRow/Labels2"]
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/EffectRow/Labels2"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 texture = ExtResource("1_3ryf8")
@@ -311,7 +305,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="Margin" type="MarginContainer" parent="ForecastBox/EffectRow/Labels2"]
+[node name="Margin" type="MarginContainer" parent="ForecastMargin/ForecastBox/EffectRow/Labels2"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/margin_left = 4
@@ -319,12 +313,12 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ForecastBox/EffectRow/Labels2/Margin"]
+[node name="VBoxContainer" type="VBoxContainer" parent="ForecastMargin/ForecastBox/EffectRow/Labels2/Margin"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
 
-[node name="EFFLB" type="RichTextLabel" parent="ForecastBox/EffectRow/Labels2/Margin/VBoxContainer"]
+[node name="EFFLB" type="RichTextLabel" parent="ForecastMargin/ForecastBox/EffectRow/Labels2/Margin/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 1
@@ -334,11 +328,11 @@ text = "[center]Effects[/center]"
 fit_content = true
 scroll_active = false
 
-[node name="TargetEfPanel" type="PanelContainer" parent="ForecastBox/EffectRow"]
+[node name="TargetEfPanel" type="PanelContainer" parent="ForecastMargin/ForecastBox/EffectRow"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastBox/EffectRow/TargetEfPanel"]
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/EffectRow/TargetEfPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 texture = ExtResource("1_3ryf8")
@@ -347,7 +341,7 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
-[node name="TMa" type="MarginContainer" parent="ForecastBox/EffectRow/TargetEfPanel"]
+[node name="TMa" type="MarginContainer" parent="ForecastMargin/ForecastBox/EffectRow/TargetEfPanel"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/margin_left = 4
@@ -355,20 +349,29 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 10
 
-[node name="TVB" type="VBoxContainer" parent="ForecastBox/EffectRow/TargetEfPanel/TMa"]
+[node name="TVB" type="VBoxContainer" parent="ForecastMargin/ForecastBox/EffectRow/TargetEfPanel/TMa"]
 layout_mode = 2
 theme = ExtResource("1_jeq77")
 theme_override_constants/separation = 2
 alignment = 2
 
-[node name="AnimationHandler" type="Node2D" parent="."]
-position = Vector2(556, 0)
+[node name="GridContainer" type="GridContainer" parent="ForecastMargin"]
+layout_mode = 2
+
+[node name="AnimationHandler" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 200
+theme_override_constants/margin_top = 200
+theme_override_constants/margin_right = 200
+theme_override_constants/margin_bottom = 200
 script = ExtResource("5_knule")
 
-[node name="InitiatorNode" type="Node2D" parent="AnimationHandler"]
-position = Vector2(-556, 0)
+[node name="InitiatorNode" type="Control" parent="AnimationHandler"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
 
-[node name="InitiateNode" type="Node2D" parent="AnimationHandler"]
-position = Vector2(596, 0)
-
-[connection signal="sequence_complete" from="AnimationHandler" to="." method="_on_animation_handler_sequence_complete"]
+[node name="InitiateNode" type="Control" parent="AnimationHandler"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0

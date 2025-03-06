@@ -1,6 +1,6 @@
-extends Node
+extends MarginContainer
 
-signal sequence_complete
+
 signal animations_complete
 signal sequence_ready
 
@@ -14,7 +14,7 @@ var sequenceSteps = []
 
 func _ready():
 	SignalTower.prompt_accepted.connect(self._scene_skipped)
-
+	SignalTower.sequence_initiated.connect(self._on_gameboard_sequence_initiated)
 
 func load_animations(units):
 	var initiatorNode = $InitiatorNode
@@ -28,7 +28,7 @@ func load_animations(units):
 		if !animScene:
 			animPath = "res://scenes/animations/combat/combat_sakuya.tscn"
 			animScene = load(animPath)
-			
+		#Some reason the animations dictionary are showing up empty later down the line and breaking everything.
 		animations[unit] = animScene.instantiate()
 		animations[unit].set_unit(unit)
 		animations[unit].pop_up_requested.connect(self._on_pop_up_requested)
@@ -107,7 +107,7 @@ func _on_gameboard_sequence_initiated(sequence):
 						for effect in script[anim][swing].Effects:
 							if !animations[effect.Target].dead:
 								animations[effect.Target].load_effect_result(effect)
-								print(effect.Target, ": Effect popup added[",effect,"]")
+								#print(effect.Target, ": Effect popup added[",effect,"]")
 						effectStep = true
 						
 				if effectStep:
@@ -129,7 +129,7 @@ func _on_gameboard_sequence_initiated(sequence):
 		if isSkipped: break
 	
 	_clear_sequence()
-	emit_signal("sequence_complete")
+	SignalTower.emit_signal("sequence_complete")
 
 func _on_animation_start(player):
 	activeAnims[player] = true

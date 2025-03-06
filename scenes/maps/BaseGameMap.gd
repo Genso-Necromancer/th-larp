@@ -348,9 +348,6 @@ func _process_bullets(bullets):
 		_call_danmaku_entrance()
 		
 		
-	#emit_signal("danmaku_progressed")
-
-
 
 func _call_danmaku_entrance():
 	for b in actingDanmaku.Spawning:
@@ -363,3 +360,27 @@ func _on_danmaku_animation_completed(anim, bullet):
 	if actingDanmaku[anim].size() == 0:
 		match anim:
 			"Spawning": emit_signal("danmaku_progressed")
+
+
+##Targeting and Pathing Functions
+## Fills the tilemap with the cells, giving a visual representation of the cells a unit can walk.
+func draw(cells: Array) -> void:
+	clear_layer(5)
+	for cell in cells:
+#		print("draw2:", cell)
+		set_cell(5, cell, 10, Vector2i(0,0))
+		
+func draw_attack(cells: Array) -> void:
+	clear_layer(5)
+	for cell in cells:
+#		print("draw2:", cell)
+		set_cell(5, cell, 9, Vector2i(0,0))
+		
+func draw_threat(walk: Array, threat: Array) -> void:
+	clear_layer(5)
+	for cell in threat:
+#		print("draw2:", cell)
+		set_cell(5, cell, 9, Vector2i(0,0))
+	for cell in walk:
+#		print("draw2:", cell)
+		set_cell(5, cell, 10, Vector2i(0,0))

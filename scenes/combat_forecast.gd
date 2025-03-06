@@ -1,25 +1,34 @@
-extends Control
+extends PanelContainer
+
+class_name CombatForecast
 
 var animationsLoaded = false
+
+
+
+func _ready():
+	self.visible = false
+	SignalTower.forecast_predicted.connect(self.update_fc)
+
 
 func show_fc() -> void:
 	self.visible = true
 	
 func hide_fc() -> void:
-	var effectPanels = [$ForecastBox/EffectRow/AtkEfPanel, $ForecastBox/EffectRow/Labels2, $ForecastBox/EffectRow/TargetEfPanel]
+	var effectPanels = [$ForecastMargin/ForecastBox/EffectRow/AtkEfPanel, $ForecastMargin/ForecastBox/EffectRow/Labels2, $ForecastMargin/ForecastBox/EffectRow/TargetEfPanel]
 	self.visible = false
 	for p in effectPanels:
 		p.visible = false
 	_close_effects()
 	if animationsLoaded: _free_animations()
 	
-func update_fc(foreCast) -> void: #HERE labels need updating to using StringGetter AND "unarmed" doesn't appear correct
+func update_fc(foreCast:Dictionary) -> void: #HERE labels need updating to using StringGetter AND "unarmed" doesn't appear correct
 	var groups : Dictionary = {}
 	var units : Array = foreCast.keys()
 	var i := 0
 	#var sprites: Array = []
-	var atkPanel = $ForecastBox/StatRow/AtkPanel/AMa/AVB
-	var trgtPanel = $ForecastBox/StatRow/TargetPanel/TMa/TVB
+	var atkPanel = $ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB
+	var trgtPanel = $ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB
 	
 	
 	_call_animations(units)
@@ -48,6 +57,7 @@ func update_fc(foreCast) -> void: #HERE labels need updating to using StringGett
 		var remainTemplate : String = StringGetter.get_template("combat_hp_remain")
 		var lifeText : String = "[center]%s[/center]"
 		var hp = lifeTemplate % [active.CurLife, units[i].baseStats.Life]
+		var wName = UnitData.itemData[units[i].get_equipped_weapon().ID].Name
 		
 		
 		if !fcCombat.CanMiss and fcCounter and fcReach: hit = "TRUE" 
@@ -71,6 +81,7 @@ func update_fc(foreCast) -> void: #HERE labels need updating to using StringGett
 		groups[g][2].set_text(hit)
 		groups[g][3].set_text(dmg)
 		groups[g][4].set_text(crit)
+		groups[g][5].set_text(wName)
 		#HERE check for swing count for visual representation
 		i += 1
 	if foreCast[units[0]].Effects or foreCast[units[(i-1)]].Effects:
@@ -82,11 +93,11 @@ func _load_effects(cmbData) -> void:
 	var panels : Array 
 	
 	if units.size() < 2: 
-		lists = {units[0]:$ForecastBox/EffectRow/AtkEfPanel/AMa/AVB}
-		panels = [$ForecastBox/EffectRow/AtkEfPanel, $ForecastBox/EffectRow/Labels2]
+		lists = {units[0]:$ForecastMargin/ForecastBox/EffectRow/AtkEfPanel/AMa/AVB}
+		panels = [$ForecastMargin/ForecastBox/EffectRow/AtkEfPanel, $ForecastMargin/ForecastBox/EffectRow/Labels2]
 	else: 
-		lists = {units[0]:$ForecastBox/EffectRow/AtkEfPanel/AMa/AVB, units[1]:$ForecastBox/EffectRow/TargetEfPanel/TMa/TVB}
-		panels = [$ForecastBox/EffectRow/AtkEfPanel, $ForecastBox/EffectRow/Labels2, $ForecastBox/EffectRow/TargetEfPanel]
+		lists = {units[0]:$ForecastMargin/ForecastBox/EffectRow/AtkEfPanel/AMa/AVB, units[1]:$ForecastMargin/ForecastBox/EffectRow/TargetEfPanel/TMa/TVB}
+		panels = [$ForecastMargin/ForecastBox/EffectRow/AtkEfPanel, $ForecastMargin/ForecastBox/EffectRow/Labels2, $ForecastMargin/ForecastBox/EffectRow/TargetEfPanel]
 		
 		
 	
@@ -139,8 +150,8 @@ func _add_effect_labels(lists, strings):
 		lists.add_child(lbl)
 
 func _close_effects() -> void:
-	var lists : Array = [$ForecastBox/EffectRow/TargetEfPanel/TMa/TVB, $ForecastBox/EffectRow/AtkEfPanel/AMa/AVB]
-	var panels : Array = [$ForecastBox/EffectRow/AtkEfPanel, $ForecastBox/EffectRow/Labels2, $ForecastBox/EffectRow/TargetEfPanel]
+	var lists : Array = [$ForecastMargin/ForecastBox/EffectRow/TargetEfPanel/TMa/TVB, $ForecastMargin/ForecastBox/EffectRow/AtkEfPanel/AMa/AVB]
+	var panels : Array = [$ForecastMargin/ForecastBox/EffectRow/AtkEfPanel, $ForecastMargin/ForecastBox/EffectRow/Labels2, $ForecastMargin/ForecastBox/EffectRow/TargetEfPanel]
 	for l in lists:
 		for child in l.get_children():
 				child.queue_free()

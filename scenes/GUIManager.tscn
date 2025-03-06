@@ -1,11 +1,8 @@
-[gd_scene load_steps=16 format=3 uid="uid://r6wtvva5qput"]
+[gd_scene load_steps=13 format=3 uid="uid://r6wtvva5qput"]
 
 [ext_resource type="Script" path="res://scenes/GUIManager.gd" id="1_d2r44"]
 [ext_resource type="Theme" uid="uid://bi2ve4mbgqqd0" path="res://fonts/Izayoi_Theme_setup.tres" id="1_puiy8"]
-[ext_resource type="PackedScene" uid="uid://2ggl8hw7vq8n" path="res://scenes/GUI/action_menu.tscn" id="4_o6laq"]
-[ext_resource type="PackedScene" uid="uid://ct2rsfnl7fi6u" path="res://scenes/combat_forecast.tscn" id="6_kojdq"]
 [ext_resource type="PackedScene" uid="uid://cv8yj4b660do" path="res://scenes/hud.tscn" id="6_odogd"]
-[ext_resource type="PackedScene" uid="uid://cmh8ono4w82cq" path="res://scenes/GUI/menu_cursor.tscn" id="6_yyl58"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="7_llyu2"]
 [ext_resource type="Script" path="res://scenes/debug.gd" id="10_pjuly"]
 [ext_resource type="Script" path="res://scenes/FailScreen.gd" id="12_jkf6w"]
@@ -30,22 +27,16 @@ theme = ExtResource("1_puiy8")
 script = ExtResource("1_d2r44")
 metadata/_edit_use_anchors_ = true
 
-[node name="CombatForecast" parent="." instance=ExtResource("6_kojdq")]
+[node name="PanelBlocker" type="Panel" parent="."]
 visible = false
+custom_minimum_size = Vector2(121, 288)
 layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.0930556
-anchor_bottom = 0.0930556
-offset_top = 24.0
-offset_bottom = 384.0
-
-[node name="ActionMenu" parent="." instance=ExtResource("4_o6laq")]
-visible = false
-layout_mode = 1
-offset_left = 0.0
-offset_top = 60.0
-offset_right = 0.0
-offset_bottom = 60.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_force_pass_scroll_events = false
 
 [node name="HUD" parent="." instance=ExtResource("6_odogd")]
 visible = false
@@ -57,12 +48,6 @@ offset_top = 31.0
 offset_bottom = 31.0
 grow_horizontal = 2
 mouse_filter = 1
-
-[node name="menu_cursor" parent="." instance=ExtResource("6_yyl58")]
-visible = false
-layout_mode = 0
-scale = Vector2(2, 2)
-cursor_offset = Vector2(25, 0)
 
 [node name="FailScreen" type="Control" parent="."]
 visible = false
@@ -454,11 +439,4 @@ texture_under = ExtResource("16_nw8x6")
 texture_over = ExtResource("17_a06i1")
 texture_progress = ExtResource("18_18bf3")
 
-[connection signal="sequence_complete" from="CombatForecast/AnimationHandler" to="." method="_on_animation_handler_sequence_complete"]
-[connection signal="action_selected" from="ActionMenu" to="." method="_on_action_menu_action_selected"]
-[connection signal="menu_closed" from="ActionMenu" to="." method="_on_action_menu_menu_closed"]
-[connection signal="menu_opened" from="ActionMenu" to="." method="_on_action_menu_menu_opened"]
-
-[editable path="CombatForecast"]
-[editable path="ActionMenu"]
 [editable path="HUD"]

@@ -133,7 +133,7 @@ static func get_named_unit_data():
 					"Fan": false,
 					"Bow": false,
 					"Gun": false,
-					"Sub": ["KNIFE"]},
+					"Sub": ["KNIVES"]},
 				"MoveType": MOVE_TYPE.RANGER
 			},
 		"Patchouli": {
@@ -574,7 +574,7 @@ static func get_job(jobInd):
 					"Fan": false,
 					"Bow": false,
 					"Gun": false,
-					"Sub": ["KNIFE"],
+					"Sub": ["KNIVES"],
 					}
 				}
 
@@ -723,7 +723,7 @@ static func get_items():
 				"Crit": 10,
 				"Barrier": 3,
 				"MinRange": 1,
-				"MaxRange": 2,
+				"MaxRange": 1,
 				"Category": "Stick",
 				"MaxDur": 40,
 				"Equip":true,

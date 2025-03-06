@@ -15,12 +15,15 @@ theme = ExtResource("1_li3j2")
 script = ExtResource("2_fcxm4")
 type = "Skill"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="ContentMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ContentMargin"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
 
-[node name="Icon" type="TextureRect" parent="HBoxContainer"]
+[node name="Icon" type="TextureRect" parent="ContentMargin/HBoxContainer"]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -29,7 +32,7 @@ texture = ExtResource("3_wseqf")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Equpped" type="Label" parent="HBoxContainer/Icon"]
+[node name="Equpped" type="Label" parent="ContentMargin/HBoxContainer/Icon"]
 visible = false
 layout_mode = 1
 anchors_preset = 2
@@ -45,7 +48,7 @@ theme_override_font_sizes/font_size = 15
 text = "Eq."
 vertical_alignment = 2
 
-[node name="Name" type="Label" parent="HBoxContainer"]
+[node name="Name" type="Label" parent="ContentMargin/HBoxContainer"]
 custom_minimum_size = Vector2(190, 26)
 layout_mode = 2
 size_flags_vertical = 8
@@ -54,7 +57,7 @@ vertical_alignment = 1
 clip_text = true
 text_overrun_behavior = 3
 
-[node name="Cost" type="Label" parent="HBoxContainer"]
+[node name="Cost" type="Label" parent="ContentMargin/HBoxContainer"]
 custom_minimum_size = Vector2(22, 26)
 layout_mode = 2
 size_flags_horizontal = 8

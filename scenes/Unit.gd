@@ -127,10 +127,10 @@ var lastGlbPosition := Vector2.ZERO
 var originCell
 
 # Toggles the "selected" animation on the unit.
-var is_selected := false:
+var isSelected := false:
 	set(value): #Buggy, causes idling when hovering unit after selecting and choosing movement
-		is_selected = value
-		if is_selected:
+		isSelected = value
+		if isSelected:
 			_animPlayer.play("selected")
 			#print(unitId,":", _animPlayer.current_animation,":","Selected")
 		elif status.Acted == false:
@@ -505,6 +505,9 @@ func _load_stats():
 	activeStats["CurLife"] = baseStats.Life
 	activeStats["CurComp"] = baseStats.Comp
 	activeStats["MoveType"] = unitData.MoveType
+	activeStats["Weapons"] = unitData.Weapons
+	activeStats["Skills"] = unitData.Skills
+	
 	update_stats()
 	_init_inv()
 	firstLoad = true
@@ -651,9 +654,16 @@ func check_passives():
 			Enums.PASSIVE_TYPE.AURA:
 				valid.append(_assign_auras(p))
 			Enums.PASSIVE_TYPE.SUB_WEAPON:
+				_add_sub_type(p.SubType)
 				_update_natural(p)
 				
 	validate_auras(valid)
+
+
+func _add_sub_type(subType):
+	var st = Enums.WEAPON_CATEGORY.keys()[subType]
+	activeStats.Weapons.Sub.append(st)
+
 
 
 func _assign_auras(passive:Dictionary) -> StringName:
@@ -808,9 +818,9 @@ func restore_equip():
 		tempSet = false
 		update_stats()
 		
-func set_temp_equip(i):
+func set_temp_equip(weapon):
 	var tempWep
-	
+	var i = unitData.Inv.find(weapon)
 	tempSet = get_equipped_weapon()
 	if tempSet != natural and tempSet != unarmed:
 		var indx = unitData.Inv.find(tempSet)
@@ -828,6 +838,14 @@ func set_temp_equip(i):
 		_equip_weapon(i, true)
 		
 	update_stats()
+	
+
+
+func set_direct_equipped(item:Dictionary):
+	var i : int = unitData.Inv.find(item)
+	set_equipped(i)
+
+
 	
 func set_equipped(iInv = false): #searches for first valid if false or out of bounds, otherwise pass inv index and will equip if valid
 	var valid = false
@@ -862,7 +880,7 @@ func get_equipped_weapon(): #returns the currently equipped weapon within invent
 			wep = item
 			found = true
 			break
-	if !found and unitData.Weapons.Sub and unitData.Weapons.Sub.has("NATURAL"):
+	if !found and activeStats.Weapons.Sub and activeStats.Weapons.Sub.has("NATURAL"):
 		wep = natural
 		_equip_weapon(-2)
 	elif !found:
@@ -878,7 +896,21 @@ func get_equipped_acc(): #returns the currently equipped accessories within inve
 	if acc.size() == 0:
 		return false
 	return acc
-	
+
+##Reach = {"Max":int,"Min":int}
+func get_weapon_reach() -> Dictionary:
+	var reach = {"Max":-INF, "Min":INF}
+	var wepData :Dictionary = UnitData.itemData
+	for wep in unitData.Inv:
+			if !check_valid_equip(wep):
+				continue
+			reach.Min = min(reach.Min, wepData[wep.ID].MinRange, reach.Min)
+			reach.Max = max(reach.Max, wepData[wep.ID].MaxRange, reach.Max)
+	var id = get_equipped_weapon().ID
+	reach.Min = min(reach.Min, wepData[id].MinRange, reach.Min)
+	reach.Max = max(reach.Max, wepData[id].MaxRange, reach.Max)
+	return reach
+
 func unequip(slot = 0): #Stop taking drugs. Fix this up later, it makes no fucking sense. HERE
 	var item = unitData.Inv[slot]
 	var noweapon = false
@@ -928,6 +960,7 @@ func _equip_acc(i : int):
 	acc.Equip = true
 	_add_equip_effects(acc)
 
+
 func _equip_weapon(index, isTemp = false) -> void:
 	var wep
 	
@@ -958,7 +991,8 @@ func _equip_weapon(index, isTemp = false) -> void:
 		wep.Equip = true
 		_add_equip_effects(wep)
 	#print(wep)
-	
+
+
 func _add_equip_effects(item):
 	var iData = UnitData.itemData[item.ID]
 	var effData = UnitData.effectData
@@ -968,7 +1002,8 @@ func _add_equip_effects(item):
 			if effData[effId].Target == Enums.EFFECT_TARGET.EQUIPPED:
 				_add_effect(effId)
 	#print(activeEffects)
-		
+
+
 func _remove_equip_effects(item):
 	var iData = UnitData.itemData[item.ID]
 	if iData.has("Effects"):
@@ -991,9 +1026,9 @@ func check_valid_equip(item : Dictionary, mode : int = 0): #Subweapons not fully
 	var iCat = get_icat(item) 
 	if item.Dur == 0:
 		return false
-	if mode < 2 and iCat.Sub and unitData.Weapons.has(iCat.Sub):
+	if mode < 2 and iCat.Sub and activeStats.Weapons.has(iCat.Sub):
 		return true
-	elif mode < 2 and unitData.Weapons.has(iCat.Main):
+	elif mode < 2 and activeStats.Weapons.has(iCat.Main):
 		return true
 	elif mode == 0 and iCat.Main == "ACC":
 		return true
@@ -1053,6 +1088,8 @@ func delete_item(item):
 	inv.remove_at(i)
 
 func _update_natural(passive):
+	if passive.SubType != Enums.WEAPON_CATEGORY.NATURAL:
+		return
 	var base : Dictionary = UnitData.itemData[passive.String].duplicate()
 	var scaleType = passive.String
 	var final : Dictionary = base

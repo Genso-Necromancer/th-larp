@@ -126,4 +126,4 @@ func _connect_manager_btns(manager):
 
 
 func _on_focus_changed(_unit:Unit):
-	unitPreview.update_prof()
+	if visible: unitPreview.update_prof()

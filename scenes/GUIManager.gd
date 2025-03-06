@@ -2,35 +2,29 @@ extends Control
 class_name GUIManager
 
 signal gui_splash_finished
-signal gui_closed
 signal start_the_justice
-signal guiReady
 signal deploy_toggled(unitID, depStatus)
 signal profile_called
 signal formation_toggled
 signal item_used
 signal map_started
-signal action_selected
+signal gui_action_menu_canceled
 
 
+@onready var blocker : Panel = $PanelBlocker #used to block the map easily
 
+#unvetted
 @export var mapCursorPath : NodePath
 @export var menuOffSet : int = 150
-
 @onready var mapCursor := get_node(mapCursorPath)
 @onready var originalPositionActX = $ActionMenu.position.x
 @onready var originalPositionActY = $ActionMenu.position.y
-
-@onready var foreCast = $CombatForecast
-
-
 
 
 @onready var parent = get_parent()
 @onready var GRANDDAD = parent.get_parent()
 @onready var mainCon = GRANDDAD.get_parent()
-@onready var GameState = mainCon.GameState
-
+@onready var gameState = mainCon.GameState
 #states
 enum sStates {
 	HOME,
@@ -43,9 +37,6 @@ enum sStates {
 	MANAGE,
 	BEGIN,
 	ROSTER,
-	
-	
-	
 	}
 
 var sState := sStates.HOME:
@@ -53,17 +44,14 @@ var sState := sStates.HOME:
 		sState = value
 		print("sState Changed: ", sStates.keys()[value])
 
-var opWepX
-var opWepY
-var originalPositionProfX
-var originalPositionProfY
-
 #preloads (this is how I should have been doing shit from the start!)
 var turnTrackerRes = preload("res://scenes/turn_tracker.tscn")
 var mapSetUp : MapGui
 var rosterGrid : UnitRoster
 var tradeScreen : TradeScreen
 var unitProf : UnitProfile
+var actMenu : ActionMenu
+var foreCast : CombatForecast
 
 #scenes
 var turnTracker
@@ -96,24 +84,10 @@ var prevFocus
 var trade1 : Unit
 var trade2 : Unit
 
-#nodes?
-var actMenu
-
 #states
-@onready var gameState = mainCon.GameState
-#@onready var _timer: Timer = $PanelContainerTimer
+
 
 var windowMode = DisplayServer.window_get_mode()
-#var Global.actionMenu = Global.actionMenu:
-#	set(value):
-#		Global.actionMenu = value
-#		Global.actionMenu = value
-
-		
-
-
-
-
 var mouseSensitivity = 0.2
 var mouseThreshold = 0.1
 var profFocus
@@ -125,8 +99,7 @@ func _init():
 
 func _ready():
 	SignalTower.prompt_accepted.connect(_on_prompt_accepted)
-	menuCursor.visible = false
-	foreCast.visible = false
+	#menuCursor.visible = false
 	_connect_asset_signals()
 	_load_turn_tracker()
 	
@@ -158,27 +131,12 @@ func _on_gameboard_turn_order_updated(turns):
 	turnTracker.display_turns(turns)
 	
 func _on_jobs_done(id, node):
-	var parent = get_parent()
-	var mapMan = parent.get_parent()
 	match id:
-		#"Profile": 
-			#unitProf = node
-			#opWepX = node.position.x
-			#opWepY = node.position.y
-			#originalPositionProfX = unitProf.position.x
-			#originalPositionProfY = unitProf.position.y
-		
 		"HUD": HUD = node
-		"Cursor": menuCursor = node
-		"Action": 
-			actMenu = node
-			
 	
-func reinitialize():
-	if !menuCursor.wep_updated.is_connected(self.update_forecast):
-		menuCursor.wep_updated.connect(self.update_forecast)
-	
-
+#func reinitialize():
+	#if !menuCursor.wep_updated.is_connected(self.update_forecast):
+		#menuCursor.wep_updated.connect(self.update_forecast)
 	
 	
 func _clear_active_btn():
@@ -202,23 +160,6 @@ func _relocate_child(child, newParent):
 	if child.get_parent():
 		child.get_parent().remove_child(child)
 	newParent.add_child(child)
-	
-		
-#func accept_skip():
-	#var failScreen : Control = $FailScreen
-	#var winScreen : Control = $WinScreen
-	#var expContainer : Control = $ExpGain
-	#match mainCon.state:
-		#GameState.ACCEPT_PROMPT:
-			#if expContainer.visible:
-				#expContainer.animation_skip()
-			#
-		#GameState.FAIL_STATE:
-			#pass
-		#GameState.WIN_STATE:
-			#winScreen.close_win_screen()
-		#GameState.SCENE_ACTIVE:
-			#emit_signal("scene_skipped")
 		
 		
 
@@ -286,7 +227,7 @@ func toggle_profile() -> void:
 		unitProf.toggle_profile()
 		profFocus = Global.focusUnit
 		rosterGrid.set_bar_focus(false)
-		_change_state(GameState.GB_PROFILE)
+		_change_state(gameState.GB_PROFILE)
 	else:
 		_strip_menuCursor(false, unitProf.focusLabels)
 		rosterGrid.set_bar_focus(true)
@@ -317,7 +258,9 @@ func _on_profile_tooltips_off():
 func _on_gameboard_target_focused( mode : int, reach: Array = [-1, -1]):
 	_swap_to_forecast()
 	match mode:
-		0: actMenu.open_weapons(reach)
+		0: 
+			_change_state(gameState.GB_COMBAT_FORECAST)
+			actMenu.open_weapon_select(reach)
 		1: pass
 		2: _ai_sequence_check()
 	
@@ -361,7 +304,8 @@ func _on_gameboard_turn_changed():
 
 
 func _on_gameboard_gb_ready(_state):
-	reinitialize()
+	pass
+	#reinitialize()
 
 #HERE
 func _on_gameboard_exp_display(oldExp, expSteps, results, unitPrt, unitName):
@@ -377,7 +321,7 @@ func call_setup(dLimit, forced, map):
 	mapSetUp.set_chapter(map.chapterNumber, map.title, map.get_objectives(), map.get_loss_conditions())
 	mapSetUp.set_mon(UnitData.playerMon)
 	mapSetUp.toggle_visible()
-	_resignal_menuCursor(btns)
+	menuCursor.resignal_cursor(btns.get_children())
 	
 	sState = sStates.HOME
 	forcedDep = forced
@@ -391,16 +335,24 @@ func _load_assets():
 	rosterGrid = load("res://scenes/GUI/unit_roster.tscn").instantiate()
 	tradeScreen = load("res://scenes/trade_screen.tscn").instantiate()
 	unitProf = load("res://scenes/profile.tscn").instantiate()
+	actMenu = load("res://scenes/GUI/action_menu.tscn").instantiate()
+	foreCast = load("res://scenes/combat_forecast.tscn").instantiate()
+	menuCursor = load("res://scenes/GUI/menu_cursor.tscn").instantiate()
 	
 	add_child(mapSetUp)
+	add_child(foreCast)
+	add_child(actMenu)
 	add_child(rosterGrid)
 	add_child(tradeScreen)
 	add_child(unitProf)
+	add_child(menuCursor)
 	
 	
 func _connect_asset_signals():
 	unitProf.tooltips_on.connect(self._on_profile_tooltips_on)
 	unitProf.tooltips_off.connect(self._on_profile_tooltips_off)
+	actMenu.action_menu_canceled.connect(self._on_action_menu_canceled)
+	actMenu.action_menu_selected.connect(GRANDDAD._on_action_menu_selected)
 
 #SetUp Buttons
 func _on_btn_deploy_pressed():
@@ -504,7 +456,7 @@ func _connect_unit_btn(bar):
 func _resignal_menuCursor(p, strip = true, oldP = menuCursor.menu_parent):
 	var i = 0
 	var btns = p.get_children()
-	var focus
+	#var focus
 	
 	if strip and oldP != null:
 		_strip_menuCursor(oldP)
@@ -592,8 +544,9 @@ func _on_gameboard_formation_closed():
 	#after revamping menuCursor code, make sure setup is it's parent
 	sState = sStates.HOME
 	emit_signal("formation_toggled")
-	_resignal_menuCursor(btns)
-	_change_state(GameState.GB_SETUP)
+	menuCursor.resignal_cursor(btns)
+	#_resignal_menuCursor(btns)
+	_change_state(gameState.GB_SETUP)
 
 	
 func _open_unit_options(b):
@@ -619,7 +572,7 @@ func _on_trade_pressed():
 	_close_unit_options()
 
 func _open_trade_menu():
-	var strip = true
+	#var strip = true
 	sState = sStates.TRADING
 	
 	tradeScreen.open_trade_menu(trade1, trade2)
@@ -653,7 +606,7 @@ func _on_supply_pressed():
 	tradeScreen.open_supply_menu(unit)
 	
 	
-func _on_trd_focus_changed(p, b = null):
+func _on_trd_focus_changed(p, _b = null):
 	_resignal_menuCursor(p)
 
 func _on_manage_pressed():
@@ -686,33 +639,37 @@ func _on_item_used(unit, item):
 
 #Action/Generic options menu functions
 
-func _close_act_menu():
-	foreCast.hide_fc()
-	actMenu.close_menu()
+func regress_act_menu():
+	#foreCast.hide_fc()
+	#actMenu.close_menu()
+	actMenu.return_previous_state()
 	
-func _on_action_menu_menu_closed():
-	_strip_menuCursor()
+func _on_action_menu_canceled():
+	#_strip_menuCursor()
+	emit_signal("gui_action_menu_canceled")
+
+
+func cancel_forecast():
+	#_change_state(gameState.GB_ACTION_MENU)
+	foreCast.hide_fc()
+	regress_act_menu()
+
 
 func _on_gameboard_cell_selected(_cell): #cell is sent by signal for general use, but the specific cell selected is not currently needed
-	actMenu.open_generic_menu()
-	
+	_change_state(gameState.GB_ACTION_MENU)
+	actMenu.open_as_options()
 
-func _on_action_menu_action_selected(selection):
-	_strip_menuCursor()
-	emit_signal("action_selected", selection)
-			
-			
-			
+
 func _on_gameboard_unit_move_ended(unit):
-	#_change_state(GameState.GB_ACTION_MENU)
-	actMenu.open_action_menu(unit)
-	
-func _on_gameboard_unit_deselected():
-	_close_act_menu()
+	_change_state(gameState.GB_ACTION_MENU)
+	actMenu.open_as_action(unit)
 
-func _on_gameboard_menu_canceled():
-	_close_act_menu()
-	
+
+func _on_gameboard_targeting_canceled():
+	_change_state(gameState.GB_ACTION_MENU)
+	regress_act_menu()
+
+
 func _on_gameboard_forecast_confirmed():
 	if actMenu.visible:
 		return
@@ -749,7 +706,7 @@ func _end_load_screen():
 func play_splash(chNum:int, chTitle:String, timeString:String):
 	var splashPlayer = load("res://scenes/GUI/chapter_splash.tscn").instantiate()
 	add_child(splashPlayer)
-	_change_state(GameState.ACCEPT_PROMPT)
+	_change_state(gameState.ACCEPT_PROMPT)
 	splashPlayer.splash_player_finished.connect(self._on_splash_player_finished)
 	splashPlayer.play_splash(chNum, chTitle, timeString)
 
@@ -761,12 +718,12 @@ func _on_splash_player_finished():
 func _on_gameboard_player_lost():
 	var failScreen = $FailScreen
 	failScreen.fade_in_failure()
-	_change_state(GameState.FAIL_STATE)
+	_change_state(gameState.FAIL_STATE)
 
 func _on_gameboard_player_win():
 	var winScreen = $WinScreen
 	winScreen.fade_in_win()
-	_change_state(GameState.WIN_STATE)
+	_change_state(gameState.WIN_STATE)
 
 func _on_win_screen_win_finished():
 	_start_load_screen()
@@ -782,4 +739,4 @@ func _on_animation_handler_sequence_complete():
 
 
 func _on_gameboard_sequence_initiated(_sequence):
-	_change_state(GameState.SCENE_ACTIVE)
+	_change_state(gameState.SCENE_ACTIVE)

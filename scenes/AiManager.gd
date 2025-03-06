@@ -41,7 +41,7 @@ func get_move(state: BoardState):
 	#assigns weighted value for the AI to compare
 	playerValues = assign_unit_value(state.player)
 	enemyValues = assign_unit_value(state.enemy)
-	terrainValues = assign_terrain_value(state.terrainData)
+	terrainValues = assign_terrain_value(Global.flags.CurrentMap)
 	
 	var moves = find_moves(state)
 	return moves

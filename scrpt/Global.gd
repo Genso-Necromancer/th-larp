@@ -5,7 +5,6 @@ extends Node
 
 
 
-
 var focusUnit : Unit:
 	set(value):
 		focusUnit = value
@@ -14,11 +13,14 @@ var focusUnit : Unit:
 		return focusUnit
 var aiTarget : Unit
 var activeUnit : Unit
+var activeSkill : StringName
 var timeOfDay := Enums.TIME.DAY
 var gameTime := 12
 var timeFactor = 1
 var trueTimeFactor = 1
 var rotationFactor = 15
+
+
 var rng
 var unitObjs : Dictionary
 var flags : Dictionary
@@ -52,7 +54,7 @@ func _init_flags():
 		"timeFactor": 1,
 		"trueTimeFactor": 1,
 		"rotationFactor": 15,
-		"currentMap": 0
+		"CurrentMap": 0
 	}
 
 func set_rich_text_params(label):

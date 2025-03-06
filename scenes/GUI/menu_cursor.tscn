@@ -6,9 +6,12 @@
 [node name="menu_cursor" type="TextureRect"]
 top_level = true
 y_sort_enabled = true
+anchors_preset = -1
 offset_right = 16.0
 offset_bottom = 16.0
+scale = Vector2(2, 2)
 pivot_offset = Vector2(8, 8)
+mouse_filter = 2
 texture = ExtResource("1_pwpkv")
 script = ExtResource("1_tms0j")
 cursor_offset = Vector2(40, 0)

@@ -24,13 +24,15 @@ var state : String = "Enabled" :
 
 
 func _ready():
+	button.focus_entered.connect(self._on_focus_entered)
+	button.focus_exited.connect(self._on_focus_exited)
 	_set_button_meta()
 	
 
 
 func set_item_text(string : String, durability : String):
-	var n = $HBoxContainer/Name
-	var d = $HBoxContainer/Durability
+	var n = $ContentMargin/HBoxContainer/Name
+	var d = $ContentMargin/HBoxContainer/Durability
 	n.set_text(string)
 	if durability == "-1":
 		durability = ""
@@ -41,12 +43,12 @@ func set_item_text(string : String, durability : String):
 		#d.add_theme_font_size_override("font_size", fSize)
 	
 func set_item_icon(icon : String):
-	var i = $HBoxContainer/Icon
+	var i = $ContentMargin/HBoxContainer/Icon
 	i.set_texture(load(icon))
 	
 
 func toggle_icon():
-	var i = $HBoxContainer/Icon
+	var i = $ContentMargin/HBoxContainer/Icon
 	var vis = i.visible
 	i.visible = !vis
 
@@ -79,7 +81,7 @@ func _verify_state(value) -> String:
 
 func _font_state_change(value : String):
 	var fColor : Color
-	var labels = [$HBoxContainer/Name, $HBoxContainer/Durability]
+	var labels = [$ContentMargin/HBoxContainer/Name, $ContentMargin/HBoxContainer/Durability]
 	match value:
 		"Enabled": fColor = Color(1,1,1)
 		"Disabled": fColor = Color(0.278, 0.278, 0.278)
@@ -117,5 +119,16 @@ func _set_button_meta():
 
 
 func _set_equipped(isEquipped):
-	var icon = $HBoxContainer/Icon/Equpped
+	var icon = $ContentMargin/HBoxContainer/Icon/Equpped
 	icon.visible = isEquipped
+
+
+func _on_focus_entered():
+	var focusBorder := $FocusBorder
+	focusBorder.visible = true
+
+
+
+func _on_focus_exited():
+	var focusBorder := $FocusBorder
+	focusBorder.visible = false

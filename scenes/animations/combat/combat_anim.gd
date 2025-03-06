@@ -56,7 +56,7 @@ func assign_action(hit, actionType, skillId = false):
 				_assign_skill_animation(skillId)
 
 
-func assign_defend(isHit, dmg, crit, graze):
+func assign_defend(hit, dmg, crit, graze):
 	var chest = $CombatSkeleton/ChestFx
 	if crit and graze:
 		_add_graze_fx()
@@ -80,7 +80,7 @@ func assign_defend(isHit, dmg, crit, graze):
 		dmgPop.set_stylized_string("crit")
 		chest.add_child(dmgPop)
 		popUp = dmgPop
-	elif isHit:
+	elif hit:
 		var dmgPop = TEXT_POP_PATH.instantiate()
 		dmgPop.set_value(dmg)
 		dmgPop.set_stylized_string("damage")

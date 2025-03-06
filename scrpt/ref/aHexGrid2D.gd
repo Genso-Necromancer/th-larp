@@ -26,8 +26,6 @@ var weight
 var lowest_f_cost = INF
 var lowest_node = null
 
-var units: Dictionary
-
 func reinit():
 	_init(tileMap)
 
@@ -51,7 +49,6 @@ func find_all_unit_paths(unit : Unit) -> Array:
 	path = _remove_passable(path) #removes passable tiles as valid selections without blocking
 	return path
 
-
 func find_remaining_unit_paths(unit : Unit, wayPoint:Vector2i, moveRemain: int) -> Array:
 	var path : Array
 	_set_units()
@@ -61,6 +58,27 @@ func find_remaining_unit_paths(unit : Unit, wayPoint:Vector2i, moveRemain: int) 
 	path = find_all_paths(wayPoint, moveRemain, unit) #searches all paths, blocking solids
 	path = _remove_passable(path) #removes passable tiles as valid selections without blocking
 	return path
+
+##Reach = {"Max":int,"Min":int}
+func find_units_in_reach(unit:Unit, reach:Dictionary, targetFaction:int) -> Array:
+	var unitsNear :=[]
+	var area : Array = []
+	var underMin : Array = []
+	var mainFaction = unit.FACTION_ID
+	_sort_solids()
+	_set_units()
+	area = find_all_paths(unit.cell, reach.Max)
+	underMin = find_all_paths(unit.cell, clampi(reach.Min-1, 0, INF))
+	
+	for cell in unitList:
+			if !area.has(cell) or underMin.has(cell):
+				continue
+			elif unitList[cell].FACTION_ID == targetFaction:
+				unitsNear.append({"Unit":unitList[cell],"Cell":cell})
+	
+	return unitsNear
+
+
 
 func _set_units(units:Dictionary = tileMap.get_active_units()) -> void:
 	if !units:
@@ -76,7 +94,7 @@ func clear_lists():
 
 
 func _sort_solids(walls:Dictionary = tileMap.get_walls()):
-	solidList = walls.Wall
+	solidList.append_array(walls.Wall)
 		
 
 

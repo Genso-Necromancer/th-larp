@@ -34,7 +34,7 @@ func _ready():
 	tabs = container.get_children()
 	
 	
-func fill_items(_isTrade := false) -> Array:
+func fill_items(_isTrade := false, reach = [0,0]) -> Array:
 	var tabKeys = tabTypes.keys()
 	var supply = UnitData.supply[tabKeys[openTab]]
 	var i = 0

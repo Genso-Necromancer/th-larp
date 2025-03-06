@@ -1,6 +1,5 @@
 extends Node
 class_name CombatManager
-signal forecast_updated
 signal combat_resolved
 signal time_factor_changed
 signal warp_selected
@@ -9,7 +8,7 @@ signal jobs_done_cmbtmnger
 var ACTION_TYPE = Enums.ACTION_TYPE
 
 var rng = Global.rng
-var fData := {}
+var fcData := {}
 
 var fateChance = 15
 
@@ -23,8 +22,8 @@ func init_manager():
 
 #FORECAST FUNCTIONS
 
-	##fData Heirarchy
-	##fData
+	##fcData Heirarchy
+	##fcData
 	##	[Unit]
 	##		SkillId
 	##		Initiator
@@ -48,59 +47,59 @@ func init_manager():
 func get_forecast(a: Unit, t: Unit, action) -> Dictionary: #HERE Augments not implemented!!!
 	var op : Unit
 	var isSelf := false
-	fData = {a:{},t:{}}
+	fcData = {a:{},t:{}}
 
 	
-	fData[a]["SkillId"] = action.Skill
-	fData[a]["Initiator"] = true
+	fcData[a]["SkillId"] = action.Skill
+	fcData[a]["Initiator"] = true
 	if a == t:
 		isSelf = true
 	else:
-		fData[t]["SkillId"] = false
-		fData[t]["Initiator"] = false
+		fcData[t]["SkillId"] = false
+		fcData[t]["Initiator"] = false
 	
-	for unit in fData:
-		match fData[unit].Initiator:
+	for unit in fcData:
+		match fcData[unit].Initiator:
 			true: 
 				op = t
-				fData[unit]["Counter"] = true
-				fData[unit]["Reach"] = true
+				fcData[unit]["Counter"] = true
+				fcData[unit]["Reach"] = true
 			false: 
 				op = a
-				fData[unit]["Counter"] = unit.can_act()
-				fData[unit]["Reach"] = _reach_check(t, a)
+				fcData[unit]["Counter"] = unit.can_act()
+				fcData[unit]["Reach"] = _reach_check(a, t)
 		
-		fData[unit]["Combat"] = _evaluate_clash(unit, op, action)
-		fData[unit]["Effects"] = _evaluate_effects(unit, op, fData[unit].SkillId)
+		fcData[unit]["Combat"] = _evaluate_clash(unit, op, action)
+		fcData[unit]["Effects"] = _evaluate_effects(unit, op, fcData[unit].SkillId)
 		
 		if action.Skill:
-			fData[unit]["Swings"] = _get_skill_swing_count(action.Skill)
+			fcData[unit]["Swings"] = _get_skill_swing_count(action.Skill)
 		else:
-			fData[unit]["Swings"] = unit.get_multi_swing()
+			fcData[unit]["Swings"] = unit.get_multi_swing()
 			
-		if fData[unit].Effects:
-			for effect in fData[unit].Effects:
-				if fData[unit].Effects[effect].Slayer:
-					fData[unit].Combat.Dmg *= Global.slayerMulti
+		if fcData[unit].Effects:
+			for effect in fcData[unit].Effects:
+				if fcData[unit].Effects[effect].Slayer:
+					fcData[unit].Combat.Dmg *= Global.slayerMulti
 					break
 			
 		if isSelf:
 			break
 		
 			
-	for unit in fData:
+	for unit in fcData:
 		var swings = false
-		match fData[unit].Initiator:
+		match fcData[unit].Initiator:
 			true: op = t
 			false: op = a
-		if fData[unit].Swings:
-			swings = fData[unit].Swings
-		if fData[unit].Combat.CanDmg and fData[unit].Reach and fData[unit].Counter:
-			fData[op].Combat["Rlife"] = _get_remaining_life(op, fData[unit].Combat.Dmg, swings)
+		if fcData[unit].Swings:
+			swings = fcData[unit].Swings
+		if fcData[unit].Combat.CanDmg and fcData[unit].Reach and fcData[unit].Counter:
+			fcData[op].Combat["Rlife"] = _get_remaining_life(op, fcData[unit].Combat.Dmg, swings)
 		if isSelf:
 			break
-	emit_signal("forecast_updated", fData)
-	return fData
+	SignalTower.emit_signal("forecast_predicted", fcData)
+	return fcData
 
 
 func _evaluate_effects(a: Unit, t: Unit, skillId = false): ##returns proc chances of each effect on a skill or weapon. Returns false if there are none.
@@ -235,8 +234,8 @@ func _reach_check(unit, target) -> bool:
 	var tWep = target.get_equipped_weapon()
 	var minR = itemData[tWep.ID].MinRange
 	var maxR = itemData[tWep.ID].MaxRange
-	var hexStar = get_parent().get_hex_star()
-	var distance = hexStar.compute_cost(unit.cell, target.cell, false, unit.unitData.MoveType)
+	var hexStar = AHexGrid2D.new(Global.flags.CurrentMap)
+	var distance = hexStar.find_distance(unit.cell, target.cell)
 	if distance >= minR and distance <= maxR:
 		return true
 	return false

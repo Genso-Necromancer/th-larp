@@ -19,10 +19,11 @@ config/icon="res://icon.svg"
 
 Global="*res://scrpt/Global.gd"
 UnitData="*res://scrpt/UnitData.gd"
-Enums="*res://scrpt/enums.gd"
 StringGetter="*res://scrpt/string_getter.gd"
+Enums="*res://scrpt/enums.gd"
 SignalTower="*res://scrpt/signal_tower.gd"
 Options="*res://scrpt/Options.gd"
+GameState="*res://scrpt/ref/game_state.gd"
 
 [display]
 

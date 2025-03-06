@@ -1,11 +1,200 @@
-[gd_scene load_steps=2 format=3 uid="uid://2ggl8hw7vq8n"]
+[gd_scene load_steps=7 format=3 uid="uid://2ggl8hw7vq8n"]
 
 [ext_resource type="Script" path="res://scenes/GUI/action_menu.gd" id="1_ilauf"]
+[ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/inventory_panel.tscn" id="2_8r605"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_38ob5"]
+[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="3_e8ygl"]
+[ext_resource type="Script" path="res://scenes/GUI/action_box.gd" id="3_hhurs"]
+[ext_resource type="Script" path="res://scenes/GUI/skill_box.gd" id="6_v4nkc"]
 
-[node name="ActionMenu" type="AspectRatioContainer"]
+[node name="ActionMenu" type="PanelContainer" node_paths=PackedStringArray("aBox", "aContainer", "sBox", "sContainer")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_ilauf")
+aBox = NodePath("ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox")
+aContainer = NodePath("ScreenMargin/ActionBackgroundMargin")
+sBox = NodePath("ScreenMargin/SkillBackgroundMargin/SkillMargin/SkillBox")
+sContainer = NodePath("ScreenMargin/SkillBackgroundMargin")
+
+[node name="Blocker" type="Panel" parent="."]
+layout_mode = 2
+
+[node name="ScreenMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 250
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 250
+theme_override_constants/margin_bottom = 100
+
+[node name="VFlowContainer" type="VFlowContainer" parent="ScreenMargin"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+
+[node name="TradePnl" parent="ScreenMargin" instance=ExtResource("2_8r605")]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="ActionBackgroundMargin" type="MarginContainer" parent="ScreenMargin"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="ScreenMargin/ActionBackgroundMargin"]
+layout_mode = 2
+texture = ExtResource("2_38ob5")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="ActionMargin" type="MarginContainer" parent="ScreenMargin/ActionBackgroundMargin"]
+custom_minimum_size = Vector2(42, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 10
+
+[node name="ActionBox" type="VBoxContainer" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin"]
+layout_mode = 2
+theme = ExtResource("3_e8ygl")
+theme_override_constants/separation = 0
+script = ExtResource("3_hhurs")
+
+[node name="TalkBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+text = "Talk"
+
+[node name="AtkBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../WaitBtn")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../SklBtn")
+mouse_filter = 1
+theme = ExtResource("3_e8ygl")
+action_mode = 0
+text = "Attack"
+
+[node name="SklBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../AtkBtn")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../ItmBtn")
+mouse_filter = 1
+theme = ExtResource("3_e8ygl")
+action_mode = 0
+text = "Skill"
+
+[node name="OpenBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+text = "Open"
+
+[node name="StealBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+text = "Steal"
+
+[node name="ItmBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../SklBtn")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../TrdBtn")
+mouse_filter = 1
+text = "Item"
+
+[node name="TrdBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../ItmBtn")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../WaitBtn")
+mouse_filter = 1
+text = "Trade"
+
+[node name="WaitBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../TrdBtn")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../AtkBtn")
+mouse_filter = 1
+theme = ExtResource("3_e8ygl")
+action_mode = 0
+text = "Wait"
+
+[node name="EndBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../SklBtn")
+focus_neighbor_bottom = NodePath("../AtkBtn")
+mouse_filter = 1
+theme = ExtResource("3_e8ygl")
+action_mode = 0
+text = "End Round"
+
+[node name="StatBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../SklBtn")
+focus_neighbor_bottom = NodePath("../AtkBtn")
+mouse_filter = 1
+theme = ExtResource("3_e8ygl")
+action_mode = 0
+text = "Status"
+
+[node name="OpBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../SklBtn")
+focus_neighbor_bottom = NodePath("../AtkBtn")
+mouse_filter = 1
+theme = ExtResource("3_e8ygl")
+action_mode = 0
+text = "Options"
+
+[node name="SusBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../SklBtn")
+focus_neighbor_bottom = NodePath("../AtkBtn")
+mouse_filter = 1
+theme = ExtResource("3_e8ygl")
+action_mode = 0
+text = "Suspend"
+
+[node name="SkillBackgroundMargin" type="MarginContainer" parent="ScreenMargin"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="ScreenMargin/SkillBackgroundMargin"]
+layout_mode = 2
+texture = ExtResource("2_38ob5")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="SkillMargin" type="MarginContainer" parent="ScreenMargin/SkillBackgroundMargin"]
+custom_minimum_size = Vector2(42, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 10
+
+[node name="SkillBox" type="VBoxContainer" parent="ScreenMargin/SkillBackgroundMargin/SkillMargin"]
+layout_mode = 2
+theme = ExtResource("3_e8ygl")
+theme_override_constants/separation = 0
+script = ExtResource("6_v4nkc")

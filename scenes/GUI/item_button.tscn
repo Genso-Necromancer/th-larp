@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://cpayroch3dxjg"]
+[gd_scene load_steps=7 format=3 uid="uid://cpayroch3dxjg"]
 
 [ext_resource type="Theme" uid="uid://dpfc6p7ruw7wo" path="res://fonts/Izayoi_Theme_Items.tres" id="1_dvsi0"]
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_ofp1p"]
 [ext_resource type="Script" path="res://scenes/GUI/item_button.gd" id="2_oouan"]
 [ext_resource type="Texture2D" uid="uid://ck144sy8g47hx" path="res://scenes/gungnir.png" id="3_dfpky"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_pqruf"]
 [ext_resource type="FontFile" uid="uid://dia8fvtnbbel2" path="res://fonts/Kalam/Kalam-Light.otf" id="4_h4p4o"]
 
 [node name="ItemButton" type="PanelContainer"]
@@ -14,12 +15,30 @@ size_flags_vertical = 4
 theme = ExtResource("1_dvsi0")
 script = ExtResource("2_oouan")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="FocusBorder" type="NinePatchRect" parent="."]
+visible = false
+layout_mode = 2
+texture = ExtResource("3_pqruf")
+draw_center = false
+region_rect = Rect2(0, 0, 48, 48)
+patch_margin_left = 5
+patch_margin_top = 5
+patch_margin_right = 5
+patch_margin_bottom = 5
+
+[node name="ContentMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 4
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 4
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ContentMargin"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
 
-[node name="Icon" type="TextureRect" parent="HBoxContainer"]
+[node name="Icon" type="TextureRect" parent="ContentMargin/HBoxContainer"]
 custom_minimum_size = Vector2(30, 30)
 layout_mode = 2
 size_flags_horizontal = 4
@@ -28,7 +47,7 @@ texture = ExtResource("3_dfpky")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Equpped" type="Label" parent="HBoxContainer/Icon"]
+[node name="Equpped" type="Label" parent="ContentMargin/HBoxContainer/Icon"]
 visible = false
 layout_mode = 1
 anchors_preset = 2
@@ -44,7 +63,7 @@ theme_override_font_sizes/font_size = 15
 text = "Eq."
 vertical_alignment = 2
 
-[node name="Name" type="Label" parent="HBoxContainer"]
+[node name="Name" type="Label" parent="ContentMargin/HBoxContainer"]
 custom_minimum_size = Vector2(190, 26)
 layout_mode = 2
 size_flags_vertical = 8
@@ -53,7 +72,7 @@ vertical_alignment = 1
 clip_text = true
 text_overrun_behavior = 3
 
-[node name="Durability" type="Label" parent="HBoxContainer"]
+[node name="Durability" type="Label" parent="ContentMargin/HBoxContainer"]
 custom_minimum_size = Vector2(54, 26)
 layout_mode = 2
 size_flags_horizontal = 8
