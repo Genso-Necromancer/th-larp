@@ -7,7 +7,7 @@
 [ext_resource type="Script" path="res://scenes/GUI/action_box.gd" id="3_hhurs"]
 [ext_resource type="Script" path="res://scenes/GUI/skill_box.gd" id="6_v4nkc"]
 
-[node name="ActionMenu" type="PanelContainer" node_paths=PackedStringArray("aBox", "aContainer", "sBox", "sContainer")]
+[node name="ActionMenu" type="PanelContainer" node_paths=PackedStringArray("aBox", "aContainer", "sBox", "sContainer", "cContainer", "skillConfirm")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -19,6 +19,8 @@ aBox = NodePath("ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox")
 aContainer = NodePath("ScreenMargin/ActionBackgroundMargin")
 sBox = NodePath("ScreenMargin/SkillBackgroundMargin/SkillMargin/SkillBox")
 sContainer = NodePath("ScreenMargin/SkillBackgroundMargin")
+cContainer = NodePath("ScreenMargin/ConfirmBackgroundMargin")
+skillConfirm = NodePath("ScreenMargin/ConfirmBackgroundMargin/ConfirmMargin/SkillConfirm")
 
 [node name="Blocker" type="Panel" parent="."]
 layout_mode = 2
@@ -198,3 +200,34 @@ layout_mode = 2
 theme = ExtResource("3_e8ygl")
 theme_override_constants/separation = 0
 script = ExtResource("6_v4nkc")
+
+[node name="ConfirmBackgroundMargin" type="MarginContainer" parent="ScreenMargin"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="ScreenMargin/ConfirmBackgroundMargin"]
+layout_mode = 2
+texture = ExtResource("2_38ob5")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="ConfirmMargin" type="MarginContainer" parent="ScreenMargin/ConfirmBackgroundMargin"]
+custom_minimum_size = Vector2(42, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 10
+
+[node name="SkillConfirm" type="Button" parent="ScreenMargin/ConfirmBackgroundMargin/ConfirmMargin"]
+layout_mode = 2
+text = "Initiate Skill"
+
+[connection signal="pressed" from="ScreenMargin/ConfirmBackgroundMargin/ConfirmMargin/SkillConfirm" to="." method="_on_skill_confirm_pressed"]

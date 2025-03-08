@@ -89,7 +89,7 @@ func _switch_state_get_slaves(value):
 		gState.GB_SKILL_TARGETING:
 			slaves = newSlave
 			activeState = GBSkillTargetState.new()
-		gState.GB_SKILL_MENU:
+		gState.GB_SKILL_MENU: #Deprecated
 			slaves = newSlave
 			activeState = GBSkillMenuState.new()
 		gState.GB_ROUND_END:

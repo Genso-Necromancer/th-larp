@@ -11,6 +11,7 @@ func _ready():
 	gameBoard.gameboard_targeting_canceled.connect(guiManager._on_gameboard_targeting_canceled)
 	SignalTower.inventory_weapon_changed.connect(gameBoard._on_inventory_weapon_changed)
 	SignalTower.action_weapon_selected.connect(gameBoard._on_action_weapon_selected)
+	SignalTower.action_skill_confirmed.connect(gameBoard._on_action_weapon_selected)
 	guiManager.gui_splash_finished.connect(self._on_gui_splash_finished)
 	guiManager.gui_action_menu_canceled.connect(gameBoard._on_gui_action_menu_canceled)
 	
@@ -51,7 +52,7 @@ func _on_action_menu_selected(bName:StringName):
 		"AtkBtn": 
 			gameBoard.start_attack_targeting()
 		"SklBtn": 
-			pass
+			gameBoard.start_skill_targeting()
 		"OpenBtn": pass
 		"StealBtn": pass
 		"ItmBtn": 

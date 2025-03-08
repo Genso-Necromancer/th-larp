@@ -112,8 +112,8 @@ func _load_skills():
 			"Crit": 0, #set an int value for crit bonus, set false to prevent crits
 			"Type": Enums.DAMAGE_TYPE.PHYS, #use enum types. Set False if augment should use weapon's type.
 			##Used regardless of Augment
-			"RangeMin": 1, #if 0, ignored by Augment. Set value to require specific weapon reach.
-			"RangeMax": 1,
+			"MinRange": 1, #if 0, ignored by Augment. Set value to require specific weapon reach.
+			"MaxRange": 1,
 			"Cost": 0,
 			"Effects": [], #any attacking effects for an augment skill must be set to instant.
 			"RuleType": false,
@@ -316,8 +316,8 @@ func stat_gen(job :int, spec : int):
 	genData["Profile"] = {"UnitName" : genname}
 	genData["Profile"].merge({"Role" : jData["Role"]})
 	genData["Profile"].merge({"Species" : sData["Spec"]})
-
-	genData["Profile"].merge(pStats.get_art(genData.Profile.UnitName))
+	var art :Dictionary = _validate_art(pStats.get_art(genData.Profile.UnitName))
+	genData["Profile"].merge(art)
 	genData["Profile"].merge({"Level": 1})
 	genData["Profile"].merge({"Exp": 00})
 	#genData["CurLife"] = genData["Bases"]["Life"]
@@ -349,6 +349,15 @@ func generate_id():
 		#if c > 5:
 			#print_rich("[color=red]UnitData[/color]:", UnitData.unitData.keys())
 		return unitId
+
+
+func _validate_art(art:Dictionary) -> Dictionary:
+	var valid := {"Prt": load("res://sprites/Fairy TroublemakerPrt.png"), "FullPrt": load("res://sprites/character/cirno/portrait_full.png")}
+	if ResourceLoader.exists(art.Prt):
+		valid.Prt = load(art.Prt)
+	if ResourceLoader.exists(art.FullPrt):
+		valid.FullPrt = load(art.FullPrt)
+	return valid
 
 #func get_experience(action, totalExp, targLvl, unitStats, growths, caps):
 #	var gainExp = 0

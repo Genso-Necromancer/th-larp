@@ -9,7 +9,7 @@ var animationsLoaded = false
 func _ready():
 	self.visible = false
 	SignalTower.forecast_predicted.connect(self.update_fc)
-
+	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
 
 func show_fc() -> void:
 	self.visible = true

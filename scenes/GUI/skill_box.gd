@@ -14,6 +14,8 @@ func fill_skills(unit:Unit) -> Array:
 		buttons.append(s.get_button())
 		s.get_button().add_to_group("SkillsTT")
 		s.set_meta_data(skill, unit, false)
+		if !_check_composure(unit, skill): s.state = "Disabled"
+		if UnitData.skillData[skill].Augment and !_check_aug(unit, skill): s.state = "Disabled"
 		add_child(s)
 	buttons[0].call_deferred("grab_focus")
 	return buttons
@@ -22,13 +24,24 @@ func fill_skills(unit:Unit) -> Array:
 func generate_skillbutton(path, data) -> SkillButton:
 	var b : SkillButton
 	b = path.instantiate()
-	b.isIconMode = true
+	b.isIconMode = false
 	b.set_item_text(data.SkillName, str(data.Cost))
 	b.set_item_icon(data.Icon)
 	#_connect_focus_signals(b)
 	return b
 	
-	
+
+
+func _check_composure(unit : Unit, skill : String) -> bool:
+	var valid : bool = unit.has_enough_comp(skill)
+	return valid
+
+
+func _check_aug(unit : Unit, skill : String) -> bool:
+	var valid : bool = unit.has_valid_aug_weapon(skill)
+	return valid
+
+
 #func _connect_focus_signals(b:Control):
 	#var button = b.get_button()
 	#if !isPreview: 

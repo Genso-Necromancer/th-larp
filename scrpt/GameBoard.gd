@@ -41,7 +41,6 @@ signal turn_order_updated
 
 enum ACTION_TYPE {ATTACK, SKILL, WAIT, END}
 
-@onready var yaBoy = $"."
 # Mapping locations of units and danmaku {cell:node}
 var units := {} 
 var danmaku := {}
@@ -90,10 +89,7 @@ var turnLoss = []
 var unitObjs : Dictionary = Global.unitObjs
 
 @onready var parent = get_parent()
-@onready var mainCon = parent.get_parent()
 
-#states
-@onready var GameState = mainCon.GameState
 
 
 
@@ -180,12 +176,12 @@ func _process(_delta):
 		_wipe_dead()
 	elif endOfRound:
 		_check_eor_events()
-	elif collisionQue.size() > 0 and mainCon.state == GameState.GB_END_OF_ROUND:
+	elif collisionQue.size() > 0 and GameState.state == GameState.gState.GB_END_OF_ROUND:
 		_pause_danmaku_phase()
 		_process_danmaku_collision()
-	elif collisionQue.size() == 0 and danmakuMotion.size() == 0 and mainCon.state == GameState.GB_END_OF_ROUND:
+	elif collisionQue.size() == 0 and danmakuMotion.size() == 0 and GameState.state == GameState.gState.GB_END_OF_ROUND:
 		emit_signal("danmaku_pathing_complete")
-	elif mainCon.state == GameState.ACCEPT_PROMPT or mainCon.state == GameState.FAIL_STATE or mainCon.state == GameState.WIN_STATE or mainCon.state == GameState.GB_END_OF_ROUND:
+	elif GameState.state == GameState.gState.ACCEPT_PROMPT or GameState.state == GameState.gState.FAIL_STATE or GameState.state == GameState.gState.WIN_STATE or GameState.state == GameState.gState.GB_END_OF_ROUND:
 		pass
 	elif turnComplete:
 		turnComplete = false
@@ -216,17 +212,17 @@ func _get_current_map():
 		
 	
 func _change_state(state):
-	var prev = mainCon.previousSlave
-	mainCon.previousSlave = mainCon.newSlave
-	if state == mainCon.state:
+	var prev = GameState.previousSlave
+	GameState.previousSlave = GameState.newSlave
+	if state == GameState.state:
 		return
-	elif state == mainCon.previousState:
-		mainCon.newSlave = prev
+	elif state == GameState.previousState:
+		GameState.newSlave = prev
 	else:
-		mainCon.newSlave = [self]
+		GameState.newSlave = [self]
 	
-	mainCon.previousState = mainCon.state
-	mainCon.state = state
+	GameState.previousState = GameState.state
+	GameState.state = state
 	
 	
 func change_map(map):
@@ -390,7 +386,7 @@ func _set_game_time():
 	
 	
 func _connect_general_signals():
-	self.gb_ready.connect(mainCon.set_new_state)
+	self.gb_ready.connect(GameState.set_new_state)
 	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
 	#self.danmaku_pathing_complete.connect()
 	#self.round_changed.connect(currMap.on_round_changed)
@@ -528,7 +524,7 @@ func _move_active_unit(new_cell: Vector2i, enemy: bool = false, enemyPath = null
 			return
 	
 	if !enemy:
-		_change_state(GameState.ACCEPT_PROMPT)
+		_change_state(GameState.gState.ACCEPT_PROMPT)
 	currMap.clear_layer(5)
 	if !new_cell == activeUnit.cell:
 		#print("it's walkable")
@@ -566,7 +562,7 @@ func _select_unit(cell: Vector2i, isAi = false) -> void:
 	walkableCells = get_walkable_cells(activeUnit)
 	
 	currMap.draw(walkableCells)
-	if !isAi: _change_state(GameState.GB_SELECTED)
+	if !isAi: _change_state(GameState.gState.GB_SELECTED)
 	emit_signal("unit_selected", units[cell])
 #	set_region_border(walkableCells)
 
@@ -658,7 +654,7 @@ func _resume_danmaku_phase():
 		b.start_move()
 
 
-func grab_target(cell): #HERE Add "Action" compatability
+func grab_target(cell):
 	#Called to assign values based on unit at cursor's coordinate
 	var hexStar = AHexGrid2D.new(currMap)
 	if not units.has(cell):
@@ -744,7 +740,7 @@ func deselect_formation_cell():
 		storedCell = defValue
 
 func toggle_unit_profile(): 
-	if mainCon.state == GameState.GB_PROFILE:
+	if GameState.state == GameState.gState.GB_PROFILE:
 		emit_signal("toggle_prof")
 	elif focusUnit:
 		emit_signal("toggle_prof")
@@ -753,14 +749,14 @@ func toggle_unit_profile():
 func request_deselect():
 	wipe_region()
 	currMap.clear_layer(5)
-	_change_state(GameState.GB_DEFAULT)
+	_change_state(GameState.gState.GB_DEFAULT)
 	_deselect_active_unit(false)
 
 
 func skill_target_cancel():
 	wipe_region()
 	currMap.clear_layer(5)
-	_change_state(GameState.GB_ACTION_MENU)
+	_change_state(GameState.gState.GB_ACTION_MENU)
 	_snap_cursor(activeUnit.cell)
 	emit_signal("skill_target_canceled")
 	
@@ -772,10 +768,10 @@ func end_targeting():
 	emit_signal("gameboard_targeting_canceled")
 
 func menu_step_back():
-	match mainCon.state:
-		GameState.GB_COMBAT_FORECAST:
+	match GameState.state:
+		GameState.gState.GB_COMBAT_FORECAST:
 			emit_signal("action_called", activeUnit)
-			_change_state(GameState.GB_ACTION_MENU)
+			_change_state(GameState.gState.GB_ACTION_MENU)
 			wipe_region()
 			cursorCell = activeUnit.cell
 	
@@ -825,7 +821,6 @@ func skill_target_selected():
 	
 					
 	if valid:
-		_change_state(GameState.GB_COMBAT_FORECAST)
 		grab_target(cursorCell)
 
 func _check_friendly(unit1, unit2) ->bool:
@@ -838,13 +833,13 @@ func _check_friendly(unit1, unit2) ->bool:
 
 func return_targeting():
 	#var s
-	match mainCon.previousState:
-		GameState.GB_ATTACK_TARGETING:
+	match GameState.previousState:
+		GameState.gState.GB_ATTACK_TARGETING:
 			#s = "Attack"
 			activeUnit.restore_equip()
 			start_attack_targeting()
-		GameState.GB_SKILL_TARGETING:
-			start_attack_targeting()
+		GameState.gState.GB_SKILL_TARGETING:
+			start_skill_targeting()
 			
 func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMORE???
 	# Controls what happens when an element is selected by the player based on input Global.state
@@ -854,27 +849,27 @@ func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMO
 	
 	cell = currMap.local_to_map(cell)
 #	print(cell, activeUnit)
-	match mainCon.state:
-		GameState.GB_DEFAULT: 
+	match GameState.state:
+		GameState.gState.GB_DEFAULT: 
 			if !activeUnit and is_occupied(cell) and focusUnit.is_in_group("Player") and !focusUnit.status.Acted:
 				
-				mainCon.state = GameState.GB_SELECTED
+				GameState.state = GameState.gState.GB_SELECTED
 				_select_unit(cell)
 			else: 
-				mainCon.previousState = mainCon.state
-				mainCon.state = GameState.GB_ACTION_MENU
+				GameState.previousState = GameState.state
+				GameState.state = GameState.gState.GB_ACTION_MENU
 				emit_signal("toggle_action", false, true)
-		GameState.GB_SELECTED: 
+		GameState.gState.GB_SELECTED: 
 			if !is_occupied(cell) and walkableCells.has(cell):
-				mainCon.state = GameState.GB_ACTION_MENU
+				GameState.state = GameState.gState.GB_ACTION_MENU
 				_move_active_unit(cell)
 			elif cell == activeUnit.cell:
-				mainCon.previousState = mainCon.state
-				mainCon.state = GameState.GB_ACTION_MENU
+				GameState.previousState = GameState.state
+				GameState.state = GameState.gState.GB_ACTION_MENU
 				emit_signal("toggle_action")
 			else:
 				return
-		GameState.GB_ATTACK_TARGETING: #Attacks
+		GameState.gState.GB_ATTACK_TARGETING: #Attacks
 			var friendly = false
 			var team = null
 			if activeUnit.is_in_group("Player"):
@@ -884,17 +879,17 @@ func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMO
 			if focusUnit.is_in_group(team):
 				friendly = true
 			if is_occupied(cell) and !friendly:
-				mainCon.previousState = mainCon.state
-				mainCon.state = GameState.GB_COMBAT_FORECAST
+				GameState.previousState = GameState.state
+				GameState.state = GameState.gState.GB_COMBAT_FORECAST
 #				$Cursor.visible = false
 				grab_target(cell)
 				
 				
 			else: return
-		GameState.GB_COMBAT_FORECAST:
+		GameState.gState.GB_COMBAT_FORECAST:
 			return
 
-		GameState.GB_SKILL_TARGETING: 
+		GameState.gState.GB_SKILL_TARGETING:
 			var friendly = false
 			var team = null
 			var targeting = UnitData.skillData[activeAction.Skill].Target
@@ -905,33 +900,33 @@ func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMO
 			match targeting:
 				"Self":
 					if is_occupied(cell) and activeUnit == focusUnit:
-						mainCon.state = GameState.GB_COMBAT_FORECAST
+						GameState.state = GameState.gState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
 						grab_target(cell)
 				"Enemy":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and !friendly:
-						mainCon.state = GameState.GB_COMBAT_FORECAST
+						GameState.state = GameState.gState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
 						grab_target(cell)
 				"Ally":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and friendly and activeUnit != focusUnit:
-						mainCon.state = GameState.GB_COMBAT_FORECAST
+						GameState.state = GameState.gState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
 						grab_target(cell)
 				"Self+":
 					if focusUnit.is_in_group(team):
 						friendly = true
 					if is_occupied(cell) and friendly:
-						mainCon.state = GameState.GB_COMBAT_FORECAST
+						GameState.state = GameState.gState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
 						grab_target(cell)
 				"Other":
 					if is_occupied(cell) and activeUnit != focusUnit:
-						mainCon.state = GameState.GB_COMBAT_FORECAST
+						GameState.state = GameState.gState.GB_COMBAT_FORECAST
 #						$Cursor.visible = false
 						grab_target(cell)
 	
@@ -951,7 +946,7 @@ func _on_cursor_moved(new_cell: Vector2i) -> void: #Pathing
 	if units.has(new_cell) and units[new_cell] == null: #safety measure, catches any uncleared cell storage that slips through the cracks
 		units.erase(new_cell)
 	
-	if !activeUnit or !activeUnit.isSelected or mainCon.state != GameState.GB_SELECTED:
+	if !activeUnit or !activeUnit.isSelected or GameState.state != GameState.gState.GB_SELECTED:
 		return
 	elif pathingArray and walkableCells.has(new_cell):
 		path = pathingArray + get_path_to_cell(pathingArray[-1], new_cell, activeUnit)
@@ -969,7 +964,7 @@ func on_directional_press(direction: Vector2i):
 	var nextCell = cursorCell + direction
 	var newCell
 	
-	if mainCon.state == GameState.GB_PROFILE:
+	if GameState.state == GameState.gState.GB_PROFILE:
 		return
 		
 	if snapPath != null and !snapPath.has(nextCell):
@@ -983,13 +978,17 @@ func on_directional_press(direction: Vector2i):
 func start_attack_targeting():
 	var reach :Dictionary = activeUnit.get_weapon_reach()
 	activeAction = {"Weapon": true, "Skill": false}
-	_change_state(GameState.GB_ATTACK_TARGETING)
+	_change_state(GameState.gState.GB_ATTACK_TARGETING)
 	_draw_range(activeUnit, reach.Max, reach.Min)
 	
 	
 func start_skill_targeting():
-	activeAction = {"Weapon": false, "Skill": Global.activeSkill}
-	_change_state(GameState.GB_SKILL_TARGETING)
+	var reach : Dictionary
+	activeAction = {"Weapon": UnitData.skillData[Global.activeSkill].Augment, "Skill": Global.activeSkill}
+	if activeAction.Weapon: reach = activeUnit.get_aug_reach(activeAction.Skill)
+	else: reach = activeUnit.get_skill_reach(activeAction.Skill)
+	_draw_range(activeUnit, reach.Max, reach.Min)
+	_change_state(GameState.gState.GB_SKILL_TARGETING)
 
 #func start_attack_targeting(unit: Unit, action):
 	#var minRange := 1000
@@ -1003,11 +1002,11 @@ func start_skill_targeting():
 		#var reach = _get_aug_range(unit, action)
 		#minRange = reach[0]
 		#maxRange = reach[1]
-		#_change_state(GameState.GB_ATTACK_TARGETING)
+		#_change_state(GameState.gState.GB_ATTACK_TARGETING)
 	#elif action.Skill:
-		#minRange = skillData[action.Skill].RangeMin
-		#maxRange = skillData[action.Skill].RangeMax
-		#_change_state(GameState.GB_SKILL_TARGETING)
+		#minRange = skillData[action.Skill].MinRange
+		#maxRange = skillData[action.Skill].MaxRange
+		#_change_state(GameState.gState.GB_SKILL_TARGETING)
 	#else:
 		#for wep in unit.unitData.Inv:
 			#if wep.Dur == 0:
@@ -1019,34 +1018,15 @@ func start_skill_targeting():
 			#minRange = min(minRange, wepData[id].MinRange, minRange)
 			#maxRange = max(maxRange, wepData[id].MaxRange, maxRange)
 			#
-		#_change_state(GameState.GB_ATTACK_TARGETING)
+		#_change_state(GameState.gState.GB_ATTACK_TARGETING)
 	#
 	#_draw_range(unit, maxRange, minRange)
-
-func _get_aug_range(unit, action) -> Array:
-	var minRange := 1000
-	var maxRange := 0
-	var reach := []
-	var skill = UnitData.skillData[action.Skill]
-	var wepData :Dictionary = UnitData.itemData
-	if skill.RangeMin == 0 or skill.RangeMax == 0:
-		for wep in unit.unitData.Inv:
-			if wep.Dur == 0:
-				continue
-			minRange = min(minRange, wepData[wep.ID].MinRange, minRange)
-			maxRange = max(maxRange, wepData[wep.ID].MaxRange, maxRange)
-	else:
-		minRange = skill.RangeMin
-		maxRange = skill.RangeMax
-	reach.append(minRange)
-	reach.append(maxRange)
-	return reach
 		
 
 
 func warp_targeting(unit, wRange):
 	_draw_range(unit, wRange)
-	_change_state(GameState.GB_WARP)
+	_change_state(GameState.gState.GB_WARP)
 	
 func _draw_range(unit : Unit, maxRange : int, minRange := 0):
 	var path = _get_cells_in_range(unit.cell, maxRange, minRange,)
@@ -1084,20 +1064,19 @@ func _on_unit_item_activated(item, unit, target):
 	
 
 func combat_sequence(scenario):
-	_change_state(GameState.ACCEPT_PROMPT)
+	_change_state(GameState.gState.ACCEPT_PROMPT)
 	
 	SignalTower.emit_signal("sequence_initiated", scenario)
 
 func _on_animation_handler_sequence_complete():
 	var hasPostEvents = _check_post_queue()
-	_change_state(GameState.LOADING)
+	_change_state(GameState.gState.LOADING)
 	
 	if hasPostEvents:
 		_run_post_queue()
 		await self.post_queue_cleared
 	emit_signal("sequence_concluded")
 	wipe_region()
-	
 	
 func _run_post_queue():
 	var postEvents = _sort_post_queue()
@@ -1117,10 +1096,11 @@ func _run_post_queue():
 			if isWait:
 				await self.continue_queue
 		
-	_clear_post_queue()
+	call_deferred("_clear_post_queue")
 
 func on_effect_complete():
 	emit_signal("continue_queue")
+
 
 func _sort_post_queue():
 	var seen := {}
@@ -1308,24 +1288,24 @@ func turn_change():
 func _start_next_turn():
 	
 	if turnOrder[0] == "Enemy":
-		mainCon.state = GameState.LOADING
+		GameState.state = GameState.gState.LOADING
 		aiTurn = true
 		aiNeedAct = true
 		print("Enemy Turn")
 		_cursor_toggle(false)
 	elif turnOrder[0] == "Player":	
-		mainCon.state = GameState.GB_DEFAULT
+		GameState.state = GameState.gState.GB_DEFAULT
 		aiTurn = false
 		print("Player Turn")
 		_cursor_toggle(true)
 	elif turnOrder[0] == "NPC": #Currently, NPC turns aren't a feature of the AI
-		mainCon.state = GameState.LOADING
+		GameState.state = GameState.gState.LOADING
 		aiTurn = true
 		print("NPC Turn")
 		_cursor_toggle(false)
 
 	if !aiTurn and earlyEnd:
-		_change_state(GameState.LOADING)
+		_change_state(GameState.gState.LOADING)
 		set_next_acted()
 		turnComplete = true
 	
@@ -1367,7 +1347,7 @@ func round_change():
 	
 func _check_eor_events():
 	endOfRound = false
-	_change_state(GameState.GB_END_OF_ROUND)
+	_change_state(GameState.gState.GB_END_OF_ROUND)
 	if danmaku.size() > 0:
 		_progress_danmaku_path()
 		await self.danmaku_pathing_complete
@@ -1412,7 +1392,7 @@ func set_next_acted():
 func start_ai_turn(aiFaction):
 	print("Starting AI Turn")
 	aiNeedAct = false
-	_change_state(GameState.GB_AI_TURN)
+	_change_state(GameState.gState.GB_AI_TURN)
 	#Gets the ball rolling for the AI to take actions
 	if boardState.enemy.size() > 0:
 		var result = ai.get_move(boardState)
@@ -1603,12 +1583,12 @@ func _on_gui_action_menu_canceled():
 
 func unit_wait():
 	_deselect_active_unit(true)
-	_change_state(GameState.LOADING)
+	_change_state(GameState.gState.LOADING)
 	turnComplete = true
 
 
 func _on_exp_gain_exp_finished():
-	_change_state(GameState.LOADING)
+	_change_state(GameState.gState.LOADING)
 	emit_signal("continue_turn")
 
 
@@ -1622,17 +1602,20 @@ func _on_action_weapon_selected(button = false):
 	if activeAction.Weapon and button:
 		var weapon = button.get_meta("Item")
 		activeUnit.set_direct_equipped(weapon)
-	_change_state(GameState.LOADING)
+	_change_state(GameState.gState.LOADING)
 	combatResults = combatManager.start_the_justice(activeUnit,target, activeAction)
 	#print(str(combatResults))
 	combat_sequence(combatResults)
 	boardState.add_acted(activeUnit)
 	#activeUnit.set_acted(true)
 	
-#	mainCon.state = GameState.GB_DEFAULT
+
+
+
+
 
 func _on_win_screen_win_finished():
-	_change_state(GameState.LOADING)
+	_change_state(GameState.gState.LOADING)
 	change_map(currMap.next_map)
 	#currMap.progress_next_map()
 	#self.call_deferred("_load_next_map")
@@ -1645,11 +1628,11 @@ func _on_gui_manager_deploy_toggled(unit, deployed):
 		_deploy_unit(unit)
 
 func _on_gui_manager_formation_toggled():
-	match mainCon.state:
-		GameState.GB_SETUP:
+	match GameState.state:
+		GameState.gState.GB_SETUP:
 			_cursor_toggle(true, true)
-			_change_state(GameState.GB_FORMATION)
-		GameState.GB_FORMATION:
+			_change_state(GameState.gState.GB_FORMATION)
+		GameState.gState.GB_FORMATION:
 			_cursor_toggle(false)
 	
 #func _on_gui_manager_item_used(unit, item):
@@ -1660,7 +1643,7 @@ func _on_gui_manager_map_started():
 		units[unit].map_start_init()
 	_cursor_toggle(true)
 	currMap.hide_deployment()
-	_change_state(GameState.GB_DEFAULT)
+	_change_state(GameState.gState.GB_DEFAULT)
 	_initialize_turns()
 	
 		

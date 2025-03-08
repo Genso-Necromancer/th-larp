@@ -897,7 +897,8 @@ func get_equipped_acc(): #returns the currently equipped accessories within inve
 		return false
 	return acc
 
-##Reach = {"Max":int,"Min":int}
+
+##Returns reach = {"Max":int, "Min":int} of given currently equipped weapon
 func get_weapon_reach() -> Dictionary:
 	var reach = {"Max":-INF, "Min":INF}
 	var wepData :Dictionary = UnitData.itemData
@@ -910,6 +911,69 @@ func get_weapon_reach() -> Dictionary:
 	reach.Min = min(reach.Min, wepData[id].MinRange, reach.Min)
 	reach.Max = max(reach.Max, wepData[id].MaxRange, reach.Max)
 	return reach
+
+
+##Returns reach = {"Max":int, "Min":int} of given skillId
+func get_skill_reach(skillId : String) -> Dictionary:
+	var reach = {"Max":-INF, "Min":INF}
+	var skill = UnitData.skillData[skillId]
+	
+	reach.Min = skill.MinRange
+	reach.Max = skill.MaxRange
+	
+	#Insert passive check for skill range bonuses here
+	
+	return reach
+
+
+##Returns reach = {"Max":int, "Min":int} of given augment type skillId
+func get_aug_reach(skillId : String) -> Dictionary:
+	var reach = {"Max":-INF, "Min":INF}
+	var skill = UnitData.skillData[skillId]
+	var wepData :Dictionary = UnitData.itemData
+	
+	for wep in unitData.Inv:
+			if wep.Dur == 0:
+				continue
+	
+	if skill.MinRange == 0 or skill.MaxRange == 0:
+		for wep in unitData.Inv:
+			if wep.Dur == 0:
+				continue
+			reach.Min = min(reach.Min, wepData[wep.ID].MinRange, reach.Min)
+			reach.Max = max(reach.Max, wepData[wep.ID].MaxRange, reach.Max)
+	else:
+		reach.Min = skill.MinRange
+		reach.Max = skill.MaxRange
+	
+	reach.Min += skill.BonusMinRange
+	reach.Max += skill.BonusMaxRange
+
+	return reach
+
+
+func has_valid_aug_weapon(skillId : String) -> bool:
+	var isValid := false
+	var skill :Dictionary = UnitData.skillData[skillId]
+	var iData : Dictionary = UnitData.itemData
+	var wepCats = Enums.WEAPON_CATEGORY.keys()
+	
+	for i in unitData.Inv:
+		var item = iData[i.ID]
+		var hasReach := false
+		var hasType := false
+		
+		if skill.MaxRange == 0 and skill.MinRange == 0: hasReach = true
+		elif item.MinRange <= skill.MinRange or item.MaxRange >= skill.MaxRange: hasReach = true
+		
+		if skill.WepCat == Enums.WEAPON_CATEGORY.ANY or item.Category.to_upper() == wepCats[skill.WepCat] or item.SubGroup.to_upper() ==  wepCats[skill.WepCat]: 
+			hasType = true
+		
+		if hasReach and hasType:
+			isValid = true
+			break
+	
+	return isValid
 
 func unequip(slot = 0): #Stop taking drugs. Fix this up later, it makes no fucking sense. HERE
 	var item = unitData.Inv[slot]
@@ -1396,10 +1460,12 @@ func update_life_bar():
 func _life_tween_finished():
 	revert_animation()
 	confirm_post_sequence_flags("Bars")
-		
+
+
 func update_composure_bar():
 	if activeStats.CurComp <= 0:
 		pass #comp check!
+
 
 
 func apply_dmg(dmg : int, source : Unit):
@@ -1422,6 +1488,14 @@ func apply_heal(heal := 0):
 func apply_composure(comp := 0):
 	activeStats.CurComp -= comp
 	activeStats.CurComp = clampi(activeStats.CurComp, 0, activeStats.Comp)
+
+
+func has_enough_comp(skillId) -> bool:
+	var isValid := false
+	var cost = UnitData.skillData[skillId].Cost
+	if cost <= activeStats.CurComp: isValid = true
+	return isValid
+
 
 func cure_status(cureType, ignoreCurable = false): #Unnest this someday? I dunno, eat shit.
 	var statusKeys : Array = Enums.SUB_TYPE.keys()

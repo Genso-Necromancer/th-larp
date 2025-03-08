@@ -11,13 +11,13 @@ var firstLaunch = true
 
 func _ready():
 	if firstLaunch:
-		var mainCon = get_parent()
-		mainCon.newSlave = [yaBoy]
-		mainCon.state = mainCon.GameState.START
+		var main = get_parent()
+		GameState.newSlave = [yaBoy]
+		GameState.state = GameState.gState.START
 		popUp = sceneMenu.get_popup()
 		popUp.index_pressed.connect(self.on_index_pressed)
-		self.loadMapManager.connect(mainCon.on_load_map_manager)
-		self.unloadMe.connect(mainCon.unload_me)
+		self.loadMapManager.connect(main.on_load_map_manager)
+		self.unloadMe.connect(main.unload_me)
 
 		firstLaunch = false
 

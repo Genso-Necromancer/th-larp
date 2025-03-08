@@ -9,6 +9,8 @@ signal action_menu_selected(bName)
 @export var aContainer : MarginContainer
 @export var sBox : VBoxContainer
 @export var sContainer : MarginContainer
+@export var cContainer : MarginContainer
+@export var skillConfirm : Button
 @onready var blocker :Panel = $Blocker
 @onready var inv : InventoryPanel =  $ScreenMargin/TradePnl
 
@@ -16,7 +18,7 @@ var cursorPath = preload("res://scenes/GUI/menu_cursor.tscn")
 var cursor : MenuCursor
 
 var currentUnit : Unit
-enum MENU_STATES {NONE, OPTIONS, ACTION, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING}
+enum MENU_STATES {NONE, OPTIONS, ACTION, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM}
 var state = MENU_STATES.NONE:
 	set(value):
 			state = value
@@ -43,11 +45,15 @@ var state = MENU_STATES.NONE:
 					_give_items_focus()
 				MENU_STATES.SKILLS_OPEN:
 					_swap_to_skills()
+					_assign_cursor(sBox.get_children())
 					cursor.setCursor = true
 				MENU_STATES.SKILL_TARGETING:
 					_hide_cursor()
 					_hide_action_container()
 					emit_signal("action_menu_selected", "SklBtn")
+				MENU_STATES.SKILL_CONFIRM:
+					_assign_cursor([skillConfirm])
+					cursor.setCursor = true
 
 var prevState = []
 var activeItem = null
@@ -81,11 +87,15 @@ func open_as_options():
 
 func open_weapon_select(reach):
 	inv.set_meta("Unit", currentUnit)
-	inv.fill_items(false, reach)
+	inv.fill_items(false, reach, true)
 	_connect_forecast_signal(inv.get_item_buttons())
 	inv.visible = true
 	_change_state(MENU_STATES.WEAPON_FORECAST)
-	
+
+
+func open_skill_confirm():
+	cContainer.visible = true
+	_change_state(MENU_STATES.SKILL_CONFIRM)
 
 func _close_inv():
 	inv.clear_items()
@@ -124,9 +134,12 @@ func _close_self():
 
 func _hide_tertiary():
 	sContainer.visible = false
+	cContainer.visible = false
+	_free_skills()
 
 
 func _hide_action_container():
+	_hide_tertiary()
 	blocker.visible = false
 	aContainer.visible = false
 
@@ -163,6 +176,9 @@ func _on_skill_pressed(sButton : Control):
 	_change_state(MENU_STATES.SKILL_TARGETING)
 
 
+func _free_skills():
+	for s in sBox.get_children():
+		s.queue_free()
 
 #Signal Functions
 func _connect_skill_signals(buttons : Array):
@@ -217,3 +233,8 @@ func return_previous_state() -> void:
 func _clear_states():
 	_change_state(MENU_STATES.NONE)
 	prevState.clear()
+
+
+func _on_skill_confirm_pressed():
+	_clear_states()
+	SignalTower.emit_signal("action_skill_confirmed")

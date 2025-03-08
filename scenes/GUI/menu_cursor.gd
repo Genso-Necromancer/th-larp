@@ -6,7 +6,6 @@ class_name MenuCursor
 @export var cursor_offset : Vector2 = Vector2(25,5)
 
 var currentButton : Button = null
-var currentFocus
 var setCursor := false
 
 var menu_parent
@@ -19,8 +18,7 @@ func _process(_delta):
 
 
 		
-func set_cursor(button = currentFocus):
-	currentFocus = button
+func set_cursor(button = get_viewport().gui_get_focus_owner()):
 	if button == null:
 		return
 	var cPosition = button.get_global_position()
@@ -36,10 +34,15 @@ func toggle_visible():
 
 func resignal_cursor(buttons: Array):
 	var focus = false
+	var firstVis = false
 	visible = true
 	for b in buttons:
 		_connect_btn_to_cursor(b)
 		if !b.disabled and b.visible and !focus: focus = b
+		elif !firstVis and b.visible: 
+			firstVis = b
+	if !focus and firstVis: 
+		focus = firstVis
 	focus.call_deferred("grab_focus")
 
 

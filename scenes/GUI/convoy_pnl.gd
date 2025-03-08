@@ -34,7 +34,7 @@ func _ready():
 	tabs = container.get_children()
 	
 	
-func fill_items(_isTrade := false, reach = [0,0]) -> Array:
+func fill_items(_isTrade := false, reach = [0,0], useBorder = false) -> Array:
 	var tabKeys = tabTypes.keys()
 	var supply = UnitData.supply[tabKeys[openTab]]
 	var i = 0
@@ -52,6 +52,7 @@ func fill_items(_isTrade := false, reach = [0,0]) -> Array:
 		b.set_item_text(str(itemData.Name), durString)
 		b.set_item_icon(itemData.Icon)
 		b.set_meta_data(item, "Supply", i, itemData.Trade)
+		b.useBorder = useBorder
 		i += 1
 		_add_item(b)
 	return items

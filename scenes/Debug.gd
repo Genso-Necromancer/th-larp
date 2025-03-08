@@ -9,11 +9,9 @@ func _ready():
 	
 
 func _process(_delta):
-	var daddy = get_parent()
-	var main = daddy.mainCon
-	var state = main.state
-	var keys = main.GameState.keys()
-	var prevState = main.previousState
+	var state = GameState.state
+	var keys = GameState.gState.keys()
+	var prevState = GameState.previousState
 	var pString : String
 	var cString : String
 	if state != null:
@@ -25,7 +23,7 @@ func _process(_delta):
 	else:
 		pString = "--"
 		
-	$PanelContainer/StateDebug.set_text("Slave: " + str(main.newSlave) + " | Prev.Slave:" + str(main.previousSlave) + " 
+	$PanelContainer/StateDebug.set_text("Slave: " + str(GameState.newSlave) + " | Prev.Slave:" + str(GameState.previousSlave) + " 
 	| State: " + cString + " | " + "Previous State: " + pString)
 
 

@@ -11,6 +11,14 @@ var targets = {}
 var activeAnims = {}
 var isInitiated = false
 var sequenceSteps = []
+var begin := false
+var sequence = false
+
+func _process(_delta):
+	if begin:
+		begin = false
+		_start_combat()
+
 
 func _ready():
 	SignalTower.prompt_accepted.connect(self._scene_skipped)
@@ -44,7 +52,13 @@ func load_animations(units):
 			targets[unit] = firstUnit
 
 
-func _on_gameboard_sequence_initiated(sequence): 
+func _on_gameboard_sequence_initiated(newSequence):
+	accept_event()
+	begin = true
+	sequence = newSequence
+
+
+func _start_combat():
 	var initiator = sequence.Rounds[0][0].keys()[0]
 	var initiate = sequence.Rounds[0][0].keys()[1]
 	var isSkipped = false
@@ -130,6 +144,7 @@ func _on_gameboard_sequence_initiated(sequence):
 	
 	_clear_sequence()
 	SignalTower.emit_signal("sequence_complete")
+
 
 func _on_animation_start(player):
 	activeAnims[player] = true

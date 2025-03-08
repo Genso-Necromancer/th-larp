@@ -581,8 +581,8 @@ static func get_job(jobInd):
 static func get_art(unit):
 	#"Prt":load(("res://sprites/character/%s/Prt.png" % [unit])),
 	var p = {
-		"Prt":load(("res://sprites/%sPrt.png" % [unit])),
-		"FullPrt":load(("res://sprites/character/%s/FullPrt.png" % [unit]))
+		"Prt":("res://sprites/%sPrt.png" % [unit]),
+		"FullPrt":("res://sprites/character/%s/FullPrt.png" % [unit])
 		}
 	return p
 	
@@ -1045,8 +1045,8 @@ static func get_skills():
 			"CanCrit": false,
 			"CanDmg": false,
 			##Used regardless of Augment
-			"RangeMin": 0, #if 0, ignored by Augment. Set value to require specific weapon reach.
-			"RangeMax": 0,
+			"MinRange": 0, #if 0, ignored by Augment. Set value to require specific weapon reach.
+			"MaxRange": 0,
 			"Cost": 0,
 			"Effects": ["SelfSleep","Heal2"], #any attacking effects for an augment skill must be set to instant.
 		},
@@ -1068,8 +1068,8 @@ static func get_skills():
 			"Type": Enums.DAMAGE_TYPE.MAG,
 			"Hit": 70,
 			"Dmg": 6,
-			"RangeMin": 1, #if 0, ignored by Augment. Set value to require specific weapon reach.
-			"RangeMax": 2,
+			"MinRange": 1, #if 0, ignored by Augment. Set value to require specific weapon reach.
+			"MaxRange": 2,
 			"Cost": 3,
 			"Effects": ["Buff"], #any attacking effects for an augment skill must be set to instant.
 			
@@ -1082,8 +1082,8 @@ static func get_skills():
 			"Target": "Self", #Enemy, Self, Ally
 			"CanMiss": true,
 			"Hit": 0,
-			"RangeMin": 0,
-			"RangeMax": 0,
+			"MinRange": 0,
+			"MaxRange": 0,
 			"Cost": 10,
 			"Effects": ["SlowTime05"]
 		},
@@ -1095,8 +1095,8 @@ static func get_skills():
 		"Target": "Enemy", #Enemy, Self, Ally
 		"CanMiss": false,
 		"Hit": 100,
-		"RangeMin": 1,
-		"RangeMax": 3,
+		"MinRange": 1,
+		"MaxRange": 3,
 		"Cost": 20,
 		"Effects": ["DebuffMove04"]
 		}

@@ -3,8 +3,25 @@ class_name ItemButton
 
 @onready var button = $ButtonLayer
 @export var type :String = "Item"
+var useBorder := false
 var metaSet := false
 @export var isIconMode := false
+@export_category("FontColors")
+@export_group("Enabled")
+@export var eFont : Color 
+@export var efFont : Color
+@export var ehFont : Color
+@export var epFont : Color
+@export_group("Disabled")
+@export var dFont : Color
+@export var dfFont : Color
+@export var dhFont : Color
+@export var dpFont : Color
+@export_group("Selected")
+@export var sFont : Color
+@export var sfFont : Color
+@export var shFont : Color
+@export var spFont : Color
 
 var disabled := false :
 	set(value):
@@ -80,18 +97,19 @@ func _verify_state(value) -> String:
 
 
 func _font_state_change(value : String):
-	var fColor : Color
+	var fontColor : Color
 	var labels = [$ContentMargin/HBoxContainer/Name, $ContentMargin/HBoxContainer/Durability]
 	match value:
-		"Enabled": fColor = Color(1,1,1)
-		"Disabled": fColor = Color(0.278, 0.278, 0.278)
-		"Selected": fColor = Color(0.84, 0.84, 0)
+		"Enabled": 
+			fontColor = Color(1,1,1)
+		"Disabled": fontColor = Color(0.278, 0.278, 0.278)
+		"Selected": fontColor = Color(0.84, 0.84, 0)
 	for l in labels:
-		l.add_theme_color_override("font_color", fColor)
-		l.add_theme_color_override("font_pressed_color", fColor)
-		l.add_theme_color_override("font_hover_color", fColor)
-		l.add_theme_color_override("font_focus_color", fColor)
-		l.add_theme_color_override("font_hover_pressed_color", fColor)
+		l.add_theme_color_override("font_color", fontColor)
+		l.add_theme_color_override("font_pressed_color", fontColor)
+		l.add_theme_color_override("font_hover_color", fontColor)
+		l.add_theme_color_override("font_focus_color", fontColor)
+		l.add_theme_color_override("font_hover_pressed_color", fontColor)
 
 func set_meta_data(item, unit, index, canTrade:=false):
 	var isEquipped := false
@@ -124,11 +142,13 @@ func _set_equipped(isEquipped):
 
 
 func _on_focus_entered():
-	var focusBorder := $FocusBorder
-	focusBorder.visible = true
+	if useBorder:
+		var focusBorder := $FocusBorder
+		focusBorder.visible = true
 
 
 
 func _on_focus_exited():
-	var focusBorder := $FocusBorder
-	focusBorder.visible = false
+	if useBorder:
+		var focusBorder := $FocusBorder
+		focusBorder.visible = false

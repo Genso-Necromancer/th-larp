@@ -7,10 +7,16 @@ func play_action():
 func set_skill_style(skillId):
 	var stringPath = "skill_name_%s" % [skillId.to_snake_case()]
 	var string = StringGetter.get_string(stringPath)
-	var skillIcon = UnitData.skillData[skillId].Icon
+	var skillIcon
+	var iconPath = UnitData.skillData[skillId].Icon
 	var lbl = $PanelContainer/MarginContainer/HBoxContainer/SkillName
 	var icon1 = $PanelContainer/MarginContainer/HBoxContainer/LeftCrest
 	var icon2 = $PanelContainer/MarginContainer/HBoxContainer/RightCrest
+	
+	if !ResourceLoader.exists(iconPath):
+		iconPath = "res://sprites/icons/features/camp_skill_luna_dial.png"
+	skillIcon = load(iconPath)
+		
 	lbl.set_text(string)
 	icon1.set_texture(skillIcon)
 	icon2.set_texture(skillIcon)

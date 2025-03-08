@@ -64,7 +64,7 @@ func _ready_style():
 
 
 
-func fill_items(isTrade : = false, reach = [0,0]) -> Array:
+func fill_items(isTrade : = false, reach = [0,0], useBorder := false) -> Array:
 	var unit = get_meta("Unit")
 	var inv = unit.unitData.Inv
 	var iData = UnitData.itemData
@@ -73,9 +73,9 @@ func fill_items(isTrade : = false, reach = [0,0]) -> Array:
 	var equipped = unit.get_equipped_weapon()
 	var b
 	var displayItem = null
-	
 	if _style == _styles[1] and equipped.ID != "Unarmed":
 		b = _generate_item_button(bPath, equipped, i, unit, isTrade)
+		b.useBorder = useBorder
 		_display_weapon(b)
 		displayItem = equipped
 		i += 1
