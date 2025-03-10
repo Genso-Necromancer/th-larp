@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://bufey13fhtkyt"]
 
 [ext_resource type="Theme" uid="uid://beha4ndul0p5x" path="res://fonts/Izayoi_Theme_Chapter_Title.tres" id="1_r5dw1"]
-[ext_resource type="Script" path="res://scenes/GUI/chapter_splash.gd" id="2_8ba2g"]
+[ext_resource type="Script" uid="uid://cxeulvixibbeb" path="res://scenes/GUI/chapter_splash.gd" id="2_8ba2g"]
 [ext_resource type="FontFile" uid="uid://ckgxohqlgjy7p" path="res://fonts/Quintessential/Quintessential.otf" id="3_cibj8"]
 [ext_resource type="FontFile" uid="uid://b4in3wjmpvqcv" path="res://fonts/NewRocker/new-rocker.regular.otf" id="3_udq14"]
 
@@ -137,9 +137,9 @@ tracks/7/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_v3od1"]
 _data = {
-"FadeOut": SubResource("Animation_e8am0"),
-"RESET": SubResource("Animation_x0qh2"),
-"Splash": SubResource("Animation_oqg5l")
+&"FadeOut": SubResource("Animation_e8am0"),
+&"RESET": SubResource("Animation_x0qh2"),
+&"Splash": SubResource("Animation_oqg5l")
 }
 
 [node name="ChapterSplash" type="Control"]

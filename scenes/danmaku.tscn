@@ -1,8 +1,8 @@
 [gd_scene load_steps=11 format=3 uid="uid://ba4p0a5q0fvet"]
 
-[ext_resource type="Script" path="res://scenes/danmaku.gd" id="1_kuxoj"]
+[ext_resource type="Script" uid="uid://bggbhullbalh4" path="res://scenes/danmaku.gd" id="1_kuxoj"]
 [ext_resource type="Texture2D" uid="uid://ywry0pe1d4v8" path="res://sprites/danmaku/danmaku.png" id="2_8xdxl"]
-[ext_resource type="Script" path="res://scenes/UnitArea.gd" id="3_tpu7c"]
+[ext_resource type="Script" uid="uid://bv74dylssenec" path="res://scenes/UnitArea.gd" id="3_tpu7c"]
 [ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="4_mpphj"]
 
 [sub_resource type="Animation" id="Animation_oy20w"]
@@ -81,10 +81,10 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_sml42"]
 _data = {
-"Collision": SubResource("Animation_oy20w"),
-"Idle": SubResource("Animation_dmej2"),
-"RESET": SubResource("Animation_0c5wl"),
-"Spawning": SubResource("Animation_y25xl")
+&"Collision": SubResource("Animation_oy20w"),
+&"Idle": SubResource("Animation_dmej2"),
+&"RESET": SubResource("Animation_0c5wl"),
+&"Spawning": SubResource("Animation_y25xl")
 }
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_uipls"]

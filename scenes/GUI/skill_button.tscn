@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://c0g6gixl7xob7"]
 
 [ext_resource type="Theme" uid="uid://dpfc6p7ruw7wo" path="res://fonts/Izayoi_Theme_Items.tres" id="1_li3j2"]
-[ext_resource type="Script" path="res://scenes/GUI/skill_button.gd" id="2_fcxm4"]
+[ext_resource type="Script" uid="uid://cgnn7busuaute" path="res://scenes/GUI/skill_button.gd" id="2_fcxm4"]
 [ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="3_wseqf"]
 [ext_resource type="FontFile" uid="uid://dia8fvtnbbel2" path="res://fonts/Kalam/Kalam-Light.otf" id="4_3yu7x"]
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="4_n1iv6"]

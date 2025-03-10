@@ -1,11 +1,11 @@
 [gd_scene load_steps=7 format=3 uid="uid://2ggl8hw7vq8n"]
 
-[ext_resource type="Script" path="res://scenes/GUI/action_menu.gd" id="1_ilauf"]
+[ext_resource type="Script" uid="uid://cpn1isih8n42y" path="res://scenes/GUI/action_menu.gd" id="1_ilauf"]
 [ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/inventory_panel.tscn" id="2_8r605"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_38ob5"]
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="3_e8ygl"]
-[ext_resource type="Script" path="res://scenes/GUI/action_box.gd" id="3_hhurs"]
-[ext_resource type="Script" path="res://scenes/GUI/skill_box.gd" id="6_v4nkc"]
+[ext_resource type="Script" uid="uid://dqnbmfjx7exf0" path="res://scenes/GUI/action_box.gd" id="3_hhurs"]
+[ext_resource type="Script" uid="uid://bsj5frkjcqte4" path="res://scenes/GUI/skill_box.gd" id="6_v4nkc"]
 
 [node name="ActionMenu" type="PanelContainer" node_paths=PackedStringArray("aBox", "aContainer", "sBox", "sContainer", "cContainer", "skillConfirm")]
 anchors_preset = 15
@@ -21,6 +21,7 @@ sBox = NodePath("ScreenMargin/SkillBackgroundMargin/SkillMargin/SkillBox")
 sContainer = NodePath("ScreenMargin/SkillBackgroundMargin")
 cContainer = NodePath("ScreenMargin/ConfirmBackgroundMargin")
 skillConfirm = NodePath("ScreenMargin/ConfirmBackgroundMargin/ConfirmMargin/SkillConfirm")
+cursorOffset = Vector2(30, 6)
 
 [node name="Blocker" type="Panel" parent="."]
 layout_mode = 2

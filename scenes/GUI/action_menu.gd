@@ -11,6 +11,7 @@ signal action_menu_selected(bName)
 @export var sContainer : MarginContainer
 @export var cContainer : MarginContainer
 @export var skillConfirm : Button
+@export var cursorOffset := Vector2(0,0)
 @onready var blocker :Panel = $Blocker
 @onready var inv : InventoryPanel =  $ScreenMargin/TradePnl
 
@@ -195,7 +196,7 @@ func _connect_forecast_signal(weapons : Array):
 #Menu Cursor Functions
 func _load_cursor():
 	cursor = cursorPath.instantiate()
-	cursor.cursor_offset = Vector2(25,0)
+	cursor.cursor_offset = cursorOffset
 	add_child(cursor)
 	
 

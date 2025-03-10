@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://bpl26vk486j8b"]
 
-[ext_resource type="Script" path="res://scenes/animations/combat/fx/gen/fx_.gd" id="1_43ir3"]
+[ext_resource type="Script" uid="uid://wc18wh5824v2" path="res://scenes/animations/combat/fx/gen/fx_.gd" id="1_43ir3"]
 [ext_resource type="Texture2D" uid="uid://cmi2revqv50ej" path="res://sprites/fx/gen/miko.sprite.FS_target_fx.png" id="2_tr1b4"]
 
 [sub_resource type="Animation" id="Animation_hufmj"]
@@ -59,8 +59,8 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_c47h8"]
 _data = {
-"Action": SubResource("Animation_hufmj"),
-"RESET": SubResource("Animation_prkun")
+&"Action": SubResource("Animation_hufmj"),
+&"RESET": SubResource("Animation_prkun")
 }
 
 [node name="fx_" type="Node2D"]

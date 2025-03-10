@@ -30,3 +30,6 @@ func _handle_bind(bind):
 			direction = Vector2.DOWN
 			gameBoard.on_directional_press(direction)
 		"debugKillLady": gameBoard._kill_lady()
+		"debug_camera_test": 
+			gameBoard._camera_test()
+		"debug_kill_test": gameBoard._kill_camera_test()

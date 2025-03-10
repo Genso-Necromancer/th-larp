@@ -31,4 +31,3 @@ func _on_load_button_pressed():
 			var map = preload("res://scenes/maps/TestMap0.tscn")
 			emit_signal("loadMapManager", map)
 			emit_signal("unloadMe", yaBoy)
-

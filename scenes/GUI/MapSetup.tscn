@@ -1,7 +1,7 @@
 [gd_scene load_steps=8 format=3 uid="uid://miyng6xfo4u2"]
 
 [ext_resource type="Theme" uid="uid://bi2ve4mbgqqd0" path="res://fonts/Izayoi_Theme_setup.tres" id="1_e5j75"]
-[ext_resource type="Script" path="res://scenes/GUI/MapSetup.gd" id="2_274cj"]
+[ext_resource type="Script" uid="uid://ji4etic8rs41" path="res://scenes/GUI/MapSetup.gd" id="2_274cj"]
 [ext_resource type="Texture2D" uid="uid://cep305fejecny" path="res://sprites/UI/player_flag.png" id="2_86641"]
 [ext_resource type="FontFile" uid="uid://di48a300uqd6d" path="res://fonts/VenomMincho-DOOyR.ttf" id="4_5e33i"]
 [ext_resource type="FontFile" uid="uid://b1ahq708k5luc" path="res://fonts/Rotunda/Rotunda.otf" id="4_n6pe2"]

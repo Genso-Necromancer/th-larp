@@ -2,9 +2,9 @@
 
 [ext_resource type="Texture2D" uid="uid://ssms2xae0fye" path="res://sprites/sun_dial.png" id="1_s7ygk"]
 [ext_resource type="Texture2D" uid="uid://5xlsgd0q0q17" path="res://sprites/sun_dial_marker.png" id="1_uwb5g"]
-[ext_resource type="Script" path="res://scenes/HUD.gd" id="1_wfywv"]
-[ext_resource type="Script" path="res://scenes/SunDial.gd" id="3_qj0qw"]
-[ext_resource type="Script" path="res://scenes/Clock.gd" id="5_dksbh"]
+[ext_resource type="Script" uid="uid://d4l2iyyc8mdsi" path="res://scenes/HUD.gd" id="1_wfywv"]
+[ext_resource type="Script" uid="uid://cqsb1veemjw30" path="res://scenes/SunDial.gd" id="3_qj0qw"]
+[ext_resource type="Script" uid="uid://xqjaib5fmksi" path="res://scenes/Clock.gd" id="5_dksbh"]
 
 [node name="HUD" type="Control"]
 layout_mode = 3

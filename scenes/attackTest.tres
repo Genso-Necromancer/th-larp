@@ -8,16 +8,12 @@ texture = ExtResource("1_areco")
 texture_region_size = Vector2i(48, 16)
 use_texture_padding = false
 0:0/0 = 0
-0:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
-0:0/0/physics_layer_0/angular_velocity = 0.0
 0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-40, -24, -80, 0, -40, 24, 40, 24, 80, 0, 40, -24)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jtw8t"]
 texture = ExtResource("2_ojpyl")
 texture_region_size = Vector2i(48, 16)
 0:0/0 = 0
-0:0/0/physics_layer_0/linear_velocity = Vector2(0, 0)
-0:0/0/physics_layer_0/angular_velocity = 0.0
 
 [resource]
 tile_shape = 3

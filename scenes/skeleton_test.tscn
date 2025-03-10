@@ -4,6 +4,9 @@
 [ext_resource type="Texture2D" uid="uid://d0a2u1dbyibvp" path="res://sprites/character/sakuya/SakuyaIdle.png" id="2_e2ejh"]
 [ext_resource type="Texture2D" uid="uid://dm32qlweuwdcr" path="res://sprites/character/sakuya/SakuyaDefend.png" id="3_tocso"]
 
+[sub_resource type="Animation" id="Animation_kpb80"]
+resource_name = "RESET"
+
 [sub_resource type="Animation" id="Animation_b0v0v"]
 resource_name = "idle"
 tracks/0/type = "value"
@@ -19,13 +22,10 @@ tracks/0/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_kpb80"]
-resource_name = "RESET"
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_e8xwy"]
 _data = {
-"RESET": SubResource("Animation_kpb80"),
-"idle": SubResource("Animation_b0v0v")
+&"RESET": SubResource("Animation_kpb80"),
+&"idle": SubResource("Animation_b0v0v")
 }
 
 [node name="SakuyaSkeleton" type="Node2D"]

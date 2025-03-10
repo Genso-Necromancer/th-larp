@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://blvv202ppra5i"]
 
 [ext_resource type="SpriteFrames" uid="uid://bfvlpdkp0kkoe" path="res://scenes/animations/item_effects/buff.tres" id="2_veuac"]
-[ext_resource type="Script" path="res://scenes/animations/item_effects/item_fx.gd" id="2_yne8f"]
+[ext_resource type="Script" uid="uid://b6u3r4g0pflyy" path="res://scenes/animations/item_effects/item_fx.gd" id="2_yne8f"]
 
 [node name="ItemFxSprite" type="AnimatedSprite2D"]
 sprite_frames = ExtResource("2_veuac")

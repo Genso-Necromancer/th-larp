@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dl4nn8ib77txs"]
 
-[ext_resource type="Script" path="res://scenes/AuraArea.gd" id="1_6jjyn"]
+[ext_resource type="Script" uid="uid://bkeqtoq314mjb" path="res://scenes/AuraArea.gd" id="1_6jjyn"]
 [ext_resource type="TileSet" uid="uid://d1u4yyh77nn4t" path="res://scenes/aura_test.tres" id="2_2x4ni"]
 
 [node name="AuraArea" type="Area2D"]

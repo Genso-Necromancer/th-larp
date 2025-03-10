@@ -14,8 +14,12 @@ func _handle_bind(bind):
 	match bind:
 		"invalid": return
 		"ui_accept": pass
-		"ui_info": slave._on_gameboard_toggle_prof()
-		"ui_return": slave.regress_menu()
+		"ui_info": 
+			pass
+			#slave._on_gameboard_toggle_prof()
+		"ui_return": 
+			pass
+			#slave.regress_menu()
 		"ui_scroll_left": pass
 		"ui_scroll_right": pass
 		"ui_right": pass

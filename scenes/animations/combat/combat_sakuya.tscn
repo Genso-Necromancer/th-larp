@@ -1,6 +1,6 @@
 [gd_scene load_steps=12 format=3 uid="uid://bmgmpnvee7hd2"]
 
-[ext_resource type="Script" path="res://scenes/animations/combat/combat_anim.gd" id="1_vq7oy"]
+[ext_resource type="Script" uid="uid://dutll5qjp8aiv" path="res://scenes/animations/combat/combat_anim.gd" id="1_vq7oy"]
 [ext_resource type="Texture2D" uid="uid://d0a2u1dbyibvp" path="res://sprites/character/sakuya/SakuyaIdle.png" id="2_faeb1"]
 [ext_resource type="Animation" uid="uid://omspph7bdn7u" path="res://scenes/animations/combat/Entry.res" id="4_gxd7g"]
 [ext_resource type="Texture2D" uid="uid://ct5jdyqgsrdra" path="res://sprites/character/sakuya/SakuyaCombatSheet.png" id="4_ixkwl"]
@@ -351,13 +351,13 @@ tracks/11/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_456y4"]
 _data = {
-"Attack": SubResource("Animation_bgmxd"),
-"Cast": SubResource("Animation_8t516"),
-"Death": SubResource("Animation_aorc4"),
-"Defend": SubResource("Animation_jb3uu"),
-"Entry": ExtResource("4_gxd7g"),
-"Idle": ExtResource("5_mpxt3"),
-"RESET": SubResource("Animation_v5su4")
+&"Attack": SubResource("Animation_bgmxd"),
+&"Cast": SubResource("Animation_8t516"),
+&"Death": SubResource("Animation_aorc4"),
+&"Defend": SubResource("Animation_jb3uu"),
+&"Entry": ExtResource("4_gxd7g"),
+&"Idle": ExtResource("5_mpxt3"),
+&"RESET": SubResource("Animation_v5su4")
 }
 
 [node name="combat_sakuya" type="Node2D"]

@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://de0fc4ialpktg" path="res://sprites/UI/bag.png" id="1_filpb"]
 [ext_resource type="Theme" uid="uid://dpfc6p7ruw7wo" path="res://fonts/Izayoi_Theme_Items.tres" id="1_hbvl4"]
-[ext_resource type="Script" path="res://scenes/GUI/inventory_panel.gd" id="2_1levr"]
+[ext_resource type="Script" uid="uid://mknl2seu7ecf" path="res://scenes/GUI/inventory_panel.gd" id="2_1levr"]
 [ext_resource type="Texture2D" uid="uid://c7u4h228kq0pr" path="res://sprites/UI/bag_trade.png" id="3_d5a4e"]
 
 [node name="TradePnl" type="PanelContainer" node_paths=PackedStringArray("itemList", "equipContainer", "styleNodes")]

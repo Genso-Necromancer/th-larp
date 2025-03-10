@@ -2,7 +2,7 @@
 
 [ext_resource type="Theme" uid="uid://errgec2364nv" path="res://fonts/Izayoi_Theme_Tooltip.tres" id="1_ajvjo"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_j0sbk"]
-[ext_resource type="Script" path="res://scenes/GUI/options_pop_up.gd" id="1_m0u7l"]
+[ext_resource type="Script" uid="uid://bqmr3lyac4mym" path="res://scenes/GUI/options_pop_up.gd" id="1_m0u7l"]
 
 [node name="OptionsPopUp" type="Panel" node_paths=PackedStringArray("list", "firstFocus")]
 custom_minimum_size = Vector2(1920, 1080)

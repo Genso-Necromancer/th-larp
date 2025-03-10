@@ -83,8 +83,8 @@ tracks/2/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_u1i7a"]
 _data = {
-"RESET": SubResource("Animation_xdv5q"),
-"float": SubResource("Animation_b6y33")
+&"RESET": SubResource("Animation_xdv5q"),
+&"float": SubResource("Animation_b6y33")
 }
 
 [node name="fx_damage_value" type="Node2D"]

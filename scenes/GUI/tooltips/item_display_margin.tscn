@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://63n00lxo2oxf"]
 
-[ext_resource type="Script" path="res://scenes/GUI/ItemDisplayMargin.gd" id="1_enshq"]
+[ext_resource type="Script" uid="uid://65m65hubeawk" path="res://scenes/GUI/ItemDisplayMargin.gd" id="1_enshq"]
 [ext_resource type="PackedScene" uid="uid://cv74wrcjpasmr" path="res://scenes/GUI/value_label.tscn" id="2_qy6v3"]
-[ext_resource type="Script" path="res://scenes/EffectList.gd" id="3_ts733"]
+[ext_resource type="Script" uid="uid://r1adrv06vgoc" path="res://scenes/EffectList.gd" id="3_ts733"]
 
 [node name="ItemDisplayMargin" type="MarginContainer"]
 self_modulate = Color(1, 1, 1, 0)

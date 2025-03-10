@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://de42f2dvbgkri"]
 
-[ext_resource type="Script" path="res://scenes/cursor.gd" id="1_2u41f"]
+[ext_resource type="Script" uid="uid://b10re3maqw47y" path="res://scenes/cursor.gd" id="1_2u41f"]
 [ext_resource type="Texture2D" uid="uid://4lca2aumdu2g" path="res://sprites/testCursor.png" id="1_k2b8o"]
 [ext_resource type="Texture2D" uid="uid://c47hmdyuaj0xn" path="res://sprites/highlightBlue.png" id="3_h7uqh"]
 [ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="4_k0n2u"]
@@ -25,7 +25,7 @@ texture = ExtResource("3_h7uqh")
 
 [node name="Timer" type="Timer" parent="."]
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="SceneCamera" type="Camera2D" parent="."]
 position_smoothing_enabled = true
 drag_horizontal_enabled = true
 drag_vertical_enabled = true

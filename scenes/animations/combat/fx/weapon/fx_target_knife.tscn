@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://djo8xtq1qv18a"]
 
-[ext_resource type="Script" path="res://scenes/animations/combat/fx/gen/fx_.gd" id="1_py7jm"]
+[ext_resource type="Script" uid="uid://wc18wh5824v2" path="res://scenes/animations/combat/fx/gen/fx_.gd" id="1_py7jm"]
 [ext_resource type="Texture2D" uid="uid://c220k3sjbwgvy" path="res://sprites/fx/weapon/maid dagger asset.png" id="2_m6l7u"]
 [ext_resource type="Texture2D" uid="uid://optrxiewffae" path="res://sprites/fx/weapon/maid dagger hit asset.png" id="3_k7fuh"]
 
@@ -181,8 +181,8 @@ tracks/6/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_c47h8"]
 _data = {
-"Action": SubResource("Animation_hufmj"),
-"RESET": SubResource("Animation_prkun")
+&"Action": SubResource("Animation_hufmj"),
+&"RESET": SubResource("Animation_prkun")
 }
 
 [node name="fx_target_knife" type="Node2D"]

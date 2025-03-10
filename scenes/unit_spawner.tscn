@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://olsjiwasnvxl"]
 
-[ext_resource type="Script" path="res://scenes/spawn_group.gd" id="1_8f15w"]
+[ext_resource type="Script" uid="uid://dni4je5y4dcu1" path="res://scenes/spawn_group.gd" id="1_8f15w"]
 [ext_resource type="PackedScene" uid="uid://cst1mk4jvlky" path="res://scenes/spawn_group.tscn" id="2_wyc45"]
 [ext_resource type="Texture2D" uid="uid://cvwlg1ibgcatk" path="res://sprites/tiles/event_spawner.png" id="2_y28xd"]
 

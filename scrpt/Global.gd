@@ -1,10 +1,6 @@
 @tool
 extends Node
 
-
-
-
-
 var focusUnit : Unit:
 	set(value):
 		focusUnit = value
@@ -46,6 +42,7 @@ func _init():
 	
 func _init_flags():
 	flags = {
+		"DebugMode": false,
 		"gameOver": false,
 		"victory": false,
 		"activeUnit": false,

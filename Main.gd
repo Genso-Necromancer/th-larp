@@ -73,7 +73,13 @@ func _input(event: InputEvent) -> void:
 	elif Input.is_action_just_pressed("ui_return"):
 		get_viewport().set_input_as_handled()
 		GameState.activeState._handle_bind("ui_return")
-		
+	elif Input.is_action_just_pressed("debug_mode"):
+		Global.flags.DebugMode = !Global.flags.DebugMode
+		print("Debug: ", Global.flags.DebugMode)
+	elif Input.is_action_just_pressed("debug_camera_test") and !Global.flags.DebugMode:
+		return
+	elif Input.is_action_just_pressed("debug_kill_test") and !Global.flags.DebugMode:
+		return
 	
 func _unhandled_input(event: InputEvent) -> void: #Main picks up the inputs, then directs them to the currently active state for processing.
 	if event.is_action_pressed("ui_snap"):
@@ -247,5 +253,3 @@ func on_load_map_manager(map):
 func unload_me(scene):
 	scene.queue_free()
 	
-
-

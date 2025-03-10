@@ -17,6 +17,7 @@ enum gState {
 	GB_AI_TURN,
 	GB_END_OF_ROUND,
 	START,
+	CAMERA_STATE,
 	ACCEPT_PROMPT,
 	FAIL_STATE,
 	WIN_STATE,
@@ -110,6 +111,9 @@ func _switch_state_get_slaves(value):
 		gState.START:
 			slaves = newSlave
 			activeState = StartState.new()
+		gState.CAMERA_STATE:
+			slaves = newSlave
+			activeState = CameraState.new()
 		gState.ACCEPT_PROMPT:
 			slaves = newSlave
 			activeState = AcceptState.new()

@@ -31,6 +31,7 @@ func animation_skip():
 func init_exp_display(oldExp, expSteps, results, unitPrt, unitName):
 	var portrait = $MC/MC/UnitPrt
 	var isLeveled = 0
+	if tween: tween.kill()
 	tween = get_tree().create_tween()
 	
 	portrait.set_texture(unitPrt)

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bi4unq8mpucas"]
 
-[ext_resource type="Script" path="res://scenes/GUI/tooltips/tooltip_display.gd" id="1_8qhcw"]
+[ext_resource type="Script" uid="uid://dj17j250425im" path="res://scenes/GUI/tooltips/tooltip_display.gd" id="1_8qhcw"]
 
 [node name="ToolTipDisplay" type="RichTextLabel"]
 visible = false

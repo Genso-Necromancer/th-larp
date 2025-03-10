@@ -2,7 +2,7 @@
 
 [ext_resource type="Theme" uid="uid://vjf2mwcfssah" path="res://fonts/Izayoi_Theme_Trading.tres" id="1_lkt56"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_f8a5e"]
-[ext_resource type="Script" path="res://scenes/GUI/convoy_pnl.gd" id="2_v423b"]
+[ext_resource type="Script" uid="uid://mglqldtkwc21" path="res://scenes/GUI/convoy_pnl.gd" id="2_v423b"]
 
 [node name="ConvoyPnl" type="PanelContainer" node_paths=PackedStringArray("itemList")]
 custom_minimum_size = Vector2(225, 0)

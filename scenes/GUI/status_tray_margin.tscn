@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3 uid="uid://b011nm5up2wry"]
 
-[ext_resource type="Script" path="res://scenes/status_tray.gd" id="1_4fos0"]
+[ext_resource type="Script" uid="uid://dsoc750igrsw6" path="res://scenes/status_tray.gd" id="1_4fos0"]
 [ext_resource type="Texture2D" uid="uid://dt8g5xp8171gn" path="res://sprites/UI/ui_status_tray.png" id="2_dii2q"]
-[ext_resource type="Script" path="res://scenes/status_grid.gd" id="3_ujxmf"]
+[ext_resource type="Script" uid="uid://q1fvpd16pg1" path="res://scenes/status_grid.gd" id="3_ujxmf"]
 
 [node name="StatusTrayMargin" type="MarginContainer"]
 size_flags_horizontal = 0

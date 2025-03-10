@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://b2uys3ijcwes2"]
 
 [ext_resource type="Theme" uid="uid://vjf2mwcfssah" path="res://fonts/Izayoi_Theme_Trading.tres" id="1_2shno"]
-[ext_resource type="Script" path="res://scenes/GUI/unit_manager.gd" id="2_33cgi"]
+[ext_resource type="Script" uid="uid://evhdm24enr2w" path="res://scenes/GUI/unit_manager.gd" id="2_33cgi"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_eh42n"]
 
 [node name="UnitManager" type="Control"]

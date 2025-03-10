@@ -2,7 +2,7 @@
 
 [ext_resource type="Theme" uid="uid://dpfc6p7ruw7wo" path="res://fonts/Izayoi_Theme_Items.tres" id="1_dvsi0"]
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_ofp1p"]
-[ext_resource type="Script" path="res://scenes/GUI/item_button.gd" id="2_oouan"]
+[ext_resource type="Script" uid="uid://dga6degdfd1pu" path="res://scenes/GUI/item_button.gd" id="2_oouan"]
 [ext_resource type="Texture2D" uid="uid://ck144sy8g47hx" path="res://scenes/gungnir.png" id="3_dfpky"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_pqruf"]
 [ext_resource type="FontFile" uid="uid://dia8fvtnbbel2" path="res://fonts/Kalam/Kalam-Light.otf" id="4_h4p4o"]

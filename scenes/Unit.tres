@@ -262,6 +262,7 @@ tracks/1/keys = {
 [sub_resource type="Animation" id="Animation_uy3io"]
 resource_name = "tossed_from_left"
 length = 2.5
+capture_included = true
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -349,6 +350,7 @@ tracks/5/keys = {
 [sub_resource type="Animation" id="Animation_kwd0d"]
 resource_name = "tossed_from_right"
 length = 2.5
+capture_included = true
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
@@ -551,18 +553,18 @@ tracks/1/keys = {
 
 [resource]
 _data = {
-"Hit": SubResource("Animation_4s25y"),
-"RESET": SubResource("Animation_ldcs1"),
-"death": SubResource("Animation_14iwe"),
-"disabled": SubResource("Animation_n8or0"),
-"idle": SubResource("Animation_qpckc"),
-"selected": SubResource("Animation_vw2je"),
-"shoved_left": SubResource("Animation_iyiwe"),
-"shoved_right": SubResource("Animation_nwvif"),
-"tossed_from_left": SubResource("Animation_uy3io"),
-"tossed_from_right": SubResource("Animation_kwd0d"),
-"walk_down": SubResource("Animation_xwkmn"),
-"walk_left": SubResource("Animation_ueevp"),
-"walk_right": SubResource("Animation_liyna"),
-"walk_up": SubResource("Animation_xsrlv")
+&"Hit": SubResource("Animation_4s25y"),
+&"RESET": SubResource("Animation_ldcs1"),
+&"death": SubResource("Animation_14iwe"),
+&"disabled": SubResource("Animation_n8or0"),
+&"idle": SubResource("Animation_qpckc"),
+&"selected": SubResource("Animation_vw2je"),
+&"shoved_left": SubResource("Animation_iyiwe"),
+&"shoved_right": SubResource("Animation_nwvif"),
+&"tossed_from_left": SubResource("Animation_uy3io"),
+&"tossed_from_right": SubResource("Animation_kwd0d"),
+&"walk_down": SubResource("Animation_xwkmn"),
+&"walk_left": SubResource("Animation_ueevp"),
+&"walk_right": SubResource("Animation_liyna"),
+&"walk_up": SubResource("Animation_xsrlv")
 }

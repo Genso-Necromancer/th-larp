@@ -1,9 +1,11 @@
 [gd_scene load_steps=5 format=3 uid="uid://dxss4yoefigwq"]
 
 [ext_resource type="Theme" uid="uid://bi2ve4mbgqqd0" path="res://fonts/Izayoi_Theme_setup.tres" id="1_fjdtq"]
-[ext_resource type="Script" path="res://scenes/SetUpMain.gd" id="2_4lsoq"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_u3p8s"]
-[ext_resource type="Script" path="res://scenes/MngOptPnl.gd" id="4_s6jeq"]
+[ext_resource type="Script" uid="uid://dugx6isjkm0hb" path="res://scenes/MngOptPnl.gd" id="4_s6jeq"]
+
+[sub_resource type="Resource" id="Resource_muvxb"]
+metadata/__load_path__ = "res://scenes/SetUpMain.gd"
 
 [node name="OldDelete" type="Control"]
 visible = false
@@ -16,7 +18,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 theme = ExtResource("1_fjdtq")
-script = ExtResource("2_4lsoq")
+script = SubResource("Resource_muvxb")
 
 [node name="SetUpGrid" type="GridContainer" parent="."]
 layout_mode = 1

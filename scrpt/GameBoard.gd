@@ -158,16 +158,21 @@ var unitScn := preload("res://scenes/Unit.tscn")
 #cursor location
 var cursorCell := Vector2i.ZERO:
 	set(value):
+		var newCell
 		if value == cursorCell:
 			return
-		cursorCell = region_clamp(value)
+		newCell = region_clamp(value)
 
-		cursor.position = currMap.map_to_local(cursorCell)
-		cursor.cell = cursorCell
+		cursor.position = currMap.map_to_local(newCell)
+		cursor.cell = newCell
+		cursorCell = newCell
 #		print(cursor.position)
-		_on_cursor_moved(cursorCell)
+		_on_cursor_moved(newCell)
 #		cTimer.start()
-
+	get:
+		if cursorCell != cursor.cell:
+			cursorCell = region_clamp(cursor.cell)
+		return cursorCell
 	
 func _process(_delta):
 	_check_flags()
@@ -193,7 +198,29 @@ func _process(_delta):
 	elif aiTurn and aiNeedAct:
 		start_ai_turn(turnOrder[0])
 			
-		
+
+#region debug funcs
+func _kill_lady():
+	var lady = unitObjs["Remilia"]
+	lady.apply_dmg(9999)
+
+
+func _camera_test():
+	cursor.store_origin()
+	cursor.cell_path_camera([Vector2i(15,8)])
+	_change_state(GameState.gState.CAMERA_STATE)
+	await cursor.camera_path_complete
+	#cursor.return_origin(true)
+	#await cursor.camera_path_complete
+	_change_state(GameState.previousState)
+	print("Camera tween test complete")
+
+func _kill_camera_test():
+	cursor.skip_tween()
+	#cursor.return_origin()
+	
+#endregion
+
 func _toggle_pause():
 	get_tree().paused = !get_tree().paused
 	
@@ -387,6 +414,7 @@ func _set_game_time():
 	
 func _connect_general_signals():
 	self.gb_ready.connect(GameState.set_new_state)
+	cursor.cursor_moved.connect(self._on_cursor_moved)
 	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
 	#self.danmaku_pathing_complete.connect()
 	#self.round_changed.connect(currMap.on_round_changed)
@@ -1826,13 +1854,3 @@ func spawn_raw_unit(unitPackage : Dictionary):
 	newUnit.set_process(true)
 	
 	
-#Debug Functions
-func _kill_lady():
-	var lady = unitObjs["Remilia"]
-	lady.apply_dmg(9999)
-
-
-
-
-
-

@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://cs0eqbem26sdi"]
 
-[ext_resource type="Script" path="res://scenes/animations/combat/fx/gen/passive_cut_in.gd" id="1_656ah"]
+[ext_resource type="Script" uid="uid://dycnfatepvtvk" path="res://scenes/animations/combat/fx/gen/passive_cut_in.gd" id="1_656ah"]
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="2_4r66x"]
 [ext_resource type="Texture2D" uid="uid://r68v1gevrwx1" path="res://sprites/fx/gen/passive_bar.png" id="2_cjgjw"]
 [ext_resource type="Texture2D" uid="uid://d2nckvmnnxanh" path="res://sprites/fx/gen/passive_icon.png" id="4_rat7p"]
@@ -62,8 +62,8 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_c47h8"]
 _data = {
-"Action": SubResource("Animation_hufmj"),
-"RESET": SubResource("Animation_prkun")
+&"Action": SubResource("Animation_hufmj"),
+&"RESET": SubResource("Animation_prkun")
 }
 
 [node name="passive_cut_in" type="Control"]

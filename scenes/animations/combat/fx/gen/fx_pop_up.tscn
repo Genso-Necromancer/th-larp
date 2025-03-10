@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://bxn00g1rrsv52"]
 
-[ext_resource type="Script" path="res://scenes/animations/combat/fx/gen/fx_pop_up.gd" id="1_6yvvn"]
+[ext_resource type="Script" uid="uid://cgubntckfir1b" path="res://scenes/animations/combat/fx/gen/fx_pop_up.gd" id="1_6yvvn"]
 [ext_resource type="Theme" uid="uid://beha4ndul0p5x" path="res://fonts/Izayoi_Theme_Chapter_Title.tres" id="2_yv45t"]
 
 [sub_resource type="Animation" id="Animation_xdv5q"]
@@ -84,8 +84,8 @@ tracks/2/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_u1i7a"]
 _data = {
-"RESET": SubResource("Animation_xdv5q"),
-"float": SubResource("Animation_b6y33")
+&"RESET": SubResource("Animation_xdv5q"),
+&"float": SubResource("Animation_b6y33")
 }
 
 [node name="fx_pop_up" type="Node2D"]

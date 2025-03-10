@@ -4,7 +4,6 @@ class_name GUIManager
 signal gui_splash_finished
 signal start_the_justice
 signal deploy_toggled(unitID, depStatus)
-signal profile_called
 signal formation_toggled
 signal item_used
 signal map_started

@@ -2,8 +2,8 @@
 
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_3ryf8"]
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_jeq77"]
-[ext_resource type="Script" path="res://scenes/combat_forecast.gd" id="2_npc5x"]
-[ext_resource type="Script" path="res://scenes/animation_handler.gd" id="5_knule"]
+[ext_resource type="Script" uid="uid://bqrxnm8bi7no" path="res://scenes/combat_forecast.gd" id="2_npc5x"]
+[ext_resource type="Script" uid="uid://c2e1stpb6yppa" path="res://scenes/animation_handler.gd" id="5_knule"]
 
 [node name="CombatForecast" type="PanelContainer"]
 anchors_preset = 15

@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://cvy4qgw5qey2i"]
 
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_jtngf"]
-[ext_resource type="Script" path="res://scenes/GUI/ActionMenu.gd" id="2_hm4hr"]
+[ext_resource type="Script" uid="uid://dms563enex66b" path="res://scenes/GUI/ActionMenu.gd" id="2_hm4hr"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_v6swc"]
 
 [node name="ActionMenu" type="Control"]

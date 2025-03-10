@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://d1ps52un0najt"]
 
 [ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="1_7pir1"]
-[ext_resource type="Script" path="res://sprites/icons/status_icon.gd" id="2_njref"]
+[ext_resource type="Script" uid="uid://cirs6h7fiatw4" path="res://sprites/icons/status_icon.gd" id="2_njref"]
 
 [node name="StatusIcon" type="TextureRect" groups=["StatusTT"]]
 custom_minimum_size = Vector2(20, 20)
