@@ -912,5 +912,3 @@ func _validate_slayer(target, effect):
 	if rule == species:
 		return true
 	return false
-
-

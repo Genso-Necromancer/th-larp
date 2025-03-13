@@ -619,13 +619,13 @@ func _play_item_anim(item) -> void:
 		return
 	var itemFx = load("res://scenes/animations/item_effects/item_fx.tscn").instantiate()
 	itemFx.itemfx_complete.connect(self._on_itemfx_complete)
-	get_parent()._change_state(GameState.ACCEPT_PROMPT)
+	GameState.change_state(get_parent(), GameState.ACCEPT_PROMPT)
 	$CharacterArtGroup/MarginContainer/PrtPnl1/MarginContainer/UnitPrt1/ItemFxNode.add_child(itemFx)
 	itemFx.play_item(item, true)
 
 
 func _on_itemfx_complete():
-	get_parent()._change_state(GameState.previousState)
+	GameState.change_state(get_parent(), GameState.previousState)
 
 
 func _trade_select(b):

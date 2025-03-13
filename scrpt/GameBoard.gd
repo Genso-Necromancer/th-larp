@@ -102,7 +102,10 @@ var defineUnits = false
 var walkableCells = []
 var solidsArray = [] #Deprecated, remove after fixing FIX
 var unitMoving = false
-var snapPath = null
+var snapPath := []:
+	set(value):
+		cursor.snapPath = value
+		snapPath = value
 var pathingArray := []
 
 #game turns
@@ -149,31 +152,12 @@ var aiNeedAct = false
 #@onready var turnTest = $Control/TurnLight
 @onready var boardState: BoardState = $BoardState
 @export var uiCooldown := 0.2
-@onready var gameCamera = $Cursor/Camera2D
 @onready var ai = $AiManager
-
+var cc : CameraController
 #@onready var cTimer: Timer = $Cursor/Timer
 var unitScn := preload("res://scenes/Unit.tscn")
 
-#cursor location
-var cursorCell := Vector2i.ZERO:
-	set(value):
-		var newCell
-		if value == cursorCell:
-			return
-		newCell = region_clamp(value)
 
-		cursor.position = currMap.map_to_local(newCell)
-		cursor.cell = newCell
-		cursorCell = newCell
-#		print(cursor.position)
-		_on_cursor_moved(newCell)
-#		cTimer.start()
-	get:
-		if cursorCell != cursor.cell:
-			cursorCell = region_clamp(cursor.cell)
-		return cursorCell
-	
 func _process(_delta):
 	_check_flags()
 	
@@ -197,7 +181,15 @@ func _process(_delta):
 		_start_next_turn()
 	elif aiTurn and aiNeedAct:
 		start_ai_turn(turnOrder[0])
-			
+
+#region utility funcs
+func _wipe_region():
+	snapPath.clear()
+
+
+#endregion
+
+
 
 #region debug funcs
 func _kill_lady():
@@ -206,19 +198,37 @@ func _kill_lady():
 
 
 func _camera_test():
-	cursor.store_origin()
-	cursor.cell_path_camera([Vector2i(15,8)])
-	_change_state(GameState.gState.CAMERA_STATE)
-	await cursor.camera_path_complete
-	#cursor.return_origin(true)
-	#await cursor.camera_path_complete
-	_change_state(GameState.previousState)
-	print("Camera tween test complete")
-
-func _kill_camera_test():
-	cursor.skip_tween()
-	#cursor.return_origin()
+	if !cc: 
+		cc = CameraController.new()
+	add_child(cc)
+	cursor.visible = false
+	GameState.change_state(self, GameState.gState.CAMERA_STATE)
+	#cc.move_camera_map(Vector2i(15,8))
 	
+	cc.move_camera_unit("Cirno")
+	
+	await cc.camera_control_complete
+	
+	cc.move_camera_unit("Remilia")
+	
+	await cc.camera_control_complete
+	
+	cc.reset_map_camera(true)
+	
+	await cc.camera_control_complete
+	
+	GameState.change_state(self, GameState.previousState)
+	cursor.visible = true
+	print("Camera tween test complete")
+	cc.queue_free()
+
+func _kill_camera_test() -> void:
+	if !cc: return
+	cc.skip_tween()
+	cursor.visible = true
+	cc.queue_free()
+	#cursor.return_origin()
+
 #endregion
 
 func _toggle_pause():
@@ -237,19 +247,6 @@ func _get_current_map():
 			continue
 		return map
 		
-	
-func _change_state(state):
-	var prev = GameState.previousSlave
-	GameState.previousSlave = GameState.newSlave
-	if state == GameState.state:
-		return
-	elif state == GameState.previousState:
-		GameState.newSlave = prev
-	else:
-		GameState.newSlave = [self]
-	
-	GameState.previousState = GameState.state
-	GameState.state = state
 	
 	
 func change_map(map):
@@ -446,10 +443,10 @@ func gb_mouse_motion(_event):
 	var toMap = currMap.local_to_map(mousePos)
 #	print(toMap)
 
-	cursorCell = Vector2i(toMap)
+	cursor.cell = Vector2i(toMap)
 	
 func gb_mouse_pressed():
-	cursor_accept_pressed(currMap.map_to_local(cursorCell))
+	cursor_accept_pressed(currMap.map_to_local(cursor.cell))
 
 ## Returns `true` if the cell is occupied by a unit
 func is_occupied(cell: Vector2i) -> bool:
@@ -534,11 +531,11 @@ func is_within_bounds(cell_coordinates: Vector2i) -> bool: #Pathing
 
 
 func select_cell(): #DEFAULT STATE: If a cell has a valid unit, selects it
-	var occupied = is_occupied(cursorCell)
+	var occupied = is_occupied(cursor.cell)
 	if !occupied:
-		emit_signal("cell_selected", cursorCell)
-	elif units[cursorCell].FACTION_ID == Enums.FACTION_ID.PLAYER:
-		_select_unit(cursorCell)
+		emit_signal("cell_selected", cursor.cell)
+	elif units[cursor.cell].FACTION_ID == Enums.FACTION_ID.PLAYER:
+		_select_unit(cursor.cell)
 	else:
 		pass #TO-DO: seperate selection that just toggles a unit's movement and reach
 		
@@ -552,7 +549,7 @@ func _move_active_unit(new_cell: Vector2i, enemy: bool = false, enemyPath = null
 			return
 	
 	if !enemy:
-		_change_state(GameState.gState.ACCEPT_PROMPT)
+		GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
 	currMap.clear_layer(5)
 	if !new_cell == activeUnit.cell:
 		#print("it's walkable")
@@ -590,7 +587,7 @@ func _select_unit(cell: Vector2i, isAi = false) -> void:
 	walkableCells = get_walkable_cells(activeUnit)
 	
 	currMap.draw(walkableCells)
-	if !isAi: _change_state(GameState.gState.GB_SELECTED)
+	if !isAi: GameState.change_state(self, GameState.gState.GB_SELECTED)
 	emit_signal("unit_selected", units[cell])
 #	set_region_border(walkableCells)
 
@@ -711,30 +708,30 @@ func _clear_active_unit() -> void:
 
 
 func select_destination(): #SELECTED STATE Pathing Related
-	var isOccupied = is_occupied(cursorCell)
-	var isWalkable = walkableCells.has(cursorCell)
+	var isOccupied = is_occupied(cursor.cell)
+	var isWalkable = walkableCells.has(cursor.cell)
 	var moveRemain :int = activeUnit.activeStats.Move - pathingArray.size()
-	if !isOccupied and isWalkable and moveRemain > 0 and !pathingArray.has(cursorCell):
-		_update_pathing_array(cursorCell)
+	if !isOccupied and isWalkable and moveRemain > 0 and !pathingArray.has(cursor.cell):
+		_update_pathing_array(cursor.cell)
 		moveRemain = activeUnit.activeStats.Move - pathingArray.size()
 		_update_walkable_range(moveRemain)
-	elif cursorCell == activeUnit.cell:
+	elif cursor.cell == activeUnit.cell:
 		emit_signal("unit_move_ended", activeUnit)
-	elif pathingArray[-1] == cursorCell:
-		_move_active_unit(cursorCell)
+	elif pathingArray[-1] == cursor.cell:
+		_move_active_unit(cursor.cell)
 	
 
 func select_formation_cell():
-	if deploymentCells.has(cursorCell) and is_occupied(cursorCell) and storedUnit == null:
-		storedUnit = units[cursorCell]
-		storedCell = cursorCell
+	if deploymentCells.has(cursor.cell) and is_occupied(cursor.cell) and storedUnit == null:
+		storedUnit = units[cursor.cell]
+		storedCell = cursor.cell
 		storedUnit.isSelected = true
-	elif deploymentCells.has(cursorCell) and is_occupied(cursorCell):
-		_deploy_swap(storedUnit, units[cursorCell])
+	elif deploymentCells.has(cursor.cell) and is_occupied(cursor.cell):
+		_deploy_swap(storedUnit, units[cursor.cell])
 		# swap function here
-	elif deploymentCells.has(cursorCell) and storedCell != Vector2i(-1,-1):
-		storedCell = cursorCell
-	elif deploymentCells.has(cursorCell):
+	elif deploymentCells.has(cursor.cell) and storedCell != Vector2i(-1,-1):
+		storedCell = cursor.cell
+	elif deploymentCells.has(cursor.cell):
 		_deploy_swap(storedUnit, storedCell)
 		#swap function
 		
@@ -775,45 +772,45 @@ func toggle_unit_profile():
 	else: toggle_extra_info()
 	
 func request_deselect():
-	wipe_region()
+	_wipe_region()
 	currMap.clear_layer(5)
-	_change_state(GameState.gState.GB_DEFAULT)
+	GameState.change_state(self, GameState.gState.GB_DEFAULT)
 	_deselect_active_unit(false)
 
 
 func skill_target_cancel():
-	wipe_region()
+	_wipe_region()
 	currMap.clear_layer(5)
-	_change_state(GameState.gState.GB_ACTION_MENU)
+	GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
 	_snap_cursor(activeUnit.cell)
 	emit_signal("skill_target_canceled")
 	
 
 func end_targeting():
-	wipe_region()
+	_wipe_region()
 	currMap.clear_layer(5)
-	cursorCell = activeUnit.cell
+	cursor.cell = activeUnit.cell
 	emit_signal("gameboard_targeting_canceled")
 
 func menu_step_back():
 	match GameState.state:
 		GameState.gState.GB_COMBAT_FORECAST:
 			emit_signal("action_called", activeUnit)
-			_change_state(GameState.gState.GB_ACTION_MENU)
-			wipe_region()
-			cursorCell = activeUnit.cell
+			GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
+			_wipe_region()
+			cursor.cell = activeUnit.cell
 	
 	
 func attack_target_selected():
-	if is_occupied(cursorCell) and !_check_friendly(activeUnit, focusUnit):
+	if is_occupied(cursor.cell) and !_check_friendly(activeUnit, focusUnit):
 #				$Cursor.visible = false
-		grab_target(cursorCell)
+		grab_target(cursor.cell)
 		
 func confirm_forecast():
 	emit_signal("forecast_confirmed")
 		
 func skill_target_selected():
-	if !is_occupied(cursorCell):
+	if !is_occupied(cursor.cell):
 		return
 	if !UnitData.skillData.has(activeAction.Skill):
 		print("No Valid SkillID")
@@ -849,7 +846,7 @@ func skill_target_selected():
 	
 					
 	if valid:
-		grab_target(cursorCell)
+		grab_target(cursor.cell)
 
 func _check_friendly(unit1, unit2) ->bool:
 	if unit1.FACTION_ID == unit2.FACTION_ID:
@@ -989,16 +986,19 @@ func _on_cursor_moved(new_cell: Vector2i) -> void: #Pathing
 
 
 func on_directional_press(direction: Vector2i):
-	var nextCell = cursorCell + direction
+	var nextCell = cursor.cell + direction
 	var newCell
 	
 	if GameState.state == GameState.gState.GB_PROFILE:
 		return
 		
-	if snapPath != null and !snapPath.has(nextCell):
-		newCell = find_next_best_cell(cursorCell, nextCell)
-		cursorCell = newCell
-	else: cursorCell += direction
+	if snapPath and !snapPath.has(nextCell):
+		newCell = find_next_best_cell(cursor.cell, nextCell)
+		cursor.cell = newCell
+	else: cursor.cell += direction
+
+
+
 
 
 #Targeting Code
@@ -1006,7 +1006,7 @@ func on_directional_press(direction: Vector2i):
 func start_attack_targeting():
 	var reach :Dictionary = activeUnit.get_weapon_reach()
 	activeAction = {"Weapon": true, "Skill": false}
-	_change_state(GameState.gState.GB_ATTACK_TARGETING)
+	GameState.change_state(self, GameState.gState.GB_ATTACK_TARGETING)
 	_draw_range(activeUnit, reach.Max, reach.Min)
 	
 	
@@ -1016,7 +1016,7 @@ func start_skill_targeting():
 	if activeAction.Weapon: reach = activeUnit.get_aug_reach(activeAction.Skill)
 	else: reach = activeUnit.get_skill_reach(activeAction.Skill)
 	_draw_range(activeUnit, reach.Max, reach.Min)
-	_change_state(GameState.gState.GB_SKILL_TARGETING)
+	GameState.change_state(self, GameState.gState.GB_SKILL_TARGETING)
 
 #func start_attack_targeting(unit: Unit, action):
 	#var minRange := 1000
@@ -1030,11 +1030,11 @@ func start_skill_targeting():
 		#var reach = _get_aug_range(unit, action)
 		#minRange = reach[0]
 		#maxRange = reach[1]
-		#_change_state(GameState.gState.GB_ATTACK_TARGETING)
+		#GameState.change_state(self, GameState.gState.GB_ATTACK_TARGETING)
 	#elif action.Skill:
 		#minRange = skillData[action.Skill].MinRange
 		#maxRange = skillData[action.Skill].MaxRange
-		#_change_state(GameState.gState.GB_SKILL_TARGETING)
+		#GameState.change_state(self, GameState.gState.GB_SKILL_TARGETING)
 	#else:
 		#for wep in unit.unitData.Inv:
 			#if wep.Dur == 0:
@@ -1046,7 +1046,7 @@ func start_skill_targeting():
 			#minRange = min(minRange, wepData[id].MinRange, minRange)
 			#maxRange = max(maxRange, wepData[id].MaxRange, maxRange)
 			#
-		#_change_state(GameState.gState.GB_ATTACK_TARGETING)
+		#GameState.change_state(self, GameState.gState.GB_ATTACK_TARGETING)
 	#
 	#_draw_range(unit, maxRange, minRange)
 		
@@ -1054,12 +1054,12 @@ func start_skill_targeting():
 
 func warp_targeting(unit, wRange):
 	_draw_range(unit, wRange)
-	_change_state(GameState.gState.GB_WARP)
+	GameState.change_state(self, GameState.gState.GB_WARP)
 	
 func _draw_range(unit : Unit, maxRange : int, minRange := 0):
 	var path = _get_cells_in_range(unit.cell, maxRange, minRange,)
 	snapPath = path
-	bump_cursor()
+	cursor.bump_cursor()
 	currMap.draw_attack(path)
 	unitPath.stop()
 	
@@ -1076,8 +1076,8 @@ func _get_cells_in_range(cell : Vector2i, maxRange : int, minRange : int): #HEX 
 func initiate_warp():
 	#var friendly = false
 #	var team = null
-	if !is_occupied(cursorCell) and !solidsArray.has(cursorCell) and snapPath.has(cursorCell):
-		combatManager.warp_to(warpTarget, cursorCell)
+	if !is_occupied(cursor.cell) and !solidsArray.has(cursor.cell) and snapPath.has(cursor.cell):
+		combatManager.warp_to(warpTarget, cursor.cell)
 		combat_sequence("warp")
 		warpTarget = null
 
@@ -1092,19 +1092,19 @@ func _on_unit_item_activated(item, unit, target):
 	
 
 func combat_sequence(scenario):
-	_change_state(GameState.gState.ACCEPT_PROMPT)
+	GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
 	
 	SignalTower.emit_signal("sequence_initiated", scenario)
 
 func _on_animation_handler_sequence_complete():
 	var hasPostEvents = _check_post_queue()
-	_change_state(GameState.gState.LOADING)
+	GameState.change_state(self, GameState.gState.LOADING)
 	
 	if hasPostEvents:
 		_run_post_queue()
 		await self.post_queue_cleared
 	emit_signal("sequence_concluded")
-	wipe_region()
+	_wipe_region()
 	
 func _run_post_queue():
 	var postEvents = _sort_post_queue()
@@ -1183,43 +1183,7 @@ func toggle_extra_info():
 		HpBarVis = true
 	return
 
-func region_clamp(grid_position: Vector2i) -> Vector2i:
-	#Keeps cursor inside temporary boundaries without messing with it's map boundaries
-	var out := grid_position
-	var mapSize = currMap.get_used_rect().size
-	if snapPath != null:
-		if !snapPath.has(grid_position):
-			return cursorCell
-		
-	else:
-		out.x = clamp(out.x, 0, mapSize.x - 1.0)
-		out.y = clamp(out.y, 0, mapSize.y - 1.0)
-	return out
-	
-func wipe_region():
-	snapPath = null
-	
-func bump_cursor():
-	var seek = false
-	var bumpTo
-	var shortest = 1000
-	var bumpFound = false
-	var hexStar = AHexGrid2D.new(currMap)
-	if !snapPath.has(cursorCell):
-		seek = true
-	if seek:
-		for cell in snapPath:
-			var distance = hexStar.find_distance(cursorCell, cell)
-			if units.has(cell) and distance < shortest:
-				bumpTo = cell
-				shortest = distance
-				bumpFound = true
-				
-	if seek and bumpFound:
-		cursorCell = bumpTo
-	elif seek:
-		cursorCell = snapPath[0]
-	
+
 func find_next_best_cell(currentCell, nextCell): #it's still pretty jank, but atleast you can reach cells using direction keys using this. Without it, some cannot be reached during targeting.
 	var shortestNext = 1000
 	var shortestCurrent = 1000
@@ -1333,7 +1297,7 @@ func _start_next_turn():
 		_cursor_toggle(false)
 
 	if !aiTurn and earlyEnd:
-		_change_state(GameState.gState.LOADING)
+		GameState.change_state(self, GameState.gState.LOADING)
 		set_next_acted()
 		turnComplete = true
 	
@@ -1375,7 +1339,7 @@ func round_change():
 	
 func _check_eor_events():
 	endOfRound = false
-	_change_state(GameState.gState.GB_END_OF_ROUND)
+	GameState.change_state(self, GameState.gState.GB_END_OF_ROUND)
 	if danmaku.size() > 0:
 		_progress_danmaku_path()
 		await self.danmaku_pathing_complete
@@ -1420,7 +1384,7 @@ func set_next_acted():
 func start_ai_turn(aiFaction):
 	print("Starting AI Turn")
 	aiNeedAct = false
-	_change_state(GameState.gState.GB_AI_TURN)
+	GameState.change_state(self, GameState.gState.GB_AI_TURN)
 	#Gets the ball rolling for the AI to take actions
 	if boardState.enemy.size() > 0:
 		var result = ai.get_move(boardState)
@@ -1588,7 +1552,6 @@ func _update_roster_label():
 			
 			
 func _cursor_toggle(enable, snapLeader = true):
-	
 	if enable:
 		cursor.visible = true
 	else:
@@ -1596,8 +1559,9 @@ func _cursor_toggle(enable, snapLeader = true):
 	if snapLeader:
 		_snap_cursor()
 
+
 func _snap_cursor(cell: Vector2i = unitObjs[forcedDeploy.keys()[0]].cell): #can be annoying to always have this tied to mouse, like before map starts.
-	cursorCell = cell
+	cursor.cell = cell
 	var mouseWarp = cursor.get_global_transform_with_canvas()
 	#mouseWarp = to_global(mouseWarp)
 	get_viewport().warp_mouse(mouseWarp.origin)
@@ -1611,12 +1575,12 @@ func _on_gui_action_menu_canceled():
 
 func unit_wait():
 	_deselect_active_unit(true)
-	_change_state(GameState.gState.LOADING)
+	GameState.change_state(self, GameState.gState.LOADING)
 	turnComplete = true
 
 
 func _on_exp_gain_exp_finished():
-	_change_state(GameState.gState.LOADING)
+	GameState.change_state(self, GameState.gState.LOADING)
 	emit_signal("continue_turn")
 
 
@@ -1630,7 +1594,7 @@ func _on_action_weapon_selected(button = false):
 	if activeAction.Weapon and button:
 		var weapon = button.get_meta("Item")
 		activeUnit.set_direct_equipped(weapon)
-	_change_state(GameState.gState.LOADING)
+	GameState.change_state(self, GameState.gState.LOADING)
 	combatResults = combatManager.start_the_justice(activeUnit,target, activeAction)
 	#print(str(combatResults))
 	combat_sequence(combatResults)
@@ -1643,7 +1607,7 @@ func _on_action_weapon_selected(button = false):
 
 
 func _on_win_screen_win_finished():
-	_change_state(GameState.gState.LOADING)
+	GameState.change_state(self, GameState.gState.LOADING)
 	change_map(currMap.next_map)
 	#currMap.progress_next_map()
 	#self.call_deferred("_load_next_map")
@@ -1659,7 +1623,7 @@ func _on_gui_manager_formation_toggled():
 	match GameState.state:
 		GameState.gState.GB_SETUP:
 			_cursor_toggle(true, true)
-			_change_state(GameState.gState.GB_FORMATION)
+			GameState.change_state(self, GameState.gState.GB_FORMATION)
 		GameState.gState.GB_FORMATION:
 			_cursor_toggle(false)
 	
@@ -1671,7 +1635,7 @@ func _on_gui_manager_map_started():
 		units[unit].map_start_init()
 	_cursor_toggle(true)
 	currMap.hide_deployment()
-	_change_state(GameState.gState.GB_DEFAULT)
+	GameState.change_state(self, GameState.gState.GB_DEFAULT)
 	_initialize_turns()
 	
 		

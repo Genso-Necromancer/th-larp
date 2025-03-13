@@ -42,7 +42,7 @@ func _init():
 	
 func _init_flags():
 	flags = {
-		"DebugMode": false,
+		"DebugMode": true,
 		"gameOver": false,
 		"victory": false,
 		"activeUnit": false,

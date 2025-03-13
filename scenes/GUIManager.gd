@@ -111,16 +111,7 @@ func update_labels(): #Use this to cascade assigning strings from XML to all har
 func _on_prompt_accepted():
 	_initiate_ai_sequence()
 	
-func _change_state(state):
-	var prev = GameState.previousSlave
-	GameState.previousSlave = GameState.newSlave
-	if state == GameState.state: return
-	elif state == GameState.previousState: 
-		GameState.newSlave = prev
-	else: GameState.newSlave = [self]
-	
-	GameState.previousState = GameState.state
-	GameState.state = state
+
 	
 func _load_turn_tracker():
 	turnTracker = turnTrackerRes.instantiate()
@@ -226,7 +217,7 @@ func toggle_profile() -> void:
 		unitProf.toggle_profile()
 		profFocus = Global.focusUnit
 		rosterGrid.set_bar_focus(false)
-		_change_state(GameState.gState.GB_PROFILE)
+		GameState.change_state(self, GameState.gState.GB_PROFILE)
 	else:
 		_strip_menuCursor(false, unitProf.focusLabels)
 		rosterGrid.set_bar_focus(true)
@@ -237,7 +228,7 @@ func toggle_profile() -> void:
 			button.call_deferred("grab_focus")
 		prevFocus = null
 		unitProf.toggle_profile()
-		_change_state(GameState.previousState)
+		GameState.change_state(self, GameState.previousState)
 
 
 func update_prof():
@@ -258,10 +249,10 @@ func _on_gameboard_target_focused( mode : int, reach: Array = [-1, -1]):
 	_swap_to_forecast()
 	match mode:
 		0: 
-			_change_state(GameState.gState.GB_COMBAT_FORECAST)
+			GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
 			actMenu.open_weapon_select(reach)
 		1: 
-			_change_state(GameState.gState.GB_COMBAT_FORECAST)
+			GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
 			actMenu.open_skill_confirm()
 		2: _ai_sequence_check()
 	
@@ -312,7 +303,7 @@ func _on_gameboard_gb_ready(_state):
 func _on_gameboard_exp_display(oldExp, expSteps, results, unitPrt, unitName):
 	var expContainer : Control = $ExpGain
 	
-	_change_state(GameState.gState.ACCEPT_PROMPT)
+	GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
 	expContainer.init_exp_display(oldExp, expSteps, results, unitPrt, unitName)
 	expContainer.toggle_visibility()
 
@@ -329,7 +320,7 @@ func call_setup(dLimit, forced, map):
 	depLimit = dLimit
 	
 	rosterGrid.init_roster(forcedDep, depLimit)
-	_change_state(GameState.gState.GB_SETUP)
+	GameState.change_state(self, GameState.gState.GB_SETUP)
 
 func _load_assets():
 	mapSetUp = load("res://scenes/GUI/MapSetup.tscn").instantiate()
@@ -547,7 +538,7 @@ func _on_gameboard_formation_closed():
 	emit_signal("formation_toggled")
 	menuCursor.resignal_cursor(btns)
 	#_resignal_menuCursor(btns)
-	_change_state(GameState.gState.GB_SETUP)
+	GameState.change_state(self, GameState.gState.GB_SETUP)
 
 	
 func _open_unit_options(b):
@@ -651,23 +642,23 @@ func _on_action_menu_canceled():
 
 
 func cancel_forecast():
-	#_change_state(GameState.gState.GB_ACTION_MENU)
+	#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
 	foreCast.hide_fc()
 	regress_act_menu()
 
 
 func _on_gameboard_cell_selected(_cell): #cell is sent by signal for general use, but the specific cell selected is not currently needed
-	_change_state(GameState.gState.GB_ACTION_MENU)
+	GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
 	actMenu.open_as_options()
 
 
 func _on_gameboard_unit_move_ended(unit):
-	_change_state(GameState.gState.GB_ACTION_MENU)
+	GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
 	actMenu.open_as_action(unit)
 
 
 func _on_gameboard_targeting_canceled():
-	_change_state(GameState.gState.GB_ACTION_MENU)
+	GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
 	regress_act_menu()
 
 
@@ -707,7 +698,7 @@ func _end_load_screen():
 func play_splash(chNum:int, chTitle:String, timeString:String):
 	var splashPlayer = load("res://scenes/GUI/chapter_splash.tscn").instantiate()
 	add_child(splashPlayer)
-	_change_state(GameState.gState.ACCEPT_PROMPT)
+	GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
 	splashPlayer.splash_player_finished.connect(self._on_splash_player_finished)
 	splashPlayer.play_splash(chNum, chTitle, timeString)
 
@@ -719,12 +710,12 @@ func _on_splash_player_finished():
 func _on_gameboard_player_lost():
 	var failScreen = $FailScreen
 	failScreen.fade_in_failure()
-	_change_state(GameState.gState.FAIL_STATE)
+	GameState.change_state(self, GameState.gState.FAIL_STATE)
 
 func _on_gameboard_player_win():
 	var winScreen = $WinScreen
 	winScreen.fade_in_win()
-	_change_state(GameState.gState.WIN_STATE)
+	GameState.change_state(self, GameState.gState.WIN_STATE)
 
 func _on_win_screen_win_finished():
 	_start_load_screen()
@@ -740,4 +731,4 @@ func _on_animation_handler_sequence_complete():
 
 
 func _on_gameboard_sequence_initiated(_sequence):
-	_change_state(GameState.gState.SCENE_ACTIVE)
+	GameState.change_state(self, GameState.gState.SCENE_ACTIVE)

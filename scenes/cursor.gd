@@ -4,7 +4,7 @@ extends Node2D
 class_name Cursor
 
 
-signal camera_path_complete
+signal cursor_path_complete
 signal cursor_moved(cell)
 
 @onready var cursorSprite: Sprite2D = $Sprite2D
@@ -16,7 +16,7 @@ var cell := Vector2i.ZERO:
 		var newCell
 		if value == cell:
 			return
-		newCell = region_clamp(value)
+		newCell = _region_clamp(value)
 
 		position = Global.flags.CurrentMap.map_to_local(newCell)
 		cell = newCell
@@ -24,24 +24,25 @@ var cell := Vector2i.ZERO:
 #		print(cursor.position)
 		emit_signal("cursor_moved", cell)
 #		cTimer.start()
-
+var snapPath := []
 var tick = 1
 var originPoint := Vector2i.ZERO
 var tween : Tween
 	
 
 func _process(_delta):
-	if tick == 0:
+	
+	if Engine.is_editor_hint(): return
+	
+	if $Cell.visible != Global.flags.DebugMode:
+		$Cell.visible = Global.flags.DebugMode
+		
+	if !Global.flags.DebugMode: pass
+	elif tick == 0:
 		var coord = $Cell
 		coord.set_text(str(cell))
 		tick = 1
-	else:
-		tick -= 1
-
-
-func align_camera():
-	var camera = $Camera2D
-	camera.align()
+	else: tick = clampi((tick - 1), 0, INF)
 
 
 #Camera Manipulation Functions
@@ -62,7 +63,7 @@ func return_origin(isTweened := false) ->void:
 		visible = true
 	else: 
 		cell = originPoint
-		emit_signal("camera_path_complete")
+		emit_signal("cursor_path_complete")
 	originPoint = Vector2i.ZERO
 
 
@@ -98,7 +99,7 @@ func kill_tween() -> void:
 	tween.kill()
 	_toggle_drag()
 	visible = true
-	emit_signal("camera_path_complete")
+	emit_signal("cursor_path_complete")
 
 
 func _create_camera_path(path:Array[Vector2i]) -> Array[Vector2i]:
@@ -123,12 +124,54 @@ func _tween_camera(path:Array[Vector2i], speed:float = 1.0, ease:Tween.EaseType 
 		tween.tween_callback(kill_tween)
 		#tween.tween_method(_move_cursor.bind(path), 0, (path.size() - 1), 2).set_trans(Tween.TRANS_LINEAR)
 
-
 func _move_cursor(destination:Vector2):
 	pass
 
 
-
 func _toggle_drag():
-	$Camera2D.drag_horizontal_enabled = !$Camera2D.drag_horizontal_enabled
-	$Camera2D.drag_vertical_enabled = !$Camera2D.drag_vertical_enabled
+	$MapCamera.drag_horizontal_enabled = !$MapCamera.drag_horizontal_enabled
+	$MapCamera.drag_vertical_enabled = !$MapCamera.drag_vertical_enabled
+
+#region utility funcs
+func _region_clamp(gridPosition: Vector2i) -> Vector2i:
+	#Keeps cursor inside temporary boundaries without messing with it's map boundaries
+	var out := gridPosition
+	var mapSize = Global.flags.CurrentMap.get_used_rect().size
+	if snapPath:
+		if !snapPath.has(gridPosition):
+			return cell
+		
+	else:
+		out.x = clamp(out.x, 0, mapSize.x - 1.0)
+		out.y = clamp(out.y, 0, mapSize.y - 1.0)
+	return out
+	
+#endregion
+
+#region cursor manipulation funcs
+func bump_cursor():
+	var seek = false
+	var bumpTo
+	var shortest = INF
+	var bumpFound = false
+	var hexStar = AHexGrid2D.new(Global.flags.CurrentMap)
+	if !snapPath.has(cell):
+		seek = true
+	if seek:
+		for cell in snapPath:
+			var distance = hexStar.find_distance(cell, cell)
+			if get_parent().units.has(cell) and distance < shortest:
+				bumpTo = cell
+				shortest = distance
+				bumpFound = true
+				
+	if seek and bumpFound:
+		cell = bumpTo
+	elif seek:
+		cell = snapPath[0]
+
+
+func align_camera():
+	var camera = $MapCamera
+	camera.align()
+#endregion

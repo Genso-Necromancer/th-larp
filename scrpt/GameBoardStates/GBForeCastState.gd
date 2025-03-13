@@ -1,11 +1,6 @@
 extends GenericState
 class_name GBForeCastState
-var slave
 
-func setup(newSlaves):
-	super.setup(newSlaves)
-	slave = slaves[0]
-	print(str(slaves))
 
 func _handle_bind(bind):
 	match bind:

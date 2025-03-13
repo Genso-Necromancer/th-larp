@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://r6wtvva5qput"]
+[gd_scene load_steps=14 format=3 uid="uid://r6wtvva5qput"]
 
 [ext_resource type="Script" uid="uid://bqpbd5d44eaxh" path="res://scenes/GUIManager.gd" id="1_d2r44"]
 [ext_resource type="Theme" uid="uid://bi2ve4mbgqqd0" path="res://fonts/Izayoi_Theme_setup.tres" id="1_puiy8"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" uid="uid://bsvach1mh5p1p" path="res://scenes/debug.gd" id="10_pjuly"]
 [ext_resource type="Script" uid="uid://cads6wf5xteti" path="res://scenes/FailScreen.gd" id="12_jkf6w"]
 [ext_resource type="Script" uid="uid://c2khcu02r73nu" path="res://scenes/WinScreen.gd" id="13_jghgq"]
+[ext_resource type="PackedScene" uid="uid://b1bjxokhen2uf" path="res://scenes/fader.tscn" id="13_kppqt"]
 [ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="15_5mgdm"]
 [ext_resource type="Script" uid="uid://cavxbmw8aekbj" path="res://scenes/expgain.gd" id="15_w87l3"]
 [ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="16_nw8x6"]
@@ -439,4 +440,11 @@ texture_under = ExtResource("16_nw8x6")
 texture_over = ExtResource("17_a06i1")
 texture_progress = ExtResource("18_18bf3")
 
+[node name="Fader" parent="." instance=ExtResource("13_kppqt")]
+layout_mode = 1
+
+[node name="Fade" parent="Fader" index="0"]
+color = Color(0, 0, 0, 1)
+
 [editable path="HUD"]
+[editable path="Fader"]

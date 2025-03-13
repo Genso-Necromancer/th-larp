@@ -59,3 +59,4 @@ script = ExtResource("9_uqyc0")
 [connection signal="area_exited" from="Cursor/Area2D" to="." method="_on_area_2d_area_exited"]
 
 [editable path="Cursor"]
+[editable path="Cursor/MapCamera"]

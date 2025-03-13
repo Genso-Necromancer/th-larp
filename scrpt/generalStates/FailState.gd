@@ -1,10 +1,6 @@
 extends GenericState
 class_name FailState
-var slave
 
-func setup(newSlaves):
-	super.setup(newSlaves)
-	slave = slaves[0]
 
 func mouse_motion(_event: InputEvent) -> void:
 	pass

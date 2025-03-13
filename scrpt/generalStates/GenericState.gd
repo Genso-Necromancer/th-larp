@@ -1,7 +1,7 @@
 extends Node
 class_name GenericState
 
-var slaves = []
+var slave : Node 
 var keyBinds = ["ui_accept", "ui_info", "ui_return", "debugKillLady", "debugHealTest", "debug_camera_test", "debug_kill_test"]
 var heldBinds = ["ui_scroll_left", "ui_scroll_right", "ui_right", "ui_up", "ui_left", "ui_down"]
 var uiCooldown = 0.2
@@ -9,19 +9,17 @@ var timer
 var direction
 var signalTower = SignalTower
 
-func setup(newSlaves):
+func setup(newSlave):
 #	var i = 0
 	if timer:
 		timer.queue_free()
 	timer = Timer.new()
 	timer.one_shot = true
 	add_child(timer)
-	self.slaves.clear()
-	if newSlaves == null or newSlaves.size() <= 0:
+	if !newSlave:
 		print("NO NEW SLAVES")
 		return
-	for slave in newSlaves:
-		self.slaves.append(slave)
+	slave = newSlave
 #		i += 1
 
 #	print(slaves)

@@ -1,0 +1,162 @@
+[gd_resource type="TileSet" load_steps=17 format=3 uid="uid://dae0fl1fnuwvk"]
+
+[ext_resource type="Texture2D" uid="uid://cwrqpj7en2cof" path="res://sprites/tiles/deployment.png" id="1_ggcxa"]
+[ext_resource type="Texture2D" uid="uid://b3kybcmn08s6d" path="res://sprites/tiles/forcedDeployment.png" id="2_e3vs3"]
+[ext_resource type="Texture2D" uid="uid://wegqw3w8dxe1" path="res://sprites/tiles/movement_tile.png" id="3_v76xb"]
+[ext_resource type="Texture2D" uid="uid://dwlnwcdgwc6de" path="res://sprites/tiles/PlaceHolderModTiles.png" id="4_j2mhh"]
+[ext_resource type="Texture2D" uid="uid://cjkkbrsts6nqc" path="res://sprites/tiles/walls.png" id="5_ycrxn"]
+[ext_resource type="Texture2D" uid="uid://cvwlg1ibgcatk" path="res://sprites/tiles/event_spawner.png" id="6_6ymmv"]
+[ext_resource type="Texture2D" uid="uid://bksmyj30srka5" path="res://sprites/tiles/TileSetPlaceHolder.png" id="7_s3su6"]
+[ext_resource type="Texture2D" uid="uid://dl5k64jih1qno" path="res://sprites/tiles/attack_target.png" id="8_rk7vv"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qmxju"]
+texture = ExtResource("1_ggcxa")
+texture_region_size = Vector2i(160, 48)
+0:0/0 = 0
+0:0/0/custom_data_2 = &"deployCell"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bkpol"]
+texture = ExtResource("2_e3vs3")
+texture_region_size = Vector2i(160, 48)
+0:0/0 = 0
+0:0/0/custom_data_2 = &"forcedCell"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mbyn6"]
+texture = ExtResource("3_v76xb")
+texture_region_size = Vector2i(168, 56)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_3ivj7"]
+texture = ExtResource("4_j2mhh")
+texture_region_size = Vector2i(168, 104)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, 25)
+0:0/0/custom_data_0 = &"Fort"
+0:0/0/custom_data_1 = &"Fort"
+1:0/0 = 0
+1:0/0/texture_origin = Vector2i(0, 25)
+1:0/0/custom_data_0 = &"Trees"
+1:0/0/custom_data_1 = &"Woodland"
+0:1/0 = 0
+0:1/0/texture_origin = Vector2i(0, 25)
+0:1/0/custom_data_0 = &"Hill"
+0:1/0/custom_data_1 = &"Hill"
+1:1/0 = 0
+1:1/0/texture_origin = Vector2i(0, 25)
+1:1/0/custom_data_0 = &"Shrine"
+1:1/0/custom_data_1 = &"House"
+0:2/0 = 0
+0:2/0/texture_origin = Vector2i(0, 25)
+0:2/0/custom_data_0 = &"House"
+0:2/0/custom_data_1 = &"House"
+1:2/0 = 0
+1:2/0/texture_origin = Vector2i(0, 25)
+1:2/0/custom_data_0 = &"Bridge"
+1:2/0/custom_data_1 = &"Flat"
+0:3/0 = 0
+0:3/0/texture_origin = Vector2i(0, 25)
+0:3/0/custom_data_0 = &"Shop"
+0:3/0/custom_data_1 = &"Shop"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fntpe"]
+texture = ExtResource("5_ycrxn")
+texture_region_size = Vector2i(168, 104)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, 25)
+0:0/0/custom_data_0 = &"WallFly"
+0:0/0/custom_data_1 = &"WallFly"
+2:0/0 = 0
+2:0/0/texture_origin = Vector2i(0, 25)
+2:0/0/custom_data_0 = &"WallShoot"
+2:0/0/custom_data_1 = &"WallShoot"
+4:0/0 = 0
+4:0/0/texture_origin = Vector2i(0, 25)
+4:0/0/custom_data_0 = &"Wall"
+4:0/0/custom_data_1 = &"Wall"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_njr1x"]
+texture = ExtResource("6_6ymmv")
+texture_region_size = Vector2i(160, 48)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2ggml"]
+resource_name = "DevTerrain"
+texture = ExtResource("7_s3su6")
+margins = Vector2i(48, 24)
+texture_region_size = Vector2i(168, 54)
+0:0/0 = 0
+0:0/0/custom_data_0 = &"Ground"
+0:0/0/custom_data_1 = &"Flat"
+1:0/0 = 0
+1:0/0/custom_data_0 = &"Grass"
+1:0/0/custom_data_1 = &"Flat"
+0:1/0 = 0
+0:1/0/custom_data_0 = &"River"
+0:1/0/custom_data_1 = &"River"
+1:1/0 = 0
+1:1/0/custom_data_0 = &"Water"
+1:1/0/custom_data_1 = &"Water"
+0:2/0 = 0
+0:2/0/custom_data_0 = &"Sanzu"
+0:2/0/custom_data_1 = &"Sanzu"
+1:2/0 = 0
+1:2/0/custom_data_0 = &"HotSpring"
+1:2/0/custom_data_1 = &"HotSpring"
+0:3/0 = 0
+0:3/0/custom_data_0 = &"Brush"
+0:3/0/custom_data_1 = &"Rough"
+1:3/0 = 0
+1:3/0/custom_data_0 = &"Snow"
+1:3/0/custom_data_1 = &"Rough"
+0:4/0 = 0
+0:4/0/custom_data_0 = &"Sand"
+0:4/0/custom_data_1 = &"Rough"
+1:4/0 = 0
+1:4/0/custom_data_0 = &"HellSand"
+1:4/0/custom_data_1 = &"HellSand"
+0:5/0 = 0
+1:5/0 = 0
+0:6/0 = 0
+0:6/0/custom_data_0 = &"Stone"
+0:6/0/custom_data_1 = &"Flat"
+1:6/0 = 0
+1:6/0/custom_data_0 = &"Tile"
+1:6/0/custom_data_1 = &"Flat"
+0:7/0 = 0
+0:7/0/custom_data_0 = &"Water"
+0:7/0/custom_data_1 = &"River"
+1:7/0 = 0
+1:7/0/custom_data_0 = &"PowTile"
+1:7/0/custom_data_1 = &"PowTile"
+0:8/0 = 0
+0:8/0/custom_data_0 = &"HitTile"
+0:8/0/custom_data_1 = &"HitTile"
+1:8/0 = 0
+1:8/0/custom_data_0 = &"MagTile"
+1:8/0/custom_data_1 = &"MagTile"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_t45qg"]
+resource_name = "targeting"
+texture = ExtResource("8_rk7vv")
+texture_region_size = Vector2i(168, 56)
+0:0/0 = 0
+
+[resource]
+tile_shape = 3
+tile_offset_axis = 1
+tile_size = Vector2i(168, 56)
+navigation_layer_0/layers = 1
+custom_data_layer_0/name = "TerrainId"
+custom_data_layer_0/type = 21
+custom_data_layer_1/name = "TerrainType"
+custom_data_layer_1/type = 21
+custom_data_layer_2/name = "Trigger"
+custom_data_layer_2/type = 21
+sources/0 = SubResource("TileSetAtlasSource_qmxju")
+sources/1 = SubResource("TileSetAtlasSource_bkpol")
+sources/6 = SubResource("TileSetAtlasSource_njr1x")
+sources/7 = SubResource("TileSetAtlasSource_2ggml")
+sources/19 = SubResource("TileSetAtlasSource_3ivj7")
+sources/4 = SubResource("TileSetAtlasSource_fntpe")
+sources/9 = SubResource("TileSetAtlasSource_t45qg")
+sources/10 = SubResource("TileSetAtlasSource_mbyn6")

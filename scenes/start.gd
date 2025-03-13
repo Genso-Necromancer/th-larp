@@ -7,13 +7,14 @@ signal loadMapManager
 var itemId = null
 var popUp
 var firstLaunch = true
-@onready var yaBoy = $"."
+#@onready var yaBoy = $"."
 
 func _ready():
 	if firstLaunch:
 		var main = get_parent()
-		GameState.newSlave = [yaBoy]
-		GameState.state = GameState.gState.START
+		GameState.change_state(self, GameState.gState.START)
+		#GameState.newSlave = yaBoy
+		#GameState.state = GameState.gState.START
 		popUp = sceneMenu.get_popup()
 		popUp.index_pressed.connect(self.on_index_pressed)
 		self.loadMapManager.connect(main.on_load_map_manager)
@@ -30,4 +31,4 @@ func _on_load_button_pressed():
 		0: 
 			var map = preload("res://scenes/maps/TestMap0.tscn")
 			emit_signal("loadMapManager", map)
-			emit_signal("unloadMe", yaBoy)
+			emit_signal("unloadMe", self)

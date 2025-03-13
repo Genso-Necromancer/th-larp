@@ -23,7 +23,7 @@ func _process(_delta):
 	else:
 		pString = "--"
 		
-	$PanelContainer/StateDebug.set_text("Slave: " + str(GameState.newSlave) + " | Prev.Slave:" + str(GameState.previousSlave) + " 
+	$PanelContainer/StateDebug.set_text("Slave: " + str(GameState.activeSlave) + " | Prev.Slave:" + str(GameState.previousSlave) + " 
 	| State: " + cString + " | " + "Previous State: " + pString)
 
 

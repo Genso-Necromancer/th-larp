@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://de42f2dvbgkri"]
+[gd_scene load_steps=7 format=3 uid="uid://de42f2dvbgkri"]
 
 [ext_resource type="Script" uid="uid://b10re3maqw47y" path="res://scenes/cursor.gd" id="1_2u41f"]
 [ext_resource type="Texture2D" uid="uid://4lca2aumdu2g" path="res://sprites/testCursor.png" id="1_k2b8o"]
 [ext_resource type="Texture2D" uid="uid://c47hmdyuaj0xn" path="res://sprites/highlightBlue.png" id="3_h7uqh"]
 [ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="4_k0n2u"]
+[ext_resource type="PackedScene" uid="uid://bndj60y8u5itg" path="res://scenes/scene_camera.tscn" id="4_pey64"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_adkd7"]
 radius = 22.0907
@@ -25,15 +26,7 @@ texture = ExtResource("3_h7uqh")
 
 [node name="Timer" type="Timer" parent="."]
 
-[node name="SceneCamera" type="Camera2D" parent="."]
-position_smoothing_enabled = true
-drag_horizontal_enabled = true
-drag_vertical_enabled = true
-drag_left_margin = 0.6
-drag_top_margin = 0.6
-drag_right_margin = 0.6
-drag_bottom_margin = 0.6
-editor_draw_drag_margin = true
+[node name="MapCamera" parent="." instance=ExtResource("4_pey64")]
 
 [node name="Area2D" type="Area2D" parent="."]
 collision_layer = 8
@@ -52,3 +45,5 @@ theme = ExtResource("4_k0n2u")
 theme_override_colors/font_color = Color(0.568627, 0.541176, 0, 1)
 theme_override_font_sizes/font_size = 22
 text = "(0, 0)"
+
+[editable path="MapCamera"]
