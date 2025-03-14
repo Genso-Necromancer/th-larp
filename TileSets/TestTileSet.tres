@@ -1,18 +1,12 @@
-[gd_resource type="TileSet" load_steps=27 format=3 uid="uid://bkx2tgo0cxpaa"]
+[gd_resource type="TileSet" load_steps=21 format=3 uid="uid://bkx2tgo0cxpaa"]
 
 [ext_resource type="Texture2D" uid="uid://cwrqpj7en2cof" path="res://sprites/tiles/deployment.png" id="1_rv4un"]
 [ext_resource type="Texture2D" uid="uid://b3kybcmn08s6d" path="res://sprites/tiles/forcedDeployment.png" id="2_wdrue"]
 [ext_resource type="Texture2D" uid="uid://d4gcf4n0wyrk" path="res://sprites/tiles/fort.png" id="3_y5vh3"]
-[ext_resource type="Texture2D" uid="uid://1qfx0p1pwk21" path="res://sprites/tiles/gold_test_3.png" id="3_y78q6"]
-[ext_resource type="Texture2D" uid="uid://dp2j581yndelg" path="res://sprites/tiles/gold_test_4.png" id="4_hbse7"]
 [ext_resource type="Texture2D" uid="uid://0l5h5gtuuhdi" path="res://sprites/tiles/hill.png" id="4_nuwhh"]
 [ext_resource type="Texture2D" uid="uid://l2mr4yng7kji" path="res://backgrounds/FE1Map.png" id="5_fc2po"]
-[ext_resource type="Texture2D" uid="uid://diwdd5nmaleg2" path="res://sprites/tiles/gold_test_5.png" id="5_o8rgn"]
 [ext_resource type="Texture2D" uid="uid://djt1ybodu04tp" path="res://sprites/tiles/grass.png" id="6_8o5ne"]
-[ext_resource type="Texture2D" uid="uid://bi60x7j8wy2fa" path="res://sprites/tiles/gold_test_6.png" id="6_rc6nl"]
 [ext_resource type="Texture2D" uid="uid://cvwlg1ibgcatk" path="res://sprites/tiles/event_spawner.png" id="7_i0b4k"]
-[ext_resource type="Texture2D" uid="uid://bey0tkxetq1en" path="res://sprites/tiles/gold_test_1.png" id="8_4fel6"]
-[ext_resource type="Texture2D" uid="uid://84dku2014t5i" path="res://sprites/tiles/gold_test_2.png" id="9_xyemr"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qmxju"]
 texture = ExtResource("1_rv4un")
@@ -27,22 +21,18 @@ texture_region_size = Vector2i(160, 48)
 0:0/0/custom_data_2 = &"forcedCell"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vu5ij"]
-texture = ExtResource("3_y78q6")
 texture_region_size = Vector2i(168, 55)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tvmja"]
-texture = ExtResource("4_hbse7")
 texture_region_size = Vector2i(168, 54)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_poowm"]
-texture = ExtResource("5_o8rgn")
 texture_region_size = Vector2i(168, 54)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1a8mh"]
-texture = ExtResource("6_rc6nl")
 texture_region_size = Vector2i(168, 54)
 0:0/0 = 0
 
@@ -158,12 +148,10 @@ texture_region_size = Vector2i(160, 48)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tkd6a"]
-texture = ExtResource("8_4fel6")
 texture_region_size = Vector2i(168, 54)
 0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ayai3"]
-texture = ExtResource("9_xyemr")
 texture_region_size = Vector2i(168, 54)
 0:0/0 = 0
 

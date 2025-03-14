@@ -648,6 +648,10 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.FLY: 1,
 				Enums.MOVE_TYPE.RANGER: 2,
 			},
+			"Bridge":{
+				"GrzBonus": -5,
+				"DefBonus": 0,
+			},
 			"Hill":{
 				"GrzBonus": 10,
 				"HitBonus": 10,

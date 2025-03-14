@@ -52,3 +52,4 @@ mapCursorPath = NodePath("../../Gameboard/Cursor")
 [editable path="Gameboard/Cursor/MapCamera"]
 [editable path="CanvasLayer/GUIManager"]
 [editable path="CanvasLayer/GUIManager/HUD"]
+[editable path="CanvasLayer/GUIManager/Fader"]

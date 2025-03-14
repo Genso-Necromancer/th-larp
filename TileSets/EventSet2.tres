@@ -1,0 +1,21 @@
+[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://din0fgduk1s21"]
+
+[ext_resource type="Texture2D" uid="uid://cvwlg1ibgcatk" path="res://sprites/tiles/event_spawner.png" id="6_4tr0b"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_we35i"]
+texture = ExtResource("6_4tr0b")
+texture_region_size = Vector2i(160, 48)
+0:0/0 = 0
+
+[resource]
+tile_shape = 3
+tile_offset_axis = 1
+tile_size = Vector2i(168, 56)
+navigation_layer_0/layers = 1
+custom_data_layer_0/name = "TerrainType"
+custom_data_layer_0/type = 21
+custom_data_layer_1/name = "TerrainId"
+custom_data_layer_1/type = 21
+custom_data_layer_2/name = "Trigger"
+custom_data_layer_2/type = 21
+sources/6 = SubResource("TileSetAtlasSource_we35i")

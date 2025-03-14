@@ -199,28 +199,36 @@ func _kill_lady():
 
 func _camera_test():
 	if !cc: 
-		cc = CameraController.new()
-	add_child(cc)
+		cc = CameraController.new(get_viewport())
 	cursor.visible = false
 	GameState.change_state(self, GameState.gState.CAMERA_STATE)
 	#cc.move_camera_map(Vector2i(15,8))
 	
-	cc.move_camera_unit("Cirno")
+	cc.move_camera_cameratile(0)
 	
 	await cc.camera_control_complete
 	
-	cc.move_camera_unit("Remilia")
+	cc.shake_camera()
 	
 	await cc.camera_control_complete
 	
-	cc.reset_map_camera(true)
+	cc.move_camera_cameratile(1)
 	
 	await cc.camera_control_complete
+	
+	cc.reset_camera(true)
+	cc.fade_out()
+	
+	await cc.camera_control_complete
+	
+	cc.fade_in()
+	
+	await cc.camera_fade_in_complete
+	
 	
 	GameState.change_state(self, GameState.previousState)
 	cursor.visible = true
 	print("Camera tween test complete")
-	cc.queue_free()
 
 func _kill_camera_test() -> void:
 	if !cc: return
@@ -550,7 +558,7 @@ func _move_active_unit(new_cell: Vector2i, enemy: bool = false, enemyPath = null
 	
 	if !enemy:
 		GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
-	currMap.clear_layer(5)
+	currMap.pathAttack.clear_layer()
 	if !new_cell == activeUnit.cell:
 		#print("it's walkable")
 		# warning-ignore:return_value_discarded
@@ -615,7 +623,7 @@ func _deselect_active_unit(confirm) -> void:
 		activeUnit.isSelected = false
 		
 	_clear_active_unit()
-	currMap.clear_layer(5)
+	currMap.pathAttack.clear_layer()
 	unitPath.stop()
 	pathingArray.clear()
 	
@@ -773,14 +781,14 @@ func toggle_unit_profile():
 	
 func request_deselect():
 	_wipe_region()
-	currMap.clear_layer(5)
+	currMap.pathAttack.clear_layer()
 	GameState.change_state(self, GameState.gState.GB_DEFAULT)
 	_deselect_active_unit(false)
 
 
 func skill_target_cancel():
 	_wipe_region()
-	currMap.clear_layer(5)
+	currMap.pathAttack.clear_layer()
 	GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
 	_snap_cursor(activeUnit.cell)
 	emit_signal("skill_target_canceled")
@@ -788,7 +796,7 @@ func skill_target_cancel():
 
 func end_targeting():
 	_wipe_region()
-	currMap.clear_layer(5)
+	currMap.pathAttack.clear_layer()
 	cursor.cell = activeUnit.cell
 	emit_signal("gameboard_targeting_canceled")
 

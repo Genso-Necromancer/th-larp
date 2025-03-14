@@ -19,7 +19,7 @@ func _ready():
 
 func get_spawn_points():
 	var eventGrid = $EventGrid
-	return eventGrid.get_used_cells(0)
+	return eventGrid.get_used_cells()
 
 func get_group():
 	var group = spawnGroup.instantiate()

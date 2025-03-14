@@ -1,23 +1,9 @@
 @tool
-extends TileMap
+extends Node2D
 class_name GameMap
 signal map_ready
 signal events_checked
 signal danmaku_progressed
-
-enum TERRAIN {
-	Flat = 1,
-	Fort = 2,
-	Hill = 3
-}
-var tileSet = tile_set
-var tileSize : Vector2i = tileSet.get_tile_size()
-var tileShape = tileSet.get_tile_shape()
-var mapSize
-var eventQue := []
-var dmkScene = preload("res://scenes/danmaku.tscn")
-var actingDanmaku := {"Spawning":[], "Collision":[]}
-
 
 
 @export_category("Map Values")
@@ -38,10 +24,23 @@ var actingDanmaku := {"Spawning":[], "Collision":[]}
 @export var dmkScript : DanmakuScript
 @export var dmkMaster : Unit
 
-	#get:
-		#return dmkMaster
-	#set(value):
-		#value.
+##ALL THE FUCKING LAYERS
+@onready var ground := $Ground
+@onready var modifier := $Modifier
+@onready var object := $Object
+@onready var deploy := $Deployments
+@onready var pathAttack := $PathAttack
+@onready var narrative := $Narrative
+@onready var dev := $Dev
+
+@onready var tileSet :TileSet = ground.tile_set
+@onready var tileSize : Vector2i = tileSet.get_tile_size()
+@onready var tileShape = tileSet.get_tile_shape()
+var mapSize
+var eventQue := []
+var dmkScene = preload("res://scenes/danmaku.tscn")
+var actingDanmaku := {"Spawning":[], "Collision":[]}
+
 
 
 #event trackers
@@ -53,9 +52,12 @@ func _ready():
 		var p = get_parent()
 		self.map_ready.connect(p.on_map_ready)
 		_load_danmaku_scripts()
-	mapSize = get_used_rect().size
+		dev.visible = false
+		narrative.visible = false
+	mapSize = ground.get_used_rect().size
 	print(mapSize)
 	emit_signal("map_ready")
+	
 
 
 func get_active_units() -> Dictionary:
@@ -80,8 +82,8 @@ func get_loss_conditions() -> Array:
 
 func cell_clamp(grid_position: Vector2i) -> Vector2i:
 	var out := grid_position
-	out.x = clamp(out.x, 0, get_used_rect().size.x - 1.0)
-	out.y = clamp(out.y, 0, get_used_rect().size.y - 1.0)
+	out.x = clamp(out.x, 0, ground.get_used_rect().size.x - 1.0)
+	out.y = clamp(out.y, 0, ground.get_used_rect().size.y - 1.0)
 	return grid_position
 	
 func hex_centered(grid_position: Vector2i) -> Vector2i:
@@ -89,22 +91,24 @@ func hex_centered(grid_position: Vector2i) -> Vector2i:
 	return tileCenter
 
 func get_movement_cost(cell, moveType):
-	var base = get_cell_tile_data(0, cell)
-	var mod = get_cell_tile_data(1, cell)
-	var baseTile
-	var modTile 
-	var costData = UnitData.terrainData
+	var base :TileData = ground.get_cell_tile_data(cell)
+	var mod :TileData = modifier.get_cell_tile_data(cell)
+	var baseTile : StringName
+	var modTile : StringName
+	var costData :Dictionary = UnitData.terrainData
 	var cost := 0.0
 	
 	if base: baseTile = base.get_custom_data("TerrainType")
 	if mod: modTile = mod.get_custom_data("TerrainType")
 	cost += costData[baseTile][moveType]
-	if modTile: cost += costData[modTile][moveType]
+	if modTile == "Bridge": cost = 0
+	elif modTile: cost += costData[modTile][moveType]
+	
 	return cost
 	
 func get_bonus(cell): # WHOOPS BROKEN
 	var bonus = 0
-	var tileData = get_cell_tile_data(1, cell)
+	var tileData = modifier.get_cell_tile_data(cell)
 	#if !tileData == null: 
 			#bonus = tileData.get_custom_data("terrainBonus")
 	return bonus
@@ -112,10 +116,10 @@ func get_bonus(cell): # WHOOPS BROKEN
 
 func get_terrain_tags(cell:Vector2i) -> Dictionary:
 	var terrainTags: Dictionary = {"TerrainType1": "", "TerrainType2": "", "TerrainId1": "", "TerrainId2": ""}
-	var type1 = get_cell_tile_data(0, cell)
-	var type2 = get_cell_tile_data(1, cell)
-	var id1 = get_cell_tile_data(0, cell)
-	var id2 = get_cell_tile_data(1, cell)
+	var type1 = ground.get_cell_tile_data(cell)
+	var type2 = modifier.get_cell_tile_data(cell)
+	var id1 = ground.get_cell_tile_data(cell)
+	var id2 = modifier.get_cell_tile_data(cell)
 	
 	if type1: 
 		terrainTags.TerrainType1 = type1.get_meta("TerrainType", "")
@@ -129,10 +133,10 @@ func get_terrain_tags(cell:Vector2i) -> Dictionary:
 	return terrainTags
 
 func get_deployment_cells():
-	var triggerCells = get_used_cells(3)
+	var triggerCells :Array[Vector2i] = deploy.get_used_cells()
 	var deploymentCells = []
 	for cell in triggerCells:
-		var tileData = get_cell_tile_data(3, cell)
+		var tileData :TileData = deploy.get_cell_tile_data(cell)
 		if tileData.get_custom_data("Trigger") == "deployCell":
 			deploymentCells.append(cell)
 	return deploymentCells
@@ -143,9 +147,9 @@ func get_walls() -> Dictionary:
 	var noGo := []
 	var shootOver := []
 	var flyOver := []
-	var modCells := get_used_cells(1)
+	var modCells :Array[Vector2i] = modifier.get_used_cells()
 	for cell in modCells:
-		var tileData = get_cell_tile_data(1, cell)
+		var tileData :TileData = modifier.get_cell_tile_data(cell)
 		var type : StringName = tileData.get_custom_data("TerrainType")
 		match type:
 			"Wall": noGo.append(cell)
@@ -160,11 +164,11 @@ func get_walls() -> Dictionary:
 
 func get_forced_deploy(): #make sure there is equal units assigned as forced as there are forced cells!
 	var i = 0
-	var triggerCells = get_used_cells(3)
+	var triggerCells :Array[Vector2i] = deploy.get_used_cells()
 	var forcedCells = []
 	var forcedDeploy = {}
 	for cell in triggerCells:
-		var tileData = get_cell_tile_data(3, cell)
+		var tileData :TileData = deploy.get_cell_tile_data(cell)
 		if tileData.get_custom_data("Trigger") == "forcedCell":
 			forcedCells.append(cell)
 	for unit in forcedUnits:
@@ -175,16 +179,30 @@ func get_forced_deploy(): #make sure there is equal units assigned as forced as 
 		i += 1
 	return forcedDeploy
 
+
+func get_narrative_tile(id:int) -> Vector2i:
+	return narrative.get_narrative_tile(id)
+
+
+
 func hide_deployment():
-	set_layer_enabled(3, false)
+	deploy.set_enabled(false)
 	
 
+#region Thanks Wokedot
+func map_to_local(mapPosition: Vector2i) -> Vector2:
+	return ground.map_to_local(mapPosition)
+	
+
+func local_to_map(localPosition: Vector2) -> Vector2i:
+	return ground.local_to_map(localPosition)
 
 
-#Event Functions
-#func on_round_changed():
-	#pass
-
+func get_used_rect() -> Rect2i:
+	return ground.get_used_rect()
+	
+	
+#region Event Functions
 
 func _on_unit_death(unit):
 	check_event("Death", unit)
@@ -264,7 +282,7 @@ func _check_off_event():
 	if eventQue.size() == 0:
 		emit_signal("events_checked")
 
-#entity spawning
+#region entity spawning
 func _spawn_premade_units(spawner : UnitSpawner): 
 	# DIAGNOSIS: SIGNAL NEVER EMITS, BECAUSE ITS PROBABLY NOT SPAWNING THE UNIT. SOMETHING MIGHT NEED TO BE DEFERRED???
 	var units = []
@@ -281,11 +299,13 @@ func _spawn_premade_units(spawner : UnitSpawner):
 	
 	for spawn in spawnPoints:
 		var unit = units.pop_front()
+		if !unit: break
 		tween.tween_callback(_spawn_from_spawner.bind(unit, spawn)).set_delay(delay)
-		await tween.finished
+		await tween.finished #might not need this with how tweens work, will check later HERE
 		
 	await get_tree().create_timer(timer).timeout
 	
+	tween.kill()
 	spawnGroup.queue_free()
 	_check_off_event.call_deferred()
 
@@ -301,7 +321,7 @@ func _spawn_new_units():
 	get_parent().spawn_raw_unit(unitPackage)
 
 
-#danmaku functions
+#region danmaku functions
 func _load_danmaku_scripts():
 
 	if dmkScript != null:
@@ -362,25 +382,25 @@ func _on_danmaku_animation_completed(anim, bullet):
 			"Spawning": emit_signal("danmaku_progressed")
 
 
-##Targeting and Pathing Functions
+#region Targeting and Pathing Functions
 ## Fills the tilemap with the cells, giving a visual representation of the cells a unit can walk.
 func draw(cells: Array) -> void:
-	clear_layer(5)
+	pathAttack.clear()
 	for cell in cells:
 #		print("draw2:", cell)
-		set_cell(5, cell, 10, Vector2i(0,0))
+		pathAttack.set_cell(cell, 10, Vector2i(0,0))
 		
 func draw_attack(cells: Array) -> void:
-	clear_layer(5)
+	pathAttack.clear_layer()
 	for cell in cells:
 #		print("draw2:", cell)
-		set_cell(5, cell, 9, Vector2i(0,0))
+		pathAttack.set_cell(cell, 9, Vector2i(0,0))
 		
 func draw_threat(walk: Array, threat: Array) -> void:
-	clear_layer(5)
+	pathAttack.clear_layer()
 	for cell in threat:
 #		print("draw2:", cell)
-		set_cell(5, cell, 9, Vector2i(0,0))
+		pathAttack.set_cell(cell, 9, Vector2i(0,0))
 	for cell in walk:
 #		print("draw2:", cell)
-		set_cell(5, cell, 10, Vector2i(0,0))
+		pathAttack.set_cell(cell, 10, Vector2i(0,0))
