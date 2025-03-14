@@ -208,16 +208,12 @@ func _camera_test():
 	
 	await cc.camera_control_complete
 	
-	cc.shake_camera()
+	cc.move_camera_cameratile(1,0.5)
 	
 	await cc.camera_control_complete
 	
-	cc.move_camera_cameratile(1)
-	
-	await cc.camera_control_complete
-	
-	cc.reset_camera(true)
 	cc.fade_out()
+	cc.reset_camera(false)
 	
 	await cc.camera_control_complete
 	

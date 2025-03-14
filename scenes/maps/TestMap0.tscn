@@ -49,8 +49,13 @@ y_sort_origin = 2
 
 [node name="Narrative" type="TileMapLayer" parent="."]
 use_parent_material = true
+tile_map_data = PackedByteArray("AAAHAAUABgAAAAAAAAAFAA0ABgAAAAAAAAA=")
 tile_set = ExtResource("1_ylh53")
 script = ExtResource("5_wmt5u")
+tileIDs = Dictionary[Vector2i, int]({
+Vector2i(5, 13): 1,
+Vector2i(7, 5): 0
+})
 
 [node name="Dev" type="TileMapLayer" parent="."]
 use_parent_material = true

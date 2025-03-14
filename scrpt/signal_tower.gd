@@ -10,6 +10,9 @@ signal action_skill_confirmed()
 signal forecast_predicted(fcData : Dictionary)
 signal sequence_initiated(sequence:Dictionary)
 signal sequence_complete
+
+##Fader signal chains. ugh.
 signal fader_fade_in(speedScale : float)
 signal fader_fade_out(speedScale : float)
-signal fade_complete
+signal fade_out_complete
+signal fade_in_complete

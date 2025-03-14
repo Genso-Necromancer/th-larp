@@ -18,11 +18,11 @@ func fade_in(speedScale: float = 0.5) -> void:
 	anim.speed_scale = speedScale
 	anim.play("fade_in")
 	await anim.animation_finished
-	SignalTower.emit_signal("fade_complete")
+	SignalTower.emit_signal("fade_in_complete")
 	
 	
 func fade_out(speedScale: float = 0.5) -> void:
 	anim.speed_scale = speedScale
 	anim.play("fade_out")
 	await anim.animation_finished
-	SignalTower.emit_signal("fade_complete")
+	SignalTower.emit_signal("fade_out_complete")

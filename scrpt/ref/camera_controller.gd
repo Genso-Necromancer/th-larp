@@ -17,19 +17,18 @@ var viewPort : Viewport
 
 #func _init(newCamera : Camera2D):
 	#camera = newCamera
-	
+
+##Checks for the currently active camera, sets it as the "original camera" and the target camera
 func _init(view_port:Viewport):
 	viewPort = view_port
-
-##When ready: Checks for the currently active camera, sets it as the "original camera" and the target camera
-func _ready():
 	var active : Camera2D = viewPort.get_camera_2d()
 	if active:
-		origCam = active
 		camera = active
 		camera.camera_tween_complete.connect(self._on_tween_complete)
 	else:
 		print("camera controller: ready: no active camera detected")
+
+	
 
 
 		
@@ -78,21 +77,21 @@ func shake_camera(duration:int = 4.0):
 ##Fade out camera
 func fade_out(speedScale:=1.5):
 	SignalTower.emit_signal("fader_fade_out", speedScale)
-	await SignalTower.fade_complete
+	await SignalTower.fade_out_complete
 	emit_signal("camera_fade_out_complete")
 
 
 ##Guess lol
 func fade_in(speedScale:=1.5):
 	SignalTower.emit_signal("fader_fade_in", speedScale)
-	await  SignalTower.fade_complete
+	await  SignalTower.fade_in_complete
 	emit_signal("camera_fade_in_complete")
 
 
 #endregion
 
 ##resets the target camera's offset, Pass true to tween the return.
-func reset_camera(isTweened := false) -> void:
+func reset_camera(isTweened := false, speed:float = 1.0) -> void:
 	camera.reset_camera()
 
 #endregion
@@ -109,14 +108,8 @@ func set_camera(newCamera : Camera2D = viewPort.get_camera_2d()):
 func skip_tween():
 	camera.skip_tween
 
-
-##Kills the tween
-func _kill_tween() -> void:
-	camera.kill_tween()
-
-
 func _on_tween_complete():
-	emit_signal("camera_control_complete")
+	call_deferred("emit_signal","camera_control_complete")
 
 
 func _check_valid(point:Vector2i) -> bool:

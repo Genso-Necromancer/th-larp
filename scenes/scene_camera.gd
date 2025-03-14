@@ -31,24 +31,25 @@ func shake_camera(duration:int = 4.0):
 	var rng = Global.rng
 	var roll : float
 	var i : int = rng.randi_range(duration-1,duration+1)
+	var origOffset : = offset
 	if tween: _kill_tween()
 	tween = create_tween()
 	
 	while i > 0:
 		roll = rng.randf_range(-150,150)
 		value = Vector2(0,rng.randf_range(-100,100))
-		tween.tween_property(self, "offset", value, 0.1)
-		tween.tween_property(self, "offset", Vector2(0,0), 0.1)
+		tween.tween_property(self, "offset", value, 0.1).as_relative()
+		tween.tween_property(self, "offset", origOffset, 0.1)
 		i -= 1
 	tween.tween_callback(_signal_complete)
 
 
-func reset_camera(isTweened := false) -> void:
+func reset_camera(isTweened := false, speed:float = 1.0) -> void:
 	if isTweened:
 		if tween: 
 			_kill_tween() 
 		tween = create_tween()
-		tween.tween_property(self, "offset", Vector2(0,0), 1)
+		tween.tween_property(self, "offset", Vector2(0,0), speed)
 		tween.tween_callback(_signal_complete)
 		
 	else: 
