@@ -2,7 +2,7 @@
 
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_phvm5"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_sedhl"]
-[ext_resource type="Script" path="res://scenes/profile.gd" id="2_wouk2"]
+[ext_resource type="Script" uid="uid://bj6cj5w14a68g" path="res://scenes/profile.gd" id="2_wouk2"]
 [ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="3_x6e7x"]
 
 [node name="Profile" type="MarginContainer"]

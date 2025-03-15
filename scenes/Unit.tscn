@@ -1,11 +1,11 @@
 [gd_scene load_steps=18 format=3 uid="uid://x6dmleipd452"]
 
-[ext_resource type="Script" path="res://scenes/Unit.gd" id="1_torj4"]
+[ext_resource type="Script" uid="uid://cx6i2dh3lb3cc" path="res://scenes/Unit.gd" id="1_torj4"]
 [ext_resource type="Texture2D" uid="uid://cgpfsnkngi2ow" path="res://sprites/RemiliaTest.png" id="3_g8xu6"]
 [ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="4_t1roa"]
 [ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="5_aeeqq"]
 [ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="6_2s8il"]
-[ext_resource type="Script" path="res://scenes/HPbar.gd" id="7_x5rnn"]
+[ext_resource type="Script" uid="uid://5maawmsefcgk" path="res://scenes/HPbar.gd" id="7_x5rnn"]
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="8_y1qcc"]
 
 [sub_resource type="Animation" id="Animation_ldcs1"]
@@ -254,15 +254,15 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_u5bc7"]
 _data = {
-"RESET": SubResource("Animation_ldcs1"),
-"death": SubResource("Animation_14iwe"),
-"disabled": SubResource("Animation_n8or0"),
-"idle": SubResource("Animation_qpckc"),
-"selected": SubResource("Animation_vw2je"),
-"walk_down": SubResource("Animation_xwkmn"),
-"walk_left": SubResource("Animation_ueevp"),
-"walk_right": SubResource("Animation_liyna"),
-"walk_up": SubResource("Animation_xsrlv")
+&"RESET": SubResource("Animation_ldcs1"),
+&"death": SubResource("Animation_14iwe"),
+&"disabled": SubResource("Animation_n8or0"),
+&"idle": SubResource("Animation_qpckc"),
+&"selected": SubResource("Animation_vw2je"),
+&"walk_down": SubResource("Animation_xwkmn"),
+&"walk_left": SubResource("Animation_ueevp"),
+&"walk_right": SubResource("Animation_liyna"),
+&"walk_up": SubResource("Animation_xsrlv")
 }
 
 [node name="Unit" type="Path2D"]

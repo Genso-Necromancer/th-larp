@@ -2,7 +2,7 @@
 
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_m17a7"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_83r3n"]
-[ext_resource type="Script" path="res://scenes/trade_screen.gd" id="2_xrvbo"]
+[ext_resource type="Script" uid="uid://ogsdflxotqc0" path="res://scenes/trade_screen.gd" id="2_xrvbo"]
 [ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="3_pdy4t"]
 
 [node name="trade_screen" type="Control"]

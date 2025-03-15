@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://7wnh3veoihvu"]
 
-[ext_resource type="Script" path="res://addons/CodeEditorBackground/BackgroundOptions.gd" id="1_jolqk"]
+[ext_resource type="Script" uid="uid://dhumo7rk7n8ng" path="res://addons/CodeEditorBackground/BackgroundOptions.gd" id="1_jolqk"]
 [ext_resource type="Texture2D" uid="uid://dg04gfxler061" path="res://addons/CodeEditorBackground/save.png" id="2_3cvy5"]
 
 [node name="BackgroundOptions" type="Control"]

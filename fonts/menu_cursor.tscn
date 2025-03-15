@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cmh8ono4w82cq"]
 
 [ext_resource type="Texture2D" uid="uid://4lca2aumdu2g" path="res://sprites/testCursor.png" id="1_pwpkv"]
-[ext_resource type="Script" path="res://fonts/menu_cursor.gd" id="1_tms0j"]
+[ext_resource type="Script" uid="uid://bmsqxc5ctf6as" path="res://fonts/menu_cursor.gd" id="1_tms0j"]
 
 [node name="menu_cursor" type="TextureRect"]
 top_level = true

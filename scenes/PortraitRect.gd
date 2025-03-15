@@ -110,4 +110,3 @@ func toggle_fade():
 
 func active():
 	pass
-

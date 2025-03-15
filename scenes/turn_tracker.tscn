@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://f4mximd4v0fx"]
 
-[ext_resource type="Script" path="res://scenes/TurnTracker.gd" id="1_13cpr"]
+[ext_resource type="Script" uid="uid://dajp1yw57akhf" path="res://scenes/TurnTracker.gd" id="1_13cpr"]
 
 [node name="TurnTracker" type="Control"]
 layout_mode = 3

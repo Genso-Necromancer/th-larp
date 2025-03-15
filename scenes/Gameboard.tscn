@@ -1,15 +1,15 @@
 [gd_scene load_steps=14 format=3 uid="uid://cmvmjk0jj7dam"]
 
-[ext_resource type="Script" path="res://scrpt/GameBoard.gd" id="1_kkv4d"]
+[ext_resource type="Script" uid="uid://cyv15mysly73j" path="res://scrpt/GameBoard.gd" id="1_kkv4d"]
 [ext_resource type="Texture2D" uid="uid://cwdtp8f162l40" path="res://sprites/hexAttackTest.png" id="3_qec1v"]
 [ext_resource type="Texture2D" uid="uid://bn4u1sykritxk" path="res://sprites/hex cover test.png" id="4_8xptj"]
-[ext_resource type="Script" path="res://scenes/UnitOverlay.gd" id="5_b7qkm"]
+[ext_resource type="Script" uid="uid://ds8xaxmxt2vpo" path="res://scenes/UnitOverlay.gd" id="5_b7qkm"]
 [ext_resource type="PackedScene" uid="uid://dar8sp5uxx2aw" path="res://scrpt/unit_path.tscn" id="6_sxhsu"]
 [ext_resource type="PackedScene" uid="uid://de42f2dvbgkri" path="res://scenes/cursor.tscn" id="7_bctkf"]
-[ext_resource type="Script" path="res://scenes/AiManager.gd" id="7_rin0x"]
+[ext_resource type="Script" uid="uid://b3kqglfgaba7h" path="res://scenes/AiManager.gd" id="7_rin0x"]
 [ext_resource type="PackedScene" uid="uid://dxoxyyj8wpdgu" path="res://scenes/combat_manager.tscn" id="8_06m4j"]
-[ext_resource type="Script" path="res://scenes/TurnSort.gd" id="9_gu2p2"]
-[ext_resource type="Script" path="res://scenes/BoardState.gd" id="9_uqyc0"]
+[ext_resource type="Script" uid="uid://dhlj5tdfc5mcu" path="res://scenes/TurnSort.gd" id="9_gu2p2"]
+[ext_resource type="Script" uid="uid://k3bg3kfsegbd" path="res://scenes/BoardState.gd" id="9_uqyc0"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_imj64"]
 texture = ExtResource("4_8xptj")

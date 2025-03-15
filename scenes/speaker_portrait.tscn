@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://d3fuiykqjxb5h"]
 
-[ext_resource type="Script" path="res://scenes/PortraitRect.gd" id="1_lmf7o"]
+[ext_resource type="Script" uid="uid://cqwq5hsah214n" path="res://scenes/PortraitRect.gd" id="1_lmf7o"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_gaf50"]
 

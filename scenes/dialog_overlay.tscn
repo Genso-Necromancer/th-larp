@@ -1,8 +1,8 @@
 [gd_scene load_steps=14 format=3 uid="uid://bnyhiorbaajm"]
 
-[ext_resource type="Script" path="res://scenes/dialog_overlay.gd" id="1_ik6st"]
+[ext_resource type="Script" uid="uid://ilk06rj5jrja" path="res://scenes/dialog_overlay.gd" id="1_ik6st"]
 [ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="2_5q3ap"]
-[ext_resource type="PackedScene" uid="uid://d3fuiykqjxb5h" path="res://speaker_portrait.tscn" id="3_mj8x4"]
+[ext_resource type="PackedScene" uid="uid://d3fuiykqjxb5h" path="res://scenes/speaker_portrait.tscn" id="3_mj8x4"]
 [ext_resource type="Texture2D" uid="uid://4lca2aumdu2g" path="res://sprites/testCursor.png" id="4_m3j4u"]
 
 [sub_resource type="Gradient" id="Gradient_oxt7h"]
@@ -98,9 +98,9 @@ tracks/1/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_qyow0"]
 _data = {
-"ContinueBobber": SubResource("Animation_25rj4"),
-"ContinueFlasher": SubResource("Animation_5lwhl"),
-"RESET": SubResource("Animation_6fxau")
+&"ContinueBobber": SubResource("Animation_25rj4"),
+&"ContinueFlasher": SubResource("Animation_5lwhl"),
+&"RESET": SubResource("Animation_6fxau")
 }
 
 [node name="DialogOverlay" type="Control"]
@@ -227,5 +227,5 @@ texture = ExtResource("4_m3j4u")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="TextStopper"]
 libraries = {
-"": SubResource("AnimationLibrary_qyow0")
+&"": SubResource("AnimationLibrary_qyow0")
 }
