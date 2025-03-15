@@ -13,6 +13,7 @@
 texture = ExtResource("1_ggcxa")
 texture_region_size = Vector2i(160, 48)
 0:0/0 = 0
+0:0/0/custom_data_2 = &"deployCell"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bkpol"]
 texture = ExtResource("2_e3vs3")

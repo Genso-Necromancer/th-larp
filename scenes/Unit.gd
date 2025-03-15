@@ -1567,7 +1567,7 @@ func set_acted(actState: bool):
 			_animPlayer.play("disabled")
 			#print(unitId,":", _animPlayer.current_animation,"Set Acted")
 
-func _on_test_map_map_ready():
+func initialize_cell():
 	var coord = $PathFollow2D/Cell
 	cell = map.local_to_map(position)
 	position = map.map_to_local(cell)

@@ -7,7 +7,7 @@ class_name AHexGrid2D
 var mapSize
 var mapRect
 
-var tileMap
+var tileMap 
 var oddq_directions = [
 	[[+1,  0], [+1, -1], [ 0, -1], 
 	[-1, -1], [-1,  0], [ 0, +1]],
@@ -64,7 +64,7 @@ func find_units_in_reach(unit:Unit, reach:Dictionary, targetFaction:int) -> Arra
 	var unitsNear :=[]
 	var area : Array = []
 	var underMin : Array = []
-	var mainFaction = unit.FACTION_ID
+	#var mainFaction = unit.FACTION_ID
 	_sort_solids()
 	_set_units()
 	area = find_all_paths(unit.cell, reach.Max)

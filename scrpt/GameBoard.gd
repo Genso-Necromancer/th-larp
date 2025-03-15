@@ -308,7 +308,6 @@ func _initialize_new_map():
 	#return hexStar
 	
 func _store_enemy_units():
-	units.clear()
 	for child in currMap.get_children(): #grab enemy unit locations
 		var unit := child as Unit
 		if not unit:
@@ -328,7 +327,9 @@ func _store_enemy_units():
 			#unit.turn_complete.connect(self.on_turn_complete)
 #		if !unit.exp_gained.is_connected(self.on_exp_gained):
 #			unit.exp_gained.connect(self.on_exp_gained)
-		_update_unit_terrain(unit) #update terrain data
+		unit.initialize_cell()
+		_update_unit_terrain(unit)
+		 #update terrain data
 		
 func _load_units(): #merge with store enemy units
 	
@@ -554,7 +555,7 @@ func _move_active_unit(new_cell: Vector2i, enemy: bool = false, enemyPath = null
 	
 	if !enemy:
 		GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
-	currMap.pathAttack.clear_layer()
+	currMap.pathAttack.clear()
 	if !new_cell == activeUnit.cell:
 		#print("it's walkable")
 		# warning-ignore:return_value_discarded
@@ -619,7 +620,7 @@ func _deselect_active_unit(confirm) -> void:
 		activeUnit.isSelected = false
 		
 	_clear_active_unit()
-	currMap.pathAttack.clear_layer()
+	currMap.pathAttack.clear()
 	unitPath.stop()
 	pathingArray.clear()
 	
@@ -777,14 +778,14 @@ func toggle_unit_profile():
 	
 func request_deselect():
 	_wipe_region()
-	currMap.pathAttack.clear_layer()
+	currMap.pathAttack.clear()
 	GameState.change_state(self, GameState.gState.GB_DEFAULT)
 	_deselect_active_unit(false)
 
 
 func skill_target_cancel():
 	_wipe_region()
-	currMap.pathAttack.clear_layer()
+	currMap.pathAttack.clear()
 	GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
 	_snap_cursor(activeUnit.cell)
 	emit_signal("skill_target_canceled")
@@ -792,7 +793,7 @@ func skill_target_cancel():
 
 func end_targeting():
 	_wipe_region()
-	currMap.pathAttack.clear_layer()
+	currMap.pathAttack.clear()
 	cursor.cell = activeUnit.cell
 	emit_signal("gameboard_targeting_canceled")
 
@@ -1524,7 +1525,7 @@ func _first_available_dep_cell():
 		
 	return firstCell
 
-func _deploy_unit(unit, forced = false, spawnLoc = Vector2i(0,0)):
+func _deploy_unit(unit, forced = false, spawnLoc = Vector2i(0,0)): 
 	if !forced:
 		spawnLoc = _first_available_dep_cell()
 	if filledSlots < depCap:

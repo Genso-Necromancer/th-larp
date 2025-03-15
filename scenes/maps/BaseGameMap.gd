@@ -57,6 +57,7 @@ func _ready():
 	mapSize = ground.get_used_rect().size
 	print(mapSize)
 	emit_signal("map_ready")
+	_initialize_unit_cells()
 	
 
 
@@ -70,6 +71,10 @@ func get_active_units() -> Dictionary:
 			unitList[unit.cell] = unit
 	return unitList
 
+func _initialize_unit_cells():
+	var units : Dictionary = get_active_units()
+	for unit in units:
+		units[unit].initialize_cell()
 
 func get_objectives() -> Array:
 	var objectives: Array = ["This is a Test", "Of The Emergency Broadcast", "System."]
@@ -391,13 +396,13 @@ func draw(cells: Array) -> void:
 		pathAttack.set_cell(cell, 10, Vector2i(0,0))
 		
 func draw_attack(cells: Array) -> void:
-	pathAttack.clear_layer()
+	pathAttack.clear()
 	for cell in cells:
 #		print("draw2:", cell)
 		pathAttack.set_cell(cell, 9, Vector2i(0,0))
 		
 func draw_threat(walk: Array, threat: Array) -> void:
-	pathAttack.clear_layer()
+	pathAttack.clear()
 	for cell in threat:
 #		print("draw2:", cell)
 		pathAttack.set_cell(cell, 9, Vector2i(0,0))
