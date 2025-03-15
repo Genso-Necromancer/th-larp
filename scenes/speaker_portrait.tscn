@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://d3fuiykqjxb5h"]
 
-[ext_resource type="Script" uid="uid://cqwq5hsah214n" path="res://scenes/PortraitRect.gd" id="1_lmf7o"]
+[ext_resource type="Script" uid="uid://cqwq5hsah214n" path="res://scenes/PortraitRect.gd" id="1_jcv3e"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_gaf50"]
 
@@ -17,7 +17,7 @@ offset_right = 128.0
 offset_bottom = 128.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_lmf7o")
+script = ExtResource("1_jcv3e")
 
 [node name="SpeakerPortrait" type="TextureRect" parent="."]
 layout_mode = 1

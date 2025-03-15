@@ -7,7 +7,7 @@ extends Control
 
 @export var draw_speed = 30
 
-var portrait = preload("res://speaker_portrait.tscn")
+var portrait = preload("res://scenes/speaker_portrait.tscn")
 var text_count = 0
 var textline_index = -1
 var line_is_finished = false
