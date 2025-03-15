@@ -24,6 +24,7 @@ Enums="*res://scrpt/enums.gd"
 SignalTower="*res://scrpt/signal_tower.gd"
 Options="*res://scrpt/Options.gd"
 GameState="*res://scrpt/ref/game_state.gd"
+CutsceneManager="*res://scrpt/CutsceneManager.gd"
 
 [display]
 
