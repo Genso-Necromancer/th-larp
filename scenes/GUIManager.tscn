@@ -4,7 +4,7 @@
 [ext_resource type="Theme" uid="uid://bi2ve4mbgqqd0" path="res://fonts/Izayoi_Theme_setup.tres" id="1_puiy8"]
 [ext_resource type="PackedScene" uid="uid://cv8yj4b660do" path="res://scenes/hud.tscn" id="6_odogd"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="7_llyu2"]
-[ext_resource type="Script" uid="uid://bsvach1mh5p1p" path="res://scenes/debug.gd" id="10_pjuly"]
+[ext_resource type="Script" uid="uid://bsvach1mh5p1p" path="res://scenes/Debug.gd" id="10_pjuly"]
 [ext_resource type="Script" uid="uid://cads6wf5xteti" path="res://scenes/FailScreen.gd" id="12_jkf6w"]
 [ext_resource type="Script" uid="uid://c2khcu02r73nu" path="res://scenes/WinScreen.gd" id="13_jghgq"]
 [ext_resource type="PackedScene" uid="uid://b1bjxokhen2uf" path="res://scenes/fader.tscn" id="13_kppqt"]
