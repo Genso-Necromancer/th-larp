@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=3 uid="uid://bnyhiorbaajm"]
 
-[ext_resource type="Script" uid="uid://ilk06rj5jrja" path="res://scenes/dialog_overlay.gd" id="1_ik6st"]
+[ext_resource type="Script" uid="uid://dufsetm4cjq6w" path="res://scenes/dialog_overlay.gd" id="1_ik6st"]
 [ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="2_5q3ap"]
 [ext_resource type="PackedScene" uid="uid://d3fuiykqjxb5h" path="res://scenes/speaker_portrait.tscn" id="3_mj8x4"]
 [ext_resource type="Texture2D" uid="uid://4lca2aumdu2g" path="res://sprites/testCursor.png" id="4_m3j4u"]

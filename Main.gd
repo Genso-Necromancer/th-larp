@@ -194,4 +194,3 @@ func set_map(map):
 func unload_me(scene):
 	scene.queue_free()
 	
-
