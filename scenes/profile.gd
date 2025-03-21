@@ -11,16 +11,9 @@ signal tooltips_off
 @export var statusTray : StatusTray
 @export var isPreview : bool = false
 @export var initialFocus : Label
-
-
-#@onready var inventory := $ProfileMargin/ProfileHBox/SideBarMargin/SideBarVBox/InventoryPanel
-#@onready var fBox := $ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/FeaturesMargin/FeaturesVBox/fBoxPanel/fBoxMargin/FeatLbVBox
-#@onready var infoPanel := $infoNode/InfoPanel
-#@onready var statusTray := $ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin/StatusTrayMargin
-
+@export var portrait : TextureRect
 var focusLabels : Array = []
 var isMouseFocus : bool = false
-
 var toolTipMode:=false:
 	set(value):
 		if isPreview: return
@@ -33,8 +26,8 @@ var toolTipMode:=false:
 			emit_signal("tooltips_off")
 			
 		toolTipMode = value
-		
 var controllerMode := false
+
 
 func _init():
 	self.visible = false
@@ -44,13 +37,12 @@ func _ready():
 	#toggle_blockers()
 	#_hide_info()
 	if !isPreview: _connect_labels()
-	
+
 
 func toggle_profile():
 	toggle_vis()
-	
 	if !isPreview: infoPanel.toggle_focus_signal()
-	
+
 
 func toggle_vis():
 	visible = !visible
@@ -65,31 +57,31 @@ func update_prof():
 	unitData = focusUnit.unitData
 	focusLabels.clear()
 	_clear_skills()
-	statusTray.update(focusUnit)
-	statusTray.connect_icons(self)
 	
 	focusLabels = get_tree().get_nodes_in_group("ToolTipLabels")
-	get_tree().call_group("ProfileLabels", "set_meta","Unit", focusUnit)
+	get_tree().call_group("ProfileLabels", "set_meta", "Unit", focusUnit)
+	if statusTray:
+		statusTray.update(focusUnit)
+		statusTray.connect_icons(self)
+		focusLabels.append_array(statusTray.get_icons())
+	
+	
 	#var unitStats = focusUnit.activeStats
 	#var unitBuffs = focusUnit.activeBuffs
-	focusLabels.append_array(statusTray.get_icons())
-	focusLabels += _update_inventory(focusUnit)
-	focusLabels += _update_features(focusUnit)
-	if !isPreview: _update_portrait(unitData["Profile"]["FullPrt"])
-	get_tree().call_group("ProfileLabels", "you_need_to_update_yourself_NOW", focusUnit)
 	
+	if inventory: focusLabels += _update_inventory(focusUnit)
+	if fBox: focusLabels += _update_features(focusUnit)
+	if !isPreview: _update_portrait(unitData["Profile"]["FullPrt"])
+	elif isPreview and portrait: _update_portrait(unitData["Profile"]["Prt"])
+	get_tree().call_group("ProfileLabels", "you_need_to_update_yourself_NOW", focusUnit)
 
-func _update_portrait(path : String):
-	var texture = load(path)
-	var portrait := $ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin/UnitPrt
-	if !texture:
-		texture = load("res://sprites/ERROR.png")
+
+func _update_portrait(path : String) -> void:
+	var texture : CompressedTexture2D
+	if !ResourceLoader.exists(path): texture = load("res://sprites/ERROR.png")
+	else: texture = load(path)
 	portrait.set_texture(texture)
 
-
-func _update_status(_unitStatus):
-	var _grid := $ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin/StatusTrayMargin/StatusGridMargin/StatusGrid
-	
 
 func _update_inventory(unit) -> Array:
 	inventory.set_meta("Unit", unit)
@@ -129,8 +121,8 @@ func _update_features(unit) -> Array:
 		fBox.add_child(s)
 		
 	return buttons
-		
-		
+
+
 func generate_skillbutton(path, data) -> SkillButton:
 	var b : SkillButton
 	b = path.instantiate()
@@ -160,8 +152,8 @@ func _connect_focus_signals(b:Control):
 		button.mouse_exited.connect(self._on_mouse_exited.bind(b))
 
 
-
-func _clear_skills():
+func _clear_skills() -> void:
+	if !fBox: return
 	for kid in fBox.get_children():
 		fBox.remove_child(kid)
 		kid.queue_free()
@@ -172,66 +164,39 @@ func toggle_tooltips(control = false):
 	toolTipMode = !toolTipMode
 	if !control and toolTipMode: 
 		initialFocus.call_deferred("grab_focus")
-	#elif toolTipMode: control.call_deferred("grab_focus")
-	
-	
+
+
 func toggle_controller_mode():
 	if isMouseFocus: return
 	controllerMode = !controllerMode
 	toggle_tooltips()
 
-#func _update_tooltip(control:Control):
-	#pass
-	#infoPanel.open_popup()
-	#infoPanel.close_popup()
-
-#func _hide_info():
-	#pass
-	#infoPanel.close_popup()
-	
 
 func _connect_labels() -> Array:
 	var labels = get_tree().get_nodes_in_group("ToolTipLabels")
 	for l in labels:
-		#l.focus_entered.connect(self._on_focus_entered.bind(l))
-		#l.focus_exited.connect(self._on_focus_exited.bind(l))
 		l.mouse_entered.connect(self._on_mouse_entered.bind(l))
 		l.mouse_exited.connect(self._on_mouse_exited.bind(l))
 	return labels
 
 
-func _on_mouse_entered(control:Control):
-	#var focus = control
+func _on_mouse_entered(control:Control) -> void:
+
+	if !visible: return 
 	isMouseFocus = true
 	if !controllerMode: 
 		toggle_tooltips(control)
-	#if !focusLabels.has(control):
-		#focus = control.get_button()
-	#focus.call_deferred("grab_focus")
 
 
-func _on_mouse_exited(control:Control):
+
+func _on_mouse_exited(control:Control) -> void:
+	if !visible: return 
 	var focus = control
 	isMouseFocus = false
 	if !controllerMode: 
 		toggle_tooltips(control)
-	if !controllerMode and !focusLabels.has(control):
+	if !controllerMode and !focusLabels.has(control) and control is ItemButton:
 		focus = control.get_button()
 		focus.release_focus()
 	
-
-#func _on_focus_entered(control:Control):
-	#pass
-#
-	##_update_tooltip(control)
-	##toggle_tooltips(control)
-	#
-#
-#func _on_focus_exited(_node):
-	#pass
-	##toggle_tooltips()
-	##_hide_info()
-	
-
-
 	

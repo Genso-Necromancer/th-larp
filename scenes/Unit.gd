@@ -84,7 +84,7 @@ var forced : bool = false
 var needDeath := false
 var deathFlag := false
 var killer : Unit
-var terrainTags: Dictionary = {"TerrainType1": "", "TerrainType2": "", "TerrainId1": "", "TerrainId2": ""}
+var terrainTags: Dictionary = {"BaseType": "", "ModType": "", "BaseId": "", "ModId": "", "Locked": false}
 var postSequenceFlags := {"Bars":false, "Death":false}
 
 #equip variables
@@ -1610,13 +1610,13 @@ func update_terrain_bonus() -> Dictionary:
 	var terrainData = UnitData.terrainData
 	if !isActive or activeStats.MoveType == Enums.MOVE_TYPE.FLY: return tVal
 	
-	if terrainTags.TerrainType1:
+	if terrainTags.BaseType:
 		for bonus in tVal:
-			tVal[bonus] += terrainData[terrainTags.TerrainType1][bonus]
+			tVal[bonus] += terrainData[terrainTags.BaseType][bonus]
 			
-	if terrainTags.TerrainType2:
+	if terrainTags.ModType:
 		for bonus in tVal:
-			tVal[bonus] += terrainData[terrainTags.TerrainType2][bonus]
+			tVal[bonus] += terrainData[terrainTags.ModType][bonus]
 	
 	return tVal
 	#if deployed:

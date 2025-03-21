@@ -1,0 +1,885 @@
+[gd_scene load_steps=15 format=3 uid="uid://bn4l14oxi8vt8"]
+
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_ckdua"]
+[ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="1_oay4f"]
+[ext_resource type="Script" uid="uid://cu0id8wd4v4h2" path="res://scenes/GUI/cursor_focus_viewer.gd" id="2_f5i04"]
+[ext_resource type="Script" uid="uid://cadn212l0oo2l" path="res://scenes/GUI/terrain_panel.gd" id="3_psmhf"]
+[ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="5_k63fk"]
+[ext_resource type="Script" uid="uid://dh5a7imlr8hal" path="res://scenes/profile.gd" id="5_nxk8q"]
+[ext_resource type="Texture2D" uid="uid://c0w3tlvvk2fdi" path="res://sprites/icons/misc/lock_stock_image.png" id="5_p6ryq"]
+[ext_resource type="Script" uid="uid://cfiddycs16e6q" path="res://scenes/GUI/terrain_value_label.gd" id="6_3ynxl"]
+[ext_resource type="Script" uid="uid://dim0gnwc08st" path="res://scenes/LabelValue.gd" id="6_f5i04"]
+[ext_resource type="Script" uid="uid://dmmoxkqdbbiuj" path="res://scenes/GUI/short_label.gd" id="6_ifhg5"]
+[ext_resource type="TileSet" uid="uid://vvc8vnsncejj" path="res://TileSets/PreviewTileSet.tres" id="6_p6ryq"]
+[ext_resource type="Script" uid="uid://v7tjpaq578at" path="res://scenes/GUI/terrain_name.gd" id="6_yxgd6"]
+[ext_resource type="PackedScene" uid="uid://b011nm5up2wry" path="res://scenes/GUI/status_tray_margin.tscn" id="7_u1j3q"]
+[ext_resource type="Script" uid="uid://1x1m002ekv0q" path="res://scenes/GUI/danmaku_profile.gd" id="14_covod"]
+
+[node name="CursorFocusViewer" type="Control" node_paths=PackedStringArray("terrainPanel", "unitPanel", "dmkPanel")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("1_oay4f")
+script = ExtResource("2_f5i04")
+terrainPanel = NodePath("PanelViewer/ViewerVBox/TerrainPanel")
+unitPanel = NodePath("PanelViewer/ViewerVBox/UnitPanel")
+dmkPanel = NodePath("PanelViewer/ViewerVBox/DanmakuPanel")
+
+[node name="PanelViewer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_top = 42
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="ViewerVBox" type="VBoxContainer" parent="PanelViewer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="TerrainPanel" type="PanelContainer" parent="PanelViewer/ViewerVBox"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+mouse_filter = 2
+script = ExtResource("3_psmhf")
+
+[node name="TerrainMargin" type="MarginContainer" parent="PanelViewer/ViewerVBox/TerrainPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="TerrainHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TexturePanel" type="PanelContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox"]
+custom_minimum_size = Vector2(184, 72)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/TexturePanel"]
+layout_mode = 2
+texture = ExtResource("1_ckdua")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="TextureMargin" type="MarginContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/TexturePanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="LockIcon" type="TextureRect" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/TexturePanel/TextureMargin"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+mouse_filter = 2
+texture = ExtResource("5_p6ryq")
+expand_mode = 1
+stretch_mode = 4
+
+[node name="BaseLayer" type="TileMapLayer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/TexturePanel"]
+position = Vector2(8, 11)
+tile_set = ExtResource("6_p6ryq")
+
+[node name="ModLayer" type="TileMapLayer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/TexturePanel"]
+position = Vector2(8, 11)
+tile_set = ExtResource("6_p6ryq")
+
+[node name="InfoPanel" type="PanelContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel"]
+layout_mode = 2
+texture = ExtResource("1_ckdua")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="InfoMagin" type="MarginContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="InfoVBox" type="VBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TerrainName" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox" groups=["TerrainName"]]
+custom_minimum_size = Vector2(200, 32)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Grass"
+vertical_alignment = 1
+script = ExtResource("6_yxgd6")
+
+[node name="StatGrid" type="GridContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 2
+columns = 2
+
+[node name="GrazeHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+
+[node name="Graze" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid/GrazeHBox" groups=["TerrainLabel"]]
+layout_mode = 2
+text = "Graze"
+horizontal_alignment = 2
+script = ExtResource("6_ifhg5")
+
+[node name="GrzBonus" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid/GrazeHBox" groups=["TerrainValue"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.427882, 0.473418, 0.886431, 1)
+text = "%+-d"
+horizontal_alignment = 1
+script = ExtResource("6_3ynxl")
+
+[node name="DefenseHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+
+[node name="Defense" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid/DefenseHBox" groups=["TerrainLabel"]]
+layout_mode = 2
+text = "Defense"
+horizontal_alignment = 2
+script = ExtResource("6_ifhg5")
+
+[node name="DefBonus" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid/DefenseHBox" groups=["TerrainValue"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.427882, 0.473418, 0.886431, 1)
+text = "%+-d"
+horizontal_alignment = 1
+script = ExtResource("6_3ynxl")
+
+[node name="HitHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+
+[node name="Hit" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid/HitHBox" groups=["TerrainLabel"]]
+layout_mode = 2
+text = "Hit"
+horizontal_alignment = 2
+script = ExtResource("6_ifhg5")
+
+[node name="HitBonus" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid/HitHBox" groups=["TerrainValue"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.427882, 0.473418, 0.886431, 1)
+text = "%+-d"
+horizontal_alignment = 1
+script = ExtResource("6_3ynxl")
+
+[node name="PwrHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+
+[node name="Pwr" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid/PwrHBox" groups=["TerrainLabel"]]
+layout_mode = 2
+text = "Power"
+horizontal_alignment = 2
+script = ExtResource("6_ifhg5")
+
+[node name="PwrBonus" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid/PwrHBox" groups=["TerrainValue"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.427882, 0.473418, 0.886431, 1)
+text = "%+-d"
+horizontal_alignment = 1
+script = ExtResource("6_3ynxl")
+
+[node name="MagHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+
+[node name="Mag" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid/MagHBox" groups=["TerrainLabel"]]
+layout_mode = 2
+text = "Magic"
+horizontal_alignment = 2
+script = ExtResource("6_ifhg5")
+
+[node name="MagBonus" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/StatGrid/MagHBox" groups=["TerrainValue"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.427882, 0.473418, 0.886431, 1)
+text = "%+-d"
+horizontal_alignment = 1
+script = ExtResource("6_3ynxl")
+
+[node name="RegenHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox"]
+layout_mode = 2
+
+[node name="HPHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/RegenHBox"]
+layout_mode = 2
+
+[node name="Life" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/RegenHBox/HPHBox" groups=["TerrainLabel"]]
+layout_mode = 2
+text = "Life Regen"
+script = ExtResource("6_ifhg5")
+metadata/_custom_type_script = "uid://dmmoxkqdbbiuj"
+
+[node name="HpRegen" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/RegenHBox/HPHBox" groups=["TerrainValue"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.427451, 0.47451, 0.886275, 1)
+text = "%+-d"
+script = ExtResource("6_3ynxl")
+metadata/_custom_type_script = "uid://cfiddycs16e6q"
+
+[node name="CompHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/RegenHBox"]
+layout_mode = 2
+
+[node name="Comp" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/RegenHBox/CompHBox" groups=["TerrainLabel"]]
+layout_mode = 2
+text = "Cmp. Regen"
+script = ExtResource("6_ifhg5")
+metadata/_custom_type_script = "uid://dmmoxkqdbbiuj"
+
+[node name="CompRegen" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/RegenHBox/CompHBox" groups=["TerrainValue"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.427451, 0.47451, 0.886275, 1)
+text = "%+-d"
+script = ExtResource("6_3ynxl")
+metadata/_custom_type_script = "uid://cfiddycs16e6q"
+
+[node name="PriceHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/RegenHBox"]
+layout_mode = 2
+
+[node name="MonPerRound" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/RegenHBox/PriceHBox" groups=["TerrainLabel"]]
+layout_mode = 2
+text = "文/Round"
+script = ExtResource("6_ifhg5")
+metadata/_custom_type_script = "uid://dmmoxkqdbbiuj"
+
+[node name="Price" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/RegenHBox/PriceHBox" groups=["TerrainValue"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.427451, 0.47451, 0.886275, 1)
+text = "%+-d"
+script = ExtResource("6_3ynxl")
+metadata/_custom_type_script = "uid://cfiddycs16e6q"
+
+[node name="WallHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox"]
+layout_mode = 2
+
+[node name="WallType" type="Label" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin/InfoVBox/WallHBox" groups=["TerrainValue"]]
+layout_mode = 2
+script = ExtResource("6_3ynxl")
+metadata/_custom_type_script = "uid://cfiddycs16e6q"
+
+[node name="UnitPanel" type="AspectRatioContainer" parent="PanelViewer/ViewerVBox" node_paths=PackedStringArray("statusTray", "portrait")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+mouse_filter = 2
+script = ExtResource("5_nxk8q")
+statusTray = NodePath("UnitMargin/UnitHBox/TexturePanel/TextureMargin/StatusTrayMargin")
+isPreview = true
+portrait = NodePath("UnitMargin/UnitHBox/TexturePanel/TextureMargin/UnitTectureRect")
+
+[node name="UnitMargin" type="MarginContainer" parent="PanelViewer/ViewerVBox/UnitPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="UnitHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TexturePanel" type="PanelContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/TexturePanel"]
+layout_mode = 2
+texture = ExtResource("1_ckdua")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="TextureMargin" type="MarginContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/TexturePanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="UnitTectureRect" type="TextureRect" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/TexturePanel/TextureMargin"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+texture = ExtResource("5_k63fk")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StatusTrayMargin" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/TexturePanel/TextureMargin" instance=ExtResource("7_u1j3q")]
+visible = false
+layout_mode = 2
+
+[node name="InfoPanel" type="PanelContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox"]
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel"]
+layout_mode = 2
+texture = ExtResource("1_ckdua")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="InfoMagin" type="MarginContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="InfoVBox" type="VBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="LvNameHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox"]
+layout_mode = 2
+
+[node name="Lv" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/LvNameHBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "Lv."
+vertical_alignment = 1
+
+[node name="LevelValue" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/LvNameHBox" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(31, 0)
+layout_mode = 2
+mouse_filter = 1
+theme_override_font_sizes/font_size = 15
+text = "%s"
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"unitData"
+key2 = &"Profile"
+key3 = &"Level"
+
+[node name="Name" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/LvNameHBox" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "%s"
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"unitName"
+
+[node name="StatHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="LabelsVBox1" type="VBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="UnitHpTag" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox1" groups=["ActiveTT", "ToolTipLabels"]]
+layout_mode = 2
+focus_neighbor_left = NodePath("../../../../../../../DerivedMargin/DerivedStatsHBox/VTags/UnitAcc")
+focus_neighbor_top = NodePath("../../../../../../../../../../../MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/SpeciesVBox/SpeciesLb")
+focus_neighbor_bottom = NodePath("../UnitCmpTag")
+focus_mode = 2
+mouse_filter = 1
+text = "Life:"
+horizontal_alignment = 2
+metadata/ToolTip = &"Life"
+
+[node name="UnitCmpTag" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox1" groups=["ActiveTT", "ToolTipLabels"]]
+layout_mode = 2
+focus_neighbor_top = NodePath("../UnitHpTag")
+focus_neighbor_bottom = NodePath("../../../../../StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitStrTag")
+focus_mode = 2
+mouse_filter = 1
+text = "Cmp.:"
+horizontal_alignment = 2
+metadata/ToolTip = &"Comp"
+
+[node name="Hit" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox1"]
+layout_mode = 2
+text = "Hit:"
+horizontal_alignment = 2
+
+[node name="Graze" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox1"]
+layout_mode = 2
+text = "Graze:"
+horizontal_alignment = 2
+
+[node name="ValuesVBox1" type="VBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="HpVBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Hp" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1/HpVBox" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(24, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.670588, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+text = "%s"
+horizontal_alignment = 2
+script = ExtResource("6_f5i04")
+key1 = &"activeStats"
+key2 = &"CurLife"
+
+[node name="Split" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1/HpVBox"]
+layout_mode = 2
+mouse_filter = 1
+text = "/"
+horizontal_alignment = 2
+
+[node name="HpMax" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1/HpVBox" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(24, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.670588, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+text = "%s"
+script = ExtResource("6_f5i04")
+key1 = &"activeStats"
+key2 = &"Life"
+
+[node name="CmpVBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Composure" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1/CmpVBox" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.741176, 0.764706, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+text = "%s"
+horizontal_alignment = 2
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"activeStats"
+key2 = &"CurComp"
+
+[node name="Split" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1/CmpVBox"]
+layout_mode = 2
+mouse_filter = 1
+text = "/"
+horizontal_alignment = 2
+
+[node name="ComposureMax" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1/CmpVBox" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(24, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.741176, 0.764706, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+text = "%s"
+script = ExtResource("6_f5i04")
+key1 = &"activeStats"
+key2 = &"Comp"
+
+[node name="Acc" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1" groups=["ProfileLabels"]]
+layout_mode = 2
+mouse_filter = 1
+text = "%s"
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"combatData"
+key2 = &"Hit"
+
+[node name="Graze" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1" groups=["ProfileLabels"]]
+layout_mode = 2
+mouse_filter = 1
+text = "%s"
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"combatData"
+key2 = &"Graze"
+
+[node name="LabelsVBox2" type="VBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="UnitHpTag" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2" groups=["ActiveTT", "ToolTipLabels"]]
+layout_mode = 2
+focus_neighbor_left = NodePath("../../../../../../../DerivedMargin/DerivedStatsHBox/VTags/UnitAcc")
+focus_neighbor_top = NodePath("../../../../../../../../../../../MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/SpeciesVBox/SpeciesLb")
+focus_neighbor_bottom = NodePath("../UnitCmpTag")
+focus_mode = 2
+mouse_filter = 1
+text = "Life:"
+horizontal_alignment = 2
+metadata/ToolTip = &"Life"
+
+[node name="UnitCmpTag" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2" groups=["ActiveTT", "ToolTipLabels"]]
+layout_mode = 2
+focus_neighbor_top = NodePath("../UnitHpTag")
+focus_neighbor_bottom = NodePath("../../../../../StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitStrTag")
+focus_mode = 2
+mouse_filter = 1
+text = "Composure:"
+metadata/ToolTip = &"Comp"
+
+[node name="Graze" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2"]
+layout_mode = 2
+text = "Graze"
+horizontal_alignment = 2
+
+[node name="Barrier" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2"]
+layout_mode = 2
+text = "Barrier"
+horizontal_alignment = 2
+
+[node name="ValuesVBox2" type="VBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="HpVBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Hp" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/HpVBox" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(24, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.670588, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+text = "%s"
+horizontal_alignment = 2
+script = ExtResource("6_f5i04")
+key1 = &"activeStats"
+key2 = &"CurLife"
+
+[node name="Split" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/HpVBox"]
+layout_mode = 2
+mouse_filter = 1
+text = "/"
+horizontal_alignment = 2
+
+[node name="HpMax" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/HpVBox" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(24, 10)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.670588, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+text = "%s"
+script = ExtResource("6_f5i04")
+key1 = &"activeStats"
+key2 = &"Life"
+
+[node name="VBoxContainer2" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2"]
+layout_mode = 2
+size_flags_horizontal = 0
+
+[node name="Composure" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/VBoxContainer2" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.741176, 0.764706, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+text = "%s"
+horizontal_alignment = 2
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"activeStats"
+key2 = &"CurComp"
+
+[node name="Split" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/VBoxContainer2"]
+layout_mode = 2
+mouse_filter = 1
+text = "/"
+horizontal_alignment = 2
+
+[node name="ComposureMax" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/VBoxContainer2" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+mouse_filter = 1
+theme_override_colors/font_color = Color(0.741176, 0.764706, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+text = "%s"
+script = ExtResource("6_f5i04")
+key1 = &"activeStats"
+key2 = &"Comp"
+
+[node name="GrazeValue" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2"]
+layout_mode = 2
+text = "%+-d"
+horizontal_alignment = 1
+
+[node name="BarValue" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2"]
+layout_mode = 2
+text = "%+-d"
+horizontal_alignment = 1
+
+[node name="DanmakuPanel" type="AspectRatioContainer" parent="PanelViewer/ViewerVBox" node_paths=PackedStringArray("portrait")]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+mouse_filter = 2
+script = ExtResource("14_covod")
+isPreview = true
+portrait = NodePath("DanmakuMargin/DanmakuHBox/TexturePanel/TextureMargin/DanmakuTectureRect")
+
+[node name="DanmakuMargin" type="MarginContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+
+[node name="DanmakuHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TexturePanel" type="PanelContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox"]
+custom_minimum_size = Vector2(110, 110)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/TexturePanel"]
+layout_mode = 2
+texture = ExtResource("1_ckdua")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="TextureMargin" type="MarginContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/TexturePanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="DanmakuTectureRect" type="TextureRect" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/TexturePanel/TextureMargin"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+texture = ExtResource("5_k63fk")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StatusTrayMargin" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/TexturePanel/TextureMargin" instance=ExtResource("7_u1j3q")]
+visible = false
+layout_mode = 2
+
+[node name="InfoPanel" type="PanelContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox"]
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel"]
+layout_mode = 2
+texture = ExtResource("1_ckdua")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="InfoMagin" type="MarginContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 6
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_right = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="InfoVBox" type="VBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="TypeNameHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox"]
+layout_mode = 2
+
+[node name="Type" type="Label" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/TypeNameHBox" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "%s"
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"dmkName"
+
+[node name="StatHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="LabelsVBox2" type="VBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Damage" type="Label" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2" groups=["ActiveTT", "ToolTipLabels"]]
+layout_mode = 2
+focus_neighbor_top = NodePath("../../LabelsVBox1/Move")
+focus_neighbor_bottom = NodePath("../../../../../StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitStrTag")
+focus_mode = 2
+mouse_filter = 1
+text = "Dmg:"
+horizontal_alignment = 2
+metadata/ToolTip = &"Comp"
+
+[node name="CmpDamage" type="Label" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2"]
+layout_mode = 2
+text = "Cmp. Dmg"
+horizontal_alignment = 2
+
+[node name="ValuesVBox2" type="VBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Damage" type="Label" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(22, 17)
+layout_mode = 2
+mouse_filter = 1
+text = "%s"
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"damage"
+
+[node name="CmpDamage" type="Label" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(31, 17)
+layout_mode = 2
+mouse_filter = 1
+text = "%s"
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"cmpDamage"
+
+[node name="LabelsVBox1" type="VBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Move" type="Label" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox1" groups=["ActiveTT", "ToolTipLabels"]]
+layout_mode = 2
+focus_neighbor_left = NodePath("../../../../../../../DerivedMargin/DerivedStatsHBox/VTags/UnitAcc")
+focus_neighbor_top = NodePath("../../../../../../../../../../../MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/SpeciesVBox/SpeciesLb")
+focus_neighbor_bottom = NodePath("../../LabelsVBox2/Damage")
+focus_mode = 2
+mouse_filter = 1
+text = "Move:"
+horizontal_alignment = 2
+metadata/ToolTip = &"Life"
+
+[node name="MoveStyle" type="Label" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox1"]
+layout_mode = 2
+text = "Move Style:"
+horizontal_alignment = 2
+
+[node name="ValuesVBox1" type="VBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Move" type="Label" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1" groups=["ProfileLabels"]]
+layout_mode = 2
+mouse_filter = 1
+text = "%s"
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"move"
+
+[node name="MoveStyle" type="Label" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(75, 0)
+layout_mode = 2
+mouse_filter = 1
+text = "%s"
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"moveStyle"
+
+[node name="PhasingHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox"]
+layout_mode = 2
+
+[node name="IsPhasingLbl" type="Label" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/PhasingHBox" groups=["ActiveTT", "ToolTipLabels"]]
+layout_mode = 2
+focus_neighbor_top = NodePath("../../StatHBox/LabelsVBox1/Move")
+focus_neighbor_bottom = NodePath("../../../../../StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitStrTag")
+focus_mode = 2
+mouse_filter = 1
+text = "Wall Phasing:"
+metadata/ToolTip = &"Comp"
+
+[node name="IsPhasing" type="Label" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/PhasingHBox" groups=["ProfileLabels"]]
+layout_mode = 2
+mouse_filter = 1
+text = "%s"
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"isPhasing"
+hideIfEmpty = true
+
+[node name="ImpactHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox"]
+visible = false
+layout_mode = 2
+
+[node name="ImpactEffects" type="Label" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/ImpactHBox" groups=["ActiveTT", "ToolTipLabels"]]
+layout_mode = 2
+focus_neighbor_top = NodePath("../../StatHBox/LabelsVBox1/Move")
+focus_neighbor_bottom = NodePath("../../../../../StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitStrTag")
+focus_mode = 2
+mouse_filter = 1
+text = "Impact Effects: "
+metadata/ToolTip = &"Comp"
+
+[node name="EffectIcons" type="HBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/ImpactHBox"]
+layout_mode = 2

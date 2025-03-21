@@ -178,6 +178,7 @@ debug_kill_test={
 2d_physics/layer_1="Auras"
 2d_physics/layer_2="Units"
 2d_physics/layer_3="Danmaku"
+2d_physics/layer_4="Cursor"
 
 [rendering]
 

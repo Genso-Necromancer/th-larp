@@ -9,6 +9,7 @@ enum gState {
 	GB_ATTACK_TARGETING,
 	GB_COMBAT_FORECAST,
 	GB_SKILL_TARGETING,
+	GB_TRADE_TARGETING,
 	GB_SKILL_MENU,
 	GB_ROUND_END,
 	GB_WARP,
@@ -37,20 +38,20 @@ var state:= gState.LOADING #when this variable is changed to a valid state tag, 
 
 var activeState : GenericState
 var activeSlave : Node
-var previousState : gState
-var previousSlave : Node
+var previousState : Array[gState]
+var previousSlave : Array[Node]
 
 var shouldChangeState = false
 
 
-func change_state(newSlave : Node = previousSlave, newState: gState = previousState):
+func change_state(newSlave : Node = previousSlave.pop_back(), newState: gState = previousState.pop_back()):
 	
 	if state != newState:
-		previousState = state
+		previousState.append(state)
 		state = newState
 	
 	if activeSlave != newSlave:
-		previousSlave = activeSlave
+		previousSlave.append(activeSlave)
 		activeSlave = newSlave
 		
 	_free_old()
@@ -67,6 +68,10 @@ func _free_old():
 func set_new_state(value): 
 	state = value
 
+
+func clear_state_lists():
+	previousSlave.clear()
+	previousState.clear()
 
 ###This is necessary for the 1 tick delay on state change, it is not called directly so variable change can be the streamlined method.
 #func _swap_state(value):
@@ -112,6 +117,8 @@ func _switch_state(value):
 		gState.GB_SKILL_TARGETING:
 			
 			activeState = GBSkillTargetState.new()
+		gState.GB_TRADE_TARGETING: 
+			activeState = GBTradeTargetingState.new()
 		gState.GB_SKILL_MENU: #Deprecated
 			
 			activeState = GBSkillMenuState.new()

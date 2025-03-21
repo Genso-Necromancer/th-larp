@@ -42,7 +42,7 @@ func _process(_delta):
 		var coord = $Cell
 		coord.set_text(str(cell))
 		tick = 1
-	else: tick = clampi((tick - 1), 0, INF)
+	else: tick = clampi((tick), 0, INF)
 
 
 #Camera Manipulation Functions

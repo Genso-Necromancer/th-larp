@@ -4,13 +4,14 @@
 [ext_resource type="Texture2D" uid="uid://dt8g5xp8171gn" path="res://sprites/UI/ui_status_tray.png" id="2_dii2q"]
 [ext_resource type="Script" uid="uid://q1fvpd16pg1" path="res://scenes/status_grid.gd" id="3_ujxmf"]
 
-[node name="StatusTrayMargin" type="MarginContainer"]
+[node name="StatusTrayMargin" type="MarginContainer" node_paths=PackedStringArray("statusGrid")]
 size_flags_horizontal = 0
 size_flags_vertical = 8
 theme_override_constants/margin_left = 275
 theme_override_constants/margin_right = 50
 theme_override_constants/margin_bottom = 100
 script = ExtResource("1_4fos0")
+statusGrid = NodePath("StatusGridMargin/StatusGrid")
 
 [node name="SpriteBG" type="NinePatchRect" parent="."]
 custom_minimum_size = Vector2(108, 8)

@@ -124,25 +124,46 @@ text = "winrar"
 
 [node name="DEBUG" type="Control" parent="."]
 top_level = true
-anchors_preset = 0
-offset_right = 40.0
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -40.0
 offset_bottom = 40.0
-mouse_filter = 1
+grow_horizontal = 0
+mouse_filter = 2
 script = ExtResource("10_pjuly")
 
 [node name="PanelContainer" type="PanelContainer" parent="DEBUG"]
-layout_mode = 0
-offset_right = 128.0
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -228.0
+offset_right = -100.0
 offset_bottom = 128.0
+grow_horizontal = 0
+mouse_filter = 2
 
-[node name="focus" type="Label" parent="DEBUG/PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="DEBUG/PanelContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="StateDebug" type="Label" parent="DEBUG/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "STATE"
+
+[node name="focus" type="Label" parent="DEBUG/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "FOCUS"
 
-[node name="StateDebug" type="Label" parent="DEBUG/PanelContainer"]
-top_level = true
+[node name="UnitFocus" type="Label" parent="DEBUG/PanelContainer/VBoxContainer"]
 layout_mode = 2
-text = "STATE"
+text = "FOCUS"
+
+[node name="DanmakuFocus" type="Label" parent="DEBUG/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "FOCUS"
 
 [node name="ExpGain" type="HBoxContainer" parent="."]
 visible = false

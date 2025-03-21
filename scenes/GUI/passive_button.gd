@@ -38,5 +38,3 @@ func set_passive_icon(data:Dictionary):
 	else:
 		icon = data.Icon
 	iconTx.set_texture(load(icon))
-
-

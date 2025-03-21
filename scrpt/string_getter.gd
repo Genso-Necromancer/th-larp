@@ -15,7 +15,7 @@ func _parse_xml(category, id) -> String:
 	var k : Array = Enums.LANGUAGE.keys()
 	var l : String = k[Global.language]
 	var pos : int = 0
-	var er : String = "[color=#00FFFF][%s]%s[/color]" % [category, id]
+	var er : String = "[color=#00FFFF]%s[/color]" % [id]
 	p.open("xml/gui.xml")
 
 	while p.read() == OK: #Read until correct language found or end of file

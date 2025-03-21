@@ -9,6 +9,7 @@ class_name fader
 	#fade_out()
 
 func _ready():
+	visible = true
 	SignalTower.fader_fade_in.connect(self.fade_in)
 	SignalTower.fader_fade_out.connect(self.fade_out)
 	fade_in(5.0)

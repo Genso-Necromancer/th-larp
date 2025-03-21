@@ -1,59 +1,14 @@
 extends Node
-#enum GameState {
-	#LOADING,
-	#GB_DEFAULT,
-	#GB_SELECTED,
-	#GB_ACTION_MENU,
-	#GB_PROFILE,
-	#GB_ATTACK_TARGETING,
-	#GB_COMBAT_FORECAST,
-	#GB_SKILL_TARGETING,
-	#GB_SKILL_MENU,
-	#GB_ROUND_END,
-	#GB_WARP,
-	#GB_SETUP,
-	#GB_FORMATION,
-	#GB_AI_TURN,
-	#GB_END_OF_ROUND,
-	#START,
-	#ACCEPT_PROMPT,
-	#FAIL_STATE,
-	#WIN_STATE,
-	#SCENE_ACTIVE
-#} #state tags for easy swapping
+
 
 static var root := "user://"
 static var gameFolder := "thLARP"
 static var dataDir := root + gameFolder
 
 var gameBoard
-#var newSlave : Array = []
-#var GameState.gState.activeState : GenericState
-#var state:= GameState.gState.LOADING: #when this variable is changed to a valid state tag, it does all the work in properly changing the state to streamline coding. See set_new_state function for more.
-	#set(value):
-##		if check_valid_state(value):
-			#change_state(value)
-			#state = value
-##		else:
-##			print("Invalid State")
-##			return
-#var previousState
-#var previousSlave
-#var newState
-#var shouldChangeState = false
-
-#func _process(delta):
-#	if shouldChangeState: #delay the change of state by 1 tick. If this is not done, values could be passed as "null", as their definitions have not updated yet. This is a temporary work around due to the skeletal nature of the game currently.
-##		shouldChangeState = false
-#		delayed_state(newState)
-		
-	
-#note on 1 tick delay: I see this not being necessary down the line when the game doesn't go straight to a test map. It is also simple to remove the 1 tick delay once it's no longer needed without rewriting the foundation.
 
 func _ready():
 	var startScene = preload("res://scenes/start.tscn").instantiate()
-#	gameBoard.queue_free()
-#	gui.queue_free()
 	load_scene(startScene)
 	_check_directory()
 	

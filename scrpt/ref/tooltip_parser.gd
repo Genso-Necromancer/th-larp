@@ -96,7 +96,7 @@ func get_skill(data:Dictionary) -> String:
 				continue
 		elif key == "RuleType":
 			var value
-			var ruleKey = Enums.RULE_TYPE.keys()[data.RuleType].to_snake_case()
+			#var ruleKey = Enums.RULE_TYPE.keys()[data.RuleType].to_snake_case()
 			match data[key]:
 				Enums.RULE_TYPE.TIME: value = "time_" + Enums.TIME.keys()[data.Rule].to_snake_case()
 				Enums.RULE_TYPE.TARGET_SPEC: value = "species_name_" + Enums.SPEC_ID.keys()[data.Rule].to_snake_case()
@@ -224,19 +224,27 @@ func _generate_stat_tt(unit:Unit, keyBase:String, keyTotal:String, keyStat: Stri
 		"Resist" : pass
 		"EffHit": pass
 		"DRes": pass
-		"MoveType": 
-			var moveCosts :Dictionary = UnitData.terrainCosts[unit[keyTotal][keyStat]]
+		"MoveType":
+			var tData : Dictionary = UnitData.terrainData
+			var moveCosts :Dictionary
 			var count := 0
+			for t in tData:
+				var cost :int = tData[t][unit[keyTotal][keyStat]]
+				if cost >= 99:
+						moveCosts[t] = " " + StringGetter.get_string("terrain_cannot_pass")
+				elif cost != 0:
+					moveCosts[t] = " +" + str(cost)
+				
 			fString += StringGetter.get_string("move_cost_title") + "\n"
 			for terrain in moveCosts:
-				fString += StringGetter.get_string("terrain_"+terrain.to_snake_case()) + str(moveCosts[terrain])
+				fString += StringGetter.get_string("terrain_"+terrain.to_snake_case()) + moveCosts[terrain]
 				count += 1
 				if count < moveCosts.size():
 					fString += "\n"
 			string = StringGetter.get_string((stringPath+keyStat.to_snake_case()+"_"+Enums.MOVE_TYPE.keys()[unit[keyTotal][keyStat]].to_snake_case()))
 		
 		
-	finished = fString + "\n" + string
+	finished = string + "\n" + fString
 	
 	return finished
 
@@ -269,7 +277,7 @@ func get_status(unit:Unit, status:String) -> String:
 	var parts := {}
 	var working : String
 	var finished : String
-	working += "{Status}"
+	working = "{Status}"
 	parts["Status"] = StringGetter.get_string("status_"+status.to_snake_case())
 	if sParams.get(status,false):
 		working += "\n" + StringGetter.get_string("remaining_label")

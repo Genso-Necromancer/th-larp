@@ -26,7 +26,7 @@ func toggle_visible():
 func init_roster(forcedDep, depLimit):
 	var grid = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer/GridContainer
 	var capLabel = $PanelContainer/MarginContainer/VBoxContainer/PanelContainer/MarginContainer/HBoxContainer/CapLabel
-	var sideBar = $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/UnitPreviewPanel/SideBar
+	
 	#var first: Button = null
 	var units = UnitData.rosterData
 	var filled = 0
@@ -36,7 +36,7 @@ func init_roster(forcedDep, depLimit):
 		tempHold.queue_free()
 	unitManager = unitMngrPL.instantiate()
 	call_deferred("_connect_manager_btns", unitManager)
-	sideBar.add_child(unitManager)
+	unitPreview.add_child(unitManager)
 	unitManager.visible = false
 	capLabel.set_text(str(depLimit))
 	capLabel.set_meta("Limit", depLimit)

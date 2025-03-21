@@ -103,7 +103,7 @@ texture = ExtResource("2_8xdxl")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="PathFollow2D/Sprite2D"]
 libraries = {
-"": SubResource("AnimationLibrary_sml42")
+&"": SubResource("AnimationLibrary_sml42")
 }
 
 [node name="Area2D" type="Area2D" parent="PathFollow2D/Sprite2D"]

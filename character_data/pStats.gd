@@ -16,9 +16,9 @@ static func get_named_unit_data():
 				"CurLife": 1,
 				"Profile": {
 					"UnitName": "Remilia",
-					"Prt": load(("res://sprites/RemiliaPrt.png")),
+					"Prt": "res://sprites/RemiliaPrt.png",
 					"FullPrt":"res://sprites/character/remilia/portrait_full.png",
-					"Sprite": load(("res://sprites/RemiliaTest.png")),
+					"Sprite": load("res://sprites/RemiliaTest.png"),
 					"Level": 1,
 					"EXP": 0,
 					"Role": "Lady",
@@ -78,7 +78,7 @@ static func get_named_unit_data():
 				"CurLife": 1,
 				"Profile": {
 					"UnitName": "Sakuya",
-					"Prt": load(("res://sprites/SakuyaPrt.png")),
+					"Prt": "res://sprites/SakuyaPrt.png",
 					"FullPrt":"res://sprites/character/sakuya/portrait_full.png",
 					"Sprite": load(("res://sprites/SakuyaTest.png")),
 					"Level": 1,
@@ -140,7 +140,7 @@ static func get_named_unit_data():
 			"CurLife": 1,
 				"Profile": {
 					"UnitName": "Patchouli",
-					"Prt": load(("res://sprites/PatchouliPrt.png")),
+					"Prt": "res://sprites/PatchouliPrt.png",
 					"FullPrt":"res://sprites/character/patchouli/portrait_full.png",
 					"Sprite": load(("res://sprites/RemiliaTest.png")),
 					"Level": 1,
@@ -201,7 +201,7 @@ static func get_named_unit_data():
 		"Meiling": {"CurLife": 1,
 				"Profile": {
 					"UnitName": "Meiling",
-					"Prt": load(("res://sprites/MeilingPrt.png")),
+					"Prt": "res://sprites/MeilingPrt.png",
 					"FullPrt":"res://sprites/character/meiling/portrait_full.png",
 					"Sprite": load(("res://sprites/RemiliaTest.png")),
 					"Level": 1,
@@ -263,7 +263,7 @@ static func get_named_unit_data():
 				"CurLife": 1,
 				"Profile": {
 					"UnitName": "Reimu",
-					"Prt": load(("res://sprites/ReimuPrt.png")),
+					"Prt": "res://sprites/ReimuPrt.png",
 					"FullPrt":"res://sprites/character/reimu/portrait_full.png",
 					"Sprite": load(("res://sprites/SakuyaTest.png")),
 					"Level": 1,
@@ -325,7 +325,7 @@ static func get_named_unit_data():
 				"CurLife": 1,
 				"Profile": {
 					"UnitName": "Cirno",
-					"Prt": load(("res://sprites/SakuyaPrt.png")),
+					"Prt": "res://sprites/SakuyaPrt.png",
 					"FullPrt":"res://sprites/character/cirno/portrait_full.png",
 					"Sprite": load(("res://sprites/SakuyaTest.png")),
 					"Level": 4,
@@ -599,6 +599,10 @@ static func get_terrain_data():
 	var terrainData : Dictionary = {
 			"Flat":{
 				},
+			"Ground":{
+				"GrzBonus": 3,
+				"DefBonus": 0,
+				},
 			"River":{
 				"GrzBonus": 10,
 				"DefBonus": 0,
@@ -628,15 +632,22 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 1,
 				},
 			"Rough":{
-				"GrzBonus": 20,
-				"DefBonus": 3,
+				"GrzBonus": 5,
+				"DefBonus": 1,
+				Enums.MOVE_TYPE.FOOT: 1,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 0.5,
+				},
+			"OpenRough":{
+				"GrzBonus": -3,
+				"DefBonus": 0,
 				Enums.MOVE_TYPE.FOOT: 1,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 0.5,
 				},
 			"HellSand":{
-				"GrzBonus": 20,
-				"DefBonus": 3,
+				"GrzBonus": 3,
+				"DefBonus": 1,
 				Enums.MOVE_TYPE.FOOT: 2,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 2,
@@ -669,6 +680,15 @@ static func get_terrain_data():
 			"House":{
 				"GrzBonus": 10,
 				"DefBonus": 0,
+				Enums.MOVE_TYPE.FOOT: 1,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 1,
+				},
+			"Shrine":{
+				"GrzBonus": 10,
+				"MagBonus": 1,
+				"HpRegen": 5,
+				"Price": -100,
 				Enums.MOVE_TYPE.FOOT: 1,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 1,

@@ -12,23 +12,35 @@ func _process(_delta):
 	var state = GameState.state
 	var keys = GameState.gState.keys()
 	var prevState = GameState.previousState
-	var pString : String
-	var cString : String
+	var pString : StringName
+	var cString : StringName
+	var actSlave : StringName
+	var prevSlave : StringName
 	if state != null:
 		cString = str(keys[state])
 	else:
 		cString = "--"
 	if prevState:
-		pString = str(keys[prevState])
+		pString = str(keys[prevState[0]])
 	else:
 		pString = "--"
+	
+	if GameState.activeSlave: actSlave = GameState.activeSlave.name
+	else: actSlave = "missing"
+	if GameState.previousSlave[-1]: prevSlave = GameState.previousSlave[-1].name
+	else: prevSlave = "empty"
 		
-	$PanelContainer/StateDebug.set_text("Slave: " + str(GameState.activeSlave) + " | Prev.Slave:" + str(GameState.previousSlave) + " 
+	$PanelContainer/VBoxContainer/StateDebug.set_text("Slave: " + str(actSlave) + " | Prev.Slave:" + str(prevSlave) + " 
 	| State: " + cString + " | " + "Previous State: " + pString)
-
+	
+	if Global.focusUnit: $PanelContainer/VBoxContainer/UnitFocus.set_text("focusUnit : [" + str(Global.focusUnit.unitName)+"]")
+	else: $PanelContainer/VBoxContainer/UnitFocus.set_text("focusUnit : [none]")
+	
+	if Global.focusDanmaku: $PanelContainer/VBoxContainer/DanmakuFocus.set_text("focusDanmaku : [" + str(Global.focusDanmaku)+"]")
+	else: $PanelContainer/VBoxContainer/DanmakuFocus.set_text("focusDanmaku : [none]")
 
 func _on_gui_focused_changed(f):
-	$PanelContainer/focus.set_text("Current Focus: [" + str(f) + "]")
+	$PanelContainer/VBoxContainer/focus.set_text("GUI Focus: [" + str(f.name) + "]")
 	#print("Current Focus: [" + str(f) + "]")
 #func position_has_obstacle(obstacle_position):
 	#return board.position_has_obstacle(obstacle_position) or board.position_has_unit(obstacle_position)

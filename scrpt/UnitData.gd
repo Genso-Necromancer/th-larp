@@ -352,11 +352,11 @@ func generate_id():
 
 
 func _validate_art(art:Dictionary) -> Dictionary:
-	var valid := {"Prt": load("res://sprites/Fairy TroublemakerPrt.png"), "FullPrt": load("res://sprites/character/cirno/portrait_full.png")}
+	var valid := {"Prt": "res://sprites/Fairy TroublemakerPrt.png", "FullPrt": "res://sprites/character/cirno/portrait_full.png"}
 	if ResourceLoader.exists(art.Prt):
-		valid.Prt = load(art.Prt)
+		valid.Prt = art.Prt
 	if ResourceLoader.exists(art.FullPrt):
-		valid.FullPrt = load(art.FullPrt)
+		valid.FullPrt = art.FullPrt
 	return valid
 
 #func get_experience(action, totalExp, targLvl, unitStats, growths, caps):

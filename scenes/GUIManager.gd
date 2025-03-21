@@ -39,10 +39,16 @@ enum sStates {
 
 var sState := sStates.HOME:
 	set(value):
+		
+		match value: #Temporary, may be best to have HUD groups to control?
+			sStates.FORM: focusViewer.enableViewer = true
+			sStates.BEGIN: focusViewer.enableViewer = true
+			_: focusViewer.enableViewer = false
+			
 		sState = value
 		print("sState Changed: ", sStates.keys()[value])
 
-#preloads (this is how I should have been doing shit from the start!)
+##preloads (this is how I should have been doing shit from the start!)
 var turnTrackerRes = preload("res://scenes/turn_tracker.tscn")
 var mapSetUp : MapGui
 var rosterGrid : UnitRoster
@@ -51,22 +57,22 @@ var unitProf : UnitProfile
 var actMenu : ActionMenu
 var foreCast : CombatForecast
 
-#scenes
+##scenes
 var turnTracker
 
-#prompts
+##prompts
 var isForecastPrompt = false
 
-#nodes unassigned
-
+##nodes unassigned
 var HUD : Node
 var timer : Timer
 var tween : Tween
 var menuCursor : Control
+var focusViewer : FocusViewer
 
 
 
-#roster variables
+##roster variables
 var rosterData = UnitData.rosterData
 var depCount = 0
 var depLimit = 0
@@ -75,14 +81,13 @@ var rosterInit : bool = false
 var unitObjs = Global.unitObjs
 var activeBtn : Node
 
-#focusTracking
+##focusTracking
 var prevFocus
 
-#trade variables
+##trade variables
 var trade1 : Unit
 var trade2 : Unit
-
-#states
+var inSetup := false
 
 
 var windowMode = DisplayServer.window_get_mode()
@@ -141,7 +146,7 @@ func _set_active_btn(b) -> void:
 	activeBtn.temp_font_change("Selected")
 	
 
-func _set_trade_partners(b):
+func _set_roster_trade_partners(b):
 	trade1 = activeBtn.get_unit()
 	trade2 = b.get_unit()
 	#b.temp_font_change("Selected")
@@ -218,6 +223,7 @@ func toggle_profile() -> void:
 		profFocus = Global.focusUnit
 		rosterGrid.set_bar_focus(false)
 		GameState.change_state(self, GameState.gState.GB_PROFILE)
+		focusViewer.visible = false
 	else:
 		_strip_menuCursor(false, unitProf.focusLabels)
 		rosterGrid.set_bar_focus(true)
@@ -228,7 +234,8 @@ func toggle_profile() -> void:
 			button.call_deferred("grab_focus")
 		prevFocus = null
 		unitProf.toggle_profile()
-		GameState.change_state(self, GameState.previousState)
+		GameState.change_state()
+		focusViewer.visible = true
 
 
 func update_prof():
@@ -309,6 +316,7 @@ func _on_gameboard_exp_display(oldExp, expSteps, results, unitPrt, unitName):
 
 func call_setup(dLimit, forced, map):
 	var btns = mapSetUp.btnContainer
+	inSetup = true
 	mapSetUp.connect_buttons(self)
 	mapSetUp.set_chapter(map.chapterNumber, map.title, map.get_objectives(), map.get_loss_conditions())
 	mapSetUp.set_mon(UnitData.playerMon)
@@ -330,6 +338,7 @@ func _load_assets():
 	actMenu = load("res://scenes/GUI/action_menu.tscn").instantiate()
 	foreCast = load("res://scenes/combat_forecast.tscn").instantiate()
 	menuCursor = load("res://scenes/GUI/menu_cursor.tscn").instantiate()
+	focusViewer = load("res://scenes/GUI/cursor_focus_viewer.tscn").instantiate()
 	
 	add_child(mapSetUp)
 	add_child(foreCast)
@@ -338,6 +347,8 @@ func _load_assets():
 	add_child(tradeScreen)
 	add_child(unitProf)
 	add_child(menuCursor)
+	add_child(focusViewer)
+	menuCursor.visible = false
 	
 	
 func _connect_asset_signals():
@@ -345,7 +356,9 @@ func _connect_asset_signals():
 	unitProf.tooltips_off.connect(self._on_profile_tooltips_off)
 	actMenu.action_menu_canceled.connect(self._on_action_menu_canceled)
 	actMenu.action_menu_selected.connect(GRANDDAD._on_action_menu_selected)
-
+	actMenu.action_menu_item_pressed.connect(self._on_action_item_pressed)
+	actMenu.action_menu_trade_pressed.connect(self._on_action_trade_pressed)
+	
 #SetUp Buttons
 func _on_btn_deploy_pressed():
 	#var sCountPnl = $SetUpMain/SetUpGrid/SetUpPnl2
@@ -359,6 +372,7 @@ func _on_frm_btn_pressed():
 	menuCursor.toggle_visible()
 #	_relocate_child(unitProf, self)
 	sState = sStates.FORM
+	
 	emit_signal("formation_toggled")
 	
 	
@@ -369,6 +383,7 @@ func _on_mng_btn_pressed():
 	
 
 func _on_begin_btn_pressed():
+	inSetup = false
 	menuCursor.visible = false
 	mapSetUp.toggle_visible()
 	sState = sStates.BEGIN
@@ -525,7 +540,7 @@ func _roster_btn_pressed(b):
 func _trade_unit_select_roster(b) -> void:
 	if b.get_unit() == activeBtn.get_unit(): return
 	else: 
-		_set_trade_partners(b)
+		_set_roster_trade_partners(b)
 		rosterGrid.toggle_visible()
 		_open_trade_menu()
 	
@@ -563,12 +578,11 @@ func _on_trade_pressed():
 	sState = sStates.TRDSEEK
 	_close_unit_options()
 
+
 func _open_trade_menu():
 	#var strip = true
 	sState = sStates.TRADING
-	
 	tradeScreen.open_trade_menu(trade1, trade2)
-	
 
 
 func _on_item_list_filled(buttons, ignoreFocus := false):
@@ -584,11 +598,21 @@ func _on_item_selected(b):
 	cursorDest.call_deferred("grab_focus")
 	
 
-func _on_trade_closed():
+func _on_trade_closed() -> void:
+	if inSetup:
+		rosterGrid.toggle_visible()
+		_open_unit_options(activeBtn)
+	elif trade1 and trade2:
+		menuCursor.visible = false
+		GameState.change_state()
+		GRANDDAD.trade_seeking()
+	else:
+		menuCursor.visible = false
+		GameState.change_state()
+		actMenu.return_previous_state()
 	trade1 = null
 	trade2 = null
-	rosterGrid.toggle_visible()
-	_open_unit_options(activeBtn)
+
 
 func _on_supply_pressed():
 	var unit = activeBtn.get_unit()
@@ -596,8 +620,8 @@ func _on_supply_pressed():
 	_close_unit_options()
 	rosterGrid.close_menu()
 	tradeScreen.open_supply_menu(unit)
-	
-	
+
+
 func _on_trd_focus_changed(p, _b = null):
 	_resignal_menuCursor(p)
 
@@ -609,6 +633,25 @@ func _on_manage_pressed():
 	tradeScreen.open_manage_menu(unit)
 
 
+func _on_action_item_pressed(unit:Unit):
+	GameState.change_state(self,GameState.gState.GB_SETUP)
+	sState = sStates.MANAGE
+	tradeScreen.open_manage_menu(unit)
+
+
+func _on_action_trade_pressed(unit:Unit):
+	trade1 = unit
+	GRANDDAD.trade_seeking(unit)
+
+
+func start_action_trade(trade_target:Unit):
+		GameState.change_state(self, GameState.gState.GB_SETUP)
+		sState = sStates.TRADING
+		trade1 = Global.activeUnit
+		trade2 = trade_target
+		_open_trade_menu()
+
+
 func _on_use_lb_pressed():
 	var unit = activeBtn.get_meta("unit")
 	var setUp = $SetUpMain/SetUpGrid
@@ -617,15 +660,14 @@ func _on_use_lb_pressed():
 	setUp.visible = false
 	tradeScreen.open_use_menu(unit)
 
+
 func _on_profile_request(newParent):
 	_relocate_child(unitProf, newParent)
 	_on_gameboard_toggle_prof()
-	
+
+
 func _on_item_used(unit, item):
 	emit_signal("item_used", unit, item)
-
-
-
 	
 #########
 

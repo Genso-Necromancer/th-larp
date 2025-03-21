@@ -4,7 +4,12 @@ class_name ActionMenu
 
 signal action_menu_canceled
 signal action_menu_selected(bName)
+signal action_menu_item_pressed(unit)
+signal action_menu_item_canceled
+signal action_menu_trade_pressed(unit)
 
+
+enum MENU_STATES {NONE, OPTIONS, ACTION, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE}
 @export var aBox : VBoxContainer
 @export var aContainer : MarginContainer
 @export var sBox : VBoxContainer
@@ -15,12 +20,10 @@ signal action_menu_selected(bName)
 @onready var blocker :Panel = $Blocker
 @onready var inv : InventoryPanel =  $ScreenMargin/TradePnl
 
-var cursorPath = preload("res://scenes/GUI/menu_cursor.tscn")
+var cursorPath := preload("res://scenes/GUI/menu_cursor.tscn")
 var cursor : MenuCursor
-
 var currentUnit : Unit
-enum MENU_STATES {NONE, OPTIONS, ACTION, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM}
-var state = MENU_STATES.NONE:
+var state := MENU_STATES.NONE:
 	set(value):
 			state = value
 			match state:
@@ -55,8 +58,11 @@ var state = MENU_STATES.NONE:
 				MENU_STATES.SKILL_CONFIRM:
 					_assign_cursor([skillConfirm])
 					cursor.setCursor = true
+				MENU_STATES.ITEM_MANAGE, MENU_STATES.ITEM_TRADE:
+					_hide_cursor()
+					_hide_action_container()
 
-var prevState = []
+var prevState : Array[MENU_STATES] = []
 var activeItem = null
 
 
@@ -160,9 +166,11 @@ func _on_button_pressed(bName):
 		"OpenBtn": pass
 		"StealBtn": pass
 		"ItmBtn": 
-			pass
+			_change_state(MENU_STATES.ITEM_MANAGE)
+			emit_signal("action_menu_item_pressed", currentUnit)
 		"TrdBtn": 
-			pass
+			_change_state(MENU_STATES.ITEM_TRADE)
+			emit_signal("action_menu_trade_pressed", currentUnit)
 		"WaitBtn": 
 			_clear_states()
 			emit_signal("action_menu_selected", bName)
@@ -220,16 +228,22 @@ func _change_state(newState):
 
 
 func return_previous_state() -> void:
-	var newState
+	var newState : MENU_STATES
+	var curState : MENU_STATES = state
+	
+	
+	if state == MENU_STATES.ACTION and Global.flags.traded: return
+	elif state == MENU_STATES.ACTION and Global.flags.itemUsed: return
+	
 	if prevState.size() > 0:
 		newState = prevState.pop_back()
 		state = newState
 	else: 
 		print("action_menu, attempted invalid state return: No previous states.",)
 		return
-		
-	if newState == MENU_STATES.NONE:
-		emit_signal("action_menu_canceled")
+	
+	#if curState == MENU_STATES.ITEM_MANAGE: emit_signal("action_menu_item_canceled")
+	if newState == MENU_STATES.NONE: emit_signal("action_menu_canceled")
 
 func _clear_states():
 	_change_state(MENU_STATES.NONE)

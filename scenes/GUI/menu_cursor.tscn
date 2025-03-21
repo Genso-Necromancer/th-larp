@@ -13,6 +13,6 @@ pivot_offset = Vector2(8, 8)
 mouse_filter = 2
 texture = ExtResource("1_pwpkv")
 script = ExtResource("1_tms0j")
-cursor_offset = Vector2(40, 0)
+cursor_offset = Vector2(40, 10)
 
 [node name="Timer" type="Timer" parent="."]

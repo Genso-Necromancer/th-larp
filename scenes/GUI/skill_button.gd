@@ -18,4 +18,3 @@ func set_item_text(string : String, cost: String = ""):
 	sCost.set_text(cost)
 	
 	
-

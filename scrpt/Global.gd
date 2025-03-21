@@ -7,6 +7,16 @@ var focusUnit : Unit:
 		SignalTower.emit_signal("focus_unit_changed", value)
 	get:
 		return focusUnit
+
+
+var focusDanmaku : Danmaku:
+	set(value):
+		focusDanmaku = value
+		#SignalTower.emit_signal("focus_unit_changed", value)
+	get:
+		return focusDanmaku
+
+
 var aiTarget : Unit
 var activeUnit : Unit
 var activeSkill : StringName
@@ -46,12 +56,14 @@ func _init_flags():
 		"gameOver": false,
 		"victory": false,
 		"activeUnit": false,
-		"focusUnit": false,
+		"focusUnit": false, #Does this get used?
 		"gameTime": 0,
 		"timeFactor": 1,
 		"trueTimeFactor": 1,
 		"rotationFactor": 15,
-		"CurrentMap": 0
+		"CurrentMap": 0,
+		"traded": false,
+		"itemUsed" : false,
 	}
 
 func set_rich_text_params(label):

@@ -17,6 +17,10 @@ type = "Skill"
 
 [node name="ContentMargin" type="MarginContainer" parent="."]
 layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
 
 [node name="HBoxContainer" type="HBoxContainer" parent="ContentMargin"]
 layout_mode = 2

@@ -1,7 +1,7 @@
 [gd_resource type="Theme" load_steps=10 format=3 uid="uid://1r4dr7022gxk"]
 
-[ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="1_0ffro"]
 [ext_resource type="FontFile" uid="uid://di48a300uqd6d" path="res://fonts/VenomMincho-DOOyR.ttf" id="1_ut3iq"]
+[ext_resource type="FontFile" uid="uid://cuuir1uibmfis" path="res://fonts/Marcellus/Marcellus.otf" id="2_htj5f"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_s7ira"]
 
@@ -19,8 +19,8 @@
 
 [resource]
 default_base_scale = 1.0
-default_font = ExtResource("1_ut3iq")
-default_font_size = 12
+default_font = ExtResource("2_htj5f")
+default_font_size = 13
 Button/colors/font_color = Color(0.87451, 0.87451, 0.87451, 1)
 Button/colors/font_disabled_color = Color(0.255659, 0.255659, 0.255659, 1)
 Button/colors/font_focus_color = Color(0.776471, 0.67451, 0.247059, 1)
@@ -43,8 +43,7 @@ Button/styles/focus = SubResource("StyleBoxEmpty_t31wv")
 Button/styles/hover = SubResource("StyleBoxEmpty_kl6js")
 Button/styles/normal = SubResource("StyleBoxEmpty_hsiuf")
 Button/styles/pressed = SubResource("StyleBoxEmpty_rfvx0")
-Fonts/fonts/normal = ExtResource("1_0ffro")
-Label/font_sizes/font_size = 12
+Fonts/fonts/normal = ExtResource("2_htj5f")
 MarginContainer/constants/margin_bottom = 4
 MarginContainer/constants/margin_left = 4
 MarginContainer/constants/margin_right = 4
@@ -52,3 +51,4 @@ MarginContainer/constants/margin_top = 4
 Panel/styles/panel = SubResource("StyleBoxEmpty_y8ifr")
 PanelContainer/styles/panel = SubResource("StyleBoxEmpty_63pdl")
 RichTextLabel/font_sizes/normal_font_size = 12
+VBoxContainer/constants/separation = 1

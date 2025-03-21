@@ -8,7 +8,7 @@ signal collision_detected
 @onready var _animPlayer = $PathFollow2D/Sprite2D/AnimationPlayer
 @onready var _pathFollow: PathFollow2D = $PathFollow2D
 
-var texture : CompressedTexture2D = preload("res://sprites/danmaku/danmaku.png"):
+var texture : = "res://sprites/danmaku/danmaku.png":
 	get:
 		return texture
 	set(value):
@@ -23,7 +23,8 @@ var damage : int
 var cmpDamage : int
 var impactEffect : Array
 var speed : int
-var typeId : String
+var typeId : StringName
+var dmkName : String
 var master : Unit
 var faction = Enums.FACTION_ID.ENEMY
 var unitHit : Unit
@@ -56,7 +57,10 @@ var hexDirect := [
 
 
 func _ready():
-	originCell = get_parent().local_to_map(position)
+	
+	if get_parent().ground:
+		initialize_cell()
+		
 	if not Engine.is_editor_hint():
 		curve = Curve2D.new()
 	
@@ -65,8 +69,17 @@ func _ready():
 func _process(delta):
 	if isMoving:
 		_process_motion(delta)
-		
-func init_bullet(dmk : Dictionary, _type : String, _master: Unit,):
+
+
+func initialize_cell():
+	var coord = $Cell
+	cell = get_parent().local_to_map(position)
+	position = get_parent().map_to_local(cell)
+	originCell = cell
+	coord.set_text(str(cell))
+
+
+func init_bullet(dmk : Dictionary, _type : StringName, _master: Unit,):
 	texture = dmk.Texture
 	sfx = dmk.Sfx
 	move = dmk.Move
@@ -78,6 +91,7 @@ func init_bullet(dmk : Dictionary, _type : String, _master: Unit,):
 	isPhasing = dmk.IsPhasing
 	typeId = _type
 	master = _master
+	dmkName = StringGetter.get_string(("danmaku_type_%s" % [typeId]))
 	
 	
 	#fullPath = _fullPath
@@ -105,9 +119,9 @@ func _set_cell_lbl(c):
 	var lbl = $Cell
 	lbl.set_text(str(c))
 	
-func _setsprite_texture(t : CompressedTexture2D):
+func _setsprite_texture(t : String):
 	var sprite = $PathFollow2D/Sprite2D
-	sprite.texture = t
+	sprite.texture = load(t)
 
 	
 func set_facing(i):

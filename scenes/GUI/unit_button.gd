@@ -81,7 +81,9 @@ func refresh_data():
 	var curComp = unitLink.activeStats.CurComp
 	var prt = unitLink.unitData.Profile.Prt
 	
-	if prt: texture.set_texture(prt)
+	if prt and ResourceLoader.exists(prt):
+		texture.set_texture(load(prt))
+	else: texture.set_texture(load("res://sprites/ERROR.png"))
 	n.set_text(unitName)
 	l.set_text("Lv."+str(lv))
 	r.set_text(role)
@@ -89,4 +91,3 @@ func refresh_data():
 	if comp < (comp/2): _change_font_color(c, "Overstressed")
 	else: _change_font_color(c)
 	cap.set_text(str(curComp))
-

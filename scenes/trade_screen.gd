@@ -97,12 +97,11 @@ func _hide_panels():
 func _connect_signals():
 	var parent = get_parent()
 	self.item_selected.connect(parent._on_item_selected)
-	
 	self.new_btn_added.connect(parent._connect_btn_to_cursor)
 	self.trade_closed.connect(parent._on_trade_closed)
 	self.item_list_filled.connect(parent._on_item_list_filled)
-	
 	self.trd_focus_changed.connect(parent._on_trd_focus_changed)
+	
 	
 
 
@@ -565,8 +564,9 @@ func _open_item_options(b):
 	if isValid: 
 		optionsPop.connect_signal(self)
 		emit_signal("trd_focus_changed", list)
-	else: _close_item_options()
-	
+	else: 
+		_close_item_options()
+
 	#var mngMenu = $SupplyOpPnl2
 	#var list = $SupplyOpPnl2/MarginContainer/supplyOpList
 	#var eBtn = $SupplyOpPnl2/MarginContainer/supplyOpList/EquipBtn
@@ -607,11 +607,12 @@ func _close_item_options():
 	#tState = tStates.DEFAULT
 
 func _on_selection_made(selection, item):
+	Global.flags.itemUsed = true
 	_close_item_options()
 	match selection:
 		"Use": _play_item_anim(item)
-		"Equip": pass
-		"Unequip": pass
+		"Equip": Global.activeUnit.set_direct_equipped(item)
+		"Unequip": Global.activeUnit.unequip()
 
 
 func _play_item_anim(item) -> void:
@@ -625,7 +626,8 @@ func _play_item_anim(item) -> void:
 
 
 func _on_itemfx_complete():
-	GameState.change_state(get_parent(), GameState.previousState)
+	#GameState.change_state(get_parent(), GameState.previousState)
+	GameState.change_state()
 
 
 func _trade_select(b):
@@ -754,6 +756,7 @@ func _find_valid_cursor_focus(l, i):
 			var bInd = b.get_meta("Index")
 			if bInd == i:
 				newFocus = btns[i]
+				break
 		if i-1 < 0: 
 			newFocus = btns[0]
 			break
@@ -810,40 +813,22 @@ func _swap_items(b1, b2):
 	var item1 = b1.button.get_meta("Item")
 	var i1 = b1.get_meta("Index")
 	var inv1 = unit1.unitData.Inv
-	
 	var btns1 = list1.itemList.get_children()
 	var unit2 = b2.get_meta("Unit")
 	var item2 = b2.button.get_meta("Item")
 	var i2 = b2.get_meta("Index")
-	
 	var inv2 = unit2.unitData.Inv
-	
-	#var btns2 = get_trade_list(2).get_children()
 	var home
-	#var destination
-	
-	
-	
+
 	if btns1.has(b1):
 		home = list1
 	else:
 		home = list2
-	#if btns1.has(b2):
-		#destination = list1
-	#else:
-		#destination = list2
-		#
-	#b1.set_meta("Unit", unit2)
-	#b2.set_meta("Unit", unit1)
-	#home.remove_child(b1)
-	#destination.remove_child(b2)
-	#destination.add_child(b1)
-	#destination.move_child(b1, i2)
-	
-	
+	item1.Equip = false
 	if item2:
 		#home.add_child(b2)
 		#home.move_child(b2, i1)
+		item2.Equip = false
 		inv1[i1] = item2.duplicate()
 		inv2[i2] = item1.duplicate()
 	else:
@@ -854,13 +839,15 @@ func _swap_items(b1, b2):
 		unit1.set_equipped()
 	if item2 and item2 == unit2.get_equipped_weapon():
 		unit2.set_equipped()
-		
-	_remove_empty()
-	#_refresh_list()
-	call_deferred("_refresh_list", true)
 	
-	#print("Inv1: " + str(inv1) + "
-	#Inv2: " + str(inv2))
+	_flag_trade()
+	_remove_empty()
+	call_deferred("_refresh_list", true)
+
+
+func _flag_trade():
+	if !Global.flags.traded:
+		Global.flags.traded = true
 
 func _get_first_valid_category() -> int:
 	var valid := tabTypes.BLADE

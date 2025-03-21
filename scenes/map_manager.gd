@@ -2,8 +2,8 @@ extends Node
 
 class_name MapManager
 
-@onready var gameBoard := $Gameboard
-@onready var guiManager := $CanvasLayer/GUIManager
+@onready var gameBoard :GameBoard = $Gameboard
+@onready var guiManager :GUIManager = $CanvasLayer/GUIManager
 
 
 func _ready():
@@ -14,7 +14,7 @@ func _ready():
 	SignalTower.action_skill_confirmed.connect(gameBoard._on_action_weapon_selected)
 	guiManager.gui_splash_finished.connect(self._on_gui_splash_finished)
 	guiManager.gui_action_menu_canceled.connect(gameBoard._on_gui_action_menu_canceled)
-	
+	gameBoard.cursor.cursor_moved.connect(self._on_cursor_moved)
 
 func load_map(map):
 	gameBoard.change_map(map)
@@ -41,7 +41,6 @@ func _on_map_loaded(map):
 	#elif: time == 0:
 
 ##GUI-Gameboard communication
-
 func _on_gui_splash_finished():
 	guiManager.call_setup(gameBoard.depCap, gameBoard.forcedDeploy.keys(), gameBoard.currMap)
 
@@ -64,3 +63,15 @@ func _on_action_menu_selected(bName:StringName):
 		"StatBtn": pass
 		"OpBtn": pass
 		"SusBtn": pass
+
+
+func trade_seeking(unit:Unit = Global.activeUnit):
+	gameBoard.seek_trade(unit)
+
+
+func call_trade(unit:Unit):
+	guiManager.start_action_trade(unit)
+
+
+func _on_cursor_moved(cell):
+	guiManager.focusViewer.call_deferred("update_focus_viewer",cell)

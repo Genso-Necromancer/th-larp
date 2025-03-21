@@ -25,13 +25,13 @@ signal danmaku_progressed
 @export var dmkMaster : Unit
 
 ##ALL THE FUCKING LAYERS
-@onready var ground := $Ground
-@onready var modifier := $Modifier
-@onready var object := $Object
-@onready var deploy := $Deployments
-@onready var pathAttack := $PathAttack
-@onready var narrative := $Narrative
-@onready var dev := $Dev
+@onready var ground :TileMapLayer= $Ground
+@onready var modifier :TileMapLayer= $Modifier
+@onready var object :TileMapLayer= $Object
+@onready var deploy :TileMapLayer= $Deployments
+@onready var pathAttack :TileMapLayer= $PathAttack
+@onready var narrative :TileMapLayer= $Narrative
+@onready var dev :TileMapLayer= $Dev
 
 @onready var tileSet :TileSet = ground.tile_set
 @onready var tileSize : Vector2i = tileSet.get_tile_size()
@@ -71,10 +71,28 @@ func get_active_units() -> Dictionary:
 			unitList[unit.cell] = unit
 	return unitList
 
+
+func get_active_danmaku() -> Dictionary:
+	var bulletList := {}
+	for child in get_children():
+		var bullet := child as Danmaku
+		if not bullet:
+			continue
+		elif bullet.isActive:
+			bulletList[bullet.cell] = bullet
+	return bulletList
+
+
 func _initialize_unit_cells():
 	var units : Dictionary = get_active_units()
 	for unit in units:
 		units[unit].initialize_cell()
+
+
+func _initialize_danmaku_cells():
+	var danmaku : Dictionary = get_active_danmaku()
+	for bullet in danmaku:
+		danmaku[bullet].initialize_cell()
 
 func get_objectives() -> Array:
 	var objectives: Array = ["This is a Test", "Of The Emergency Broadcast", "System."]
@@ -120,20 +138,18 @@ func get_bonus(cell): # WHOOPS BROKEN
 
 
 func get_terrain_tags(cell:Vector2i) -> Dictionary:
-	var terrainTags: Dictionary = {"TerrainType1": "", "TerrainType2": "", "TerrainId1": "", "TerrainId2": ""}
-	var type1 = ground.get_cell_tile_data(cell)
-	var type2 = modifier.get_cell_tile_data(cell)
-	var id1 = ground.get_cell_tile_data(cell)
-	var id2 = modifier.get_cell_tile_data(cell)
+	var terrainTags: Dictionary = {"BaseType": "", "ModType": "", "BaseId": "", "ModId": "", "Locked": false}
+	var base = ground.get_cell_tile_data(cell)
+	var mod = modifier.get_cell_tile_data(cell)
 	
-	if type1: 
-		terrainTags.TerrainType1 = type1.get_meta("TerrainType", "")
-	if type2:
-		terrainTags.TerrainType2 = type2.get_meta("TerrainType", "")
-	if id1:
-		terrainTags.TerrainId1 = id1.get_meta("TerrainId", "")
-	if id2:
-		terrainTags.TerrainId2 = id2.get_meta("TerrainId", "")
+	if base: 
+		terrainTags.BaseType = base.get_custom_data("TerrainType")
+		terrainTags.BaseId = base.get_custom_data("TerrainId")
+	if mod:
+		terrainTags.ModType = mod.get_custom_data("TerrainType")
+		terrainTags.ModId = mod.get_custom_data("TerrainId")
+		terrainTags.Locked = mod.get_custom_data("Locked")
+		
 		
 	return terrainTags
 

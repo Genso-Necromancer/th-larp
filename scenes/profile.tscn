@@ -19,7 +19,7 @@
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8x012"]
 bg_color = Color(0, 0, 0, 0.45098)
 
-[node name="ProfileAspect" type="AspectRatioContainer" node_paths=PackedStringArray("inventory", "fBox", "infoPanel", "statusTray", "initialFocus")]
+[node name="ProfileAspect" type="AspectRatioContainer" node_paths=PackedStringArray("inventory", "fBox", "infoPanel", "statusTray", "initialFocus", "portrait")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -36,6 +36,7 @@ fBox = NodePath("ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/
 infoPanel = NodePath("infoNode/InfoPanel")
 statusTray = NodePath("ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin/StatusTrayMargin")
 initialFocus = NodePath("ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/NameMargin/NameVBox/NameLb")
+portrait = NodePath("ProfileMargin/ProfileHBox/ProfileContainer/PortraitMargin/UnitPrt")
 
 [node name="Panel" type="Panel" parent="."]
 custom_minimum_size = Vector2(1920, 0)

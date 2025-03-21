@@ -4,6 +4,7 @@ extends Node
 
 signal prompt_accepted
 signal focus_unit_changed(unit : Unit)
+signal cursor_tile_updated(unit: Unit, tile)
 signal inventory_weapon_changed(button : ItemButton)
 signal action_weapon_selected(button : ItemButton)
 signal action_skill_confirmed()

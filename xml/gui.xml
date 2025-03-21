@@ -17,6 +17,7 @@
 			<entry id = "unit_name"><![CDATA[%s %s]]></entry>
 			<entry id = "combat_hp_remain"><![CDATA[[[color=#FF0000]%d[/color]] %s]]></entry>
 			<entry id = "combat_hp"><![CDATA[%d/%d]]></entry>
+			<entry id = "unit_ownership"><![CDATA[{Owner}'s {Object}]]></entry>
 			<!-- effect type templates -->
 			<entry id = "effect_template_buff"><![CDATA[[color=#6495ED]Buff[/color] %s]]></entry>
 			<entry id = "effect_template_debuff"><![CDATA[[color=#5b248c]Debuff[/color] %s]]></entry>
@@ -102,6 +103,7 @@
 			<entry id = "unit_name_patchouli"><![CDATA[Patchouli Knowledge]]></entry>
 			<entry id = "unit_name_meiling"><![CDATA[Hong Meiling]]></entry>
 			<entry id = "unit_name_reimu"><![CDATA[Reimu Hakuri]]></entry>
+			<entry id = "unit_name_cirno"><![CDATA[Cirno]]></entry>
 			<!-- species -->
 			<entry id = "species_name_fairy"><![CDATA[Fairy]]></entry>
 			<entry id = "species_name_human"><![CDATA[Human]]></entry>
@@ -163,7 +165,76 @@
 			<!-- Tool Tips: Status Conditions -->
 			<entry id = "status_sleep"><![CDATA[[color=#5F9EA0]Sleep[/color]]]></entry>
 			
-			<!-- OLD: Need Vetting -->
+			<!-- Terrain -->
+			<!--Bases -->
+			<entry id = "terrain_name_grass"><![CDATA[Grass]]></entry>
+			<entry id = "terrain_name_dirt"><![CDATA[Ground]]></entry>
+			<entry id = "terrain_name_river"><![CDATA[River]]></entry>
+			<entry id = "terrain_name_sea"><![CDATA[Sea]]></entry>
+			<entry id = "terrain_name_sanzu"><![CDATA[Sanzu]]></entry>
+			<entry id = "terrain_name_hotspring"><![CDATA[Hot Spring]]></entry>
+			<entry id = "terrain_name_brush"><![CDATA[Brush]]></entry>
+			<entry id = "terrain_name_snow"><![CDATA[Snow]]></entry>
+			<entry id = "terrain_name_sand"><![CDATA[Sand]]></entry>
+			<entry id = "terrain_name_hellsand"><![CDATA[Hell Sand]]></entry>
+			<entry id = "terrain_name_stone"><![CDATA[Cobble]]></entry>
+			<entry id = "terrain_name_tile"><![CDATA[Tile]]></entry>
+			<entry id = "terrain_name_water"><![CDATA[Water]]></entry>
+			<!-- Modifiers -->
+			<entry id = "terrain_name_fort"><![CDATA[Fort]]></entry>
+			<entry id = "terrain_name_woodland"><![CDATA[Woods]]></entry>
+			<entry id = "terrain_name_hill"><![CDATA[Hills]]></entry>
+			<entry id = "terrain_name_shrine"><![CDATA[Shrine]]></entry>
+			<entry id = "terrain_name_house"><![CDATA[Home]]></entry>
+			<entry id = "terrain_name_bridge"><![CDATA[Bridge]]></entry>
+			<entry id = "terrain_name_shop"><![CDATA[Shop]]></entry>
+			<entry id = "terrain_name_wall"><![CDATA[Covered Wall]]></entry>
+			<entry id = "terrain_name_wallfly"><![CDATA[Uncovered Wall]]></entry>
+			<entry id = "terrain_name_wallshoot"><![CDATA[Murder Hole]]></entry>
+			
+			<!-- Adjectives -->
+			<entry id = "terrain_adjective_grass"><![CDATA[Grassy]]></entry>
+			<entry id = "terrain_adjective_dirt"><![CDATA[Clear]]></entry>
+			<entry id = "terrain_adjective_river"><![CDATA[Soggy]]></entry>
+			<entry id = "terrain_adjective_sea"><![CDATA[Watery]]></entry>
+			<entry id = "terrain_adjective_sanzu"><![CDATA[Lost]]></entry>
+			<entry id = "terrain_adjective_brush"><![CDATA[Dense]]></entry>
+			<entry id = "terrain_adjective_snow"><![CDATA[Snowy]]></entry>
+			<entry id = "terrain_adjective_sand"><![CDATA[Sandy]]></entry>
+			<entry id = "terrain_adjective_hellsand"><![CDATA[Hellish]]></entry>
+			<entry id = "terrain_adjective_stone"><![CDATA[Paved]]></entry>
+			<entry id = "terrain_adjective_water"><![CDATA[Wet]]></entry>
+			
+			<!-- Terrain Stats -->
+			<entry id = "terrain_label_life"><![CDATA[Life]]></entry>
+			<entry id = "terrain_label_comp"><![CDATA[Composure]]></entry>
+			<entry id = "terrain_label_pwr"><![CDATA[Power]]></entry>
+			<entry id = "terrain_label_mag"><![CDATA[Magic]]></entry>
+			<entry id = "terrain_label_eleg"><![CDATA[Elegance]]></entry>
+			<entry id = "terrain_label_cele"><![CDATA[Celerity]]></entry>
+			<entry id = "terrain_label_barrier"><![CDATA[Barrier]]></entry>
+			<entry id = "terrain_label_cha"><![CDATA[Charisma]]></entry>
+			<entry id = "terrain_label_hit"><![CDATA[Hit]]></entry>
+			<entry id = "terrain_label_dmg"><![CDATA[Damage]]></entry>
+			<entry id = "terrain_label_graze"><![CDATA[Graze]]></entry>
+			<entry id = "terrain_label_barprc"><![CDATA[Barrier Chance]]></entry>
+			<entry id = "terrain_label_crit"><![CDATA[Crit]]></entry>
+			<entry id = "terrain_label_luck"><![CDATA[Luck]]></entry>
+			<entry id = "terrain_label_resist"><![CDATA[Resist]]></entry>
+			<entry id = "terrain_label_effhit"><![CDATA[Effect Chance]]></entry>
+			<entry id = "terrain_label_def"><![CDATA[Defense]]></entry>
+			<entry id = "terrain_label_monperround"><![CDATA[文/Round]]></entry>
+			<entry id = "terrain_label_wall_shoot"><![CDATA[Cannot Fly Over - Can Shoot Through]]></entry>
+			<entry id = "terrain_label_wall_fly"><![CDATA[Can Fly Over - Can Shoot Over]]></entry>
+			<entry id = "terrain_label_wall"><![CDATA[Cannot Fly Over - Cannot Shoot Through]]></entry>
+			<entry id = "terrain_cannot_pass"><![CDATA[Impassable]]></entry>
+			
+			
+			<!-- Danmaku -->
+			<entry id = "danmaku_type_dmkukunai"><![CDATA[Kunai]]></entry>
+			
+			
+			<!-- OLD: Need Vetting
 			<entry id = "lore_night_prot"><![CDATA[{RuleType}, negate {Rule} stat penalties at [color=#230f8c]Night[/color].]]></entry>
 			<entry id = "lore_day_prot"><![CDATA[{RuleType}, negate {Rule} stat penalties during the [color=##87CEEB]Day[/color].]]></entry>
 			<entry id = "lore_self_spec"><![CDATA[If Unit is {Rule}]]></entry>
@@ -181,6 +252,8 @@
 			<entry id = "lore_morph_day"><![CDATA[During the [color=#87CEEB]Day[/color], skill becomes {Morph}]]></entry>
 			<entry id = "lore_restrict_night"><![CDATA[[i]Feature is restricted to [color=#230f8c]Night[/color][/i]]]></entry>
 			<entry id = "lore_restrict_day"><![CDATA[[i]Feature is restricted to [color=##87CEEB]Day[/color][/i]]]></entry>
+			 -->
+			
 			
 			
 			
