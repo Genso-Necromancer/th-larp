@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://bqhoeac2w0jxl"]
+
+[ext_resource type="TileSet" uid="uid://iq0by434lvhu" path="res://TileSets/danmaku_spawns.tres" id="1_av6vu"]
+[ext_resource type="Script" uid="uid://bycpm6vyadwpb" path="res://scenes/Danmaku/dmk_spawn_pattern.gd" id="1_xqx2l"]
+
+[node name="DmkSpawnPattern" type="Node2D"]
+script = ExtResource("1_xqx2l")
+
+[node name="DmkSpawnPattern" type="TileMapLayer" parent="."]
+position = Vector2(-80, -25)
+tile_set = ExtResource("1_av6vu")

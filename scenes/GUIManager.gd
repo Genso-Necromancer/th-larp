@@ -9,15 +9,12 @@ signal item_used
 signal map_started
 signal gui_action_menu_canceled
 
-
 @onready var blocker : Panel = $PanelBlocker #used to block the map easily
 
 #unvetted
 @export var mapCursorPath : NodePath
 @export var menuOffSet : int = 150
 @onready var mapCursor := get_node(mapCursorPath)
-@onready var originalPositionActX = $ActionMenu.position.x
-@onready var originalPositionActY = $ActionMenu.position.y
 
 
 @onready var parent = get_parent()
@@ -69,6 +66,7 @@ var timer : Timer
 var tween : Tween
 var menuCursor : Control
 var focusViewer : FocusViewer
+var chClock : ChapterClock
 
 
 
@@ -105,58 +103,49 @@ func _ready():
 	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
 	#menuCursor.visible = false
 	_connect_asset_signals()
-	_load_turn_tracker()
-	
+
+
 func update_labels(): #Use this to cascade assigning strings from XML to all hard loaded buttons HERE
 	pass
-	
-	
 
 
 func _on_prompt_accepted():
 	_initiate_ai_sequence()
-	
 
-	
-func _load_turn_tracker():
-	turnTracker = turnTrackerRes.instantiate()
-	add_child(turnTracker)
-	
+
 func _on_gameboard_turn_order_updated(turns):
 	turnTracker.display_turns(turns)
-	
+
+
 func _on_jobs_done(id, node):
 	match id:
 		"HUD": HUD = node
-	
-#func reinitialize():
-	#if !menuCursor.wep_updated.is_connected(self.update_forecast):
-		#menuCursor.wep_updated.connect(self.update_forecast)
-	
-	
+
+
 func _clear_active_btn():
 	activeBtn.temp_font_change()
 	activeBtn = null
-	
+
+
 func _set_active_btn(b) -> void:
 	if !b:
 		push_error("set_active_btn: Missing Button")
 		return
 	activeBtn = b
 	activeBtn.temp_font_change("Selected")
-	
+
 
 func _set_roster_trade_partners(b):
 	trade1 = activeBtn.get_unit()
 	trade2 = b.get_unit()
 	#b.temp_font_change("Selected")
-	
+
+
 func _relocate_child(child, newParent):
 	if child.get_parent():
 		child.get_parent().remove_child(child)
 	newParent.add_child(child)
-		
-		
+
 
 func regress_menu():
 	match sState:
@@ -168,6 +157,7 @@ func regress_menu():
 		sStates.TRADING: tradeScreen.regress_trade()
 		sStates.SUPPLY: tradeScreen.regress_trade()
 		sStates.MANAGE: tradeScreen.regress_trade()
+
 
 func _font_color_change(b, style):
 	var fColor
@@ -182,6 +172,7 @@ func _font_color_change(b, style):
 	b.add_theme_color_override("font_focus_color", fColor)
 	b.add_theme_color_override("font_hover_pressed_color", fColor)
 
+
 func _snap_to_cursor(node): #bug gy save for later
 	var cursorPos = mapCursor.to_local(mapCursor.position)
 	var newPos
@@ -193,7 +184,7 @@ func _snap_to_cursor(node): #bug gy save for later
 	print("new " + str(newPos))
 	node.global_position = newPos
 	print("Node " + str(node.global_position))
-	
+
 
 func _on_gameboard_toggle_prof():
 	toggle_profile()
@@ -268,43 +259,25 @@ func _ai_sequence_check():
 	match Options.aiForecastPrompt:
 		0: pass
 		1: _prompt_delay()
-			
+
 
 func _prompt_delay():
 	var time = Options.promptDelay
 	await get_tree().create_timer(time).timeout
 	_initiate_ai_sequence()
-	
+
+
 func _initiate_ai_sequence():
 	if isForecastPrompt:
 		isForecastPrompt = false
 		emit_signal("start_the_justice")
 
-	
+
 func _swap_to_forecast():
 	var fc = $CombatForecast
 	fc.show_fc()
 	turnTracker.visible = false
 
-func _on_gameboard_time_set():
-	HUD.set_sun(Global.gameTime)
-
-func _on_gameboard_turn_changed():
-#	var sunMod = 0
-	var sunRot = Global.rotationFactor
-#	if sunDial.rotation_degrees >= (361 - sunRot):
-#		sunMod = sunDial.rotation_degrees - (361 - sunRot)
-#		sunMod += sunRot
-#		sunDial.rotation_degrees = sunMod
-#	else: sunDial.rotation_degrees += sunRot
-#	sunDial.rotation_degrees += sunRot
-#	clockLabel.set_text(str(Global.gameTime))
-	HUD.update_sun(sunRot)
-
-
-func _on_gameboard_gb_ready(_state):
-	pass
-	#reinitialize()
 
 #HERE
 func _on_gameboard_exp_display(oldExp, expSteps, results, unitPrt, unitName):
@@ -322,11 +295,9 @@ func call_setup(dLimit, forced, map):
 	mapSetUp.set_mon(UnitData.playerMon)
 	mapSetUp.toggle_visible()
 	menuCursor.resignal_cursor(btns.get_children())
-	
 	sState = sStates.HOME
 	forcedDep = forced
 	depLimit = dLimit
-	
 	rosterGrid.init_roster(forcedDep, depLimit)
 	GameState.change_state(self, GameState.gState.GB_SETUP)
 
@@ -339,7 +310,12 @@ func _load_assets():
 	foreCast = load("res://scenes/combat_forecast.tscn").instantiate()
 	menuCursor = load("res://scenes/GUI/menu_cursor.tscn").instantiate()
 	focusViewer = load("res://scenes/GUI/cursor_focus_viewer.tscn").instantiate()
+	chClock = load("res://scenes/GUI/chapter_clock.tscn").instantiate()
+	turnTracker = turnTrackerRes.instantiate()
 	
+	add_child(chClock)
+	add_child(turnTracker)
+	add_child(focusViewer)
 	add_child(mapSetUp)
 	add_child(foreCast)
 	add_child(actMenu)
@@ -347,10 +323,9 @@ func _load_assets():
 	add_child(tradeScreen)
 	add_child(unitProf)
 	add_child(menuCursor)
-	add_child(focusViewer)
 	menuCursor.visible = false
-	
-	
+
+
 func _connect_asset_signals():
 	unitProf.tooltips_on.connect(self._on_profile_tooltips_on)
 	unitProf.tooltips_off.connect(self._on_profile_tooltips_off)
@@ -380,7 +355,7 @@ func _on_mng_btn_pressed():
 	mapSetUp.toggle_visible()
 	sState = sStates.ROSTER
 	_open_unit_menu()
-	
+
 
 func _on_begin_btn_pressed():
 	inSetup = false
@@ -388,8 +363,9 @@ func _on_begin_btn_pressed():
 	mapSetUp.toggle_visible()
 	sState = sStates.BEGIN
 	turnTracker.visible = true
+	chClock.visible = true
 	emit_signal("map_started")
-	
+
 
 func _on_status_btn_pressed():
 	pass

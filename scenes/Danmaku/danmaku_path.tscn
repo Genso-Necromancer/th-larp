@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://cfs7qbct83nrh"]
+
+[ext_resource type="Script" uid="uid://bggbhullbalh4" path="res://scenes/danmaku.gd" id="1_j3of6"]
+[ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="2_ghrki"]
+
+[node name="Danmaku" type="Path2D"]
+z_index = 1
+script = ExtResource("1_j3of6")
+
+[node name="Cell" type="Label" parent="."]
+offset_left = -35.0
+offset_top = 19.0
+offset_right = 36.0
+offset_bottom = 45.0
+theme = ExtResource("2_ghrki")
+theme_override_colors/font_color = Color(0.843137, 0.588235, 1, 1)
+theme_override_font_sizes/font_size = 22
+text = "(0, 0)"

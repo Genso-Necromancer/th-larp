@@ -92,7 +92,7 @@ func fade_in(speedScale:=1.5):
 
 ##resets the target camera's offset, Pass true to tween the return.
 func reset_camera(isTweened := false, speed:float = 1.0) -> void:
-	camera.reset_camera()
+	camera.reset_camera(isTweened)
 
 #endregion
 

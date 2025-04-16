@@ -8,7 +8,7 @@ var timeMethod: String:
 		return timeMethod
 	set(value):
 		timeMethod = value
-		print(timeMethod)
+		#print(timeMethod)
 var timeHours: int = 0 ##use the 24hour clock retard
 
 

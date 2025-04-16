@@ -17,10 +17,13 @@ func play_splash(chNum :int, chTitle:String, timeString:String):
 	var num := $TitleNode/ChPanel/ChHBox/ChNum
 	var title := $TitleNode/TitlePanel/ChTitle
 	var time := $TitleNode/TimePanel/ChTime
-	
+	var dayHalf : String = ""
+	match Global.timeOfDay:
+		Enums.TIME.DAY: dayHalf = "AM"
+		Enums.TIME.NIGHT: dayHalf = "PM"
 	num.set_text(str(chNum))
 	title.set_text(chTitle)
-	time.set_text(timeString)
+	time.set_text(timeString+dayHalf)
 	animPlayer.play("Splash")
 
 func skip_animation():

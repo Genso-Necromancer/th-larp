@@ -1,5 +1,6 @@
-[gd_resource type="Theme" load_steps=9 format=3 uid="uid://du12ka2217r4x"]
+[gd_resource type="Theme" load_steps=10 format=3 uid="uid://du12ka2217r4x"]
 
+[ext_resource type="FontFile" uid="uid://byluxrpq7rwkq" path="res://fonts/JimNightshade/JimNightshade.otf" id="1_2rbyj"]
 [ext_resource type="FontFile" uid="uid://cuuir1uibmfis" path="res://fonts/Marcellus/Marcellus.otf" id="2_6wp4o"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_s7ira"]
@@ -41,7 +42,8 @@ Button/styles/focus = SubResource("StyleBoxEmpty_t31wv")
 Button/styles/hover = SubResource("StyleBoxEmpty_kl6js")
 Button/styles/normal = SubResource("StyleBoxEmpty_hsiuf")
 Button/styles/pressed = SubResource("StyleBoxEmpty_rfvx0")
-Label/font_sizes/font_size = 12
+Label/font_sizes/font_size = 42
+Label/fonts/font = ExtResource("1_2rbyj")
 MarginContainer/constants/margin_bottom = 15
 MarginContainer/constants/margin_left = 15
 MarginContainer/constants/margin_right = 15

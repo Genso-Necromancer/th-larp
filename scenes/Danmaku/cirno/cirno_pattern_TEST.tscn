@@ -1,0 +1,15 @@
+[gd_scene load_steps=5 format=3 uid="uid://brtnw26ay5k2k"]
+
+[ext_resource type="PackedScene" uid="uid://bqhoeac2w0jxl" path="res://scenes/Danmaku/dmk_spawn_pattern.tscn" id="1_sjovh"]
+[ext_resource type="PackedScene" uid="uid://cfs7qbct83nrh" path="res://scenes/Danmaku/danmaku_path.tscn" id="2_u2wt2"]
+[ext_resource type="Curve2D" uid="uid://dcmv664sutu3a" path="res://scenes/Danmaku/danmaku_curves/NW_diagonal.tres" id="3_jltnb"]
+[ext_resource type="PackedScene" uid="uid://xtu4w2xednw0" path="res://scenes/Danmaku/danmaku_types/kunai_type.tscn" id="4_21b54"]
+
+[node name="DmkSpawnPattern" instance=ExtResource("1_sjovh")]
+
+[node name="Danmaku2" parent="DmkSpawnPattern" index="0" instance=ExtResource("2_u2wt2")]
+position = Vector2(80, -31)
+curve = ExtResource("3_jltnb")
+
+[node name="DanmakuType" parent="DmkSpawnPattern/Danmaku2" index="1" instance=ExtResource("4_21b54")]
+rotation = -2.92292

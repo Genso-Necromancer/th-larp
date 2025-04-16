@@ -1,0 +1,9 @@
+[gd_resource type="Curve2D" format=3 uid="uid://dcmv664sutu3a"]
+
+[resource]
+resource_local_to_scene = true
+resource_name = "NW_Diagonal"
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -126, -28, 0, 0, 0, 0, -252, -56, 0, 0, 0, 0, -384, -84, 0, 0, 0, 0, -508, -112)
+}
+point_count = 5

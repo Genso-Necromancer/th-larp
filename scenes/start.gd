@@ -29,6 +29,6 @@ func on_index_pressed(index):
 func _on_load_button_pressed():
 	match itemId:
 		0: 
-			var map = preload("res://scenes/maps/TestMap0.tscn")
+			var map = preload("res://scenes/maps/test_map01.tscn")
 			emit_signal("loadMapManager", map)
 			emit_signal("unloadMe", self)

@@ -13,11 +13,13 @@ signal cell_selected
 signal unit_selected(unit:Unit)
 signal unit_move_ended(unit:Unit)
 signal gameboard_targeting_canceled
+signal camera_on_anchor
+signal danmaku_pathing_complete
 
 signal sequence_concluded
 signal post_queue_cleared
 signal continue_queue
-signal danmaku_pathing_complete
+
 
 
 signal map_loaded(map)
@@ -42,10 +44,11 @@ signal turn_order_updated
 enum ACTION_TYPE {ATTACK, SKILL, WAIT, END}
 
 # Mapping locations of units and danmaku {cell:node}
-var units := {} 
+var units :Dictionary[Vector2i, Unit]= {} 
 var danmaku := {}
 var danmakuMotion := []
 var collisionQue := []
+var dmkScriptProgressing:bool = false
 
 
 #these are used to store references to actual units that are passed around this class and those it controls
@@ -116,7 +119,7 @@ var snapPath := []:
 var pathingArray := []
 
 #game turns
-var turnOrder = []
+var turnOrder :Array[String]= []
 var roundCounter = 0
 var turnCounter = 0
 var maxTurns = 0
@@ -157,11 +160,14 @@ var aiNeedAct = false
 @onready var combatManager : CombatManager = $CombatManager
 @onready var turnSort : TurnSort = $TurnSort
 #@onready var turnTest = $Control/TurnLight
-@onready var boardState: BoardState = $BoardState
+@onready var boardState: BoardState = BoardState.new()
 @export var uiCooldown := 0.2
-@onready var ai = $AiManager
+
+## Global node variables
 var cc : CameraController
-#@onready var cTimer: Timer = $Cursor/Timer
+var ai : AiManager
+
+##Unit Preload
 var unitScn := preload("res://scenes/Unit.tscn")
 
 
@@ -175,13 +181,12 @@ func _process(_delta):
 	elif collisionQue.size() > 0 and GameState.state == GameState.gState.GB_END_OF_ROUND:
 		_pause_danmaku_phase()
 		_process_danmaku_collision()
-	elif collisionQue.size() == 0 and danmakuMotion.size() == 0 and GameState.state == GameState.gState.GB_END_OF_ROUND:
+	elif collisionQue.size() == 0 and danmakuMotion.size() == 0 and GameState.state == GameState.gState.GB_END_OF_ROUND and !dmkScriptProgressing: #When spawning danmaku, this is valid over and over.
 		emit_signal("danmaku_pathing_complete")
 	elif GameState.state == GameState.gState.ACCEPT_PROMPT or GameState.state == GameState.gState.FAIL_STATE or GameState.state == GameState.gState.WIN_STATE or GameState.state == GameState.gState.GB_END_OF_ROUND:
 		pass
 	elif turnComplete:
 		turnComplete = false
-		
 		_post_turn_events()
 	elif startNextTurn:
 		startNextTurn = false
@@ -233,11 +238,11 @@ func _camera_test():
 	cursor.visible = true
 	print("Camera tween test complete")
 
-func _kill_camera_test() -> void:
+func _kill_camera() -> void:
 	if !cc: return
 	cc.skip_tween()
 	cursor.visible = true
-	cc.queue_free()
+	cc.call_deferred("free")
 	#cursor.return_origin()
 
 #endregion
@@ -275,7 +280,7 @@ func _load_new_map(map):
 	add_child(newMap)
 	
 	
-func on_map_ready():
+func _on_map_ready():
 	call_deferred("_initialize_new_map")
 	
 #func on_map_gone():
@@ -292,28 +297,12 @@ func _initialize_new_map():
 	_load_units()
 	_init_gamestate()
 	combatManager.init_manager()
-	ai.init_ai()
+	ai = currMap.ai
+	ai.init_ai(self)
 	_cursor_toggle(true)
 	emit_signal("map_loaded", currMap)
-	
-#func _initialize_terrain_data():
-	#terrainData.clear()
-	#var tiles0 = currMap.get_used_cells(0) #terrainData
-	#for tile in tiles0: 
-		#terrainData.append([tile, currMap.get_movement_cost(tile), currMap.get_bonus(tile)])
-	
-#func _initialize_hexstar() ->: #HEX REF
-	#mapRect = currMap.get_used_rect() #initializing hexStar
-	#mapSize = mapRect.size
-	##mapCellSize = currMap.tileSize
-	#
-	##start up pathfinder
-	#hexStar = AHexGrid2D.new(currMap)
-	##hexStar.tileSize = mapCellSize
-	
-#func get_hex_star() -> AHexGrid2D: #HEX REF
-	#return hexStar
-	
+
+
 func _store_enemy_units():
 	for child in currMap.get_children(): #grab enemy unit locations
 		var unit := child as Unit
@@ -371,7 +360,6 @@ func _load_units(): #merge with store enemy units
 			
 		_update_unit_terrain(unit)
 		unit.set_process(true)
-	
 	_update_roster_label()
 	
 
@@ -408,30 +396,16 @@ func _connect_danmaku_signals(bullet):
 	if !bullet.animation_completed.is_connected(self._on_danmaku_animation):
 		bullet.animation_completed.connect(self._on_danmaku_animation)
 
-func _set_game_time():
-	Global.gameTime = currMap.gameTime #setting game time
-	emit_signal("time_set")
-	checkSun()
-	
 	
 func _connect_general_signals():
-	self.gb_ready.connect(GameState.set_new_state)
+	#self.gb_ready.connect(GameState.set_new_state)
 	cursor.cursor_moved.connect(self._on_cursor_moved)
 	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
 	#self.danmaku_pathing_complete.connect()
 	#self.round_changed.connect(currMap.on_round_changed)
 	#self.cell_selected.connect(mainCon.on_cell_selected)
 	
-func checkSun():
-	if Global.gameTime >= 6.0 and Global.gameTime <= 18.0:
-		Global.timeOfDay = Enums.TIME.DAY
-	else:
-		Global.timeOfDay = Enums.TIME.NIGHT
-	for unit in units:
-		units[unit].check_passives()
-		#if units[unit] != null:
-			#units[unit].check_passives()
-		#else: units.erase(unit)
+
 		
 func _init_gamestate():
 	#boardState.update_map_data(terrainData)
@@ -445,13 +419,12 @@ func _update_unit_terrain(unit): #HERE BROKEN
 			
 func gb_mouse_motion(_event):
 	var mousePos: Vector2i = currMap.get_local_mouse_position()
-	var toMap = currMap.local_to_map(mousePos)
+	var toMap = currMap.ground.local_to_map(mousePos)
 #	print(toMap)
 
 	cursor.cell = Vector2i(toMap)
 	
-func gb_mouse_pressed():
-	cursor_accept_pressed(currMap.map_to_local(cursor.cell))
+
 
 ## Returns `true` if the cell is occupied by a unit
 func is_occupied(cell: Vector2i) -> bool:
@@ -585,7 +558,7 @@ func _select_unit(cell: Vector2i, isAi = false) -> void:
 	# Sets it as the `activeUnit` and draws its walkable cells and interactive move path. 
 #	#print(units, units.has(cell))
 #	print(cell)
-	if !units.has(cell): return
+	if !units.has(cell) or units[cell].status.Acted: return
 	activeUnit = units[cell]
 	#activeUnit.save_equip()
 	activeUnit.isSelected = true
@@ -631,7 +604,7 @@ func on_unit_relocated(oldCell, newCell, unit): #updates unit locations with it'
 	units[newCell] = unit
 
 
-func on_danmaku_relocated(oldCell, newCell, bullet): #updates unit locations with it's new location
+func on_danmaku_relocated(oldCell, newCell, bullet):
 	var hexStar = AHexGrid2D.new(currMap)
 	if danmaku.has(oldCell):
 		danmaku.erase(oldCell)
@@ -717,7 +690,7 @@ func _clear_active_unit() -> void:
 	walkableCells.clear()
 
 
-func select_destination(): #SELECTED STATE Pathing Related
+func select_destination() -> void: #SELECTED STATE Pathing Related
 	var isOccupied = is_occupied(cursor.cell)
 	var isWalkable = walkableCells.has(cursor.cell)
 	var moveRemain :int = activeUnit.activeStats.Move - pathingArray.size()
@@ -727,6 +700,7 @@ func select_destination(): #SELECTED STATE Pathing Related
 		_update_walkable_range(moveRemain)
 	elif cursor.cell == activeUnit.cell:
 		emit_signal("unit_move_ended", activeUnit)
+	elif isOccupied: return
 	elif pathingArray[-1] == cursor.cell:
 		_move_active_unit(cursor.cell)
 	
@@ -879,93 +853,98 @@ func return_targeting():
 			start_attack_targeting()
 		GameState.gState.GB_SKILL_TARGETING:
 			start_skill_targeting()
-			
-func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMORE???
-	# Controls what happens when an element is selected by the player based on input Global.state
-	#Includes: Selecting Unit, Destinations; Targets
-	#Currently also checks if selection is valid
-	
-	
-	cell = currMap.local_to_map(cell)
-#	print(cell, activeUnit)
-	match GameState.state:
-		GameState.gState.GB_DEFAULT: 
-			if !activeUnit and is_occupied(cell) and focusUnit.is_in_group("Player") and !focusUnit.status.Acted:
-				
-				GameState.state = GameState.gState.GB_SELECTED
-				_select_unit(cell)
-			else: 
-				GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-				
-				emit_signal("toggle_action", false, true)
-		GameState.gState.GB_SELECTED: 
-			if !is_occupied(cell) and walkableCells.has(cell):
-				GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-				_move_active_unit(cell)
-			elif cell == activeUnit.cell:
-				GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-				emit_signal("toggle_action")
-			else:
-				return
-		GameState.gState.GB_ATTACK_TARGETING: #Attacks
-			var friendly = false
-			var team = null
-			if activeUnit.is_in_group("Player"):
-				team = "Player"
-			if activeUnit.is_in_group("Enemy"):
-				team = "Enemy"
-			if focusUnit.is_in_group(team):
-				friendly = true
-			if is_occupied(cell) and !friendly:
-				GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
-#				$Cursor.visible = false
-				grab_target(cell)
-				
-				
-			else: return
-		GameState.gState.GB_COMBAT_FORECAST:
-			return
 
-		GameState.gState.GB_SKILL_TARGETING:
-			var friendly = false
-			var team = null
-			var targeting = UnitData.skillData[activeAction.Skill].Target
-			if activeUnit.is_in_group("Player"):
-				team = "Player"
-			if activeUnit.is_in_group("Enemy"):
-				team = "Enemy"
-			match targeting:
-				"Self":
-					if is_occupied(cell) and activeUnit == focusUnit:
-						GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
-#						$Cursor.visible = false
-						grab_target(cell)
-				"Enemy":
-					if focusUnit.is_in_group(team):
-						friendly = true
-					if is_occupied(cell) and !friendly:
-						GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
-#						$Cursor.visible = false
-						grab_target(cell)
-				"Ally":
-					if focusUnit.is_in_group(team):
-						friendly = true
-					if is_occupied(cell) and friendly and activeUnit != focusUnit:
-						GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
-#						$Cursor.visible = false
-						grab_target(cell)
-				"Self+":
-					if focusUnit.is_in_group(team):
-						friendly = true
-					if is_occupied(cell) and friendly:
-						GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
-#						$Cursor.visible = false
-						grab_target(cell)
-				"Other":
-					if is_occupied(cell) and activeUnit != focusUnit:
-						GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
-#						$Cursor.visible = false
-						grab_target(cell)
+#Old marked for deletion
+#func gb_mouse_pressed():
+	#cursor_accept_pressed(currMap.map_to_local(cursor.cell))
+
+#func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMORE???
+	## Controls what happens when an element is selected by the player based on input Global.state
+	##Includes: Selecting Unit, Destinations; Targets
+	##Currently also checks if selection is valid
+	#
+	#
+	#cell = currMap.ground.local_to_map(cell)
+##	print(cell, activeUnit)
+	#match GameState.state:
+		#GameState.gState.GB_DEFAULT: 
+			#var test = focusUnit.status.Acted
+			#if !activeUnit and is_occupied(cell) and focusUnit.is_in_group("Player") and !focusUnit.status.Acted:
+				#
+				#GameState.state = GameState.gState.GB_SELECTED
+				#_select_unit(cell)
+			#else: 
+				#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
+				#
+				#emit_signal("toggle_action", false, true)
+		#GameState.gState.GB_SELECTED: 
+			#if !is_occupied(cell) and walkableCells.has(cell):
+				#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
+				#_move_active_unit(cell)
+			#elif cell == activeUnit.cell:
+				#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
+				#emit_signal("toggle_action")
+			#else:
+				#return
+		#GameState.gState.GB_ATTACK_TARGETING: #Attacks
+			#var friendly = false
+			#var team = null
+			#if activeUnit.is_in_group("Player"):
+				#team = "Player"
+			#if activeUnit.is_in_group("Enemy"):
+				#team = "Enemy"
+			#if focusUnit.is_in_group(team):
+				#friendly = true
+			#if is_occupied(cell) and !friendly:
+				#GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
+##				$Cursor.visible = false
+				#grab_target(cell)
+				#
+				#
+			#else: return
+		#GameState.gState.GB_COMBAT_FORECAST:
+			#return
+#
+		#GameState.gState.GB_SKILL_TARGETING:
+			#var friendly = false
+			#var team = null
+			#var targeting = UnitData.skillData[activeAction.Skill].Target
+			#if activeUnit.is_in_group("Player"):
+				#team = "Player"
+			#if activeUnit.is_in_group("Enemy"):
+				#team = "Enemy"
+			#match targeting:
+				#"Self":
+					#if is_occupied(cell) and activeUnit == focusUnit:
+						#GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
+##						$Cursor.visible = false
+						#grab_target(cell)
+				#"Enemy":
+					#if focusUnit.is_in_group(team):
+						#friendly = true
+					#if is_occupied(cell) and !friendly:
+						#GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
+##						$Cursor.visible = false
+						#grab_target(cell)
+				#"Ally":
+					#if focusUnit.is_in_group(team):
+						#friendly = true
+					#if is_occupied(cell) and friendly and activeUnit != focusUnit:
+						#GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
+##						$Cursor.visible = false
+						#grab_target(cell)
+				#"Self+":
+					#if focusUnit.is_in_group(team):
+						#friendly = true
+					#if is_occupied(cell) and friendly:
+						#GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
+##						$Cursor.visible = false
+						#grab_target(cell)
+				#"Other":
+					#if is_occupied(cell) and activeUnit != focusUnit:
+						#GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
+##						$Cursor.visible = false
+						#grab_target(cell)
 	
 
 
@@ -1228,26 +1207,23 @@ func _remove_from_grid(unit: Unit):
 	var remove = unit.cell
 	if units.has(remove):
 		units.erase(remove)
-	
-#turn functions
+
+
+#region turn functions
 func _post_turn_events():
-	
-	_progress_time()
-	checkSun()
+	Global.progress_time()
+	check_passives()
 	currMap.call_deferred("check_events")
 	await currMap.events_checked
 	turn_change()
-		
-	
-	
+
+
 func turn_change():
 	#change turn
 #	ai.rein_units(units)
 	boardState.update_unit_data(units)
 	turnOrder.pop_front()
 	turnCounter += 1
-	
-	
 	if turnOrder.size() == 0:
 		round_change()
 	else:
@@ -1259,23 +1235,22 @@ func turn_change():
 	Global.flags.itemUsed = false
 	emit_signal("turn_changed")
 	emit_signal("turn_order_updated", turnOrder)
-	
+
 
 func _start_next_turn():
-	
 	if turnOrder[0] == "Enemy":
-		GameState.state = GameState.gState.LOADING
+		GameState.change_state(self, GameState.gState.LOADING)
 		aiTurn = true
 		aiNeedAct = true
 		print("Enemy Turn")
 		_cursor_toggle(false)
 	elif turnOrder[0] == "Player":	
-		GameState.state = GameState.gState.GB_DEFAULT
+		GameState.change_state(self, GameState.gState.GB_DEFAULT)
 		aiTurn = false
 		print("Player Turn")
 		_cursor_toggle(true)
 	elif turnOrder[0] == "NPC": #Currently, NPC turns aren't a feature of the AI
-		GameState.state = GameState.gState.LOADING
+		GameState.change_state(self, GameState.gState.LOADING)
 		aiTurn = true
 		print("NPC Turn")
 		_cursor_toggle(false)
@@ -1327,10 +1302,26 @@ func _check_eor_events():
 	if danmaku.size() > 0:
 		_progress_danmaku_path()
 		await self.danmaku_pathing_complete
+	dmkScriptProgressing = true
+	if !cc: 
+		cc = CameraController.new(get_viewport())
+	cursor.visible = false
 	currMap.progress_danmaku_script()
+	
+
+
+func camera_to_anchor(cell:Vector2i):
+	cc.move_camera_map(cell)
+	await cc.camera_control_complete
+	emit_signal("camera_on_anchor")
 
 
 func _on_danmaku_progressed():
+	dmkScriptProgressing = false
+	if cc:
+		cc.reset_camera(true)
+		await cc.camera_control_complete
+		_kill_camera()
 	_start_next_turn()
 	
 func _initialize_turns(ignoreActed = false): #not quite right Groups might be the problem, just use faction ID
@@ -1358,26 +1349,36 @@ func _initialize_turns(ignoreActed = false): #not quite right Groups might be th
 	emit_signal("turn_order_updated", turnOrder)
 	print(turnOrder)
 
+
 func set_next_acted():
 	for cell in units:
 		if !units[cell].status.Acted and units[cell].FACTION_ID == Enums.FACTION_ID.PLAYER:
 			units[cell].set_acted(true)
 			return
-	
+#endregion
 
+##Gets the ball rolling for the AI to take actions
 func start_ai_turn(aiFaction):
 	print("Starting AI Turn")
+	var team : Array = boardState[aiFaction.to_lower()]
+	var factionId : Enums.FACTION_ID = Enums.FACTION_ID[aiFaction.to_upper()]
 	aiNeedAct = false
 	GameState.change_state(self, GameState.gState.GB_AI_TURN)
-	#Gets the ball rolling for the AI to take actions
-	if boardState.enemy.size() > 0:
-		var result = ai.get_move(boardState)
-		print_rich("[color=green]AI MOVE[/color]:",result)
-		match result.BestMove["Action"]:
-			"Attack": ai_attack(result)
-			"Move": ai_move(result)
-			"Wait": ai_wait(result)
+	if team.size() > 0:
+		var result = ai.get_move(factionId)
+		
+		print_rich("[color=green]AI MOVE[/color]: ",result)
+		turnComplete = true
+		#match result.BestMove["Action"]:
+			#"Attack": ai_attack(result)
+			#"Skill": pass
+			#"Move": ai_move(result)
+			#"Wait": ai_wait(result)
 	else: turnComplete = true
+	
+
+func _continue_ai_turn():
+	pass
 	
 #The next three functions process the AI's decided action based on which one is taken
 ##Attacking, Move without attacking; waiting in place
@@ -1447,41 +1448,45 @@ func _on_combat_manager_combat_resolved():
 	#Left over from very early development
 	_cursor_toggle(true, false)
 
-func set_time_factor(effId):
-	var effect = UnitData.effectData[effId]
-	match effect.SubType:
-		Enums.SUB_TYPE.SPEED_UP: Global.timeFactor += effect.Value
-		Enums.SUB_TYPE.SLOW_DOWN: Global.timeFactor -= effect.Value
-	Global.timeFactor = clampf(Global.timeFactor, 0, 2)
-	globalEffects[effId] = {}
-	globalEffects[effId]["Type"] = effect.SubType
-	globalEffects[effId]["Factor"] = effect.Value
-	globalEffects[effId]["Duration"] = effect.Duration
 
-func _progress_time():
-	if Global.gameTime >= 24 - Global.timeFactor:
-		var timeMod = Global.gameTime - 24
-		timeMod += Global.timeFactor
-		Global.gameTime = timeMod
-	else: Global.gameTime += Global.timeFactor
-	Global.timePassed += Global.timeFactor
-	
-func reset_time_factor():
-	Global.timeFactor = Global.trueTimeFactor
-	
-func round_duration_tick(): #tracks duration of round based effects, removing them when duration is up
+#region Time bullshitery
+##tracks duration of round based effects, removing them when duration is up
+##Lacks a check for stacked global effects, and only really works for timeFactor changes
+func round_duration_tick():
 	var keys = globalEffects.keys()
 	for effId in keys:
 		globalEffects[effId].Duration -= 1
 		if globalEffects[effId].Duration <= 0 and globalEffects[effId].Type == "Time":
-			reset_time_factor()
+			Global.reset_time_factor()
 			globalEffects.erase(effId)
 		else: #no other global effects exist, this needs to be expanded if a new one is made
 			globalEffects.erase(effId)
 
+##Does not have a stacking check
+func add_global_effect_time_factor(effId:StringName):
+	var effect = UnitData.effectData[effId]
+	globalEffects[effId] = {}
+	globalEffects[effId]["Type"] = effect.SubType
+	globalEffects[effId]["Factor"] = effect.Value
+	globalEffects[effId]["Duration"] = effect.Duration
+	Global.apply_time_factor(effect.Value)
+
 
 func _on_combat_manager_time_factor_changed(effId):
-	set_time_factor(effId)
+	add_global_effect_time_factor(effId)
+
+
+func _set_game_time():
+	var newTime = Global.time_to_float(currMap.hours, currMap.minutes)
+	Global.gameTime = newTime
+	emit_signal("time_set")
+	check_passives()
+
+
+func check_passives():
+	for unit in units:
+		units[unit].check_passives()
+#endregion
 
 
 func _on_combat_manager_warp_selected(actor, target, reach):
@@ -1504,7 +1509,7 @@ func _first_available_dep_cell():
 		
 	return firstCell
 
-func _deploy_unit(unit, forced = false, spawnLoc = Vector2i(0,0)): 
+func _deploy_unit(unit:Unit, forced = false, spawnLoc = Vector2i(0,0)): 
 	if !forced:
 		spawnLoc = _first_available_dep_cell()
 	if filledSlots < depCap:
@@ -1530,7 +1535,7 @@ func _undeploy_unit(unit, ini = false):
 		_update_roster_label()
 
 func _update_roster_label():
-	print(filledSlots)
+	#print(filledSlots)
 	emit_signal("deploy_toggled", filledSlots)
 
 			
@@ -1548,6 +1553,7 @@ func _snap_cursor(cell: Vector2i = unitObjs[forcedDeploy.keys()[0]].cell): #can 
 	cursor.cell = cell
 	var mouseWarp = cursor.get_global_transform_with_canvas()
 	#mouseWarp = to_global(mouseWarp)
+	print("Mouse Warp:", mouseWarp.origin)
 	get_viewport().warp_mouse(mouseWarp.origin)
 	cursor.align_camera()
 
@@ -1676,58 +1682,63 @@ func _progress_danmaku_path():
 	for cell in danmaku:
 		danmakuMotion.append(danmaku[cell])
 		danmaku[cell].start_move()
-	
-	
-	
+
+
+func append_danmaku(new_danmaku:Dictionary[Vector2i,Danmaku]):
+	for cell in new_danmaku:
+		danmaku[cell] = new_danmaku[cell]
+		_connect_danmaku_signals(danmaku[cell])
+
+
 #spawner functions
-func spawn_danmaku(bullets: Array, danRange: int, anchor: Vector2i, anchorType: String) -> Array:
-	var results := []
-	var region := []
-	#_init_hexStar_danmaku()
-	region = _get_cells_in_range(anchor, danRange, danRange)
-	_snap_cursor(anchor)
-	for bullet in bullets:
-		var isResolved := false
-		var spawnPoint 
-		while !isResolved:
-			if region.size() == 0:
-				spawnPoint = false
-				isResolved = true
-				break
-			var cell = region.pop_front()
-			var isAlly := false
-			if units.has(cell) and units[cell].FACTION_ID == Enums.FACTION_ID.ENEMY:
-				isAlly = true
-			if !danmaku.has(cell) and !isAlly:
-				danmaku[cell] = bullet
-				_connect_danmaku_signals(bullet)
-				spawnPoint = cell
-				set_danmaku_facing(bullet,spawnPoint, anchor, anchorType)
-				isResolved = true
-			
-		results.append({"SpawnPoint": spawnPoint, "Bullet": bullet})
-	return results
+#func spawn_danmaku(bullets: Array, danRange: int, anchor: Vector2i, anchorType: String) -> Array:
+	#var results := []
+	#var region := []
+	##_init_hexStar_danmaku()
+	#region = _get_cells_in_range(anchor, danRange, danRange)
+	#_snap_cursor(anchor)
+	#for bullet in bullets:
+		#var isResolved := false
+		#var spawnPoint 
+		#while !isResolved:
+			#if region.size() == 0:
+				#spawnPoint = false
+				#isResolved = true
+				#break
+			#var cell = region.pop_front()
+			#var isAlly := false
+			#if units.has(cell) and units[cell].FACTION_ID == Enums.FACTION_ID.ENEMY:
+				#isAlly = true
+			#if !danmaku.has(cell) and !isAlly:
+				#danmaku[cell] = bullet
+				#_connect_danmaku_signals(bullet)
+				#spawnPoint = cell
+				#set_danmaku_facing(bullet,spawnPoint, anchor, anchorType)
+				#isResolved = true
+			#
+		#results.append({"SpawnPoint": spawnPoint, "Bullet": bullet})
+	#return results
 	
 
-func set_danmaku_facing(bullet,spawnPoint, anchor, type):
-	var offsets := []
-	var difference : Vector2i =  anchor - spawnPoint
-	#var directions := ["TopRight","BottomRight","Bottom","BottomLeft","TopLeft","Top"]
-	var i : int
-	var hexStar = AHexGrid2D.new(currMap)
-	offsets = hexStar._get_offsets(spawnPoint.x)
-	i = offsets.find(difference)
-	
-	match type:
-		"Master":
-			#"TopRight","BottomRight","Bottom","BottomLeft","TopLeft","Top",
-			#var d := [6,0.2,1.59,3,3.3,4.72,]
-			var away := [3,4,5,0,1,2]
-			i = away[i]
-		"Target": pass
-		
-	#print("Cell:",spawnPoint," i:",i)
-	bullet.set_facing(i)
+#func set_danmaku_facing(bullet,spawnPoint, anchor, type):
+	#var offsets := []
+	#var difference : Vector2i =  anchor - spawnPoint
+	##var directions := ["TopRight","BottomRight","Bottom","BottomLeft","TopLeft","Top"]
+	#var i : int
+	#var hexStar = AHexGrid2D.new(currMap)
+	#offsets = hexStar._get_offsets(spawnPoint.x)
+	#i = offsets.find(difference)
+	#
+	#match type:
+		#"Master":
+			##"TopRight","BottomRight","Bottom","BottomLeft","TopLeft","Top",
+			##var d := [6,0.2,1.59,3,3.3,4.72,]
+			#var away := [3,4,5,0,1,2]
+			#i = away[i]
+		#"Target": pass
+		#
+	##print("Cell:",spawnPoint," i:",i)
+	#bullet.set_facing(i)
 	
 
 

@@ -127,7 +127,3 @@ func LoadData() -> void:
 
 func setLoadedData() -> void:
 	emit_signal("setData", UserData)
-
-
-
-

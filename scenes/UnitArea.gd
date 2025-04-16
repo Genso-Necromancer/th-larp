@@ -1,3 +1,4 @@
+@tool
 extends Area2D
 
 var master

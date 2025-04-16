@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Personality" load_steps=2 format=3 uid="uid://befkt7mur7ux"]
+
+[ext_resource type="Script" uid="uid://ddggxto7a5s72" path="res://scrpt/AI/personality_weights.gd" id="1_hy373"]
+
+[resource]
+script = ExtResource("1_hy373")
+first = 1
+second = 2
+third = 3
+fourth = 4
+fifth = 6
+sixth = 5
+seventh = 6
+terrain = 1.0
+finishOffUnits = 0.25
+dmgWeight = 0.25
+accWeight = 0.25
+barrierChance = 1.2
+survival = 1.1
+waitWeight = 0.12
+survThresh = 0.5
+accScale = 2.2
+safeBonus = 1.4
+maxDepth = 3
+minimumValue = 0.5
+metadata/_custom_type_script = "uid://ddggxto7a5s72"

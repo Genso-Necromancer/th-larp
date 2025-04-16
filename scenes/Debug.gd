@@ -27,7 +27,9 @@ func _process(_delta):
 	
 	if GameState.activeSlave: actSlave = GameState.activeSlave.name
 	else: actSlave = "missing"
-	if GameState.previousSlave[-1]: prevSlave = GameState.previousSlave[-1].name
+	if GameState.previousSlave.has(null): 
+		GameState.previousSlave.erase(null)
+	elif GameState.previousSlave and GameState.previousSlave[-1] != null: prevSlave = GameState.previousSlave[-1].name
 	else: prevSlave = "empty"
 		
 	$PanelContainer/VBoxContainer/StateDebug.set_text("Slave: " + str(actSlave) + " | Prev.Slave:" + str(prevSlave) + " 

@@ -44,6 +44,8 @@ func _ready():
 	button.focus_entered.connect(self._on_focus_entered)
 	button.focus_exited.connect(self._on_focus_exited)
 	_set_button_meta()
+	if metaSet and get_meta("ID") == "NONE":
+		toggle_icon()
 	
 
 

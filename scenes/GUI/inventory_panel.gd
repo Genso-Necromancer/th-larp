@@ -13,7 +13,7 @@ var _style : String = "NONE" :
 		return _style
 	set(value):
 		if value != "NONE":
-			print(value)
+			#print(value)
 			_style = value
 			_set_style_style(_style)
 		

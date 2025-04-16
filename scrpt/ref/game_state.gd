@@ -46,13 +46,13 @@ var shouldChangeState = false
 
 func change_state(newSlave : Node = previousSlave.pop_back(), newState: gState = previousState.pop_back()):
 	
-	if state != newState:
-		previousState.append(state)
-		state = newState
 	
-	if activeSlave != newSlave:
-		previousSlave.append(activeSlave)
-		activeSlave = newSlave
+	previousState.append(state)
+	state = newState
+	
+	
+	previousSlave.append(activeSlave)
+	activeSlave = newSlave
 		
 	_free_old()
 	_switch_state(state)

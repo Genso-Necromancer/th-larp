@@ -1,0 +1,17 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://b62b753ie387q"]
+
+[ext_resource type="Script" uid="uid://ddggxto7a5s72" path="res://scrpt/AI/personality_weights.gd" id="1_64stn"]
+
+[resource]
+script = ExtResource("1_64stn")
+tWeight = 1
+uWeight = 0.25
+ulWeight = 0.25
+dmgWeight = 0.25
+accWeight = 0.25
+grWeight = 1.2
+survWeight = 1.1
+waitWeight = 0.12
+survThresh = 0.5
+accScale = 2.2
+safeBonus = 1.4

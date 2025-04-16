@@ -31,7 +31,7 @@ layout_mode = 2
 size_flags_horizontal = 0
 text = "Pick Scene"
 item_count = 1
-popup/item_0/text = "TestMap"
+popup/item_0/text = "TestMap01"
 popup/item_0/id = 0
 
 [node name="LoadButton" type="Button" parent="VBoxContainer"]

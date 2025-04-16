@@ -5,23 +5,27 @@ signal danmaku_relocated
 signal animation_completed
 signal collision_detected
 
-@onready var _animPlayer = $PathFollow2D/Sprite2D/AnimationPlayer
-@onready var _pathFollow: PathFollow2D = $PathFollow2D
 
-var texture : = "res://sprites/danmaku/danmaku.png":
-	get:
-		return texture
-	set(value):
-		texture = value
-		_setsprite_texture(value)
+@onready var _pathFollow: DanmakuType = $DanmakuType
+@onready var sprite : Sprite2D = _pathFollow.get_sprite2D()
+@onready var _animPlayer :AnimationPlayer = _pathFollow.animPlayer
+
+#var texture : = "res://sprites/danmaku/danmaku.png":
+	#get:
+		#return texture
+	#set(value):
+		#texture = value
+		#_setsprite_texture(value)
 var sfx
 var move : int
 var moveStyle : String
-var fullPath : Array
+var texture : CompressedTexture2D
 var activePath : Array
+var pathPattern : Array
+var patternStep := 0
 var damage : int
 var cmpDamage : int
-var impactEffect : Array
+var impactEffects : Array
 var speed : int
 var typeId : StringName
 var dmkName : String
@@ -57,13 +61,11 @@ var hexDirect := [
 
 
 func _ready():
-	
-	if get_parent().ground:
-		initialize_cell()
+	#if get_parent().ground:
+		#initialize_cell()
 		
-	if not Engine.is_editor_hint():
-		curve = Curve2D.new()
-	
+	#if not Engine.is_editor_hint():
+		#curve = Curve2D.new()
 	_signals()
 
 func _process(delta):
@@ -79,25 +81,28 @@ func initialize_cell():
 	coord.set_text(str(cell))
 
 
-func init_bullet(dmk : Dictionary, _type : StringName, _master: Unit,):
-	texture = dmk.Texture
-	sfx = dmk.Sfx
-	move = dmk.Move
-	damage = dmk.Damage
-	cmpDamage = dmk.CmpDamage
-	impactEffect = dmk.Impact
-	speed = dmk.Speed
-	moveStyle = dmk.MoveStyle
-	isPhasing = dmk.IsPhasing
-	typeId = _type
-	master = _master
+func init_bullet(dmk_master:Unit):
+	var dmk :DanmakuType = _pathFollow
+	texture = dmk.sprite
+	sfx = dmk.sfx
+	move = dmk.move
+	damage = dmk.damage
+	cmpDamage = dmk.cmpDamage
+	impactEffects = dmk.impact
+	speed = dmk.speed
+	for i in curve.point_count:
+		pathPattern.append(curve.get_point_position(i))
+	moveStyle = StringGetter.get_string(("danmaku_movetype_%s" % [curve.resource_name.to_lower()]))
+	#isPhasing = dmk.IsPhasing
+	typeId = dmk.type
+	master = dmk_master
 	dmkName = StringGetter.get_string(("danmaku_type_%s" % [typeId]))
-	
-	
+	_pathFollow.set_loop(false)
 	#fullPath = _fullPath
 
+
 func _signals():
-	var hitBox = $PathFollow2D/Sprite2D/Area2D
+	var hitBox = _pathFollow.area2d
 	if !_animPlayer.animation_finished.is_connected(self._on_animation_finished):
 		_animPlayer.animation_finished.connect(self._on_animation_finished)
 	hitBox.set_master(self)
@@ -112,7 +117,6 @@ func _on_animation_finished(anim):
 	match anim:
 		"Spawning": _animPlayer.play("Idle")
 		"Collision": unitHit.danmaku_collision()
-	
 	emit_signal("animation_completed", anim, self)
 	
 func _set_cell_lbl(c):
@@ -120,12 +124,11 @@ func _set_cell_lbl(c):
 	lbl.set_text(str(c))
 	
 func _setsprite_texture(t : String):
-	var sprite = $PathFollow2D/Sprite2D
 	sprite.texture = load(t)
 
 	
 func set_facing(i):
-	var pf2d = $PathFollow2D
+	var pf2d = $DanamakuType
 	
 	#"TopRight","BottomRight","Bottom","BottomLeft","TopLeft","Top",
 	var d := [6,0.2,1.59,3,3.3,4.72,]
@@ -141,32 +144,39 @@ func set_facing(i):
 
 func set_path(path):
 	activePath = path
-	_pathFollow.set_rotates(true)
+	#_pathFollow.set_rotates(true)
 	_pathFollow.set_loop(false)
 	#print(path)
 	curve.add_point(Vector2.ZERO)
 	for point in path:
 		curve.add_point(get_parent().map_to_local(point) - position)
-	
+
 
 func start_move():
+	_fill_path()
 	isMoving = true
+
+
+func _fill_path():
+	while curve.get_point_count() <= move:
+		curve.add_point(pathPattern[patternStep])
+		patternStep += 1
+	if patternStep >= pathPattern.size(): patternStep = 0
 
 
 func _fade_out():
 	pass
+
 
 func _process_motion(delta):
 	var directionsSize = directions.size()
 	var current_move_vec 
 	var norm_move_vec 
 	var direction_id
-	var sprite := $PathFollow2D/Sprite2D
 	var prog = speed * delta
 	prog = clamp(prog, 0, 1.0)
 		
 	lastGlbPosition = sprite.global_position
-	
 	_pathFollow.progress += prog
 	current_move_vec = sprite.global_position - lastGlbPosition
 	lastGlbPosition = sprite.global_position
@@ -176,6 +186,7 @@ func _process_motion(delta):
 	cell = get_parent().local_to_map(sprite.global_position)
 	#_animPlayer.play(str(directions[direction_id]))
 	#print(_pathFollow.progress_ratio)
+	#print(_pathFollow.progress)
 	
 	if _pathFollow != null and _pathFollow.progress_ratio >= 1.0:
 		#print("SHOULDN'T SEE BELOW 1.0 ",_pathFollow.progress_ratio)

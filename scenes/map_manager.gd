@@ -18,27 +18,14 @@ func _ready():
 
 func load_map(map):
 	gameBoard.change_map(map)
-	
 
-func _on_map_loaded(map):
+
+func _on_map_loaded(map:GameMap):
 	var chNum = map.chapterNumber
 	var chTitle = map.title
-	var time = map.gameTime
-	#var dayHalf := ""
-	var timeString := "%s:00"
-	
-	if time < 10:
-		time = "0%s" % [time]
-	timeString = timeString % [time]
-	
+	var timeString : String = Global.time_to_string(map.hours,map.minutes)
 	guiManager.play_splash(chNum, chTitle, timeString)
-	
-	#if time > 12:
-		#time = time - 12
-		#dayHalf = "PM"
-	#elif: time == 12:
-		#dayHalf = "PM"
-	#elif: time == 0:
+
 
 ##GUI-Gameboard communication
 func _on_gui_splash_finished():

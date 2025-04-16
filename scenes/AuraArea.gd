@@ -29,7 +29,7 @@ func _place_areas(cells: Array) -> void:
 		var pos = map.to_global(mappos)
 		add_child(area)
 		area.set_polygon(polygon)
-		area.position = pos
-		map.queue_free()
+		area.position = (mappos+map.position)
+	map.queue_free()
 		
 		

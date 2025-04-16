@@ -65,6 +65,7 @@ func _load_items():
 		itemData[key] = {
 			"Name":"None",
 			"Icon":load(("res://sprites/gungnir.png")),
+			"Level": 1,
 			"Type":"",
 			"Target": 0,
 			"Dmg":0,
@@ -81,7 +82,7 @@ func _load_items():
 			"Expendable": true,
 			"Trade": true,
 			"Personal": false,
-			"Effects":{},
+			"Effects":[],
 		}
 		var innerKeys = rawData[key].keys()
 		for iKey in innerKeys:
@@ -232,7 +233,7 @@ func _load_aura_data():
 			auraData[key] = {
 						"Range": 0,
 						"IsSelf": false,
-						"TeamTarget": Enums.TARGET_TEAM.ALLY,
+						"TargetTeam": Enums.TARGET_TEAM.ALLY,
 						"Target": Enums.EFFECT_TARGET.TARGET,
 						"Effects":[]
 }

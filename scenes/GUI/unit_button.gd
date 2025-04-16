@@ -18,18 +18,29 @@ func temp_font_change(state : StringName = ""):
 
 func _font_state_change(state):
 	var fColor : Color
+	var bgColor : Color
 	var labels = [$MarginContainer/HBoxContainer3/HBoxContainer/Name]
+	var backGround := $BackgroundWhite
 	match state:
-		"Deployed": fColor = Color(1,1,1)
-		"Undeployed": fColor = Color(0.194, 0.194, 0.194)
-		"Forced": fColor = Color(0, 0.62, 0)
-		"Selected": fColor = Color(0.84, 0.84, 0)
-	for l in labels:
-		l.add_theme_color_override("font_color", fColor)
-		l.add_theme_color_override("font_pressed_color", fColor)
-		l.add_theme_color_override("font_hover_color", fColor)
-		l.add_theme_color_override("font_focus_color", fColor)
-		l.add_theme_color_override("font_hover_pressed_color", fColor)
+		"Deployed": 
+			bgColor = Color(1.0, 1.0, 1.0)
+			fColor = Color(1,1,1)
+		"Undeployed": 
+			bgColor = Color(1.0, 1.0, 1.0)
+			fColor = Color(0.194, 0.194, 0.194)
+		"Forced": 
+			bgColor = Color(1.0, 1.0, 1.0)
+			fColor = Color(0, 0.62, 0)
+		"Selected": bgColor = Color(1.0, 0.0, 0.0)
+			
+	if fColor:
+		for l in labels:
+			l.add_theme_color_override("font_color", fColor)
+			l.add_theme_color_override("font_pressed_color", fColor)
+			l.add_theme_color_override("font_hover_color", fColor)
+			l.add_theme_color_override("font_focus_color", fColor)
+			l.add_theme_color_override("font_hover_pressed_color", fColor)
+	backGround.set_self_modulate(bgColor)
 
 
 func _change_font_color(label, style : String = "") -> void:
@@ -73,7 +84,7 @@ func refresh_data():
 	var r = $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2/Role
 	var c = $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer/CompCurrent
 	var cap = $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer/CompCap
-	var texture = $MarginContainer/HBoxContainer3/TextureRect
+	var texture = $PortraitMargin/TextureRect
 	var unitName = unitLink.unitData.Profile.UnitName
 	var role = unitLink.unitData.Profile.Role
 	var lv = unitLink.unitData.Profile.Level

@@ -1,0 +1,28 @@
+[gd_scene load_steps=6 format=3 uid="uid://dytugmw615m15"]
+
+[ext_resource type="PackedScene" uid="uid://bqhoeac2w0jxl" path="res://scenes/Danmaku/dmk_spawn_pattern.tscn" id="1_pjuka"]
+[ext_resource type="PackedScene" uid="uid://cfs7qbct83nrh" path="res://scenes/Danmaku/danmaku_path.tscn" id="2_xwlok"]
+[ext_resource type="Curve2D" uid="uid://c7a537dkxujiw" path="res://scenes/Danmaku/danmaku_curves/W_wave.tres" id="3_xwlok"]
+[ext_resource type="PackedScene" uid="uid://xtu4w2xednw0" path="res://scenes/Danmaku/danmaku_types/kunai_type.tscn" id="4_yxqnf"]
+
+[sub_resource type="Curve2D" id="Curve2D_yxqnf"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -126, 28, 0, 0, 0, 0, -252, 0, 0, 0, 0, 0, -378, 28, 0, 0, 0, 0, -504, 0)
+}
+point_count = 5
+
+[node name="DmkSpawnPattern" instance=ExtResource("1_pjuka")]
+
+[node name="Danmaku" parent="DmkSpawnPattern" index="0" instance=ExtResource("2_xwlok")]
+position = Vector2(-40, -3)
+curve = ExtResource("3_xwlok")
+
+[node name="DanmakuType" parent="DmkSpawnPattern/Danmaku" index="1" instance=ExtResource("4_yxqnf")]
+rotation = -2.92292
+
+[node name="Danmaku2" parent="DmkSpawnPattern" index="1" instance=ExtResource("2_xwlok")]
+position = Vector2(-40, 53)
+curve = SubResource("Curve2D_yxqnf")
+
+[node name="DanmakuType" parent="DmkSpawnPattern/Danmaku2" index="1" instance=ExtResource("4_yxqnf")]
+rotation = 2.92292

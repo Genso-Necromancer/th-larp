@@ -1,0 +1,80 @@
+[gd_scene load_steps=7 format=3 uid="uid://jmdc2n1a1cmw"]
+
+[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_xrg8s"]
+[ext_resource type="Script" uid="uid://d4l2iyyc8mdsi" path="res://scenes/GUI/chapter_clock.gd" id="2_o1dct"]
+[ext_resource type="Texture2D" uid="uid://ba5l4eya6bq83" path="res://sprites/UI/clock_wheel.png" id="2_o1fpl"]
+[ext_resource type="Texture2D" uid="uid://ojuy1dftwelb" path="res://sprites/UI/upper_clock.png" id="3_nqesu"]
+[ext_resource type="Script" uid="uid://cqsb1veemjw30" path="res://scenes/GUI/clock_dial.gd" id="3_o1dct"]
+[ext_resource type="Script" uid="uid://b3lx3c4pfks7o" path="res://scenes/GUI/digital_time.gd" id="6_u16ko"]
+
+[node name="ChapterClock" type="Control"]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+grow_horizontal = 2
+scale = Vector2(0.7, 0.7)
+mouse_filter = 2
+theme = ExtResource("1_xrg8s")
+script = ExtResource("2_o1dct")
+
+[node name="ClockMargin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -96.0
+offset_right = 96.0
+offset_bottom = 247.0
+grow_horizontal = 2
+mouse_filter = 2
+theme_override_constants/margin_top = 98
+
+[node name="PivotPoint" type="Control" parent="ClockMargin"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="ClockDial" type="TextureRect" parent="ClockMargin/PivotPoint"]
+layout_mode = 1
+anchors_preset = -1
+offset_left = -80.0
+offset_top = -80.0
+offset_right = 82.0
+offset_bottom = 81.0
+grow_horizontal = 2
+pivot_offset = Vector2(80, 80)
+size_flags_horizontal = 4
+size_flags_vertical = 0
+mouse_filter = 2
+texture = ExtResource("2_o1fpl")
+flip_v = true
+script = ExtResource("3_o1dct")
+
+[node name="Border" type="TextureRect" parent="ClockMargin/PivotPoint"]
+layout_mode = 2
+offset_left = -608.0
+offset_top = -84.0
+offset_right = 606.0
+offset_bottom = 84.0
+size_flags_horizontal = 4
+size_flags_vertical = 0
+mouse_filter = 2
+texture = ExtResource("3_nqesu")
+
+[node name="CenterContainer" type="CenterContainer" parent="ClockMargin"]
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 2
+
+[node name="DigitalMargin" type="MarginContainer" parent="ClockMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_top = 91
+
+[node name="DigitalTime" type="Label" parent="ClockMargin/DigitalMargin"]
+layout_mode = 2
+text = "12:00"
+horizontal_alignment = 1
+script = ExtResource("6_u16ko")

@@ -28,7 +28,7 @@ var usedTiles : Array[Vector2i] = []:
 			
 		usedTiles = value
 		notify_property_list_changed.call_deferred()
-		print(tileIDs.keys())
+		#print(tileIDs.keys())
 
 
 			#update_configuration_warnings()

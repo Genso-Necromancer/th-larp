@@ -8,15 +8,14 @@ signal danmaku_progressed
 
 @export_category("Map Values")
 @export var forcedUnits = ["Remilia"] ##Units required to participate in this chapter [Do not use units which can die and arrive prior to this map]
-@export var gameTime = 12 ##Time of day at the start of chapter
 @export var next_map : PackedScene
 @export var chapterNumber: int = 0
 @export var title: String = ""
-@export_category("Conditions")
-@export_group("Win Conditions")
+@export_group("Conditions")
+@export_subgroup("Win Conditions")
 @export var winEvents : Dictionary = {"Seize" : 0} ## 0 = false, input number of event occurences required for win
 @export var winKill : Array[Unit] = [] ##Use Add Element to select map units which trigger a win condition
-@export_group("Loss Conditions")
+@export_subgroup("Loss Conditions")
 @export var playerDeath : Dictionary = {"Remilia" : true, "Sakuya" : true, "Patchouli" : false, "Meiling" : false} ##Tick Player units whose death triggers a loss condition
 @export var lossKill : Array[Unit] = [] ##Use Add Element to select map units which trigger a loss condition
 @export var hoursPassed : int = 0 ##0 = false, set hour limit before loss
@@ -29,6 +28,7 @@ signal danmaku_progressed
 @onready var modifier :TileMapLayer= $Modifier
 @onready var object :TileMapLayer= $Object
 @onready var deploy :TileMapLayer= $Deployments
+@onready var regions :TileMapLayer= $Regions ##tiles with Even region numbers are treated as "Enemy Team" regions, while odd are considered "player" regions.
 @onready var pathAttack :TileMapLayer= $PathAttack
 @onready var narrative :TileMapLayer= $Narrative
 @onready var dev :TileMapLayer= $Dev
@@ -36,29 +36,65 @@ signal danmaku_progressed
 @onready var tileSet :TileSet = ground.tile_set
 @onready var tileSize : Vector2i = tileSet.get_tile_size()
 @onready var tileShape = tileSet.get_tile_shape()
+##Ai Manager
+@onready var ai : AiManager = $AiManager
+
+var hours : int = 0
+var minutes : int = 0
 var mapSize
 var eventQue := []
-var dmkScene = preload("res://scenes/danmaku.tscn")
+#var dmkScene = preload("res://scenes/danmaku.tscn")
 var actingDanmaku := {"Spawning":[], "Collision":[]}
-
-
-
 #event trackers
 var victoryKills : Array = []
+
+
+
 
 
 func _ready():
 	if not Engine.is_editor_hint():
 		var p = get_parent()
-		self.map_ready.connect(p.on_map_ready)
+		self.map_ready.connect(p._on_map_ready)
 		_load_danmaku_scripts()
 		dev.visible = false
 		narrative.visible = false
+		regions.visible = false
 	mapSize = ground.get_used_rect().size
-	print(mapSize)
+	#print(mapSize)
 	emit_signal("map_ready")
 	_initialize_unit_cells()
+
+#region property list functions
+func _get_property_list():
+	var properties = []
+	properties.append({
+		"name":"Start_Time",
+		"type": TYPE_STRING,
+		"usage": PROPERTY_USAGE_CATEGORY
+	})
+	properties.append({
+		"name" : "hours",
+		"type" : TYPE_INT,
+		"hint" : PROPERTY_HINT_RANGE,
+		"hint_string" : "0,23,1"
+	})
+	properties.append({
+		"name" : "minutes",
+		"type" : TYPE_INT,
+		"hint" : PROPERTY_HINT_RANGE,
+		"hint_string" : "0,60,1"
+	})
 	
+	return properties
+
+
+func _array_to_string(arr: Array, seperator = ",") -> String:
+	var string = ""
+	for i in arr:
+		string += str(i)+seperator
+	return string
+#endregion
 
 
 func get_active_units() -> Dictionary:
@@ -128,13 +164,6 @@ func get_movement_cost(cell, moveType):
 	elif modTile: cost += costData[modTile][moveType]
 	
 	return cost
-	
-func get_bonus(cell): # WHOOPS BROKEN
-	var bonus = 0
-	var tileData = modifier.get_cell_tile_data(cell)
-	#if !tileData == null: 
-			#bonus = tileData.get_custom_data("terrainBonus")
-	return bonus
 
 
 func get_terrain_tags(cell:Vector2i) -> Dictionary:
@@ -149,9 +178,21 @@ func get_terrain_tags(cell:Vector2i) -> Dictionary:
 		terrainTags.ModType = mod.get_custom_data("TerrainType")
 		terrainTags.ModId = mod.get_custom_data("TerrainId")
 		terrainTags.Locked = mod.get_custom_data("Locked")
-		
-		
 	return terrainTags
+
+
+func get_bonus(cell:Vector2i) -> Dictionary:
+	var tags : Dictionary =  get_terrain_tags(cell)
+	var cellParams : Dictionary
+	var tData : Dictionary = UnitData.terrainData
+	cellParams = tData[tags.BaseType].duplicate()
+	if tags.ModType == "Bridge": cellParams = tData[tags.ModType]
+	elif tags.ModType:
+		for param in cellParams:
+			cellParams[param] += tData[tags.ModType][param]
+	return cellParams
+
+
 
 func get_deployment_cells():
 	var triggerCells :Array[Vector2i] = deploy.get_used_cells()
@@ -228,7 +269,7 @@ func get_used_rect() -> Rect2i:
 func _on_unit_death(unit):
 	check_event("Death", unit)
 	
-func check_event(trigger, parameter): ##Triggers: death, time, seize
+func check_event(trigger:String, parameter): ##Triggers: death, time, seize
 	var triggered := false
 	match trigger:
 		"Death": triggered = _check_death_conditionals(parameter)
@@ -271,12 +312,12 @@ func _add_kill(unit, victory):
 			
 	Global.flags.victory = true
 		
-func _check_time_conditional(_time):
+func _check_time_conditional(_time) -> bool:
 	var triggered := false
-	if Global.timePassed == hoursPassed:
+	if hoursPassed == 0: triggered = false
+	elif Global.timePassed == hoursPassed:
 		Global.flags.gameOver = true
-		triggered = true
-		return
+		return true
 	var childs = get_children()
 	for child in childs:
 		var spawner = child as UnitSpawner
@@ -344,7 +385,6 @@ func _spawn_new_units():
 
 #region danmaku functions
 func _load_danmaku_scripts():
-
 	if dmkScript != null:
 		var p = get_parent()
 		if !self.danmaku_progressed.is_connected(p._on_danmaku_progressed):
@@ -354,45 +394,81 @@ func _load_danmaku_scripts():
 	
 	
 func progress_danmaku_script():
-	var step = dmkScript.get_pattern_step()
+	var step = dmkScript.get_step()
 	#var action = step.keys()[0]
-	match step.Action:
-		"Spawn": _process_bullets(step.Bullets)
-		_: emit_signal("danmaku_progressed")
+	_process_bullets(step)
+	#match step.Action:
+		#"Spawn": _process_bullets(step.Bullets)
+		#_: emit_signal("danmaku_progressed")
 
-func _process_bullets(bullets):
+func _process_bullets(spawn_scene:PackedScene):
+	var spawner :DanmakuPattern= spawn_scene.instantiate()
+	var danmaku :Array[Danmaku]= spawner.get_danmaku()
+	var anchor : Unit
+	match spawner.anchorTarget:
+		spawner.AnchorTarget.SELF: anchor = dmkMaster
+		spawner.AnchorTarget.TARGET: anchor = get_danmaku_target() ##Not functioning yet
+	anchor.add_child(spawner)
+	if danmaku.size() == 0:
+		emit_signal("danmaku_progressed")
+		spawner.queue_free()
+		return
+	
+	for bullet:Danmaku in danmaku:
+		bullet.reparent(self, true)
+		bullet.init_bullet(dmkMaster)
+		actingDanmaku.Spawning.append(bullet)
+		bullet.animation_completed.connect(self._on_danmaku_animation_completed)
+	call_deferred("assign_danmaku", danmaku)
+	spawner.queue_free()
+	get_parent().camera_to_anchor(anchor.cell)
+	await get_parent().camera_on_anchor
+	_call_danmaku_entrance()
+	
 	#"Type": "DmkuKunai",
 	#"SpawnStyle": "Left",
 	#"Amount": 2,
 	#"Offset": 1,
-	var dmkData = dmkScript.danmakuData
-	for bullet in bullets:
-		var a : int = bullet.Amount
-		var dmk : Dictionary = dmkData[bullet.Type]
-		var grouping := []
-		
-		for i in a:
-			var b = dmkScene.instantiate()
-			b.init_bullet(dmk, bullet.Type, dmkMaster)
-			grouping.append(b)
-			
-		var results : Array = get_parent().spawn_danmaku(grouping, bullet.Offset, dmkMaster.cell, bullet.AnchorType)
-		
-		for b in results:
-			if b.SpawnPoint:
-				add_child(b.Bullet)
-				b.Bullet.relocate(b.SpawnPoint)
-				b.Bullet.animation_completed.connect(self._on_danmaku_animation_completed)
-				actingDanmaku.Spawning.append(b.Bullet)
-			else: b.Bullet.queue_free()
-	if actingDanmaku.Spawning.size() > 0:
-		_call_danmaku_entrance()
-		
-		
+	#var dmkData = dmkScript.danmakuData
+	#for bullet in bullets:
+		#var a : int = bullet.Amount
+		#var dmk : Dictionary = dmkData[bullet.Type]
+		#var grouping := []
+		#
+		#for i in a:
+			#var b = dmkScene.instantiate()
+			#b.init_bullet(dmk, bullet.Type, dmkMaster)
+			#grouping.append(b)
+			#
+		#var results : Array = get_parent().spawn_danmaku(grouping, bullet.Offset, dmkMaster.cell, bullet.AnchorType)
+		#
+		#for b in results:
+			#if b.SpawnPoint:
+				#add_child(b.Bullet)
+				#b.Bullet.relocate(b.SpawnPoint)
+				#b.Bullet.animation_completed.connect(self._on_danmaku_animation_completed)
+				#actingDanmaku.Spawning.append(b.Bullet)
+			#else: b.Bullet.queue_free()
+	#if actingDanmaku.Spawning.size() > 0:
+		#_call_danmaku_entrance()
+##Not functioning yet
+func get_danmaku_target() -> Unit:
+	var target : Unit
+	return target
+
+
+func assign_danmaku(unassigned_danmaku:Array[Danmaku]):
+	var danmaku : Dictionary[Vector2i,Danmaku]
+	for b in unassigned_danmaku:
+		b.initialize_cell()
+		danmaku[b.cell] = b
+	get_parent().append_danmaku(danmaku)
+
 
 func _call_danmaku_entrance():
 	for b in actingDanmaku.Spawning:
 		b.call_deferred("play_animation", "Spawning")
+
 
 func _on_danmaku_animation_completed(anim, bullet):
 	if !actingDanmaku[anim] or actingDanmaku[anim].size() == 0:
@@ -401,6 +477,7 @@ func _on_danmaku_animation_completed(anim, bullet):
 	if actingDanmaku[anim].size() == 0:
 		match anim:
 			"Spawning": emit_signal("danmaku_progressed")
+	
 
 
 #region Targeting and Pathing Functions

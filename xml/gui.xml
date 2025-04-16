@@ -230,9 +230,11 @@
 			<entry id = "terrain_cannot_pass"><![CDATA[Impassable]]></entry>
 			
 			
-			<!-- Danmaku -->
-			<entry id = "danmaku_type_dmkukunai"><![CDATA[Kunai]]></entry>
-			
+			<!-- Danmaku types -->
+			<entry id = "danmaku_type_kunai"><![CDATA[Kunai]]></entry>
+			<!-- Danmaku Move Types -->
+			<entry id = "danmaku_movetype_nw_diagonal"><![CDATA[Straight]]></entry>
+			<entry id = "danmaku_movetype_sw_diagonal"><![CDATA[Straight]]></entry>
 			
 			<!-- OLD: Need Vetting
 			<entry id = "lore_night_prot"><![CDATA[{RuleType}, negate {Rule} stat penalties at [color=#230f8c]Night[/color].]]></entry>

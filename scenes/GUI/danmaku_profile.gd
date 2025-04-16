@@ -25,6 +25,6 @@ func update_prof():
 	
 	if inventory: focusLabels += _update_inventory(focusDmk)
 	if fBox: focusLabels += _update_features(focusDmk)
-	if !isPreview: _update_portrait(focusDmk.texture)
-	elif isPreview and portrait: _update_portrait(focusDmk.texture)
+	if !isPreview: portrait.set_texture(focusDmk.texture)
+	elif isPreview and portrait: portrait.set_texture(focusDmk.texture)
 	get_tree().call_group("ProfileLabels", "you_need_to_update_yourself_NOW", focusDmk)

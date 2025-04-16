@@ -19,12 +19,17 @@ signal item_activated(item, unit, target)
 
 
 var defaultId := "UnitId"
-#Unit Parameters
+enum AI_TYPE {
+	NONE,
+	DEFENDER,
+	OFFENDER,
+	SUPPORT,
+	BOSS
+}
+##Unit Parameters
 @export_category("Unit Parameters")
 @export_group("Base Parameters")
 @export var generate : bool = true ##Toggle on for randomly leveled stats based on growths, Toggle Off to use predefined stats
-#Profile
-								# Consider getting rid of one of these, or both. 
 @export var unitId := "UnitId" ## Only change if unique unit
 @export var disabled := false:
 	get:
@@ -34,14 +39,20 @@ var defaultId := "UnitId"
 		set_process(!value)
 
 var unitName := "" #Presented strings will eventually be taken from a seperate file
-@export var FACTION_ID := Enums.FACTION_ID.ENEMY
+@export var FACTION_ID :Enums.FACTION_ID = Enums.FACTION_ID.ENEMY
 @export_group("Generated Only")
-@export var SPEC_ID := Enums.SPEC_ID.FAIRY 
-@export var JOB_ID := Enums.JOB_ID.TRBLR
+@export var SPEC_ID :Enums.SPEC_ID= Enums.SPEC_ID.FAIRY 
+@export var JOB_ID :Enums.JOB_ID= Enums.JOB_ID.TRBLR
 @export var genLevel : int = 1
 @export_group("Spawn Parameters")
 @export var isForced := false
 @export var isActive := true
+@export_category("AI Paramters")
+@export var isBoss : bool = false
+@export var isMidBoss : bool = false
+@export var archetype :AI_TYPE = AI_TYPE.NONE
+@export var leash : int = -1 ##Number of spaces a target must be for the them move and attack. -1 turns this off.
+@export var one_time_leash:bool = false ##True: After a unit is moved, their leash value will be set to -1 False: Unit never loses it's leash value
 @export_category("Animation Values")
 @export var moveSpeed := 200.0
 @export var shoveSpeed := 350.0
@@ -57,6 +68,8 @@ var unitName := "" #Presented strings will eventually be taken from a seperate f
 @export_category("Conditions")
 @export var status : Dictionary = {"Acted":false, "Sleep":false}
 var sParam : Dictionary = {}
+
+
 
 @export_category("Inventory")
 var _items : String:
@@ -75,6 +88,8 @@ var inventory: Array[String]: #revisit this for ease of selection
 			inventory = value
 			update_configuration_warnings()
 			notify_property_list_changed.call_deferred()
+
+
 
 var firstLoad := false
 var tick = 1
@@ -105,12 +120,13 @@ var baseStats := {}
 #aura owned by unit
 var unitAuras := {}
 #combination of base stats and buffs
-var activeStats := {}
+var activeStats :Dictionary= {}
 #de/buffs applied to unit
 var activeBuffs := {}
 var activeDebuffs := {}
 var activeEffects := []
 var activeAuras := {}
+var bonusSkills := []
 
 #Unique NPC/Enemy params
 var isElite : bool = false
@@ -206,9 +222,10 @@ func _ready() -> void:
 	#var testKey = UnitData.MOVE_TYPE.keys()[unitData.MoveType]
 	#print(str(unitName) + " Move Type: " + str(testKey))
 
+
+#region property list functions
 func _get_property_list():
 	var properties = []
-	
 	properties.append({
 		"name" : "_items",
 		"type" : TYPE_STRING,
@@ -216,15 +233,12 @@ func _get_property_list():
 		"hint_string" : _array_to_string(UnitData.get_item_keys())
 		#"hint_string" : _array_to_string(UnitData.get_item_keys())
 	})
-	
 	properties.append({
 		"name" : "inventory",
 		"type" : TYPE_ARRAY,
 		"hint" : PROPERTY_HINT_TYPE_STRING,
 		"hint_string" : "%d:" % [TYPE_STRING]
 	})
-		
-		
 	return properties
 
 func _array_to_string(arr: Array, seperator = ",") -> String:
@@ -232,12 +246,13 @@ func _array_to_string(arr: Array, seperator = ",") -> String:
 	for i in arr:
 		string += str(i)+seperator
 	return string
+#endregion
 
-func _add_initial_item(item):
+func _add_initial_item(item:String):
 	if item != "NONE":
-		inventory.append(item)
+		inventory += [item]
 
-func init_unit(currentMap, unique:bool = !generate, newFaction := FACTION_ID, id : String = "none", elite = false, lv = genLevel, spec = SPEC_ID, job = JOB_ID):
+func init_unit(currentMap:GameMap, unique:bool = !generate, newFaction := FACTION_ID, id : String = "none", elite = false, lv = genLevel, spec = SPEC_ID, job = JOB_ID):
 	FACTION_ID = newFaction
 	isElite = elite
 	map = currentMap
@@ -256,7 +271,6 @@ func init_unit(currentMap, unique:bool = !generate, newFaction := FACTION_ID, id
 
 
 func _process(delta: float) -> void:
-	
 	if tick == 0:
 		var coord = $PathFollow2D/Cell
 		coord.set_text(str(cell))
@@ -345,11 +359,9 @@ func _process_motion(delta):
 func walk_along(path: PackedVector2Array) -> void:
 #	#print("walk along")
 	lastAnim = _animPlayer.current_animation
-	
 	if path.is_empty():
 		print("walk_along Path Empty")
 		return
-		
 #	#print(cell)
 	originCell = map.local_to_map(position)
 #	print(originCell)
@@ -358,13 +370,13 @@ func walk_along(path: PackedVector2Array) -> void:
 	for point in path:
 		curve.add_point(map.map_to_local(point) - position)
 	#print(curve.point_count)
-	print(path)
+	#print(path)
 	cell = path[-1]
-	
 #	print(path[-1])
 	isWalking = true
 #	print("unit cell: ", cell)
 #	print("unit position: ", position)
+	
 
 func shove_unit(location):
 	var oldCell = cell
@@ -660,6 +672,40 @@ func check_passives():
 	validate_auras(valid)
 
 
+##Non-permanent Skills Function
+func validate_skills():
+	var skills = unitData.Skills
+	var sData = UnitData.skillData
+	var valid = []
+	for id in skills:
+		var s = sData[id]
+		match s.Target:
+			Enums.EFFECT_TARGET.EQUIPPED: pass
+				
+	validate_auras(valid)
+
+
+##Validate skills from effects
+func validate_active_effect_skills():
+	var eData = UnitData.effectData
+	for skill in bonusSkills:
+		unitData.Skills.erase(skill)
+	bonusSkills.clear()
+
+
+	for effId in activeEffects:
+		if eData[effId].Type == Enums.EFFECT_TYPE.ADD_SKILL:
+			_resolve_bonus_skill(effId)
+
+
+func _resolve_bonus_skill(effId: String) -> void:
+	var data = UnitData.effectData[effId]
+	if unitData.Skills.has(data.Skill): return
+	else: 
+		bonusSkills.append(data.Skill)
+		unitData.Skills.append(data.Skill)
+
+
 func _add_sub_type(subType):
 	var st = Enums.WEAPON_CATEGORY.keys()[subType]
 	activeStats.Weapons.Sub.append(st)
@@ -673,8 +719,9 @@ func _assign_auras(passive:Dictionary) -> StringName:
 		Enums.RULE_TYPE.TIME: 
 			if passive.Rule == Global.timeOfDay: aura = passive.Aura
 		_: aura = passive.Aura
-	load_aura(aura)
+	if !unitAuras.has(aura):load_aura(aura)
 	return aura
+
 
 func check_time_prot() -> bool:
 	var passives = unitData.Passives
@@ -693,6 +740,7 @@ func check_time_prot() -> bool:
 			return true
 	return false
 
+
 func search_passive_id(type):
 	var highest = 0
 	var found = false
@@ -702,6 +750,7 @@ func search_passive_id(type):
 			highest = p.Value
 			found = passive
 	return found
+
 
 ##Aura Functions
 func validate_auras(valid:Array):
@@ -725,7 +774,7 @@ func load_aura(id):
 	var pathFollow = $PathFollow2D
 	
 	pathFollow.add_child(auraArea)
-	auraArea.set_aura(self, a)
+	auraArea.call_deferred("set_aura",self, a)
 	unitAuras[id] = auraArea
 	
 	
@@ -850,16 +899,15 @@ func set_direct_equipped(item:Dictionary):
 func set_equipped(iInv = false): #searches for first valid if false or out of bounds, otherwise pass inv index and will equip if valid
 	var valid = false
 	var invItem
-		
 	if iInv and iInv < unitData.Inv.size() and iInv > -1:
 		invItem = unitData.Inv[iInv]
-		valid = check_valid_equip(invItem)
+		valid = check_valid_equip(invItem, 1)
 	else: 
 		var i = 0
 		#print("sorting starting Inv....")
 		for thing in unitData.Inv:
 			#print("checking: ", str(thing))
-			if check_valid_equip(thing) and get_icat(thing).Main != "ACC":
+			if check_valid_equip(thing, 1) and get_icat(thing).Main != "ACC":
 				#print(str(thing), "Validated")
 				valid = true
 				iInv = i
@@ -897,6 +945,26 @@ func get_equipped_acc(): #returns the currently equipped accessories within inve
 		return false
 	return acc
 
+func get_reach() -> Dictionary:
+	var reach = {"Max":-INF, "Min":INF}
+	var wep = get_weapon_reach()
+	var aug = {"Max":-INF, "Min":INF}
+	var skill = {"Max":-INF, "Min":INF}
+	for s in unitData.Skills:
+		if UnitData.skillData[s].Augment: 
+			var r = get_aug_reach(s)
+			aug.Min = min(aug.Min, r.Min, aug.Min)
+			aug.Max = max(aug.Max, r.Max, aug.Max)
+		elif UnitData.skillData[s].MaxRange > 0:
+			var r = get_skill_reach(s)
+			skill.Min = min(skill.Min, r.Min, skill.Min)
+			skill.Max = max(skill.Max, r.Max, skill.Max)
+	reach.Min = min(reach.Min, skill.Min, reach.Min)
+	reach.Max = max(reach.Max, skill.Max, reach.Max)
+	reach.Min = min(reach.Min, aug.Min, reach.Min)
+	reach.Max = max(reach.Max, aug.Max, reach.Max)
+	return reach
+
 
 ##Returns reach = {"Max":int, "Min":int} of given currently equipped weapon
 func get_weapon_reach() -> Dictionary:
@@ -917,12 +985,10 @@ func get_weapon_reach() -> Dictionary:
 func get_skill_reach(skillId : String) -> Dictionary:
 	var reach = {"Max":-INF, "Min":INF}
 	var skill = UnitData.skillData[skillId]
-	
 	reach.Min = skill.MinRange
 	reach.Max = skill.MaxRange
 	
 	#Insert passive check for skill range bonuses here
-	
 	return reach
 
 
@@ -1098,7 +1164,7 @@ func check_valid_equip(item : Dictionary, mode : int = 0): #Subweapons not fully
 		return true
 	elif mode == 2 and iCat.Main == "ACC":
 		return true
-	elif mode < 2 and iCat.Main == "ITEM":
+	elif mode == 0 and iCat.Main == "ITEM":
 		return true
 	else:
 		return false
@@ -1327,6 +1393,7 @@ func update_stats(): #GO BACK AND FINISH ACTIVE DEBUFFS AFTER THIS
 	var subKeys := Enums.SUB_TYPE.keys()
 	
 	check_passives()
+	validate_active_effect_skills()
 	
 	if baseStats == null or activeStats == null or lifeBar == null:
 		return
@@ -1548,9 +1615,8 @@ func set_status(effect): #Missing a check for "duration type", same goes for tic
 		sprite.add_child(fxAnimation)
 		fxAnimation.call_deferred("move_before",hp)
 	update_stats()
-	#{"Active" : true, "Duration" : duration, "Curable" : isCurable}
-	#$PathFollow2D/Cell2.set_text(str(status))
-	
+
+
 func check_status(condition:String):
 	if status[condition]:
 		return true
@@ -1564,6 +1630,7 @@ func set_acted(actState: bool):
 			_animPlayer.play("idle")
 			#print(unitId,":", _animPlayer.current_animation,"Set Acted")
 		true: 
+			if one_time_leash and leash > -1: leash = -1
 			_animPlayer.play("disabled")
 			#print(unitId,":", _animPlayer.current_animation,"Set Acted")
 

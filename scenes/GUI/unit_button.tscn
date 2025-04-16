@@ -1,9 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://bwdal2jmyoy6f"]
+[gd_scene load_steps=8 format=3 uid="uid://bwdal2jmyoy6f"]
 
 [ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="1_ausw1"]
 [ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="2_pdeuu"]
 [ext_resource type="Script" uid="uid://6l4kgqwso35c" path="res://scenes/GUI/unit_button.gd" id="2_sdugk"]
-[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_ic7y6"]
+[ext_resource type="Texture2D" uid="uid://dd5n8e6454qno" path="res://sprites/UI/characterpfptop.png" id="3_e73pf"]
+[ext_resource type="Texture2D" uid="uid://dypirsbrvnnva" path="res://sprites/UI/characterpfpoutline.png" id="3_o1etu"]
+[ext_resource type="Texture2D" uid="uid://cymycbt6be0fl" path="res://sprites/UI/characterpfpportrait.png" id="4_imyh0"]
+[ext_resource type="Texture2D" uid="uid://dfuxqwwgadulx" path="res://sprites/UI/characterpfpwinginner.png" id="5_icoig"]
 
 [node name="UnitButton" type="PanelContainer"]
 offset_right = 40.0
@@ -11,24 +14,49 @@ offset_bottom = 40.0
 theme = ExtResource("1_ausw1")
 script = ExtResource("2_sdugk")
 
-[node name="BackgroundCenter" type="NinePatchRect" parent="."]
+[node name="BackgroundWhite" type="NinePatchRect" parent="."]
+custom_minimum_size = Vector2(400, 180)
 layout_mode = 2
-texture = ExtResource("3_ic7y6")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
+texture = ExtResource("3_o1etu")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="GreenTemplate" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(400, 180)
 layout_mode = 2
+texture = ExtResource("4_imyh0")
+expand_mode = 1
+stretch_mode = 4
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer"]
+[node name="RedWings" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(400, 180)
 layout_mode = 2
+texture = ExtResource("5_icoig")
+expand_mode = 1
+stretch_mode = 4
 
-[node name="TextureRect" type="TextureRect" parent="MarginContainer/HBoxContainer3"]
+[node name="PortraitMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme_override_constants/margin_left = 54
+theme_override_constants/margin_top = 20
+
+[node name="TextureRect" type="TextureRect" parent="PortraitMargin"]
 custom_minimum_size = Vector2(115, 112)
 layout_mode = 2
 texture = ExtResource("2_pdeuu")
+stretch_mode = 4
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="."]
+custom_minimum_size = Vector2(400, 180)
+layout_mode = 2
+texture = ExtResource("3_e73pf")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 230
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
 
 [node name="HBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer3"]
 layout_mode = 2

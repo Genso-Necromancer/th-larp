@@ -8,7 +8,7 @@ collision_mask = 2
 input_pickable = false
 script = ExtResource("1_6jjyn")
 
-[node name="AuraMap" type="TileMap" parent="."]
+[node name="AuraMap" type="TileMapLayer" parent="."]
+use_parent_material = true
 position = Vector2(-80, -25)
 tile_set = ExtResource("2_2x4ni")
-format = 2

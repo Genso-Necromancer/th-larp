@@ -1,0 +1,60 @@
+[gd_scene load_steps=9 format=3 uid="uid://cl7ik2hxcwm08"]
+
+[ext_resource type="Script" uid="uid://2hx5flk7mcr3" path="res://scenes/maps/BaseGameMap.gd" id="1_ak6bi"]
+[ext_resource type="TileSet" uid="uid://dae0fl1fnuwvk" path="res://TileSets/TestTileSet2.tres" id="2_1xy5d"]
+[ext_resource type="TileSet" uid="uid://csbjmhaysou6f" path="res://TileSets/ObjectSet.tres" id="3_6ts4f"]
+[ext_resource type="TileSet" uid="uid://d0jkuu7oqmw7d" path="res://TileSets/region_tiles.tres" id="4_ds6an"]
+[ext_resource type="TileSet" uid="uid://dc86d54yrw68y" path="res://TileSets/EventSet.tres" id="5_8do3e"]
+[ext_resource type="Script" uid="uid://d2s883a3vismr" path="res://scenes/maps/narrativeLayer.gd" id="6_lbo8e"]
+[ext_resource type="Script" uid="uid://bdpbd4lp3x08s" path="res://scrpt/AI/ai_manager.gd" id="7_77vj4"]
+[ext_resource type="Resource" uid="uid://befkt7mur7ux" path="res://scrpt/AI/personality_test.tres" id="8_gm7ke"]
+
+[node name="GameMap" type="Node2D"]
+z_index = -2
+script = ExtResource("1_ak6bi")
+forcedUnits = ["Remilia", "Sakuya"]
+title = "Testing My Fucking Patience"
+hours = 0
+minutes = 0
+
+[node name="Ground" type="TileMapLayer" parent="."]
+use_parent_material = true
+tile_set = ExtResource("2_1xy5d")
+
+[node name="Modifier" type="TileMapLayer" parent="."]
+use_parent_material = true
+tile_set = ExtResource("2_1xy5d")
+y_sort_origin = 1
+
+[node name="Object" type="TileMapLayer" parent="."]
+use_parent_material = true
+tile_set = ExtResource("3_6ts4f")
+
+[node name="Deployments" type="TileMapLayer" parent="."]
+use_parent_material = true
+tile_set = ExtResource("2_1xy5d")
+
+[node name="Regions" type="TileMapLayer" parent="."]
+self_modulate = Color(1, 1, 1, 0.658824)
+use_parent_material = true
+tile_set = ExtResource("4_ds6an")
+
+[node name="PathAttack" type="TileMapLayer" parent="."]
+use_parent_material = true
+tile_set = ExtResource("2_1xy5d")
+y_sort_origin = 2
+
+[node name="Narrative" type="TileMapLayer" parent="."]
+use_parent_material = true
+tile_set = ExtResource("5_8do3e")
+script = ExtResource("6_lbo8e")
+
+[node name="Dev" type="TileMapLayer" parent="."]
+use_parent_material = true
+tile_set = ExtResource("2_1xy5d")
+
+[node name="DanmakuManager" type="Node2D" parent="."]
+
+[node name="AiManager" type="Node" parent="."]
+script = ExtResource("7_77vj4")
+mind = ExtResource("8_gm7ke")

@@ -7,7 +7,7 @@ class_name AHexGrid2D
 var mapSize
 var mapRect
 
-var tileMap 
+var tileMap
 var oddq_directions = [
 	[[+1,  0], [+1, -1], [ 0, -1], 
 	[-1, -1], [-1,  0], [ 0, +1]],
@@ -39,13 +39,13 @@ func _init(map):
 
 ##New Code
 #region
-func find_all_unit_paths(unit : Unit) -> Array:
+func find_all_unit_paths(unit : Unit, customCell:Vector2i = unit.cell, leash : int = unit.activeStats.Move) -> Array:
 	var path : Array
 	_set_units()
 	_sort_solids() 
 	_sort_hostiles(unit)
 	_sort_walls(unit)
-	path = find_all_paths(unit.cell, unit.activeStats.Move, unit) #searches all paths, blocking solids
+	path = find_all_paths(customCell, leash, unit) #searches all paths, blocking solids
 	path = _remove_passable(path) #removes passable tiles as valid selections without blocking
 	return path
 
@@ -612,13 +612,13 @@ func find_range(current):
 	var unitRange = [minRange, maxRange]
 	return unitRange
 	
-func find_threat(walkable, unitRange):
+func find_threat(walkable:Array, unitRange:Dictionary) -> Array:
 	var attackSpaces = []
 	var i = 1
 	var threatRange = []
 	var visited = []
-	var maxRange = unitRange[0]
-	var minRange = unitRange[1]
+	var maxRange = unitRange.Max
+	var minRange = unitRange.Min
 	var reachable = walkable.duplicate()
 	while i <= maxRange:
 		for oddQ in reachable:
@@ -636,7 +636,7 @@ func find_threat(walkable, unitRange):
 			if !reachable.has(tile):
 				reachable.append(tile)
 		i += 1
-	var filteredThreatRange = []
+	var filteredThreatRange := []
 	
 	for tile in threatRange:
 		for cell in walkable:
@@ -699,7 +699,6 @@ func _weave(cell) -> Array:
 	var point = cell
 	var endX = _find_closest_edge_x(cell)
 	
-	
 	if endX == 0:
 		endX = mapSize.x
 		while point.x < endX:
@@ -712,8 +711,8 @@ func _weave(cell) -> Array:
 			point.x -= 1
 	print("Danmaku Path:",path)
 	return path
-	
-	
+
+
 func _find_closest_edge_x(cell):
 	var edge
 	if cell.x > (mapSize.x/2):
@@ -722,6 +721,7 @@ func _find_closest_edge_x(cell):
 		edge = 0
 	
 	return edge
+
 
 func find_goal(wakka, brother, sinsToxin, youSaySo):
 	var goal

@@ -183,8 +183,8 @@ static func get_named_unit_data():
 					},
 				"MaxInv": 6,
 				"Inv":[],
-				"SpawnGear":["BK","PZA",],
-				"Skills":["FireBasic"],
+				"SpawnGear":["PZA",],
+				"Skills":[],
 				"Passives":[],
 				"Weapons": {
 					"Blade": false,
@@ -325,7 +325,7 @@ static func get_named_unit_data():
 				"CurLife": 1,
 				"Profile": {
 					"UnitName": "Cirno",
-					"Prt": "res://sprites/SakuyaPrt.png",
+					"Prt": "res://sprites/character/cirno/cirno_prt.png",
 					"FullPrt":"res://sprites/character/cirno/portrait_full.png",
 					"Sprite": load(("res://sprites/SakuyaTest.png")),
 					"Level": 4,
@@ -465,6 +465,48 @@ static func get_spec(specInd):
 					"Cele": 0,
 					"Def": 0,
 					"Cha": 0
+					}
+					},
+			"Passives":[],
+			"Skills":[],
+			"MoveType": MOVE_TYPE.FOOT
+				}
+		SPEC_ID.HUMAN:
+			return {
+			"Spec": SPEC_ID.HUMAN,
+			"StatGroups":{
+				"Stats": {
+					"Move": 4,
+					"Life": 0,
+					"Comp": 100,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+					},
+				"Growths": {
+					"Move": 0,
+					"Life": 0.1,
+					"Comp": 0.0,
+					"Pwr": 0.1,
+					"Mag": 0.0,
+					"Eleg": 0.1,
+					"Cele": 0.1,
+					"Def": 0.0,
+					"Cha": 0.3
+					},
+				"Caps": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 2
 					}
 					},
 			"Passives":[],
@@ -837,6 +879,7 @@ static func get_items():
 				"MaxDur": 40,
 				"Equip":true,
 				"SubGroup": false,
+				"Effects":["GrantFire1"],
 				},
 				
 				"NaturalMartial":{
@@ -875,7 +918,6 @@ static func get_items():
 				"Equip":true,
 				"SubGroup": false,
 				},
-				
 				## Consumables
 				"PZA":{
 				"Name":"Pizza",
@@ -954,7 +996,7 @@ static func get_effects():
 			"Heal2" :{
 				"Type": Enums.EFFECT_TYPE.HEAL,
 				"Target": Enums.EFFECT_TARGET.SELF,
-				"Value": 2, #use 0-2 float for time speed up/slow down.	
+				"Value": 2, 
 			},
 			"Graze5":{
 				"Type": Enums.EFFECT_TYPE.BUFF,
@@ -997,12 +1039,12 @@ static func get_effects():
 				"Proc": -1,
 				"Duration": 2,
 				"DurationType": Enums.DURATION_TYPE.ROUND,
-				"Value": -0.5
+				"Value": 0.5
 			},
 			"Pizza01": {
 				"Type": Enums.EFFECT_TYPE.HEAL,
 				"Target": Enums.EFFECT_TARGET.SELF,
-				"Value": 8, #use 0-2 float for time speed up/slow down.	
+				"Value": 8, 
 			},
 			"PwrBuff01":{
 				"Type": Enums.EFFECT_TYPE.BUFF,
@@ -1018,6 +1060,14 @@ static func get_effects():
 				"Target": Enums.EFFECT_TARGET.EQUIPPED,
 				"Stack": true, 
 				"Value": 1,
+			},
+			"GrantFire1":{
+				"Type": Enums.EFFECT_TYPE.ADD_SKILL,
+				"SubType": false, #Use Enums.SUB_TYPE. For Damage, use Damage Enums. Just how it's gotta be.
+				"Target": Enums.EFFECT_TARGET.EQUIPPED, #Self, Target, Global, Equipped
+				#effect: Reloc
+				"Hostile": false, #If movement should be treated as "hostile"
+				"Skill": "FireBasic", #Not used yet. Temporarily adds skills via on-equip effects
 			}
 	}
 	return skillEffects

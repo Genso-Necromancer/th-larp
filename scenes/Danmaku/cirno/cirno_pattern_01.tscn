@@ -1,0 +1,45 @@
+[gd_scene load_steps=7 format=3 uid="uid://bg6gj0igt3tqu"]
+
+[ext_resource type="PackedScene" uid="uid://bqhoeac2w0jxl" path="res://scenes/Danmaku/dmk_spawn_pattern.tscn" id="1_0bcyd"]
+[ext_resource type="PackedScene" uid="uid://cfs7qbct83nrh" path="res://scenes/Danmaku/danmaku_path.tscn" id="2_qy0cg"]
+[ext_resource type="Curve2D" uid="uid://dcmv664sutu3a" path="res://scenes/Danmaku/danmaku_curves/NW_diagonal.tres" id="3_038kv"]
+[ext_resource type="PackedScene" uid="uid://xtu4w2xednw0" path="res://scenes/Danmaku/danmaku_types/kunai_type.tscn" id="4_y2hvs"]
+[ext_resource type="Curve2D" uid="uid://dywk4q70t16pw" path="res://scenes/Danmaku/danmaku_curves/SW_diagonal.tres" id="5_waq87"]
+
+[sub_resource type="Curve2D" id="Curve2D_7k760"]
+resource_local_to_scene = true
+resource_name = "NW_Diagonal"
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -126, -28, 0, 0, 0, 0, -252, -56, 0, 0, 0, 0, -384, -84, 0, 0, 0, 0, -508, -112)
+}
+point_count = 5
+
+[node name="DmkSpawnPattern" instance=ExtResource("1_0bcyd")]
+
+[node name="Danmaku" parent="DmkSpawnPattern" index="0" instance=ExtResource("2_qy0cg")]
+position = Vector2(-40, -3)
+curve = ExtResource("3_038kv")
+
+[node name="DanmakuType" parent="DmkSpawnPattern/Danmaku" index="1" instance=ExtResource("4_y2hvs")]
+rotation = -2.92292
+
+[node name="Danmaku2" parent="DmkSpawnPattern" index="1" instance=ExtResource("2_qy0cg")]
+position = Vector2(80, -31)
+curve = SubResource("Curve2D_7k760")
+
+[node name="DanmakuType" parent="DmkSpawnPattern/Danmaku2" index="1" instance=ExtResource("4_y2hvs")]
+rotation = -2.92292
+
+[node name="Danmaku3" parent="DmkSpawnPattern" index="2" instance=ExtResource("2_qy0cg")]
+position = Vector2(-40, 53)
+curve = ExtResource("5_waq87")
+
+[node name="DanmakuType" parent="DmkSpawnPattern/Danmaku3" index="1" instance=ExtResource("4_y2hvs")]
+rotation = 2.92292
+
+[node name="Danmaku4" parent="DmkSpawnPattern" index="3" instance=ExtResource("2_qy0cg")]
+position = Vector2(80, 81)
+curve = ExtResource("5_waq87")
+
+[node name="DanmakuType" parent="DmkSpawnPattern/Danmaku4" index="1" instance=ExtResource("4_y2hvs")]
+rotation = 2.92292

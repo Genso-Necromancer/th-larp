@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://xtu4w2xednw0"]
+
+[ext_resource type="PackedScene" uid="uid://dt7tkhud3igbt" path="res://scenes/Danmaku/danmaku_follow.tscn" id="1_on5bf"]
+[ext_resource type="Texture2D" uid="uid://ywry0pe1d4v8" path="res://sprites/danmaku/danmaku.png" id="2_eeu6q"]
+
+[node name="DanmakuType" instance=ExtResource("1_on5bf")]
+sprite = ExtResource("2_eeu6q")
+move = 4
+damage = 5
+cmpDamage = 5
+type = &"kunai"
+
+[node name="Sprite2D" parent="." index="0"]
+texture = ExtResource("2_eeu6q")
