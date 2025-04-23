@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Aura" load_steps=4 format=3 uid="uid://dcwqn2mdckhce"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_tr7h2"]
+[ext_resource type="Resource" uid="uid://beelx1wu1xm18" path="res://unit_resources/effects/terror_debuff.tres" id="2_38dl7"]
+[ext_resource type="Script" uid="uid://blrufmbqn5ftl" path="res://unit_resources/auras/aura.gd" id="2_xciiy"]
+
+[resource]
+script = ExtResource("2_xciiy")
+range = 2
+is_self = false
+target_team = 2
+target = 2
+effects = Array[ExtResource("1_tr7h2")]([ExtResource("2_38dl7")])
+id = "terror"
+rule_type = 0
+metadata/_custom_type_script = "uid://blrufmbqn5ftl"

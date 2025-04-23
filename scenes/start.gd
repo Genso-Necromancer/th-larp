@@ -1,5 +1,5 @@
 extends Control
-signal loadScene
+signal load_scene(scene)
 signal unloadMe
 signal loadMapManager
 @onready var sceneMenu = $VBoxContainer/SceneMenu
@@ -11,7 +11,7 @@ var firstLaunch = true
 
 func _ready():
 	if firstLaunch:
-		var main = get_parent()
+		var main :MainNode= get_parent()
 		GameState.change_state(self, GameState.gState.START)
 		#GameState.newSlave = yaBoy
 		#GameState.state = GameState.gState.START

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=3 format=3 uid="uid://bvde7og1xou31"]
+
+[ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="1_7k3n7"]
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_43b8l"]
+
+[resource]
+resource_name = "unarmed"
+script = ExtResource("1_7k3n7")
+dmg = 0
+hit = 0
+crit = 0
+barrier = 0
+barrier_chance = 0
+min_reach = 0
+max_reach = 0
+damage_type = 0
+personal = true
+level = 0
+use = false
+equippable = true
+breakable = false
+expendable = false
+trade = false
+max_dur = 1
+category = 0
+sub_group = 0
+effects = Array[ExtResource("1_43b8l")]([])
+id = "unarmed"
+rule_type = 0
+metadata/_custom_type_script = "uid://b7y6ry7pkb23i"

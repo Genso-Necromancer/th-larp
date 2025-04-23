@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=3 format=3 uid="uid://b7s77y3xj1qtm"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_5rema"]
+[ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="2_17hyr"]
+
+[resource]
+resource_name = "knife_dagger"
+script = ExtResource("2_17hyr")
+dmg = 4
+hit = 85
+crit = 0
+barrier = 0
+barrier_chance = 0
+min_reach = 1
+max_reach = 2
+damage_type = 1
+personal = false
+level = 1
+use = false
+equippable = true
+breakable = true
+expendable = true
+trade = true
+max_dur = 25
+category = 0
+sub_group = 0
+effects = Array[ExtResource("1_5rema")]([])
+id = "knife_dagger"
+rule_type = 0
+metadata/_custom_type_script = "uid://b7y6ry7pkb23i"

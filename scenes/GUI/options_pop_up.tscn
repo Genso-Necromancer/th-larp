@@ -5,9 +5,6 @@
 [ext_resource type="Script" uid="uid://bqmr3lyac4mym" path="res://scenes/GUI/options_pop_up.gd" id="1_m0u7l"]
 
 [node name="OptionsPopUp" type="Panel" node_paths=PackedStringArray("list", "firstFocus")]
-custom_minimum_size = Vector2(1920, 1080)
-offset_right = 70.0
-offset_bottom = 76.0
 mouse_force_pass_scroll_events = false
 theme = ExtResource("1_ajvjo")
 script = ExtResource("1_m0u7l")
@@ -15,9 +12,9 @@ list = NodePath("OptionsPanel/MarginContainer/OptionsList")
 firstFocus = NodePath("OptionsPanel/MarginContainer/OptionsList/EquipBtn")
 
 [node name="OptionsPanel" type="PanelContainer" parent="."]
-layout_mode = 0
-offset_right = 70.0
-offset_bottom = 76.0
+layout_mode = 1
+offset_right = 92.0
+offset_bottom = 101.0
 size_flags_horizontal = 0
 theme = ExtResource("1_ajvjo")
 
@@ -40,13 +37,15 @@ layout_mode = 2
 [node name="EquipBtn" type="Button" parent="OptionsPanel/MarginContainer/OptionsList"]
 layout_mode = 2
 focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../UseBtn")
 focus_neighbor_right = NodePath(".")
-focus_neighbor_bottom = NodePath("../UseBtn")
+focus_neighbor_bottom = NodePath("../UnequipBtn")
 text = "Equip"
 
 [node name="UnequipBtn" type="Button" parent="OptionsPanel/MarginContainer/OptionsList"]
 layout_mode = 2
 focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../EquipBtn")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../UseBtn")
 text = "Unequip"
@@ -54,8 +53,9 @@ text = "Unequip"
 [node name="UseBtn" type="Button" parent="OptionsPanel/MarginContainer/OptionsList"]
 layout_mode = 2
 focus_neighbor_left = NodePath(".")
-focus_neighbor_top = NodePath("../EquipBtn")
+focus_neighbor_top = NodePath("../UnequipBtn")
 focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../EquipBtn")
 text = "Use"
 
 [connection signal="pressed" from="OptionsPanel/MarginContainer/OptionsList/EquipBtn" to="." method="_on_equip_btn_pressed"]

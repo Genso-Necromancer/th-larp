@@ -1,0 +1,9 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://dhtx1ltwrbcn4"]
+
+[ext_resource type="Script" uid="uid://tkxohry12rc3" path="res://unit_resources/items/weapons/natural.gd" id="1_tkj8p"]
+
+[resource]
+script = ExtResource("1_tkj8p")
+dur = 0
+equipped = false
+dropped = false

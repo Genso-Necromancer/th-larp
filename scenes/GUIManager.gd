@@ -23,15 +23,15 @@ signal gui_action_menu_canceled
 #states
 enum sStates {
 	HOME,
-	FORM,
 	TRADING,
 	UNITOP,
 	SUPPLY,
 	TRDSEEK,
+	FORM,
 	DEPLOY,
 	MANAGE,
-	BEGIN,
 	ROSTER,
+	BEGIN,
 	}
 
 var sState := sStates.HOME:
@@ -64,7 +64,7 @@ var isForecastPrompt = false
 var HUD : Node
 var timer : Timer
 var tween : Tween
-var menuCursor : Control
+var menuCursor : MenuCursor
 var focusViewer : FocusViewer
 var chClock : ChapterClock
 
@@ -191,11 +191,7 @@ func _on_gameboard_toggle_prof():
 		
 			
 func toggle_profile() -> void: 
-	if sState < 6:  #profile should not open in these states.
-		return
-		
-	#if sState != sStates.BEGIN:
-		#menuCursor.toggle_visible()
+	if sState < 4: return #profile should not open in these states.
 	
 	if unitProf.visible and Global.focusUnit != profFocus:
 		update_prof()
@@ -462,6 +458,7 @@ func _resignal_menuCursor(p, strip = true, oldP = menuCursor.menu_parent):
 func _resignal_menuCursor_array(btns:Array, mode:= 0):
 	var i = 0
 	var focus
+	if btns.is_empty(): return
 	menuCursor.visible = true
 	for b in btns:
 		_connect_btn_to_cursor(b)
@@ -521,7 +518,7 @@ func _trade_unit_select_roster(b) -> void:
 		_open_trade_menu()
 	
 func _on_gameboard_formation_closed():
-	var btns = mapSetUp.btnContainer
+	var btns :Array = mapSetUp.btnContainer.get_children()
 	mapSetUp.toggle_visible()
 	menuCursor.toggle_visible()
 	#after revamping menuCursor code, make sure setup is it's parent
@@ -599,7 +596,7 @@ func _on_supply_pressed():
 
 
 func _on_trd_focus_changed(p, _b = null):
-	_resignal_menuCursor(p)
+	menuCursor.resignal_cursor(p.get_children())
 
 func _on_manage_pressed():
 	var unit = activeBtn.get_unit()

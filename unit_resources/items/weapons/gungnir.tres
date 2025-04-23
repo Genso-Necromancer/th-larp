@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=3 format=3 uid="uid://da080uvnxli85"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_1w2e6"]
+[ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="2_jsf6o"]
+
+[resource]
+resource_name = "gungnir"
+script = ExtResource("2_jsf6o")
+dmg = 7
+hit = 90
+crit = 0
+barrier = 3
+barrier_chance = 10
+min_reach = 1
+max_reach = 1
+damage_type = 1
+personal = true
+level = 0
+use = false
+equippable = true
+breakable = true
+expendable = false
+trade = false
+max_dur = 25
+category = 5
+sub_group = 0
+effects = Array[ExtResource("1_1w2e6")]([])
+id = "gungnir"
+rule_type = 0

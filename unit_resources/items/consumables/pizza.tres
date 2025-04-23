@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="ConsumableResource" load_steps=4 format=3 uid="uid://cmoym4xuhijeg"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_q382v"]
+[ext_resource type="Resource" uid="uid://bgpwadshxdogx" path="res://unit_resources/effects/item_heal01.tres" id="2_rbh5e"]
+[ext_resource type="Script" uid="uid://6xq3oabgheeu" path="res://unit_resources/items/consumables/consumable_resource.gd" id="2_sgdej"]
+
+[resource]
+script = ExtResource("2_sgdej")
+target = 1
+min_reach = 0
+max_reach = 0
+personal = false
+level = 0
+use = true
+equippable = false
+breakable = true
+expendable = true
+trade = true
+max_dur = 8
+category = 12
+sub_group = 0
+effects = Array[ExtResource("1_q382v")]([ExtResource("2_rbh5e")])
+id = "pizza"
+rule_type = 0
+metadata/_custom_type_script = "uid://6xq3oabgheeu"

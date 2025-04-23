@@ -1,6 +1,5 @@
 @tool
 extends PanelContainer
-
 class_name InventoryPanel
 
 
@@ -16,7 +15,7 @@ var _style : String = "NONE" :
 			#print(value)
 			_style = value
 			_set_style_style(_style)
-		
+			notify_property_list_changed()
 			
 const _styles: Array[String] = ["Trade", "Profile", "Preview"]
 
@@ -64,65 +63,56 @@ func _ready_style():
 
 
 
-func fill_items(isTrade : = false, reach = [0,0], useBorder := false) -> Array:
-	var unit = get_meta("Unit")
-	var inv = unit.unitData.Inv
-	var iData = UnitData.itemData
+func fill_items(isTrade : = false, reach := [0,0], useBorder := false) -> Array:
+	var unit :Unit = get_meta("Unit")
+	var inv = unit.inventory
 	var i := 0
 	var bPath = load("res://scenes/GUI/item_button.tscn")
 	var equipped = unit.get_equipped_weapon()
 	var b
 	var displayItem = null
-	if _style == _styles[1] and equipped.ID != "Unarmed":
+	var reqRange : Array = range(reach[0], reach[1] + 1)
+	if _style == _styles[1] and equipped != unit.unarmed:
 		b = _generate_item_button(bPath, equipped, i, unit, isTrade)
 		b.useBorder = useBorder
 		_display_weapon(b)
 		displayItem = equipped
 		i += 1
 			
-	for item in inv:
+	for item : Item in inv:
 		if _style == _styles[1] and item == displayItem:
 			continue
 		if !reach[0]: pass
-		elif !unit.check_valid_equip(item): continue
-		elif iData[item.ID].MinRange > reach[0] or iData[item.ID].MaxRange < reach[1]: 
-			continue
-			
+		elif item is Accessory or !unit.check_valid_equip(item): continue
+		elif !reqRange.has(item.min_reach) and !reqRange.has(item.max_reach): continue
 		b = _generate_item_button(bPath, item, i, unit, isTrade)
-		
 		_add_item(b)
 		i += 1
 	return items
-	
 
 
-
-func _generate_item_button(bPath, item : Dictionary, i : int, unit : Unit, isTrade : bool) -> ItemButton:
-	
-	var itemData = UnitData.itemData[item.ID]
-	var b = bPath.instantiate()
-	var dur = item.Dur
-	var mDur = itemData.MaxDur
+func _generate_item_button(bPath, item : Item, i : int, unit : Unit, isTrade : bool) -> ItemButton:
+	var b :ItemButton= bPath.instantiate()
+	var dur = item.dur
+	var mDur = item.max_dur
 	var durString
-	if dur == -1 or mDur == -1:
-		durString = str(" --")
-	else:
-		durString = (str(dur) + "/" + str(mDur))
-		
-	b.set_item_text(str(itemData.Name), durString)
-	b.set_item_icon(itemData.Icon)
-	b.set_meta_data(item, unit, i, itemData.Trade)
+	var iconPath : String = "res://sprites/icons/items/%s/%s.png"
+	var folder : String
+	if item is Weapon: folder = "weapon"
+	if item is Accessory: folder = "accessory"
+	if item is Consumable: folder = "consumable"
+	iconPath = iconPath % [folder, item.id]
+	
+	
+	
+	b.set_item_text(item)
+	b.set_item_icon(item.id)
+	b.set_meta_data(item, unit, i, item.trade)
 	b.get_button().add_to_group("ItemTT")
-	if isTrade and !itemData.Trade:
+	if isTrade and !item.trade:
 		b.state = "Disabled"
 	elif _style == _styles[1] and !unit.check_valid_equip(item):
 		b.state = "Disabled"
-	
-	#does this work still like this? HERE
-	#b.get_button().set_focus_neighbor(SIDE_LEFT, b.get_path_to(b.get_button()))
-	#b.get_button().set_focus_neighbor(SIDE_RIGHT, b.get_path_to(b.get_button()))
-	
-	
 	return b
 
 

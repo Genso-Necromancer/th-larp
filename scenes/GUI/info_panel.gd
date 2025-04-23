@@ -9,6 +9,7 @@ class_name InfoPanel
 @onready var TTCon := $ToolTipContainer
 @onready var animTree := $AnimationPlayer/AnimationTree
 @onready var animPlayer := $AnimationPlayer
+@onready var itemDisplay :ItemDisplay= $ToolTipContainer/VBoxContainer/ItemDisplayMargin
 
 
 var hasEffects := false
@@ -117,27 +118,30 @@ func _update_info(control:Control) -> void:
 	var unit :Unit = Global.focusUnit
 	var type : StringName
 	var tt : Control = $ToolTipContainer/VBoxContainer/ToolTipDisplay
-	var statDisplay : Control = $ToolTipContainer/VBoxContainer/ItemDisplayMargin
+	var statDisplay : ItemDisplay = $ToolTipContainer/VBoxContainer/ItemDisplayMargin
 	var toolTip : String
 	var parser := ToolTipParser.new()
 	
-	_close_refs()
-	activeRefs.clear()
-	if isRoaming: set_panel(control)
 	for group in control.get_groups():
 		if group.ends_with("TT"):
 			type = group
 			break
-			
+	if !type: return
+	elif type == "ItemTT" and control.get_meta("Item").id == "unarmed": return
+	_close_refs()
+	activeRefs.clear()
+	if isRoaming: set_panel(control)
+	
+	itemDisplay.visible = true
 	match type:
 		"ItemTT": 
-			var data = UnitData.itemData[control.get_meta("ID")]
+			var data = control.get_meta("Item")
 			toolTip = parser.get_skill(data)
 			statDisplay.update_stat_values(control)
 			activeRefs.append(statDisplay)
 			
 		"SkillsTT": 
-			var data = UnitData.skillData[control.get_meta("ID")]
+			var data = control.get_meta("ID")
 			toolTip = parser.get_skill(data)
 			statDisplay.update_stat_values(control)
 			activeRefs.append(statDisplay)
@@ -152,12 +156,12 @@ func _update_info(control:Control) -> void:
 			toolTip = parser.get_active(unit, control.get_meta("ToolTip"))
 			
 		"PassivesTT":
-			var data = UnitData.passiveData[control.get_meta("ID")]
-			toolTip = parser.get_passive(data)
+			itemDisplay.visible = false
+			var passive = control.get_meta("ID")
+			toolTip = parser.get_passive(passive)
 			
 		"StatusTT":
 			toolTip = parser.get_status(unit, control.get_meta("ID"))
-			
 			
 	activeRefs.append(tt.display_tooltip(toolTip))
 	_open_ttcon()

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Passive" load_steps=4 format=3 uid="uid://co546romn6pwr"]
+
+[ext_resource type="Resource" uid="uid://djsy8cgx7laia" path="res://unit_resources/auras/charisma.tres" id="1_6qx3h"]
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="1_ludn7"]
+[ext_resource type="Resource" uid="uid://dcwqn2mdckhce" path="res://unit_resources/auras/terror.tres" id="2_ou1c3"]
+
+[resource]
+script = ExtResource("1_ludn7")
+type = 3
+sub_type = 0
+sub_weapon = 0
+day_id = "charisma"
+night_id = "terror"
+value = 0
+string_value = &""
+is_time_sens = true
+day = ExtResource("1_6qx3h")
+night = ExtResource("2_ou1c3")
+feature_id = "rem_aura"
+rule_type = 4
+metadata/_custom_type_script = "uid://c5hmv6tclm43r"

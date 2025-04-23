@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=4 format=3 uid="uid://6toly2qn15kk"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_rk43s"]
+[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_1vm3e"]
+[ext_resource type="Resource" uid="uid://c2l318d6d3p8d" path="res://unit_resources/effects/slow_time05.tres" id="2_4kon2"]
+
+[resource]
+script = ExtResource("2_1vm3e")
+augment = false
+target = 1
+can_miss = false
+can_crit = false
+can_dmg = false
+min_reach = 0
+max_reach = 0
+cost = 10
+weapon_category = 1
+sub_group = 0
+bonus_min_range = 0
+bonus_max_range = 0
+hit = 0
+dmg = 0
+crit = 0
+dmg_type = 0
+effects = Array[ExtResource("1_rk43s")]([ExtResource("2_4kon2")])
+feature_id = "slow_time05"
+rule_type = 0
+metadata/_custom_type_script = "uid://cc71mceo7glas"

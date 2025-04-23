@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="AccessoryResource" load_steps=4 format=3 uid="uid://2j8nnuwph76x"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_vvffb"]
+[ext_resource type="Resource" uid="uid://dosudfnnkglag" path="res://unit_resources/effects/acc_pwr01.tres" id="2_cc8qv"]
+[ext_resource type="Script" uid="uid://c3kdkx1u7ppud" path="res://unit_resources/items/accessories/accessory_resource.gd" id="2_l772u"]
+
+[resource]
+script = ExtResource("2_l772u")
+personal = false
+level = 1
+use = false
+equippable = false
+breakable = false
+expendable = false
+trade = true
+max_dur = 1
+category = 11
+sub_group = 0
+effects = Array[ExtResource("1_vvffb")]([ExtResource("2_cc8qv")])
+id = "pwr_ring01"
+rule_type = 0
+metadata/_custom_type_script = "uid://c3kdkx1u7ppud"

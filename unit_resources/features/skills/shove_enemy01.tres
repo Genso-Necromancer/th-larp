@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=4 format=3 uid="uid://dhlpeampaptvh"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_q43g0"]
+[ext_resource type="Resource" uid="uid://doxw0x7i1i0d4" path="res://unit_resources/effects/shove_enemy01.tres" id="2_8bppx"]
+[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="3_1any1"]
+
+[resource]
+script = ExtResource("3_1any1")
+augment = false
+target = 3
+can_miss = true
+can_crit = false
+can_dmg = false
+min_reach = 0
+max_reach = 0
+cost = 4
+weapon_category = 1
+sub_group = 0
+bonus_min_range = 0
+bonus_max_range = 0
+hit = 95
+dmg = 0
+crit = 0
+dmg_type = 0
+effects = Array[ExtResource("1_q43g0")]([ExtResource("2_8bppx")])
+feature_id = "shove_enemy01"
+rule_type = 0
+metadata/_custom_type_script = "uid://cc71mceo7glas"

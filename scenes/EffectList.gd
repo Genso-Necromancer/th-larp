@@ -16,12 +16,12 @@ func _close_all_effects():
 	get_tree().set_group("EffectSeparators", "visible", false)
 
 
-func update_effects(source):
+func update_effects(source:SlotWrapper):
 	var type = get_meta("Type")
 	_clear_old()
 	match type:
-		"Item": _set_item_text(UnitData.itemData[source])
-		"Skill": _set_skill_text(UnitData.skillData[source])
+		"Item": _set_item_text(StringGetter.get_item_name(source))
+		"Skill": _set_skill_text(StringGetter.get_skill_name(source))
 
 
 func _set_item_text(data) -> void:
@@ -36,7 +36,7 @@ func _set_item_text(data) -> void:
 	for effId in data.Effects:
 		string = "%s" % StringGetter.get_effect_string(effId)
 		
-		match UnitData.effectData[effId].Type:
+		match UnitData.effectData[effId].type:
 			Enums.EFFECT_TYPE.ADD_SKILL:
 				skillEff.append(string)
 				continue
@@ -110,4 +110,3 @@ func _clear_old():
 	var kids = $TargetBox/TargetContainer.get_children() + $SelfBox/SelfContainer.get_children() + $GlobalBox/GlobalContainer.get_children() + $PassiveBox/PassiveContainer.get_children()
 	for kid in kids:
 		kid.queue_free()
-

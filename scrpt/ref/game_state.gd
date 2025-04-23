@@ -19,6 +19,7 @@ enum gState {
 	GB_END_OF_ROUND,
 	START,
 	CAMERA_STATE,
+	DIALOGUE_SCENE,
 	ACCEPT_PROMPT,
 	FAIL_STATE,
 	WIN_STATE,
@@ -145,6 +146,8 @@ func _switch_state(value):
 			activeState = CameraState.new()
 		gState.ACCEPT_PROMPT:
 			
+			activeState = AcceptState.new()
+		gState.DIALOGUE_SCENE:
 			activeState = AcceptState.new()
 		gState.FAIL_STATE:
 			

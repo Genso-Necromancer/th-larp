@@ -52,14 +52,14 @@ theme_override_font_sizes/font_size = 15
 text = "Eq."
 vertical_alignment = 2
 
-[node name="Name" type="Label" parent="ContentMargin/HBoxContainer"]
+[node name="Name" type="RichTextLabel" parent="ContentMargin/HBoxContainer"]
 custom_minimum_size = Vector2(190, 26)
 layout_mode = 2
 size_flags_vertical = 8
+bbcode_enabled = true
 text = "Item Name"
+scroll_active = false
 vertical_alignment = 1
-clip_text = true
-text_overrun_behavior = 3
 
 [node name="Cost" type="Label" parent="ContentMargin/HBoxContainer"]
 custom_minimum_size = Vector2(22, 26)

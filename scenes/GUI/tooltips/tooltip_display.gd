@@ -7,4 +7,3 @@ func display_tooltip(toolTip:String) -> RichTextLabel:
 	visible = true
 	set_text(toolTip)
 	return self
-

@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=4 format=3 uid="uid://p3wtlxq4fq1f"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_t418x"]
+[ext_resource type="Resource" uid="uid://dxv863yt5tseh" path="res://unit_resources/effects/thirst50.tres" id="2_u8n2y"]
+[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_xevab"]
+
+[resource]
+script = ExtResource("2_xevab")
+augment = true
+target = 3
+can_miss = true
+can_crit = true
+can_dmg = true
+min_reach = 0
+max_reach = 0
+cost = 15
+weapon_category = 5
+sub_group = 0
+bonus_min_range = 0
+bonus_max_range = 0
+hit = 15
+dmg = 0
+crit = 0
+dmg_type = 0
+effects = Array[ExtResource("1_t418x")]([ExtResource("2_u8n2y")])
+feature_id = "life_steal_rem"
+rule_type = 1
+sub_rule = 2
+metadata/_custom_type_script = "uid://cc71mceo7glas"

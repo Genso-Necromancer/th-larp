@@ -5,9 +5,9 @@ signal trade_requested
 
 @onready var unitPreview := $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/UnitPreviewPanel
 
-var unitButton = preload("res://scenes/GUI/unit_button.tscn")
-var unitMngrPL = preload("res://scenes/GUI/unit_manager.tscn")
-var unitManager
+var unitButton := preload("res://scenes/GUI/unit_button.tscn")
+var unitMngrPL := preload("res://scenes/GUI/unit_manager.tscn")
+var unitManager : Control
 var unitBars : Array = []
 
 
@@ -37,7 +37,7 @@ func init_roster(forcedDep, depLimit):
 	unitManager = unitMngrPL.instantiate()
 	call_deferred("_connect_manager_btns", unitManager)
 	unitPreview.add_child(unitManager)
-	unitManager.visible = false
+	close_unit_manager()
 	capLabel.set_text(str(depLimit))
 	capLabel.set_meta("Limit", depLimit)
 	for unit in units:
@@ -99,7 +99,8 @@ func _font_state_change(node, state := ""):
 	node.add_theme_color_override("font_hover_pressed_color", fColor)
 
 
-func open_unit_manager() -> Control:
+func open_unit_manager() -> Control: #need catch for which items to show
+	Global.focusUnit
 	unitManager.visible = true
 	return unitManager.buttonBox
 
@@ -126,4 +127,5 @@ func _connect_manager_btns(manager):
 
 
 func _on_focus_changed(_unit:Unit):
-	if visible: unitPreview.update_prof()
+	if visible: 
+		unitPreview.update_prof()

@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Aura" load_steps=3 format=3 uid="uid://dffc4e120afkd"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_drvrc"]
+[ext_resource type="Script" uid="uid://blrufmbqn5ftl" path="res://unit_resources/auras/aura.gd" id="1_w7b47"]
+
+[resource]
+script = ExtResource("1_w7b47")
+range = 0
+is_self = false
+target_team = 0
+target = 0
+effects = Array[ExtResource("1_drvrc")]([])
+id = ""
+rule_type = 0

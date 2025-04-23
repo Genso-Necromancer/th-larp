@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://dlu0fw6odwmn0"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_v7lr3"]
+[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_a2w6i"]
+
+[resource]
+script = ExtResource("2_a2w6i")
+augment = false
+target = 0
+can_miss = true
+can_crit = true
+can_dmg = true
+min_reach = 0
+max_reach = 0
+cost = 0
+weapon_category = 1
+sub_group = 0
+bonus_min_range = 0
+bonus_max_range = 0
+hit = 0
+dmg = 0
+crit = 0
+dmg_type = 0
+effects = Array[ExtResource("1_v7lr3")]([])
+feature_id = ""
+rule_type = 0
+metadata/_custom_type_script = "uid://cc71mceo7glas"

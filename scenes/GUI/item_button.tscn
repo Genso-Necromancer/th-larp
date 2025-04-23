@@ -3,9 +3,9 @@
 [ext_resource type="Theme" uid="uid://dpfc6p7ruw7wo" path="res://fonts/Izayoi_Theme_Items.tres" id="1_dvsi0"]
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_ofp1p"]
 [ext_resource type="Script" uid="uid://dga6degdfd1pu" path="res://scenes/GUI/item_button.gd" id="2_oouan"]
-[ext_resource type="Texture2D" uid="uid://ck144sy8g47hx" path="res://scenes/gungnir.png" id="3_dfpky"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_pqruf"]
 [ext_resource type="FontFile" uid="uid://dia8fvtnbbel2" path="res://fonts/Kalam/Kalam-Light.otf" id="4_h4p4o"]
+[ext_resource type="Texture2D" uid="uid://334jwhhfyadm" path="res://sprites/icons/items/missing_item.png" id="4_t4ocv"]
 
 [node name="ItemButton" type="PanelContainer"]
 offset_right = 282.0
@@ -39,11 +39,11 @@ size_flags_horizontal = 0
 size_flags_vertical = 4
 
 [node name="Icon" type="TextureRect" parent="ContentMargin/HBoxContainer"]
-custom_minimum_size = Vector2(30, 30)
+custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
-texture = ExtResource("3_dfpky")
+texture = ExtResource("4_t4ocv")
 expand_mode = 1
 stretch_mode = 5
 
@@ -63,14 +63,14 @@ theme_override_font_sizes/font_size = 15
 text = "Eq."
 vertical_alignment = 2
 
-[node name="Name" type="Label" parent="ContentMargin/HBoxContainer"]
+[node name="Name" type="RichTextLabel" parent="ContentMargin/HBoxContainer"]
 custom_minimum_size = Vector2(190, 26)
 layout_mode = 2
 size_flags_vertical = 8
+bbcode_enabled = true
 text = "Item Name"
+scroll_active = false
 vertical_alignment = 1
-clip_text = true
-text_overrun_behavior = 3
 
 [node name="Durability" type="Label" parent="ContentMargin/HBoxContainer"]
 custom_minimum_size = Vector2(54, 26)

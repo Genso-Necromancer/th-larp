@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=4 format=3 uid="uid://bt4av6jfrwk5g"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_sjtpx"]
+[ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="2_dtir2"]
+[ext_resource type="Resource" uid="uid://clgmqp2u21lb5" path="res://unit_resources/effects/grant_spell_basic_fire.tres" id="2_s6uek"]
+
+[resource]
+resource_name = "book_fire"
+script = ExtResource("2_dtir2")
+dmg = 1
+hit = 70
+crit = 0
+barrier = 0
+barrier_chance = 0
+min_reach = 1
+max_reach = 1
+damage_type = 1
+personal = false
+level = 1
+use = false
+equippable = true
+breakable = true
+expendable = true
+trade = true
+max_dur = 10
+category = 9
+sub_group = 0
+effects = Array[ExtResource("1_sjtpx")]([ExtResource("2_s6uek")])
+id = "book_fire"
+rule_type = 0
+metadata/_custom_type_script = "uid://b7y6ry7pkb23i"

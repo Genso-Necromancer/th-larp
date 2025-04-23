@@ -1,10 +1,10 @@
 extends Node
-
 class_name MapManager
 
 @onready var gameBoard :GameBoard = $Gameboard
 @onready var guiManager :GUIManager = $CanvasLayer/GUIManager
-
+var dialogie_overlay := preload("res://scenes/cutscenes/dialog_overlay.tscn")
+var dOverlay : DialogueOverlay
 
 func _ready():
 	gameBoard.map_loaded.connect(self._on_map_loaded)
@@ -20,7 +20,14 @@ func load_map(map):
 	gameBoard.change_map(map)
 
 
+func load_cutscene():
+	dOverlay = dialogie_overlay.instantiate()
+	$CanvasLayer.add_child(dOverlay)
+
 func _on_map_loaded(map:GameMap):
+	
+	#SignalTower.fader_fade_in.emit()
+	#await SignalTower.fade_in_complete
 	var chNum = map.chapterNumber
 	var chTitle = map.title
 	var timeString : String = Global.time_to_string(map.hours,map.minutes)
@@ -29,6 +36,10 @@ func _on_map_loaded(map:GameMap):
 
 ##GUI-Gameboard communication
 func _on_gui_splash_finished():
+	dOverlay.prepare_new_dialogue(gameBoard.currMap.start_script)
+	await dOverlay.dialog_finished
+	dOverlay.queue_free()
+	GameState.change_state(self, GameState.gState.LOADING)
 	guiManager.call_setup(gameBoard.depCap, gameBoard.forcedDeploy.keys(), gameBoard.currMap)
 
 

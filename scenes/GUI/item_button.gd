@@ -44,27 +44,39 @@ func _ready():
 	button.focus_entered.connect(self._on_focus_entered)
 	button.focus_exited.connect(self._on_focus_exited)
 	_set_button_meta()
-	if metaSet and get_meta("ID") == "NONE":
+	if  get_meta("Item") and get_meta("Item") is String: pass
+	elif get_meta("Item") and get_meta("Item").id == "unarmed":
 		toggle_icon()
 	
 
 
-func set_item_text(string : String, durability : String):
+func set_item_text(item : SlotWrapper):
 	var n = $ContentMargin/HBoxContainer/Name
 	var d = $ContentMargin/HBoxContainer/Durability
-	n.set_text(string)
-	if durability == "-1":
-		durability = ""
-	d.set_text(durability)
+	var durString
+	var dur : int = item.dur
+	var mDur : int = item.max_dur
+	if !item.breakable:
+		durString = str(" --")
+	elif mDur == -1:
+		durString = ""
+	else:
+		durString = (str(dur) + "/" + str(mDur))
+	n.set_text(StringGetter.get_item_name(item))
+	d.set_text(durString)
 	
 	#if fSize:
 		#n.add_theme_font_size_override("font_size", fSize)
 		#d.add_theme_font_size_override("font_size", fSize)
 	
-func set_item_icon(icon : String):
+func set_item_icon(icon_path : String):
 	var i = $ContentMargin/HBoxContainer/Icon
-	i.set_texture(load(icon))
-	
+	if ResourceLoader.exists(icon_path):
+		i.set_texture(load(icon_path))
+	else:
+		print("item_button/set_item_icon: invalid icon path[", icon_path,"]")
+		i.set_texture(load("res://sprites/icons/items/missing_item.png"))
+
 
 func toggle_icon():
 	var i = $ContentMargin/HBoxContainer/Icon
@@ -121,7 +133,7 @@ func set_meta_data(item, unit, index, canTrade:=false):
 	set_meta("Unit", unit)
 	set_meta("Index", index)
 	set_meta("CanTrade", canTrade)
-	if item is Dictionary and item.Equip:
+	if item is Item and item.equipped:
 		isEquipped = true
 		_set_equipped(true)
 	set_meta("Equipped", isEquipped)

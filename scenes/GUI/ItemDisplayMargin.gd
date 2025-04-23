@@ -4,15 +4,11 @@ class_name ItemDisplay
 
 
 func update_stat_values(control:Control):
+	var id = control.get_meta("ID")
 	get_tree().call_group("ValueLabels", "update_value", control.get_meta("ID"), control.get_meta("Type"))
-	_check_extra_params(control.get_meta("ID"), control.get_meta("Type"))
+	_check_extra_params(control.get_meta("ID"))
 
-func _check_extra_params(id:String, type:String):
+func _check_extra_params(data:SlotWrapper):
 	var efftag := $ToolTipVBox/StatPanel/VBoxContainer/EffectTitleBox
-	var data:Dictionary
-	match type:
-		"Item": data = UnitData.itemData[id]
-		"Skill": data = UnitData.skillData[id]
-	if data.get("Effects",false): efftag.visible = true
+	if data.effects: efftag.visible = true
 	else: efftag.visible = false
-	

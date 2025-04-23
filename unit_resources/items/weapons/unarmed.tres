@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Weapon" load_steps=3 format=3 uid="uid://ddrtkmbrgslwq"]
+
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="1_7k3n7"]
+[ext_resource type="Resource" uid="uid://bvde7og1xou31" path="res://unit_resources/items/weapons/unarmed_resource.tres" id="1_kn8us"]
+
+[resource]
+resource_name = "unarmed"
+script = ExtResource("1_7k3n7")
+stats = ExtResource("1_kn8us")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"

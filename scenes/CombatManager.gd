@@ -3,15 +3,11 @@ class_name CombatManager
 signal combat_resolved
 signal time_factor_changed
 signal warp_selected
-signal jobs_done_cmbtmnger
 
 var ACTION_TYPE = Enums.ACTION_TYPE
-
 var rng = Global.rng
-var fcData := {}
-
+var fcData : Dictionary[Unit,Dictionary] = {}
 var fateChance = 15
-
 
 #var canReach = false
 var gameBoard
@@ -21,11 +17,10 @@ func init_manager():
 	gameBoard = get_parent()
 
 #FORECAST FUNCTIONS
-
 	##fcData Heirarchy
 	##fcData
 	##	[Unit]
-	##		SkillId
+	##		skill
 	##		Initiator
 	##		combat
 	##			CanMiss
@@ -44,18 +39,18 @@ func init_manager():
 	##		Swings
 	##		Counter
 	##		Reach
-func get_forecast(a: Unit, t: Unit, action) -> Dictionary: #HERE Augments not implemented!!!
+func get_forecast(a: Unit, t: Unit, action:Dictionary) -> Dictionary: #HERE Augments not implemented!!!
 	var op : Unit
 	var isSelf := false
 	fcData = {a:{},t:{}}
 
 	
-	fcData[a]["SkillId"] = action.Skill
+	fcData[a]["Skill"] = action.Skill
 	fcData[a]["Initiator"] = true
 	if a == t:
 		isSelf = true
 	else:
-		fcData[t]["SkillId"] = false
+		fcData[t]["Skill"] = false
 		fcData[t]["Initiator"] = false
 	
 	for unit in fcData:
@@ -70,7 +65,7 @@ func get_forecast(a: Unit, t: Unit, action) -> Dictionary: #HERE Augments not im
 				fcData[unit]["Reach"] = _reach_check(a, t)
 		
 		fcData[unit]["Combat"] = _evaluate_clash(unit, op, action)
-		fcData[unit]["Effects"] = _evaluate_effects(unit, op, fcData[unit].SkillId)
+		fcData[unit]["Effects"] = _evaluate_effects(unit, op, fcData[unit].Skill)
 		
 		if action.Skill:
 			fcData[unit]["Swings"] = _get_skill_swing_count(action.Skill)
@@ -102,58 +97,54 @@ func get_forecast(a: Unit, t: Unit, action) -> Dictionary: #HERE Augments not im
 	return fcData
 
 
-func _evaluate_effects(a: Unit, t: Unit, skillId = false): ##returns proc chances of each effect on a skill or weapon. Returns false if there are none.
+func _evaluate_effects(a: Unit, t: Unit, skill :Skill= null): ##returns proc chances of each effect on a skill or weapon. Returns false if there are none.
 	#HERE
 	#Only considers effects with Target: "Target", some "Self" effects may be relevant.
-	#Does not consider "effect" damage, "skill" damage is handled in _evaluate_clash()
+	#Does not consider "effect" damage, "Skill" damage is handled in _evaluate_clash()
 	
 	#need updating after effect handling is finished. Also lacks "action" compatability
-	var attack : Dictionary
+	var attack :SlotWrapper
 	var chance : int = a.combatData.EffHit
 	var resist : int = t.combatData.Resist
 	var results : Dictionary = {}
-	var skillData = UnitData.skillData
-	var effectData = UnitData.effectData
 	
-	if skillId:
-		attack = skillData[skillId]
+	if skill:
+		attack = skill
 	else:
 		attack = a.get_equipped_weapon()
-	if !attack.has("Effects"):
-		return false
+	if attack.effects.size() < 0: return false
 	
-	for id in attack.Effects:
-		var effect = effectData[id]
-		var value = effect.Value
-		results[id] = {}
+	for effect in attack.effects:
+		var value = effect.value
+		results[effect] = {}
 			
-		if effect.Target != Enums.EFFECT_TARGET.TARGET:
-			results[id]["Self"] = true
-		else: results[id]["Self"] = false
+		if effect.target != Enums.EFFECT_TARGET.TARGET:
+			results[effect]["Self"] = true
+		else: results[effect]["Self"] = false
 		
-		if effect.Proc == -1:
-			results[id]["Proc"] = false
-		elif results[id].Self:
-			results[id]["Proc"] = chance + effect.Proc
-			results[id].Proc = clampi(results[id].Proc, 0, 100)
+		if effect.proc == -1:
+			results[effect]["Proc"] = false
+		elif results[effect].Self:
+			results[effect]["Proc"] = chance + effect.proc
+			results[effect].Proc = clampi(results[effect].proc, 0, 100)
 		else:
-			results[id]["Proc"] = (chance + effect.Proc) - resist
-			results[id].Proc = clampi(results[id].Proc, 0, 100)
+			results[effect]["Proc"] = (chance + effect.proc) - resist
+			results[effect].Proc = clampi(results[effect].proc, 0, 100)
 			
-		if value and effect.Type == Enums.EFFECT_TYPE.DAMAGE:
-			results[id]["Value"] = _factor_dmg(t, effect)
-		elif value and effect.Type == Enums.EFFECT_TYPE.HEAL:
-			results[id]["Value"] = _factor_healing(a, t, effect)
+		if value and effect.type == Enums.EFFECT_TYPE.DAMAGE:
+			results[effect]["Value"] = _factor_dmg(t, effect)
+		elif value and effect.type == Enums.EFFECT_TYPE.HEAL:
+			results[effect]["Value"] = _factor_healing(a, t, effect)
 		elif typeof(value) == Variant.Type.TYPE_FLOAT:
 			var v = value * 100
 			v = round(v)
-			results[id]["Value"] = v
+			results[effect]["Value"] = v
 		else:
-			results[id]["Value"] = value
+			results[effect]["Value"] = value
 			
-		if effect.Type == Enums.EFFECT_TYPE.SLAYER and effect.Rule == t.SPEC_ID:
-			results[id]["Slayer"] = true
-		else: results[id]["Slayer"] = false
+		if effect.type == Enums.EFFECT_TYPE.SLAYER and effect.sub_rule == t.SPEC_ID:
+			results[effect]["Slayer"] = true
+		else: results[effect]["Slayer"] = false
 			
 	
 	if results.size() > 0:
@@ -162,28 +153,26 @@ func _evaluate_effects(a: Unit, t: Unit, skillId = false): ##returns proc chance
 		return false
 
 
-func _evaluate_clash(a, t, action):
-	var results = {}
+func _evaluate_clash(a:Unit, t:Unit, action:Dictionary) -> Dictionary:
+	var results := {}
 	var aData
-	var tData = t.combatData
-	var tAct = t.activeStats
-	var skill : Dictionary
-	var skillData = UnitData.skillData
-	var skillId = action.Skill
+	var tData := t.combatData
+	var tAct := t.activeStats
+	var skill : Skill
 	
 	if !action.Skill:
 		aData = a.combatData
 	else:
-		aData = a.get_skill_combat_stats(skillId, action.Weapon)
-		skill = skillData[skillId]
+		aData = a.get_skill_combat_stats(skill, action.Weapon)
+		skill = action.Skill
 	
-	if skillId:
+	if skill:
 		results["CanMiss"] = skill.CanMiss
 	else: results["CanMiss"] = true
 	results["Hit"] = aData.Hit - tData.Graze
 	results.Hit = clampi(results.Hit, 0, 1000)
 	
-	if skillId and !skill.CanDmg:
+	if skill and !skill.CanDmg:
 		results["CanDmg"] = false
 	else:
 		var d := 0
@@ -198,14 +187,14 @@ func _evaluate_clash(a, t, action):
 		results["Dmg"] = aData.Dmg - d
 		results.Dmg = clampi(results.Dmg, 0, 1000)
 		
-	if skillId and !skill.CanCrit:
+	if skill and !skill.CanCrit:
 		results["CanCrit"] = false
 	else:
 		results["CanCrit"] = true
 		results["Crit"] = aData.Crit - tData.Luck
 		results.Crit = clampi(results.Crit, 0, 1000)
 	
-	if !skillId:
+	if !skill:
 		results["Barrier"] = results.Dmg - tData.Barrier
 		results["BarPrc"] = tData.BarPrc
 	else:
@@ -213,7 +202,7 @@ func _evaluate_clash(a, t, action):
 		results["BarPrc"] = false
 		
 		
-	if _speed_check(a, t) and !skillId:
+	if _speed_check(a, t) and !skill:
 		results["FUP"] = true
 	else:
 		results["FUP"] = false
@@ -230,10 +219,9 @@ func _get_remaining_life(unit, dmg, swings = false):
 
 
 func _reach_check(unit, target) -> bool:
-	var itemData = UnitData.itemData
 	var tWep = target.get_equipped_weapon()
-	var minR = itemData[tWep.ID].MinRange
-	var maxR = itemData[tWep.ID].MaxRange
+	var minR = tWep.min_reach
+	var maxR = tWep.max_reach
 	var hexStar = AHexGrid2D.new(Global.flags.CurrentMap)
 	var distance = hexStar.find_distance(unit.cell, target.cell)
 	if distance >= minR and distance <= maxR:
@@ -324,14 +312,12 @@ func _get_action_type(unit1:Unit, unit2:Unit, action: Dictionary) -> int:
 		return ACTION_TYPE.HOSTILE_SKILL
 
 func _get_death_match(unit : Unit, action: Dictionary):
-	var skillData = UnitData.skillData
-	var effectData = UnitData.effectData
 	var deathMatch = unit.get_multi_round()
 	if !action.Skill or deathMatch:
 		return deathMatch
-	for effect in skillData[action.Skill].Effects:
-		if effectData[effect].Type == Enums.EFFECT_TYPE.MULTI_ROUND:
-			deathMatch = effectData[effect].Value
+	for effect in action.Skill.effects:
+		if effect.type == Enums.EFFECT_TYPE.MULTI_ROUND:
+			deathMatch = effect.value
 	return deathMatch
 	
 
@@ -356,9 +342,9 @@ func _validate_response(actor, target, lastAct, deathMatch, actionType) -> bool:
 			print("Failed. Dmg taken while not in Death Match")
 			return false
 		elif lastAct[swing].Effects:
-			for effect in lastAct[swing].Effects:
-				if !effect.Resisted and !deathMatch:
-					print("Failed. Effect not Resisted: ", str(effect.EffectId))
+			for effResult in lastAct[swing].Effects:
+				if !effResult.Resisted and !deathMatch:
+					print("Failed. Effect not Resisted: ", str(effResult.id))
 					return false
 	print("Success, all checks passed.")
 	return true
@@ -383,7 +369,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 	var critDmg : int = 0
 	var grzDef : int = 0
 	var slayerMulti := 1
-	var weapon : Dictionary
+	var weapon : Weapon
 	var unitEffects
 	var multiSwing = false
 	var swings = 1
@@ -403,7 +389,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 	if action.Skill:
 		skillData = UnitData.skillData[action.Skill]
 		unitCompCost += _factor_combat_composure(unit, unit, skillData.Cost)
-		print("Skill Cost comp loss added: ",unit.unitName, " ", unitCompCost)
+		print("skill Cost comp loss added: ",unit.unitName, " ", unitCompCost)
 		multiSwing = _get_skill_swing_count(action.Skill)
 	else:
 		multiSwing = unit.get_multi_swing()
@@ -417,7 +403,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			print("Basic attack comp loss added: ",unit.unitName, " ", unitCompCost)
 		swingIndx = ("Swing" + str(swing))
 		print(str(swingIndx))
-		outcome[unit] = {swingIndx:{"ActionType": actionType, "Hit" : false, "CompLoss": 0, "Dmg" : 0, "Crit" : 0, "SkillId" : action.Skill, "PassiveProc" : [], "Instant" : [], "Effects" : [], "Break" : false, "Slayer" : 0}}
+		outcome[unit] = {swingIndx:{"ActionType": actionType, "Hit" : false, "CompLoss": 0, "Dmg" : 0, "Crit" : 0, "Skill" : action.Skill, "PassiveProc" : [], "Instant" : [], "Effects" : [], "Break" : false, "Slayer" : 0}}
 		outcome[target] = {swingIndx:{"Barrier" : 0, "CompLoss": 0, "PassiveProc" : [], "Effects" : [], "Dead" : false,}}
 		
 		if action.Skill and action.Weapon:
@@ -434,11 +420,11 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			
 		unitEffects = _get_action_effects(unit, action)
 		
-		for effId in unitEffects.Instant:
+		for effect in unitEffects.instant:
 			print("Checking Instant Effects....")
-			var effectResult = [_run_effect(unit, target, effId, actionType)]
-			outcome[unit][swingIndx].Instant = outcome[unit][swingIndx].Instant + effectResult
-			#outcome[unit][swingIndx].PassiveProc.append(effId)
+			var effectResult = [_run_effect(unit, target, effect, actionType)]
+			outcome[unit][swingIndx].instant = outcome[unit][swingIndx].instant + effectResult
+			#outcome[unit][swingIndx].PassiveProc.append(effect)
 			if effectResult[0].Slayer:
 				slayerMulti = Global.slayerMulti
 		#check units passive procs
@@ -470,8 +456,8 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			
 		
 		if !outcome[unit][swingIndx].Hit:
-			for effId in unitEffects.Always:
-				outcome[unit][swingIndx].Effects = outcome[unit][swingIndx].Effects + _run_effect(unit, target, effId, actionType)
+			for effect in unitEffects.always:
+				outcome[unit][swingIndx].Effects = outcome[unit][swingIndx].Effects + _run_effect(unit, target, effect, actionType)
 			#if outcome[unit][swingIndx].Effects and outcome[unit][swingIndx].Effects.size() <= 0:
 				#outcome[unit][swingIndx].Effects = false
 			if outcome[unit][swingIndx].Effects:
@@ -529,13 +515,13 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			
 			targetCompCost += _factor_combat_composure(unit, target, triggers.WAS_HIT, finalDmg)
 			print("Was Hit Comp Loss added: ", target.unitName, " ", targetCompCost)
-			for effId in unitEffects.OnHit:
+			for effect in unitEffects.on_hit:
 				print("Checking On Hit Effects....")
-				outcome[unit][swingIndx].Effects.append(_run_effect(unit, target, effId, actionType, finalDmg))
+				outcome[unit][swingIndx].Effects.append(_run_effect(unit, target, effect, actionType, finalDmg))
 				
-			for effId in unitEffects.Always:
+			for effect in unitEffects.always:
 				print("Checking Always Effects....")
-				outcome[unit][swingIndx].Effects.append(_run_effect(unit, target, effId, actionType, finalDmg))
+				outcome[unit][swingIndx].Effects.append(_run_effect(unit, target, effect, actionType, finalDmg))
 			if outcome[unit][swingIndx].Effects:
 				unitCompCost += _get_composure_total(unit, outcome[unit][swingIndx].Effects)
 				targetCompCost += _get_composure_total(target, outcome[unit][swingIndx].Effects)
@@ -555,8 +541,6 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.BREAK)
 			print("Break Composure Loss added: ", unit.unitName, " ", unitCompCost)
 			
-		#if outcome[unit][swingIndx].Effects and outcome[unit][swingIndx].Effects.size() <= 0:
-				#outcome[unit][swingIndx].Effects = false
 				
 		outcome[unit][swingIndx].CompLoss = unitCompCost
 		unit.apply_composure(unitCompCost)
@@ -602,69 +586,50 @@ func get_roll():
 	print("Roll: ", roll)
 	return roll
 
-func _get_effects(id) -> Array:
+func _get_effects(res:SlotWrapper) -> Array:
 	var effects := []
 	var seen := []
-	for effId in id.Effects:
-		var effect = UnitData.effectData[effId]
-		if effect.Target != Enums.EFFECT_TARGET.EQUIPPED and !seen.has(effId):
-			effects.append(effId)
-		seen.append(effId)
+	for effect in res.effects:
+		if effect.target != Enums.EFFECT_TARGET.EQUIPPED and !seen.has(effect):
+			effects.append(effect)
+		seen.append(effect)
 	return effects
 
-func _get_action_effects(unit, action) -> Dictionary:
+func _get_action_effects(unit:Unit, action:Dictionary) -> Dictionary:
 	var weapon
 	var augment
-	var skillData = UnitData.skillData
-	var itemData = UnitData.itemData
-	var unitEffects
+	var unitEffects : Array[Effect]
 	if action.Skill and action.Weapon:
-		weapon = itemData[unit.get_equipped_weapon().ID]
-		augment = skillData[action.Skill]
+		weapon = unit.get_equipped_weapon()
+		augment = action.Skill
 		unitEffects = _get_effects(augment)
 		unitEffects = unitEffects + _get_effects(weapon)
 	elif action.Skill:
-		augment = skillData[action.Skill]
+		augment = action.Skill
 		unitEffects = _get_effects(augment)
 	elif action.Weapon:
-		weapon = itemData[unit.get_equipped_weapon().ID]
+		weapon = unit.get_equipped_weapon()
 		unitEffects = _get_effects(weapon)
-	unitEffects = _sort_instant(unitEffects)
-	return unitEffects
+	return _sort_instant(unitEffects)
 
-func _sort_instant(effectArray) -> Dictionary:
+func _sort_instant(effectArray:Array[Effect]) -> Dictionary:
 	var effects := {"Instant":[], "OnHit":[], "Always":[]}
-	for effId in effectArray:
-		var effect = UnitData.effectData[effId]
-		if effect.Instant:
-			effects.Instant.append(effId)
-		elif effect.OnHit:
-			effects.OnHit.append(effId)
-		elif !effect.OnHit:
-			effects.Always.append(effId)
+	for effect:Effect in effectArray:
+		if effect.instant:
+			effects.instant.append(effect)
+		elif effect.on_hit:
+			effects.on_hit.append(effect)
+		elif !effect.on_hit:
+			effects.always.append(effect)
 	return effects
-	
-#func _get_swing_count(unit, action) -> int:
-	#var swings := 1
-	#var unitSwings = unit.get_multi_swing()
-	#var unitWeapon = UnitData.itemData[unit.get_equipped_weapon().ID]
-	#var weaponSwings := 0
-	#if unitWeapon.Effects:
-		#for effId in unitWeapon.Effects:
-			#if UnitData.effectData[effId].Type == Enums.EFFECT_TYPE.MULTI_SWING and UnitData.effectData[effId].Value > weaponSwings:
-				#weaponSwings = UnitData.effectData[effId].Value
-	#if unitSwings and unitSwings > weaponSwings and unitSwings > swings:
-		#swings = unitSwings
-	#elif weaponSwings > swings:
-		#swings = weaponSwings
-	#return swings
-	
-func _get_skill_swing_count(skillId):
+
+
+func _get_skill_swing_count(skill):
 	var swings := 1
 	var skillSwings := 0
-	for effId in UnitData.skillData[skillId].Effects:
-		if UnitData.effectData[effId].Type == Enums.EFFECT_TYPE.MULTI_SWING and UnitData.effectData[effId].Value > skillSwings:
-				skillSwings = UnitData.effectData[effId].Value
+	for effect in skill.effects:
+		if effect.type == Enums.EFFECT_TYPE.MULTI_SWING and effect.value > skillSwings:
+				skillSwings = effect.value
 	if skillSwings > swings:
 		swings = skillSwings
 	return swings
@@ -672,75 +637,74 @@ func _get_skill_swing_count(skillId):
 #func _get_weapon_swing_count()
 	
 
-func _run_effect(actor, target, effId, actionType, dmg = 0):
+func _run_effect(actor:Unit, target:Unit, effect:Effect, actionType:Enums.ACTION_TYPE, dmg := 0):
 	var targetCd = target.combatData
 	var actorCd = actor.combatData
 	var focus : Unit
 	#var proc : bool = false
-	var result = {"Actor":false,"Type":false, "Target": false,"EffectId": effId, "Resisted": false, "Dmg": false, "Heal": false, "Comp": false, "Slayer": false}
-	var effect = UnitData.effectData[effId]
+	var result = {"Actor":false,"Type":false, "Target": false,"EffectId": effect, "Resisted": false, "Dmg": false, "Heal": false, "Comp": false, "Slayer": false}
 	var chance := 0 
 	var type = Enums.EFFECT_TYPE
 	
 	
-	match effect.Target:
+	match effect.target:
 		Enums.EFFECT_TARGET.TARGET: 
 			focus = target
-			chance = effect.Proc + actorCd.EffHit - targetCd.Resist
+			chance = effect.proc + actorCd.EffHit - targetCd.Resist
 		Enums.EFFECT_TARGET.SELF, Enums.EFFECT_TARGET.GLOBAL: 
 			focus = actor
-			chance = effect.Proc + actorCd.EffHit
+			chance = effect.proc + actorCd.EffHit
 	result.Target = focus
 	result.Actor = actor
-	result.Type = effect.Type
+	result.Type = effect.type
 	if actionType == ACTION_TYPE.FRIENDLY_SKILL:
-		chance = effect.Proc + actorCd.EffHit
+		chance = effect.proc + actorCd.EffHit
 			
 	if _roll_proc(effect, chance):
-		match effect.Type:
+		match effect.type:
 			#Need to go through and enable each effect one at a time
 			type.TIME:
-				emit_signal("time_factor_changed", " EffectId: ", effId)
+				emit_signal("time_factor_changed", " EffectId: ", effect)
 			type.BUFF:
-				focus.set_buff(effId, effect)
+				focus.set_buff(effect)
 				
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effId), " Buffed ", str(effect.SubType), " by +", effect.Value, " for ", effect.Duration, " rounds.")
+				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Buffed ", str(effect.sub_type), " by +", effect.value, " for ", effect.Duration, " rounds.")
 			type.DEBUFF: 
 				#"Debuffs" are resistable, possibly different general FXs, too. Remember this. need resist code.
-				focus.set_buff(effId, effect)
+				focus.set_buff(effect)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				focus.apply_composure(result.Comp)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effId), " Buffed ", str(effect.SubType), " by +", effect.Value, " for ", effect.Duration, " rounds.")
+				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Buffed ", str(effect.sub_type), " by +", effect.value, " for ", effect.Duration, " rounds.")
 			type.STATUS: 
 				focus.set_status(effect)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				focus.apply_composure(result.Comp)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effId), " Applied Status: ", str(effect.SubType), " for ", effect.Duration, " rounds.")
+				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Applied Status: ", str(effect.sub_type), " for ", effect.Duration, " rounds.")
 			type.DAMAGE:
 				result.Dmg = _factor_dmg(focus, effect)
 				target.apply_dmg(result.Dmg, actor)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effId), " Inflicted Damage: ", effect.Value, " HP: ", target.activeStats.CurLife)
+				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Inflicted Damage: ", effect.value, " HP: ", target.activeStats.CurLife)
 			type.HEAL:
 				result.Heal = _factor_healing(actor, focus, effect)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				target.apply_heal(result.Heal)
 				target.apply_composure(result.Comp)
 				
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effId), " Healed For: ", result.Heal, " HP: ", target.activeStats.CurLife)
+				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Healed For: ", result.Heal, " HP: ", target.activeStats.CurLife)
 			type.CURE:
-				target.cure_status(effect.SubType)
+				target.cure_status(effect.sub_type)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				target.apply_composure(result.Comp)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effId), " Cured Status: ", str(effect.SubType))
+				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Cured Status: ", str(effect.sub_type))
 			type.RELOC:
 				#start_relocation(actor, focus, effect)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effId), "Relocation Requested")
+				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), "Relocation Requested")
 			type.LIFE_STEAL:
 				result.Heal = _factor_life_steal(focus, effect, dmg)
 				result.Comp = _factor_effect_composure(actor, focus, effect, result.Heal)
 				focus.apply_heal(result.Heal)
 				focus.apply_composure(result.Comp)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effId), " Life Steal: ", result.Heal, " HP: ", target.activeStats.CurLife)
+				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Life Steal: ", result.Heal, " HP: ", target.activeStats.CurLife)
 			#type.ADD_SKILL: pass
 			#type.ADD_PASSIVE: pass
 			#type.MULTI_SWING: pass
@@ -752,11 +716,11 @@ func _run_effect(actor, target, effId, actionType, dmg = 0):
 		gameBoard.add_post_queue(result.duplicate())
 	else:
 			result.Resisted = true
-			print("Actor: ", actor.unitName, "Target: ", focus.unitName, " Resisted: " + str(effId))
+			print("Actor: ", actor.unitName, "Target: ", focus.unitName, " Resisted: " + str(effect))
 	return result
 
 func _roll_proc(effect, chance) -> bool:
-	if effect.Proc == -1:
+	if effect.proc == -1:
 		return true
 	elif get_roll() <= chance:
 		return true
@@ -767,8 +731,8 @@ func start_relocation(actor, target, effect): #determines method of relocation, 
 	var pivotHex
 	var matchHex
 	var type = Enums.SUB_TYPE
-	var reach = effect.Value
-	match effect.SubType:
+	var reach = effect.value
+	match effect.sub_type:
 		type.WARP: emit_signal("warp_selected", actor, target, reach)
 		type.SHOVE: 
 			pivotHex = target.cell
@@ -807,7 +771,7 @@ func warp_to(target, cell):
 func _factor_dmg(target, effect) -> int:
 	var targetCd = target.combatData
 	var dmg
-	dmg = effect.Value - targetCd.DRes[effect.SubType]
+	dmg = effect.value - targetCd.DRes[effect.sub_type]
 	return dmg
 
 func _factor_healing(actor, target, effect) -> int:
@@ -815,11 +779,11 @@ func _factor_healing(actor, target, effect) -> int:
 	#Add checks for bonus effects here
 	var statBonus : int
 	var healPower : int
-	if effect.FromItem:
+	if effect.from_item:
 		statBonus = 0
 	else:
 		statBonus = actor.activeStats.Mag
-	healPower = effect.Value + statBonus + bonusEff
+	healPower = effect.value + statBonus + bonusEff
 	print("Target Life: ", target.activeStats.CurLife, " Heal:", healPower, " New Life Total: ", target.activeStats.CurLife)
 	return healPower
 
@@ -827,7 +791,7 @@ func _factor_healing(actor, target, effect) -> int:
 func _factor_life_steal(target, effect, dmg) -> int:
 	var bonusEff := 0
 	var healPower : int
-	healPower = (dmg * effect.Value) + bonusEff
+	healPower = (dmg * effect.value) + bonusEff
 	print("Target Life: ", target.activeStats.CurLife, " Life Steal:", healPower, " New Life Total: ", target.activeStats.CurLife)
 	return healPower
 
@@ -838,15 +802,15 @@ func _factor_effect_composure(actor, target, effect, lifeStolen: int = 0) -> int
 	var actorBonus = 1
 	if actor != target:
 		actorBonus = 1 + (actor.combatData.CompBonus / 100)
-	match effect.Type:
+	match effect.type:
 		Enums.EFFECT_TYPE.HEAL:
-			compLoss += Global.compCosts.Healed + (effect.Value / 4)
+			compLoss += Global.compCosts.Healed + (effect.value / 4)
 		Enums.EFFECT_TYPE.CURE:
 			compLoss += Global.compCosts.Healed
 		Enums.EFFECT_TYPE.DAMAGE:
-			compLoss += Global.compCosts.NegEff + (effect.Value / 4)
+			compLoss += Global.compCosts.NegEff + (effect.value / 4)
 		Enums.EFFECT_TYPE.STATUS:
-			if effect.SubType == Enums.SUB_TYPE.SLEEP:
+			if effect.sub_type == Enums.SUB_TYPE.SLEEP:
 				compLoss -= 1
 			else: compLoss += Global.compCosts.NegEff
 		Enums.EFFECT_TYPE.LIFE_STEAL:
@@ -856,7 +820,7 @@ func _factor_effect_composure(actor, target, effect, lifeStolen: int = 0) -> int
 	compLoss = round((compLoss * actorBonus) * targetRes)
 	return compLoss
 
-func _factor_combat_composure(actor, target, type, dmg := 0) -> int: ##Pass Skill Cost through dmg
+func _factor_combat_composure(actor, target, type, dmg := 0) -> int: ##Pass skill Cost through dmg
 	var compLoss := 0
 	var targetRes = 1 - (target.combatData.CompRes / 100)
 	var actorBonus = 1
@@ -889,24 +853,21 @@ func _get_composure_total(unit, results):
 			compLoss += result.Comp
 	return compLoss
 	
-func use_item(unit, target, invItem) -> Array: #not exactly finished. Missing support for user feed back on all item types.
-	var itemData = UnitData.itemData
+func use_item(unit:Unit, target:Unit, item:Item) -> Array: #not exactly finished. Missing support for user feed back on all item types.
 	var actionType = _get_action_type(unit, target, {"Weapon": false, "Skill": false})
-	var item = itemData[invItem.ID]
 	var results = []
 	var compChange = 0
 	
-	for effId in item.Effects:
-		
-		results.append(_run_effect(unit, target, effId, actionType))
+	for effect in item.effects:
+		results.append(_run_effect(unit, target, effect, actionType))
 	compChange += _get_composure_total(unit, results)
 	print("Harvesting Effects Comp Loss.... ", unit.unitName, ": ", compChange)
 	unit.apply_composure(compChange)
-	unit.reduce_durability(invItem)
+	unit.reduce_durability(item)
 	return results
 
 func _validate_slayer(target, effect):
-	var rule = effect.Rule
+	var rule = effect.sub_rule
 	var species = target.SPEC_ID
 	#HERE effective immunity check goes here later
 	if rule == species:

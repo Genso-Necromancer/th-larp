@@ -6,60 +6,67 @@ var buffColor : Color = Color(0.392, 0.584, 0.929)
 var debuffColor : Color = Color(0.357, 0.141, 0.549)
 
 
-func get_passive(data: Dictionary) -> String:
-	var converted : Dictionary = data.duplicate()
+func get_passive(passive:Passive) -> String:
 	var enumKeys : Array = Enums.PASSIVE_TYPE.keys()
+	var properties := passive.get_property_names()
+	var converted:Dictionary
 	var finished : String
 	var working : String = ""
-	working = StringGetter.get_string("lore_" + Enums.PASSIVE_TYPE.keys()[data.Type].to_snake_case())
-
-	match data.Type:
+	working = StringGetter.get_string("lore_" + Enums.PASSIVE_TYPE.keys()[passive.type].to_snake_case())
+	for key in properties:
+		converted[key] = ""
+	match passive.type:
 		Enums.PASSIVE_TYPE.AURA: 
-			var aura : String
-			var morph : String
+			var aura : Aura
+			var morph : Aura
 			var reverseTime : String
 			var timeRule : String
 			var restrict : String
+			var auraData := {}
+			
 			match Global.timeOfDay:
 					Enums.TIME.NIGHT:
-						aura = str(data.get("Night", ""))
-						morph = str(data.get("Day", ""))
+						aura = passive.night
+						morph = passive.day
 						restrict = "night"
 						reverseTime = "day"
 					Enums.TIME.DAY:
-						aura = str(data.get("Day", ""))
-						morph = str(data.get("Night", ""))
+						aura = passive.day
+						morph = passive.night
 						restrict = "day"
 						reverseTime = "night"
-			if data.Night and data.Day:
+			if passive.night and passive.day:
 				timeRule = StringGetter.get_string("lore_morph_" + reverseTime)
-				timeRule = timeRule.format({"Morph":"[color=#FFD700]"+StringGetter.get_string("passive_name_"+morph.to_snake_case())+"[/color]"})
-			elif data.IsTimeSens:
+				timeRule = timeRule.format({"Morph":"[color=#FFD700]"+StringGetter.get_string("passive_name_"+str(morph.id).to_snake_case())+"[/color]"})
+			elif passive.is_time_sens:
 				timeRule = StringGetter.get_string("lore_restrict_" + restrict)
-			else: aura = data.Aura
+			else: aura = passive.aura
+			properties = aura.get_property_names()
+			for prop in properties:
+				auraData[prop] = aura[prop]
+				
 			
-			var auraData = UnitData.auraData[aura]
 			
-			if auraData.Range > 1:
-				converted["Range"] = StringGetter.get_string("lore_range")
-			else: converted["Range"] = StringGetter.get_string("lore_range_adjacent")
-			converted.Range = converted.Range.format(auraData)
-			converted["TargetTeam"] = StringGetter.get_string("lore_" + Enums.TARGET_TEAM.keys()[auraData.TargetTeam].to_snake_case())
+			if aura.range > 1:
+				converted["range"] = StringGetter.get_string("lore_range")
+			else: converted["range"] = StringGetter.get_string("lore_range_adjacent")
+			converted.range = converted.range.format(auraData)
+			converted["target_team"] = StringGetter.get_string("lore_" + Enums.TARGET_TEAM.keys()[auraData.target_team].to_snake_case())
 			
 			var first := true
-			converted["Effects"] = ""
+			converted["effects"] = ""
 			
-			for eff in auraData.Effects:
+			for eff in auraData.effects:
 				if !first:
 					first = false
-					converted.Effects += " & "
-				converted.Effects += StringGetter.get_effect_string(eff)
+					converted.effects += " & "
+				converted.effects += StringGetter.get_effect_string(eff)
 			
-			converted["Target"] = StringGetter.get_string("lore_aura_" + Enums.EFFECT_TARGET.keys()[auraData.Target].to_snake_case())
-			converted.Aura = converted.Target.format(converted)
+			converted["target"] = StringGetter.get_string("lore_aura_" + Enums.EFFECT_TARGET.keys()[auraData.target].to_snake_case())
+			converted.aura = converted.target.format(converted)
 			
 			if timeRule: 
-				converted.Aura += "\n" + timeRule
+				converted.aura += "\n" + timeRule
 				
 		Enums.PASSIVE_TYPE.VANTAGE: pass
 		Enums.PASSIVE_TYPE.NIGHT_PROT: pass
@@ -67,72 +74,73 @@ func get_passive(data: Dictionary) -> String:
 		Enums.PASSIVE_TYPE.STAT_CHANGE: pass
 		Enums.PASSIVE_TYPE.RESPONSE: pass
 		Enums.PASSIVE_TYPE.FATED: pass
-		Enums.PASSIVE_TYPE.SUB_WEAPON:  converted.SubType = StringGetter.get_string("lore_" + Enums.WEAPON_CATEGORY.keys()[data.SubType].to_snake_case())
+		Enums.PASSIVE_TYPE.SUB_WEAPON:  converted.sub_type = StringGetter.get_string("lore_" + Enums.WEAPON_CATEGORY.keys()[passive.sub_type].to_snake_case())
 	
-	converted.RuleType = StringGetter.get_string("lore_" + Enums.RULE_TYPE.keys()[data.get("RuleType",0)].to_snake_case())
+	converted.rule_type = StringGetter.get_string("lore_" + Enums.RULE_TYPE.keys()[passive.rule_type].to_snake_case())
 	
-	match data.get("RuleType",0):
+	match passive.rule_type:
 		Enums.RULE_TYPE.SELF_SPEC: enumKeys = Enums.SPEC_ID.keys()
 		Enums.RULE_TYPE.TIME: enumKeys = Enums.TIME.keys()
 		Enums.RULE_TYPE.TARGET_SPEC: enumKeys = Enums.SPEC_ID.keys()
-
-	converted.Rule = StringGetter.get_string("lore_" + enumKeys[data.get("Rule",0)].to_snake_case())
-	converted.RuleType = converted.RuleType.format(converted)
+	
+	if passive.sub_rule != null:
+		converted.sub_rule = StringGetter.get_string("lore_" + enumKeys[passive.sub_rule].to_snake_case())
+	converted.rule_type = converted.rule_type.format(converted)
 	finished = working.format(converted)
 	
 	return finished
 
 
-func get_skill(data:Dictionary) -> String:
+func get_skill(data:SlotWrapper) -> String:
 	var finished : String
 	var effectString := ""
 	var ruleString := ""
 	var working := ""
-	var converted := {}
-	for key in data:
+	var converted:Dictionary
+	for key in data.get_property_names():
 		if !data[key]:
 			continue
-		elif key == "Rule":
+		elif key == "rule":
 				continue
-		elif key == "RuleType":
+		elif key == "rule_type":
 			var value
-			#var ruleKey = Enums.RULE_TYPE.keys()[data.RuleType].to_snake_case()
+			#var ruleKey = Enums.RULE_TYPE.keys()[data.rule_type].to_snake_case()
 			match data[key]:
-				Enums.RULE_TYPE.TIME: value = "time_" + Enums.TIME.keys()[data.Rule].to_snake_case()
-				Enums.RULE_TYPE.TARGET_SPEC: value = "species_name_" + Enums.SPEC_ID.keys()[data.Rule].to_snake_case()
-				Enums.RULE_TYPE.SELF_SPEC: value = "species_name_" + Enums.SPEC_ID.keys()[data.Rule].to_snake_case()
+				Enums.RULE_TYPE.TIME: value = "time_" + Enums.TIME.keys()[data.sub_rule].to_snake_case()
+				Enums.RULE_TYPE.TARGET_SPEC: value = "species_name_" + Enums.SPEC_ID.keys()[data.sub_rule].to_snake_case()
+				Enums.RULE_TYPE.SELF_SPEC: value = "species_name_" + Enums.SPEC_ID.keys()[data.sub_rule].to_snake_case()
 				Enums.RULE_TYPE.MORPH: value = "time_" + Enums.TIME.keys()[Global.timeOfDay].to_snake_case()
-			converted["Rule"] = StringGetter.get_string(str(value))
+			converted["sub_rule"] = StringGetter.get_string(str(value))
 			#converted["Rule"] = StringGetter.get_string("lore_" + ruleKey + "_" + str(value))
-			ruleString = "{RuleType}"
-		elif key == "Effects":
+			ruleString = "{rule_type}"
+		elif key == "effects":
 			var first := true
 			var effString := ""
 			var effStringSelf := ""
-			var effStringTarget := ""
+			var effStringtarget := ""
 			var effStringGlobal := ""
 			var effStringEquip := ""
 			
-			for eff in data[key]:
-				var effData = UnitData.effectData[eff]
+			for effect in data.effects:
+				
 				var string := ""
 				if first: 
-					effectString = "{Effects}"
+					effectString = "{effects}"
 					first = false
 				else: string += "\n"
-				string += StringGetter.get_effect_string(eff)
-				match effData.Target:
+				string += StringGetter.get_effect_string(effect)
+				match effect.target:
 					Enums.EFFECT_TARGET.SELF: effStringSelf += string
-					Enums.EFFECT_TARGET.TARGET: effStringTarget += string
+					Enums.EFFECT_TARGET.TARGET: effStringtarget += string
 					Enums.EFFECT_TARGET.GLOBAL:  effStringGlobal += string
 					Enums.EFFECT_TARGET.EQUIPPED: effStringEquip += string
 				
 			if effStringSelf: 
 				effString += StringGetter.get_string("target_" + Enums.EFFECT_TARGET.keys()[Enums.EFFECT_TARGET.SELF].to_snake_case()) + "\n"
 				effString += effStringSelf
-			if effStringTarget: 
+			if effStringtarget: 
 				effString += StringGetter.get_string("target_" + Enums.EFFECT_TARGET.keys()[Enums.EFFECT_TARGET.TARGET].to_snake_case()) + "\n"
-				effString += effStringTarget
+				effString += effStringtarget
 			if effStringGlobal: 
 				effString += StringGetter.get_string("target_" + Enums.EFFECT_TARGET.keys()[Enums.EFFECT_TARGET.GLOBAL].to_snake_case()) + "\n"
 				effString += effStringGlobal
@@ -142,7 +150,7 @@ func get_skill(data:Dictionary) -> String:
 			
 			converted[key] = effString
 		
-		if key != "Effects": converted[key] = StringGetter.get_string(str(key+"_"+str(data[key])).to_snake_case())
+		if key != "effects" and key != "sub_rule": converted[key] = StringGetter.get_string(str(key+"_"+str(data[key])).to_snake_case())
 	
 	if ruleString and effectString:
 		working = ruleString + "\n" + effectString
@@ -202,8 +210,6 @@ func _generate_stat_tt(unit:Unit, keyBase:String, keyTotal:String, keyStat: Stri
 	var fString : String = ""
 	var finished : String
 	var stringPath:= "lore_"
-	#var dataPath = unit[keyTotal][keyStat]
-	#var wep = UnitData.itemData[unit.get_equipped_weapon().ID]
 	
 	if keyStat != "MoveType": 
 		fString = str(keyStat,": ",unit[keyBase][keyStat]," %s") % _generate_formula([(unit[keyTotal][keyStat] - unit[keyBase][keyStat])])

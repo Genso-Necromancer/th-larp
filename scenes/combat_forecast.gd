@@ -57,8 +57,14 @@ func update_fc(foreCast:Dictionary) -> void: #HERE labels need updating to using
 		var remainTemplate : String = StringGetter.get_template("combat_hp_remain")
 		var lifeText : String = "[center]%s[/center]"
 		var hp = lifeTemplate % [active.CurLife, units[i].baseStats.Life]
-		var wName = UnitData.itemData[units[i].get_equipped_weapon().ID].Name
-		
+		#var iconPath : String = "res://sprites/icons/items/%s/%s.png"
+		var wNamePath : String = "weapon_%s"
+		#var folder : String
+		#if item is Weapon: folder = "weapon"
+		#if item is Accessory: folder = "accessory"
+		#if item is Consumable: folder = "consumable"
+		#iconPath = iconPath % [folder, units[i].get_equipped_weapon().id]
+		wNamePath = wNamePath % [units[i].get_equipped_weapon().id]
 		
 		if !fcCombat.CanMiss and fcCounter and fcReach: hit = "TRUE" 
 		elif fcCombat.CanMiss and fcCounter and fcReach: hit = str(fcCombat.Hit)
@@ -68,7 +74,6 @@ func update_fc(foreCast:Dictionary) -> void: #HERE labels need updating to using
 		if fcCombat.CanCrit and fcCounter and fcReach:  crit = str(fcCombat.Crit)
 		
 		if fcSwings and fcCounter and fcReach and fcSwings > 1: dmg = dmg + " x" + str(fcSwings)
-		
 		
 		if fcCombat.has("Rlife") and active.CurLife != fcCombat.Rlife:
 			lifeText = lifeText % [remainTemplate]
@@ -81,12 +86,13 @@ func update_fc(foreCast:Dictionary) -> void: #HERE labels need updating to using
 		groups[g][2].set_text(hit)
 		groups[g][3].set_text(dmg)
 		groups[g][4].set_text(crit)
-		groups[g][5].set_text(wName)
+		groups[g][5].set_text(StringGetter.get_string(wNamePath))
 		#HERE check for swing count for visual representation
 		i += 1
 	if foreCast[units[0]].Effects or foreCast[units[(i-1)]].Effects:
 		_load_effects(foreCast)
-	
+
+
 func _load_effects(cmbData) -> void:
 	var units : Array = cmbData.keys()
 	var lists : Dictionary

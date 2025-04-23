@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Aura" load_steps=4 format=3 uid="uid://djsy8cgx7laia"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_fxjnb"]
+[ext_resource type="Resource" uid="uid://b8p6064r6171b" path="res://unit_resources/effects/cha_hit.tres" id="2_3vkhf"]
+[ext_resource type="Script" uid="uid://blrufmbqn5ftl" path="res://unit_resources/auras/aura.gd" id="2_ux7f6"]
+
+[resource]
+script = ExtResource("2_ux7f6")
+range = 2
+is_self = false
+target_team = 1
+target = 2
+effects = Array[ExtResource("1_fxjnb")]([ExtResource("2_3vkhf")])
+id = "charisma"
+rule_type = 0
+metadata/_custom_type_script = "uid://blrufmbqn5ftl"

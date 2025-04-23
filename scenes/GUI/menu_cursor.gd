@@ -1,5 +1,4 @@
 extends TextureRect
-
 class_name MenuCursor
 
 
@@ -7,7 +6,6 @@ class_name MenuCursor
 
 var currentButton : Button = null
 var setCursor := false
-
 var menu_parent
 
 
@@ -19,8 +17,7 @@ func _process(_delta):
 
 		
 func set_cursor(button = get_viewport().gui_get_focus_owner()):
-	if button == null:
-		return
+	
 	var cPosition = button.get_global_position()
 	var cSize = button.size
 	var newPos

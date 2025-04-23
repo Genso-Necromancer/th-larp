@@ -22,7 +22,9 @@ signal danmaku_progressed
 @export_category("Danmaku")
 @export var dmkScript : DanmakuScript
 @export var dmkMaster : Unit
-
+@export_category("Scene Scripts")
+@export var start_script : SceneScript
+@export var end_script : SceneScript
 ##ALL THE FUCKING LAYERS
 @onready var ground :TileMapLayer= $Ground
 @onready var modifier :TileMapLayer= $Modifier
@@ -49,9 +51,6 @@ var actingDanmaku := {"Spawning":[], "Collision":[]}
 var victoryKills : Array = []
 
 
-
-
-
 func _ready():
 	if not Engine.is_editor_hint():
 		var p = get_parent()
@@ -64,6 +63,7 @@ func _ready():
 	#print(mapSize)
 	emit_signal("map_ready")
 	_initialize_unit_cells()
+
 
 #region property list functions
 func _get_property_list():

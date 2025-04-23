@@ -97,43 +97,45 @@ func _update_inventory(unit) -> Array:
 
 func _update_features(unit) -> Array:
 	var skills = unit.unitData.Skills
-	var sData = UnitData.skillData
+	#var sData = UnitData.skillData
 	var passives = unit.unitData.Passives
-	var pData = UnitData.passiveData
+	#var pData = UnitData.passiveData
 	var sPath = load("res://scenes/GUI/skill_button.tscn")
 	var pPath = load("res://scenes/GUI/passive_button.tscn")
 	var s : SkillButton
 	var p : PassiveButton
 	var buttons : Array = []
-	
-	for passive in passives:
-		p = generate_passivebutton(pPath, pData[passive])
-		buttons.append(p.get_button())
-		p.get_button().add_to_group("PassivesTT")
-		p.set_meta_data(passive, unit, false)
-		fBox.add_child(p)
-	
-	for skill in skills:
-		s = generate_skillbutton(sPath, sData[skill])
-		buttons.append(s.get_button())
-		s.get_button().add_to_group("SkillsTT")
-		s.set_meta_data(skill, unit, false)
-		fBox.add_child(s)
+	if !passives.is_empty(): 
+		for passive in passives:
+			p = generate_passivebutton(pPath, passive)
+			buttons.append(p.get_button())
+			p.get_button().add_to_group("PassivesTT")
+			p.set_meta_data(passive, unit, false)
+			fBox.add_child(p)
+	if !skills.is_empty():
+		for skill in skills:
+			s = generate_skillbutton(sPath, skill)
+			buttons.append(s.get_button())
+			s.get_button().add_to_group("SkillsTT")
+			s.set_meta_data(skill, unit, false)
+			fBox.add_child(s)
 		
 	return buttons
 
 
-func generate_skillbutton(path, data) -> SkillButton:
+func generate_skillbutton(path, data:Skill) -> SkillButton:
 	var b : SkillButton
+	var iconPath : String = "res://sprites/icons/features/%s_icon.png"
+	iconPath = iconPath % [data.id]
 	b = path.instantiate()
 	b.isIconMode = isPreview
-	b.set_item_text(data.SkillName, str(data.Cost))
-	b.set_item_icon(data.Icon)
+	b.set_item_text(data)
+	b.set_item_icon(iconPath)
 	_connect_focus_signals(b)
 	return b
 
 
-func generate_passivebutton(path, data) -> PassiveButton:
+func generate_passivebutton(path, data:Passive) -> PassiveButton:
 	var b : PassiveButton
 	b = path.instantiate()
 	b.isIconMode = isPreview

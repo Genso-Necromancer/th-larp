@@ -22,7 +22,8 @@ var cell := Vector2i.ZERO:
 		cell = newCell
 		
 #		print(cursor.position)
-		emit_signal("cursor_moved", cell)
+		call_deferred("emit_signal","cursor_moved", cell)
+		#emit_signal("cursor_moved", cell)
 #		cTimer.start()
 var snapPath := []
 var tick = 1

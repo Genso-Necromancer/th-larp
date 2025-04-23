@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Passive" load_steps=2 format=3 uid="uid://m4j8pc7uii7k"]
+
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="1_yyq3d"]
+
+[resource]
+script = ExtResource("1_yyq3d")
+type = 7
+sub_type = 0
+sub_weapon = 0
+day_id = ""
+night_id = ""
+value = 0
+string_value = &""
+is_time_sens = false
+aura = &""
+day = &""
+night = &""
+feature_id = "night_person"
+rule_type = 3
+sub_rule = 2
+metadata/_custom_type_script = "uid://c5hmv6tclm43r"

@@ -1,0 +1,20 @@
+[gd_scene load_steps=6 format=3 uid="uid://b6vorq2w1b5oa"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/Unit.tscn" id="1_77cbq"]
+[ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_tawq4"]
+[ext_resource type="Resource" uid="uid://e7drxbfl83us" path="res://unit_resources/items/weapons/club.tres" id="3_tawq4"]
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="4_acftt"]
+
+[sub_resource type="Resource" id="Resource_tawq4"]
+script = ExtResource("4_acftt")
+stats = ExtResource("3_tawq4")
+equipped = true
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[node name="Cirno" instance=ExtResource("1_77cbq")]
+generate = false
+unitId = "Cirno"
+archetype = 4
+inventory = Array[ExtResource("2_tawq4")]([SubResource("Resource_tawq4")])

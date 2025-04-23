@@ -488,4 +488,4 @@ script = ExtResource("8_fh3sa")
 
 [node name="TradePnl" parent="SideBar" instance=ExtResource("9_my0xn")]
 layout_mode = 2
-_style = "Profile"
+_style = "NONE"

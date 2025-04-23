@@ -93,20 +93,20 @@ func display_player_options():
 				b.call_deferred("grab_focus")
 
 func _check_inv(unit:Unit) -> Dictionary:
-	var uInv = unit.unitData.Inv
+	var uInv = unit.inventory
 	var itemFlags := {"hasWeapons":false, "hasItems":false}
 	
-	if unit.get_equipped_weapon().ID != "NONE":
+	if unit.get_equipped_weapon() != unit.unarmed:
 		itemFlags.hasWeapons = true
 		itemFlags.hasItems = true
 	elif uInv.size() > 0:
 		itemFlags.hasItems = true
 		for item in uInv:
-			if unit.check_valid_equip(item, 1):
+			if item is Weapon and unit.check_valid_equip(item):
 				itemFlags.hasWeapons = true
 				break
-
 	return itemFlags
+
 
 func _check_reach(unit:Unit) -> Dictionary:
 	var inReach := {"Hostiles":false, "Trades": false}

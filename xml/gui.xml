@@ -11,6 +11,7 @@
 	<language id = "AMERICAN">
 		<template>
 			<entry id = "value_template"><![CDATA[%s %+-d]]></entry>
+			<entry id = "dual_type_template"><![CDATA[{Type}({Sub})]]></entry>
 			<entry id = "percent_value_template"><![CDATA[%s %+-d%%]]></entry>
 			<entry id = "proc_template"><![CDATA[%s (%d%%)]]></entry>
 			<entry id = "duration_template"><![CDATA[%s for %d %s]]></entry>
@@ -26,6 +27,7 @@
 			<entry id = "effect_template_life_steal"><![CDATA[[color=#8C1717]Life Steal[/color]]]></entry>
 			<entry id = "effect_template_heal"><![CDATA[[color=#3CB371]Heal[/color]]]></entry>
 			<entry id = "effect_template_slayer"><![CDATA[[color=#3CB371]Slayer[/color]]]></entry>
+			<entry id = "effect_template_add_skill"><![CDATA[Grants Skill: {skill}]]></entry>
 			<!-- Pop Up Text -->
 			<entry id = "pop_up_template_value"><![CDATA[%s %d]]></entry>
 			<entry id = "pop_up_template_buff"><![CDATA[%s %s]]></entry>
@@ -70,7 +72,7 @@
 			<entry id = "effect_sub_type_effhit"><![CDATA[Effect Chance]]></entry>
 			<entry id = "effect_sub_type_def"><![CDATA[Defense]]></entry>
 			<!-- Effect Rules -->
-			<entry id = "effect_target_spec"><![CDATA[vs {Rule}]]></entry>
+			<entry id = "effect_target_spec"><![CDATA[vs {sub_rule}]]></entry>
 			<!-- Effect Pop Text -->
 			<entry id = "effect_pop_text_resisted"><![CDATA[Resisted!]]></entry>
 			<entry id = "effect_pop_text_buff"><![CDATA[Up!]]></entry>
@@ -121,7 +123,7 @@
 			<!-- Weapon Types -->
 			<entry id = "type_blade"><![CDATA[Blade]]></entry>
 			<entry id = "type_blunt"><![CDATA[Blunt]]></entry>
-			<entry id = "type_stick"><![CDATA[Stick]]></entry>
+			<entry id = "type_stick"><![CDATA[Spear]]></entry>
 			<entry id = "type_book"><![CDATA[Book]]></entry>
 			<entry id = "type_gohei"><![CDATA[Gohei]]></entry>
 			<entry id = "type_scroll"><![CDATA[Scroll]]></entry>
@@ -130,6 +132,8 @@
 			<entry id = "type_ofuda"><![CDATA[Ofuda]]></entry>
 			<entry id = "type_acc"><![CDATA[Acc.]]></entry>
 			<entry id = "type_item"><![CDATA[Item]]></entry>
+			<entry id = "type_natural"><![CDATA[Natural]]></entry>
+			<entry id = "type_knife"><![CDATA[Knife]]></entry>
 			<entry id = "type_augment"><![CDATA[Weapon Augment]]></entry>
 			<entry id = "type_time"><![CDATA[Chronomancy]]></entry>
 			<entry id = "type_sabotage"><![CDATA[Sabotage]]></entry>
@@ -147,18 +151,20 @@
 			<entry id = "passive_name_fated"><![CDATA[Fated]]></entry>
 			<entry id = "passive_name_terror"><![CDATA[Terror]]></entry>
 			<entry id = "passive_name_charisma"><![CDATA[Charisma]]></entry>
+			<entry id = "passive_name_night_person"><![CDATA[Night Person]]></entry>
 			<!-- Skill Names -->
 			<entry id = "skill_name_life_steal_rem"><![CDATA[Scarlet Thirst]]></entry>
-			<entry id = "skill_name_fire_basic"><![CDATA[Fire Ball]]></entry>
+			<entry id = "skill_name_spell_basic_fire"><![CDATA[Fire Ball]]></entry>
 			<entry id = "skill_name_enemy_toss_1"><![CDATA[Toss]]></entry>
+			<entry id = "skill_name_locked_corpse"><![CDATA[Locked Corpse]]></entry>
 			
 			<!-- Tool Tips:Rules-->
-			<entry id = "rule_type_1"><![CDATA[Feature is restricted to {Rule}]]></entry>
-			<entry id = "rule_type_3"><![CDATA[If Unit is {Rule}]]></entry>
+			<entry id = "rule_type_1"><![CDATA[Feature is restricted to {sub_rule}]]></entry>
+			<entry id = "rule_type_3"><![CDATA[If Unit is {sub_rule}]]></entry>
 			<entry id = "time_night"><![CDATA[[color=#230f8c]Night[/color]]]></entry>
 			<!-- Tool Tips: labels -->
 			<entry id = "effect_label"><![CDATA[Effects]]></entry>
-			<entry id = "remaining_label"><![CDATA[Remaining: {Duration} {DurationType}]]></entry>
+			<entry id = "remaining_label"><![CDATA[Remaining: {duration} {duration_type}]]></entry>
 			
 			<!-- Tool Tips: Skill Types -->
 			<entry id = "augment_skill"><![CDATA[Weapon Augment]]></entry>
@@ -236,25 +242,38 @@
 			<entry id = "danmaku_movetype_nw_diagonal"><![CDATA[Straight]]></entry>
 			<entry id = "danmaku_movetype_sw_diagonal"><![CDATA[Straight]]></entry>
 			
-			<!-- OLD: Need Vetting
-			<entry id = "lore_night_prot"><![CDATA[{RuleType}, negate {Rule} stat penalties at [color=#230f8c]Night[/color].]]></entry>
-			<entry id = "lore_day_prot"><![CDATA[{RuleType}, negate {Rule} stat penalties during the [color=##87CEEB]Day[/color].]]></entry>
-			<entry id = "lore_self_spec"><![CDATA[If Unit is {Rule}]]></entry>
-			<entry id = "lore_target_spec"><![CDATA[If Target is {Rule}]]></entry>
+			<!-- Items -->
+			<!-- Weapons -->
+			<entry id = "weapon_unarmed"><![CDATA[[center]--[/center]]]></entry>
+			<entry id = "weapon_gungnir"><![CDATA[Gungnir]]></entry>
+			<entry id = "weapon_club"><![CDATA[Club]]></entry>
+			<entry id = "weapon_knife_silver"><![CDATA[Silver Knife]]></entry>
+			<entry id = "weapon_book_fire"><![CDATA[Fire Book]]></entry>
+			<entry id = "weapon_gohei_simple"><![CDATA[Simple Gohei]]></entry>
+			<!-- Accessories -->
+			<entry id = "accesory_pwr_ring01"><![CDATA[Power Ring]]></entry>
+			<!-- Consumables -->
+			<entry id = "consumable_pizza"><![CDATA[Pizza]]></entry>
+			
+			
+			<entry id = "lore_night_prot"><![CDATA[{rule_type}, negate {sub_rule} stat penalties at [color=#230f8c]Night[/color].]]></entry>
+			<entry id = "lore_day_prot"><![CDATA[{rule_type}, negate {sub_rule} stat penalties during the [color=##87CEEB]Day[/color].]]></entry>
+			<entry id = "lore_self_spec"><![CDATA[If Unit is {sub_rule}]]></entry>
+			<entry id = "lore_target_spec"><![CDATA[If Target is {sub_rule}]]></entry>
 			<entry id = "lore_human"><![CDATA[[color=#59a198]Human[/color]]]></entry>
 			<entry id = "lore_fated"><![CDATA[This Unit has a chance to turn a Miss! into a Hit! This Unit really has this ability, she swears it.]]></entry>
-			<entry id = "lore_aura"><![CDATA[{Aura}.]]></entry>
+			<entry id = "lore_aura"><![CDATA[{aura}.]]></entry>
 			<entry id = "lore_range_adjacent"><![CDATA[adjacent to Unit]]></entry>
-			<entry id = "lore_range"><![CDATA[within {Range} spaces of Unit]]></entry>
+			<entry id = "lore_range"><![CDATA[within {range} spaces of Unit]]></entry>
 			<entry id = "lore_enemy"><![CDATA[[color=#DC143C]Enemy[/color]]]></entry>
 			<entry id = "lore_ally"><![CDATA[[color=#DC143C]Ally[/color]]]></entry>
-			<entry id = "lore_aura_self"><![CDATA[{Effects} per {TargetTeam} {Range}]]></entry>
-			<entry id = "lore_aura_target"><![CDATA[{Effects} to each {TargetTeam} {Range}]]></entry>
-			<entry id = "lore_morph_night"><![CDATA[At [color=#230f8c]Night[/color], skill becomes {Morph}]]></entry>
-			<entry id = "lore_morph_day"><![CDATA[During the [color=#87CEEB]Day[/color], skill becomes {Morph}]]></entry>
+			<entry id = "lore_aura_self"><![CDATA[{effects} per {target_team} {range}]]></entry>
+			<entry id = "lore_aura_target"><![CDATA[{effects} to each {target_team} {range}]]></entry>
+			<entry id = "lore_morph_night"><![CDATA[At [color=#230f8c]Night[/color], skill becomes {morph}]]></entry>
+			<entry id = "lore_morph_day"><![CDATA[During the [color=#87CEEB]Day[/color], skill becomes {morph}]]></entry>
 			<entry id = "lore_restrict_night"><![CDATA[[i]Feature is restricted to [color=#230f8c]Night[/color][/i]]]></entry>
 			<entry id = "lore_restrict_day"><![CDATA[[i]Feature is restricted to [color=##87CEEB]Day[/color][/i]]]></entry>
-			 -->
+			
 			
 			
 			

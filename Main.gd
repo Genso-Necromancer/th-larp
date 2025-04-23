@@ -1,5 +1,5 @@
 extends Node
-
+class_name MainNode
 
 static var root := "user://"
 static var gameFolder := "thLARP"
@@ -74,7 +74,6 @@ func _create_director(newDir : String) -> String:
 	return newPath
 
 
-	
 func take_screenshot(): ##ignore this, dev purpose only
 	var viewport = get_viewport()
 	var newDir := "screenshots"
@@ -94,6 +93,7 @@ func take_screenshot(): ##ignore this, dev purpose only
 		if is_file_duplicate(screenShotDir, fileName):
 			print("ScreenShot:[",fileName,"]", " Saved to:[", screenShotDir,"]",)
 
+
 func is_file_duplicate(directory:String, fileName: String) -> bool: 
 	var dir := DirAccess.open(directory)
 	if dir:
@@ -105,101 +105,13 @@ func is_file_duplicate(directory:String, fileName: String) -> bool:
 			else:
 				file = dir.get_next()
 	return false
-## stop ignoring now
 
-#func check_valid_state(value): 
-	#if GameState.gState.has(value):
-		#return true
-	#else: return false
-
-#func change_state(value): #This is necessary for the 1 tick delay on state change, it is not called directly so variable change can be the streamlined method.
-	#var oldState
-	#var slaves = []
-	#if GameState.gState.activeState != null:
-		#oldState = GameState.gState.activeState
-		#oldState.queue_free() 
-	#slaves = _switch_state_get_slaves(value)
-	#GameState.gState.activeState.setup(slaves)
-	
-
-#func set_new_state(value): #Value = new State Tag. Call this function, or simply changing the "state" variable from anywhere to change the state properly.
-	#state = value
-
-
-
-#func _switch_state_get_slaves(value):
-	#var slaves = []
-	#var stateKeys = GameState.gState.keys()
-	#var key = stateKeys[value]
-	##print("StateChange: ", key)
-	#match value: #when creating a new state, you must add an entry to this match list
-		#GameState.gState.LOADING: 
-			#slaves = newSlave #array of nodes that listen to the state, used to call their functions
-			#GameState.gState.activeState = LoadingState.new() #the actual state script, remember to change this when making a new one.
-		#GameState.gState.GB_DEFAULT:
-			#slaves = newSlave
-			#GameState.activeState = GBDefaultState.new()
-		#GameState.gState.GB_SELECTED:
-			#slaves = newSlave
-			#GameState.activeState = GBSelectedState.new()
-		#GameState.gState.GB_ACTION_MENU:
-			#slaves = newSlave
-			#GameState.activeState = GBActionMenuState.new()
-		#GameState.gState.GB_PROFILE:
-			#slaves = newSlave
-			#GameState.activeState = GBProfileState.new()
-		#GameState.gState.GB_ATTACK_TARGETING:
-			#slaves = newSlave
-			#GameState.activeState = GBAttackState.new()
-		#GameState.gState.GB_COMBAT_FORECAST:
-			#slaves = newSlave
-			#GameState.activeState = GBForeCastState.new()
-		#GameState.gState.GB_SKILL_TARGETING:
-			#slaves = newSlave
-			#GameState.activeState = GBSkillTargetState.new()
-		#GameState.gState.GB_SKILL_MENU:
-			#slaves = newSlave
-			#GameState.activeState = GBSkillMenuState.new()
-		#GameState.gState.GB_ROUND_END:
-			#slaves = newSlave
-			#GameState.activeState = GBRoundEndState.new()
-		#GameState.gState.GB_WARP:
-			#slaves = newSlave
-			#GameState.activeState = GBWarpSelectState.new()
-		#GameState.gState.GB_SETUP:
-			#slaves = newSlave
-			#GameState.activeState = GBSetUpState.new()
-		#GameState.gState.GB_FORMATION:
-			#slaves = newSlave
-			#GameState.activeState = GBFormationState.new()
-		#GameState.gState.GB_AI_TURN:
-			#slaves = newSlave
-			#GameState.activeState = AcceptState.new()
-		#GameState.gState.START:
-			#slaves = newSlave
-			#GameState.activeState = StartState.new()
-		#GameState.gState.ACCEPT_PROMPT:
-			#slaves = newSlave
-			#GameState.activeState = AcceptState.new()
-		#GameState.gState.FAIL_STATE:
-			#slaves = newSlave
-			#GameState.activeState = FailState.new()
-		#GameState.gState.WIN_STATE:
-			#slaves = newSlave
-			#GameState.activeState = AcceptState.new()
-		#GameState.gState.SCENE_ACTIVE:
-			#slaves = newSlave
-			#GameState.activeState = AcceptState.new()
-		#GameState.gState.GB_END_OF_ROUND:
-			#slaves = newSlave
-			#GameState.activeState = LoadingState.new()
-	#add_child(GameState.activeState)
-	#return slaves
 
 func on_load_map_manager(map):
 	var manager = preload("res://scenes/map_manager.tscn").instantiate()
 	load_scene(manager)
-	$mapManager.load_map(map)
+	manager.load_map(map)
+	manager.load_cutscene()
 	
 #func set_map(map):
 	#gameBoard = $mapManager/Gameboard

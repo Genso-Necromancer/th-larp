@@ -491,23 +491,22 @@ func find_best_attack(attacks):
 			bestAttack = attack.duplicate()
 	return bestAttack
 	
-func _find_valid_attacks(aiUnit:Unit, path) -> Array:
+func _find_valid_attacks(aiUnit:Unit, path:Array) -> Array:
 	#Needs updating for unique weapon ID
 	var validAttacks :Array= []
 #	threat = aHex.find_threat(path, ranges)
-	var aiInv :Array= aiUnit.unitData.Inv
-	var wepData :Dictionary= UnitData.itemData
+	var aiInv :Array= aiUnit.inventory
 	var targetDef
 	var aHex :AHexGrid2D= AHexGrid2D.new(gb.currMap)
 	#var archetype : float = unit.get_archetype("Offense")
 	var archetype : float = 1.0
-	for wep in aiInv:
-		var wepID = wep["ID"]
+	for wep :Weapon in aiInv:
+		if wep is not Weapon: continue
 		aiUnit.set_temp_equip(wep)
 		var ranges = aiUnit.get_weapon_reach()
 		var threat = aHex.find_threat(path, ranges)
 		for unit in oppContext:
-			match wepData[wepID].Type:
+			match wep.type:
 				Enums.DAMAGE_TYPE.PHYS:
 					targetDef = "Def"
 					if (aiUnit.combatData.Dmg - unit.activeStats.Def <= 0):
@@ -606,27 +605,23 @@ func combat_values(aiUnit, attack, targetDef):
 		value -= (aiUnit.activeStats.CurLife - dmgTaken / aiUnit.activeStats.Life) * mind.survival
 	return value
 	
-func _check_safe(aiUnit, target, launch):
-	var wepData = UnitData.itemData
-	var aHex = AHexGrid2D.new(gb.currMap)
-	var distance = aHex.find_distance(launch, target.cell,)
-	var equip = target.get_equipped_weapon()
-	var wepID = equip["ID"]
-	var targetReach
-	var safe = false
-	var wep = wepData[wepID]
+func _check_safe(aiUnit:Unit, target:Unit, launch:Vector2i) -> bool:
+	var aHex := AHexGrid2D.new(gb.currMap)
+	var distance : int = aHex.find_distance(launch, target.cell,)
+	var targetReach : int
+	var wep := target.get_equipped_weapon()
 	if target.is_in_group("Player"):
-		targetReach = wep.MaxRange
+		targetReach = wep.max_reach
 	elif target.is_in_group("Enemy"):
-		targetReach = wep.MaxRange
+		targetReach = wep.max_reach
 #	if distance == 3:
 #		print(launch, target.cell)
 	if distance > targetReach:
-		safe = true
-		return safe
+		return true
 	else:
-		return safe
-	
+		return false
+
+
 func _assign_terrain_value(map:GameMap) -> Dictionary:
 	var oldValue: float = 0.0
 	var value: float = 0.0

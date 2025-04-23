@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=3 format=3 uid="uid://e7drxbfl83us"]
+
+[ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="1_mxyyn"]
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_yjg51"]
+
+[resource]
+resource_name = "club"
+script = ExtResource("1_mxyyn")
+dmg = 6
+hit = 65
+crit = 0
+barrier = 4
+barrier_chance = 1
+min_reach = 1
+max_reach = 1
+damage_type = 1
+personal = false
+level = 1
+use = false
+equippable = true
+breakable = true
+expendable = true
+trade = true
+max_dur = 40
+category = 4
+sub_group = 0
+effects = Array[ExtResource("1_yjg51")]([])
+id = "club"
+rule_type = 0
+metadata/_custom_type_script = "uid://b7y6ry7pkb23i"

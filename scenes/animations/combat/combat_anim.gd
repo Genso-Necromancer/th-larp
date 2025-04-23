@@ -97,12 +97,14 @@ func assign_defend(hit, dmg, crit, graze):
 	
 	
 func _assign_attack_animation():
-	var iData =  UnitData.itemData
 	var weapon = unit.get_equipped_weapon()
-	var variant : String = iData[weapon.ID].Category.to_pascal_case()
+	var variant : String
 	var default := "Attack"
 	var list = combatPlayer.get_animation_list()
 	var animation := "Attack_%s" % [variant]
+	
+	if weapon.sub_group: variant =  Enums.WEAPON_SUB.keys()[weapon.sub_group].to_pascal_case()
+	else: variant = Enums.WEAPON_CATEGORY.keys()[weapon.category].to_pascal_case()
 	
 	if list.has(animation):
 		activeAnim = animation

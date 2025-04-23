@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=3 format=3 uid="uid://ck2mfsbmow1ok"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_utopn"]
+[ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="2_sprt3"]
+
+[resource]
+resource_name = "knife_silver"
+script = ExtResource("2_sprt3")
+dmg = 11
+hit = 95
+crit = 5
+barrier = 0
+barrier_chance = 0
+min_reach = 1
+max_reach = 2
+damage_type = 1
+personal = false
+level = 1
+use = false
+equippable = true
+breakable = true
+expendable = true
+trade = true
+max_dur = 20
+category = 3
+sub_group = 1
+effects = Array[ExtResource("1_utopn")]([])
+id = "knife_silver"
+rule_type = 0
+metadata/_custom_type_script = "uid://b7y6ry7pkb23i"

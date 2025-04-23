@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Aura" load_steps=4 format=3 uid="uid://cftafd38hu3mo"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_wuxb5"]
+[ext_resource type="Script" uid="uid://blrufmbqn5ftl" path="res://unit_resources/auras/aura.gd" id="2_vcu4u"]
+[ext_resource type="Resource" uid="uid://cgbyvtm28fuvm" path="res://unit_resources/effects/aura_graze5.tres" id="2_vggxs"]
+
+[resource]
+script = ExtResource("2_vcu4u")
+range = 1
+is_self = false
+target_team = 2
+target = 1
+effects = Array[ExtResource("1_wuxb5")]([ExtResource("2_vggxs")])
+id = "adj_graze"
+rule_type = 0
+metadata/_custom_type_script = "uid://blrufmbqn5ftl"

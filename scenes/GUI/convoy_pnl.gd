@@ -1,5 +1,5 @@
+@tool
 extends InventoryPanel
-
 class_name ConvoyPanel
 
 enum tabTypes {
@@ -32,26 +32,37 @@ var supplyStats = UnitData.supplyStats
 func _ready():
 	var container := $VBoxContainer/PanelContainer2/MarginContainer/tabContainer
 	tabs = container.get_children()
-	
-	
-func fill_items(_isTrade := false, reach = [0,0], useBorder = false) -> Array:
+	_convert_string_to_item()
+
+
+func _convert_string_to_item():
+	var tabKeys = tabTypes.keys()
+	var supply = UnitData.supply
+	for tab in tabKeys:
+		for entry in supply[tab]:
+			if entry is String: entry = load(entry).duplicate()
+
+
+func fill_items(_isTrade := false, _reach = [0,0], useBorder = false) -> Array:
 	var tabKeys = tabTypes.keys()
 	var supply = UnitData.supply[tabKeys[openTab]]
 	var i = 0
 	var bPath = load("res://scenes/GUI/item_button.tscn")
+	
 	for item in supply:
-		var itemData = UnitData.itemData[item.ID]
-		var b = bPath.instantiate()
-		var dur = item.Dur
-		var mDur = itemData.MaxDur
-		var durString
-		if dur == -1 or mDur == -1:
-			durString = str(" --")
-		else:
-			durString = str(dur) + "/" + str(mDur)
-		b.set_item_text(str(itemData.Name), durString)
-		b.set_item_icon(itemData.Icon)
-		b.set_meta_data(item, "Supply", i, itemData.Trade)
+		if item is String: item = _load_new_item(item)
+		if item == null: continue
+		var iconPath : String = "res://sprites/icons/items/%s/%s.png"
+		var folder : String
+		var b :ItemButton = bPath.instantiate()
+		if item is Weapon: folder = "weapon"
+		elif item is Accessory: folder = "accessory"
+		elif item is Consumable: folder = "consumable"
+		iconPath = iconPath % [folder, item.id]
+		
+		b.set_item_text(item)
+		b.set_item_icon(item.id)
+		b.set_meta_data(item, "Supply", i, item.trade)
 		b.useBorder = useBorder
 		i += 1
 		_add_item(b)
@@ -68,13 +79,12 @@ func sort_supply() -> Array:
 	return fill_items()
 	
 
-func _sort_items(a, b):
-	var itemData = UnitData.itemData
-	var aName = itemData[a.ID].Name
-	var bName = itemData[b.ID].Name
-	var aDur = a.Dur
-	var bDur = b.Dur
-	var checkDur = false
+func _sort_items(a:Item, b:Item):
+	var aName :String= a.id
+	var bName :String= b.id
+	var aDur :int= a.dur
+	var bDur :int= b.dur
+	var checkDur := false
 	if aName < bName:
 		return true
 	elif aName == bName:
@@ -86,4 +96,12 @@ func _sort_items(a, b):
 	else:
 		return false
 
-	
+
+func _load_new_item(path:String) -> Item:
+	var res := load(path)
+	var newItem : Item
+	if res is WeaponResource: newItem = Weapon.new().duplicate()
+	elif res is AccessoryResource: newItem = Accessory.new().duplicate()
+	elif res is ConsumableResource: newItem = Consumable.new().duplicate()
+	newItem.stats = res
+	return newItem

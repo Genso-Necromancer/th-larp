@@ -17,4 +17,3 @@ func deploy_pop(button):
 
 func hide_pop():
 	self.visible = false
-

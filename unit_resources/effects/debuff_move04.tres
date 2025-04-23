@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="Effect" load_steps=2 format=3 uid="uid://cnv18ch7ul4ms"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_bh0ho"]
+
+[resource]
+script = ExtResource("1_bh0ho")
+type = 4
+target = 0
+instant = false
+on_hit = true
+proc = 0
+duration = 1
+duration_type = 1
+stack = false
+value = -4.0
+permanent = false
+curable = true
+from_item = false
+hostile = false
+multi_swing = 0
+multi_round = 0
+crit_dmg = Array[int]([0, 0])
+crit_mult = false
+crit_rate = 0
+sub_type = 5
+id = "debuff_move04"
+rule_type = 0
+metadata/_custom_type_script = "uid://bu76i50vv08ad"

@@ -3,7 +3,7 @@ extends ItemButton
 class_name SkillButton
 
 
-func set_item_text(string : String, cost: String = ""):
+func set_item_text(skill : SlotWrapper):
 	var sName := $ContentMargin/HBoxContainer/Name
 	var sCost := $ContentMargin/HBoxContainer/Cost
 	
@@ -14,7 +14,7 @@ func set_item_text(string : String, cost: String = ""):
 		sName.visible = true
 		sCost.visible = true
 	
-	sName.set_text(string)
-	sCost.set_text(cost)
+	sName.set_text(StringGetter.get_skill_name(skill))
+	sCost.set_text(str(skill.cost))
 	
 	

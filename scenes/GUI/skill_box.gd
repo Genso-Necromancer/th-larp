@@ -3,14 +3,12 @@ extends VBoxContainer
 class_name SkillBox
 
 func fill_skills(unit:Unit) -> Array:
-	var skills = unit.unitData.Skills
-	var sData = UnitData.skillData
 	var sPath = load("res://scenes/GUI/skill_button.tscn")
 	var s : SkillButton
 	var buttons := []
 	#var buttons : Array = []
-	for skill in skills:
-		s = generate_skillbutton(sPath, sData[skill])
+	for skill in unit.unitData.Skills:
+		s = generate_skillbutton(sPath, skill)
 		buttons.append(s.get_button())
 		s.get_button().add_to_group("SkillsTT")
 		s.set_meta_data(skill, unit, false)
@@ -23,21 +21,22 @@ func fill_skills(unit:Unit) -> Array:
 		
 func generate_skillbutton(path, data) -> SkillButton:
 	var b : SkillButton
+	
 	b = path.instantiate()
 	b.isIconMode = false
-	b.set_item_text(data.SkillName, str(data.Cost))
+	b.set_item_text(data)
 	b.set_item_icon(data.Icon)
 	#_connect_focus_signals(b)
 	return b
 	
 
 
-func _check_composure(unit : Unit, skill : String) -> bool:
+func _check_composure(unit : Unit, skill : Skill) -> bool:
 	var valid : bool = unit.has_enough_comp(skill)
 	return valid
 
 
-func _check_aug(unit : Unit, skill : String) -> bool:
+func _check_aug(unit : Unit, skill : Skill) -> bool:
 	var valid : bool = unit.has_valid_aug_weapon(skill)
 	return valid
 

@@ -134,14 +134,11 @@ mouse_filter = 2
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_mqi45")
+&"": SubResource("AnimationLibrary_mqi45")
 }
 
 [node name="AnimationTree" type="AnimationTree" parent="AnimationPlayer"]
 root_node = NodePath("../..")
-libraries = {
-"": SubResource("AnimationLibrary_mqi45")
-}
 tree_root = SubResource("AnimationNodeBlendSpace1D_k0a7b")
 anim_player = NodePath("..")
 parameters/blend_position = -1.0

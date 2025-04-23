@@ -16,8 +16,8 @@ signal trd_focus_changed
 #Node references
 @onready var box1 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1
 @onready var box2 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2
-@onready var list1 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1/TradePnl1
-@onready var list2 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/TradePnl2
+@onready var list1 :InventoryPanel= $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1/TradePnl1
+@onready var list2 :InventoryPanel= $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/TradePnl2
 @onready var sprite1 = $CharacterArtGroup/MarginContainer/PrtPnl1/MarginContainer/UnitPrt1
 @onready var sprite2 = $CharacterArtGroup/MarginContainer/PrtPnl2/MarginContainer/UnitPrt2
 @onready var prtPanel1 = $CharacterArtGroup/MarginContainer/PrtPnl1
@@ -25,9 +25,9 @@ signal trd_focus_changed
 @onready var infoPanel = $TradeContainer/MarginContainer/TradeScreenVBox/InfoPanel
 @onready var supplyPanel = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl
 #@onready var tabContainer = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/PanelContainer2/MarginContainer/tabContainer
-@onready var optionsPop = $OptionsPopUp
+@onready var optionsPop :OptionsPopUp = $OptionsPopUp
 #@onready var effTitle = $TradeContainer/MarginContainer/TradeScreenVBox/ItemInfoPanel/MarginContainer/VBoxContainer/EffectTitleBox
-
+var list_snap : Array = []
 #Trade tracking
 var firstBtn : ItemButton
 var firstUnit : Unit
@@ -331,6 +331,7 @@ func _refresh_list(useLastItem := false, resetList = list1):
 	emit_signal("item_list_filled", get_buttons(), useLastItem)
 	if useLastItem:
 		_find_valid_cursor_focus(resetList, i)
+		firstBtn = null
 	elif lastClicked:
 		lastClicked.call_deferred("grab_focus")
 		lastClicked = null
@@ -514,25 +515,23 @@ func _check_empty_supply():
 	return noItems
 
 
-func _check_usable_inv(unit):
-	var inv = unit.unitData.Inv
-	
-	var noUse = true
-	for instance in inv:
-		
-		if _check_usable(instance):
-			noUse = false
-			break
-	return noUse
-
-
-func _check_usable(item):
-	var itemData = UnitData.itemData
-	var iData = itemData[item.ID]
-	if iData.MANAGE:
-		return true
-	else:
-		return false
+#func _check_usable_inv(unit): #Old Delete
+	#var inv = unit.unitData.Inv
+	#
+	#var noUse = true
+	#for instance in inv:
+		#
+		#if _check_usable(instance):
+			#noUse = false
+			#break
+	#return noUse
+#
+#
+#func _check_usable(item:Item):
+	#if iData.MANAGE:
+		#return true
+	#else:
+		#return false
 
 
 func _item_pressed(b):
@@ -547,56 +546,35 @@ func _item_pressed(b):
 		tStates.DEFAULT:
 			pass
 		tStates.MANAGE:
+			_open_item_options(b)
 			b.state = "Selected"
 			firstBtn = b
-			_open_item_options(b)
+			
 
 
 func _supply_item_pressed(b):
 	_take_select(b)
 
 
-func _open_item_options(b):
+func _open_item_options(b) -> void:
 	var list = optionsPop.list
+	list_snap = list1.items
 	optionsPop.deploy_pop(b)
-	var isValid : bool = optionsPop.validate_buttons(b)
+	optionsPop.validate_buttons(b)
 	tState = tStates.ITEMOP
-	if isValid: 
-		optionsPop.connect_signal(self)
-		emit_signal("trd_focus_changed", list)
-	else: 
-		_close_item_options()
-
-	#var mngMenu = $SupplyOpPnl2
-	#var list = $SupplyOpPnl2/MarginContainer/supplyOpList
-	#var eBtn = $SupplyOpPnl2/MarginContainer/supplyOpList/EquipBtn
-	#var uBtn = $SupplyOpPnl2/MarginContainer/supplyOpList/UseBtn
-	#var item = b.button.get_meta("Item")
-	#var usable = false
-	#var equippable = false
-	#firstBtn = b
-	#mngMenu.visible = true
-	#equippable = firstUnit.check_valid_equip(item)
-	#usable = _check_usable(item)
-	#if !usable:
-		#uBtn.disabled = true
-	#else:
-		#uBtn.disabled = false
-	#if !equippable:
-		#eBtn.disabled = true
-	#else:
-		#eBtn.disabled = false
-	##_toggle_group_filter("unitInv", false)
-	#
-	
+	optionsPop.connect_signal(self)
+	emit_signal("trd_focus_changed", list)
 
 
 func _close_item_options():
+	var useLast := false
 	tState = tStates.MANAGE
 	optionsPop.hide_pop()
-	call_deferred("_refresh_list", true)
+	if list_snap == list1.items: useLast = true
+	list_snap.clear()
+	call_deferred("_refresh_list", useLast)
 	#_refresh_list(true)
-	firstBtn = null
+	
 	
 	#_item_deselected()
 	#var mngMenu = $SupplyOpPnl2
@@ -606,13 +584,13 @@ func _close_item_options():
 	#emit_signal("trd_focus_changed", list)
 	#tState = tStates.DEFAULT
 
-func _on_selection_made(selection, item):
+func _on_selection_made(selection:String, item:Item):
 	Global.flags.itemUsed = true
 	_close_item_options()
 	match selection:
 		"Use": _play_item_anim(item)
-		"Equip": Global.activeUnit.set_direct_equipped(item)
-		"Unequip": Global.activeUnit.unequip()
+		#"Equip": 
+		#"Unequip": 
 
 
 func _play_item_anim(item) -> void:
@@ -620,7 +598,7 @@ func _play_item_anim(item) -> void:
 		return
 	var itemFx = load("res://scenes/animations/item_effects/item_fx.tscn").instantiate()
 	itemFx.itemfx_complete.connect(self._on_itemfx_complete)
-	GameState.change_state(get_parent(), GameState.ACCEPT_PROMPT)
+	GameState.change_state(get_parent(), GameState.gState.ACCEPT_PROMPT)
 	$CharacterArtGroup/MarginContainer/PrtPnl1/MarginContainer/UnitPrt1/ItemFxNode.add_child(itemFx)
 	itemFx.play_item(item, true)
 
@@ -653,12 +631,11 @@ func _trade_select(b):
 	
 	
 func _give_select(b) -> void:
-	var unit = b.get_meta("Unit")
-	var item = b.button.get_meta("Item")
-	var iData = UnitData.itemData[item.ID]
-	var iType = iData.Category.to_upper()
+	var unit :Unit = b.get_meta("Unit")
+	var item :Item = b.button.get_meta("Item")
+	var iType = Enums.WEAPON_CATEGORY.keys()[item.category]
 	var iInd = b.get_meta("Index")
-	var inv = unit.unitData.Inv
+	var inv = unit.inventory
 	var supplyInv = UnitData.supply[iType]
 	var wasEquipped := false
 	
@@ -677,8 +654,8 @@ func _give_select(b) -> void:
 	inv.remove_at(iInd)
 	list1.remove_child(b)
 
-	if item.Equip == true:
-		item.Equip = false
+	if item.equipped == true:
+		item.equipped = false
 	
 	if wasEquipped:
 		unit.set_equipped()
@@ -692,12 +669,11 @@ func _give_select(b) -> void:
 	
 	
 func _take_select(b): 
-	var unit = firstUnit
-	var item = b.button.get_meta("Item")
-	var iData = UnitData.itemData[item.ID]
-	var iType = iData.Category.to_upper()
+	var unit :Unit= firstUnit
+	var item :Item = b.button.get_meta("Item")
+	var iType = Enums.WEAPON_CATEGORY.keys()[item.category]
 	var iInd = b.get_meta("Index")
-	var inv = unit.unitData.Inv
+	var inv = unit.inventory
 	var supply = UnitData.supply
 	var supplyInv = supply[iType]
 	
@@ -705,7 +681,7 @@ func _take_select(b):
 	inv.append(item)
 	supplyInv.remove_at(iInd)
 	
-	if unit.get_equipped_weapon() == null:
+	if unit.get_equipped_weapon() == unit.unarmed:
 		unit.set_equipped()
 
 	#if !_check_full_unit_inv(unit):
@@ -812,33 +788,31 @@ func _swap_items(b1, b2):
 	var unit1 = b1.get_meta("Unit")
 	var item1 = b1.button.get_meta("Item")
 	var i1 = b1.get_meta("Index")
-	var inv1 = unit1.unitData.Inv
+	var inv1 = unit1.inventory
 	var btns1 = list1.itemList.get_children()
 	var unit2 = b2.get_meta("Unit")
 	var item2 = b2.button.get_meta("Item")
 	var i2 = b2.get_meta("Index")
-	var inv2 = unit2.unitData.Inv
+	var inv2 = unit2.inventory
 	var home
 
 	if btns1.has(b1):
 		home = list1
 	else:
 		home = list2
-	item1.Equip = false
+	item1.equipped = false
 	if item2:
 		#home.add_child(b2)
 		#home.move_child(b2, i1)
-		item2.Equip = false
-		inv1[i1] = item2.duplicate()
-		inv2[i2] = item1.duplicate()
+		item2.equipped = false
+		inv1[i1] = item2
+		inv2[i2] = item1
 	else:
-		inv2.append(item1.duplicate())
+		inv2.append(item1)
 		inv1.remove_at(i1)
 		
-	if item1 and item1 == unit1.get_equipped_weapon():
-		unit1.set_equipped()
-	if item2 and item2 == unit2.get_equipped_weapon():
-		unit2.set_equipped()
+	unit1.set_equipped()
+	unit2.set_equipped()
 	
 	_flag_trade()
 	_remove_empty()

@@ -6,8 +6,8 @@
 [ext_resource type="TileSet" uid="uid://csbjmhaysou6f" path="res://TileSets/ObjectSet.tres" id="4_u8cgw"]
 [ext_resource type="TileSet" uid="uid://d0jkuu7oqmw7d" path="res://TileSets/region_tiles.tres" id="5_a5i45"]
 [ext_resource type="Script" uid="uid://d2s883a3vismr" path="res://scenes/maps/narrativeLayer.gd" id="5_wmt5u"]
-[ext_resource type="Script" uid="uid://bdpbd4lp3x08s" path="res://scrpt/AI/ai_manager.gd" id="11_a5i45"]
-[ext_resource type="Resource" uid="uid://befkt7mur7ux" path="res://scrpt/AI/personality_test.tres" id="12_ydau4"]
+[ext_resource type="Script" uid="uid://bdpbd4lp3x08s" path="res://scrpt/ai/ai_manager.gd" id="11_a5i45"]
+[ext_resource type="Resource" uid="uid://befkt7mur7ux" path="res://scrpt/ai/personality_test.tres" id="12_ydau4"]
 
 [node name="GameMap" type="Node2D"]
 z_index = -2

@@ -42,6 +42,7 @@ size_flags_vertical = 8
 [node name="TradePnl" parent="ScreenMargin" instance=ExtResource("2_8r605")]
 layout_mode = 2
 size_flags_vertical = 8
+_style = "NONE"
 
 [node name="ActionBackgroundMargin" type="MarginContainer" parent="ScreenMargin"]
 layout_mode = 2

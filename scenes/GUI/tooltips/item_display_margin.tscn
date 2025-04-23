@@ -53,7 +53,7 @@ theme_type_variation = &"ValueLabel"
 horizontal_alignment = 0
 vertical_alignment = 1
 partner = NodePath("../Lv")
-metadata/Key = "Level"
+metadata/Key = "level"
 metadata/Type = "Item"
 
 [node name="Type" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/HBoxContainer"]
@@ -71,7 +71,7 @@ text = "Natural"
 horizontal_alignment = 0
 vertical_alignment = 1
 partner = NodePath("../Type")
-metadata/Key = "Category"
+metadata/Key = "category"
 metadata/Type = "Item"
 
 [node name="Cost" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/HBoxContainer"]
@@ -89,7 +89,7 @@ text = "00"
 horizontal_alignment = 0
 vertical_alignment = 1
 partner = NodePath("../Cost")
-metadata/Key = "Cost"
+metadata/Key = "cost"
 metadata/Type = "Item"
 
 [node name="GridContainer" type="GridContainer" parent="ToolTipVBox/StatPanel/VBoxContainer"]
@@ -114,7 +114,7 @@ theme_type_variation = &"ValueLabel"
 text = "--
 "
 partner = NodePath("../Might")
-metadata/Key = "Dmg"
+metadata/Key = "dmg"
 metadata/Type = "Item"
 
 [node name="Accuracy" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
@@ -129,7 +129,7 @@ layout_mode = 2
 size_flags_horizontal = 0
 theme_type_variation = &"ValueLabel"
 partner = NodePath("../Accuracy")
-metadata/Key = "Hit"
+metadata/Key = "hit"
 metadata/Type = "Item"
 
 [node name="Crit" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
@@ -144,7 +144,7 @@ layout_mode = 2
 size_flags_horizontal = 0
 theme_type_variation = &"ValueLabel"
 partner = NodePath("../Crit")
-metadata/Key = "Crit"
+metadata/Key = "crit"
 metadata/Type = "Item"
 
 [node name="Barrier" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
@@ -158,7 +158,7 @@ custom_minimum_size = Vector2(20, 13)
 layout_mode = 2
 theme_type_variation = &"ValueLabel"
 partner = NodePath("../Barrier")
-metadata/Key = "Barrier"
+metadata/Key = "barrier"
 metadata/Type = "Item"
 
 [node name="Range" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
@@ -172,7 +172,7 @@ custom_minimum_size = Vector2(20, 13)
 layout_mode = 2
 theme_type_variation = &"ValueLabel"
 partner = NodePath("../Range")
-metadata/Key = "Range"
+metadata/Key = "range"
 metadata/Type = "Item"
 
 [node name="EffectTitleBox" type="VBoxContainer" parent="ToolTipVBox/StatPanel/VBoxContainer"]

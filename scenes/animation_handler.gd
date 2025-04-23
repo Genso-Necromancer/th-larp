@@ -104,12 +104,12 @@ func _start_combat():
 					animations[initiate].assign_defend(script[initiator][swing].Hit, script[initiator][swing].Dmg, isCrit, isBarrier)
 					#print("Initiate: Defend animation called")
 				
-				animations[initiator].assign_action(script[initiator][swing].Hit, script[initiator][swing].ActionType, script[initiator][swing].SkillId)
+				animations[initiator].assign_action(script[initiator][swing].Hit, script[initiator][swing].ActionType, script[initiator][swing].Skill)
 				#print("Initiator: action passed, ", script[initiator][swing].ActionType)
 				
-				if script[initiator][swing].SkillId:
-					animations[initiator].add_skill_fx(script[initiator][swing].SkillId)
-					#print("Initiator: Fx Added[", script[initiator][swing].SkillId, "]")
+				if script[initiator][swing].Skill:
+					animations[initiator].add_skill_fx(script[initiator][swing].Skill)
+					#print("Initiator: Fx Added[", script[initiator][swing].Skill, "]")
 					
 				if animations[initiator].targetFxArray:
 					animations[initiate].add_target_fx(animations[initiator].targetFxArray)

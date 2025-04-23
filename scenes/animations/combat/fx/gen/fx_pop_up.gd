@@ -96,7 +96,7 @@ func set_stylized_string(s = "damage"):
 func set_effect_result(effectResult):
 	var effect = UnitData.effectData[effectResult.EffectId]
 	
-	var type = effect.Type
+	var type = effect.type
 	var subType = effect.SubType
 	var value = 0
 

@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="Effect" load_steps=2 format=3 uid="uid://c2l318d6d3p8d"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_1rm6o"]
+
+[resource]
+script = ExtResource("1_1rm6o")
+type = 2
+target = 3
+instant = false
+on_hit = false
+proc = -1
+duration = 2
+duration_type = 2
+stack = false
+value = 0.5
+permanent = false
+curable = false
+from_item = false
+hostile = false
+multi_swing = 0
+multi_round = 0
+crit_dmg = Array[int]([0, 0])
+crit_mult = false
+crit_rate = 0
+sub_type = 29
+id = "slow_time05"
+rule_type = 0
+metadata/_custom_type_script = "uid://bu76i50vv08ad"

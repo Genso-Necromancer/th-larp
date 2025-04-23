@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Accessory" load_steps=2 format=3 uid="uid://cnl0fbm7twgfh"]
+
+[ext_resource type="Script" uid="uid://b62j6u801juy5" path="res://unit_resources/items/accessories/accessory.gd" id="1_s3gou"]
+
+[resource]
+script = ExtResource("1_s3gou")
+equipped = false
+dropped = false
+is_broken = false

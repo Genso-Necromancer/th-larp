@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Consumable" load_steps=2 format=3 uid="uid://cmt7b5bvjjmv3"]
+
+[ext_resource type="Script" uid="uid://y8vspyvvdgjj" path="res://unit_resources/items/consumables/consumable.gd" id="1_rrip7"]
+
+[resource]
+script = ExtResource("1_rrip7")
+dur = 0
+equipped = false
+dropped = false

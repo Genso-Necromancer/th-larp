@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Passive" load_steps=2 format=3 uid="uid://7o4v4rgpdbgf"]
+
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="1_6cq12"]
+
+[resource]
+script = ExtResource("1_6cq12")
+type = 0
+sub_type = 0
+sub_weapon = 0
+day_id = ""
+night_id = ""
+value = 0
+string_value = &""
+is_time_sens = false
+feature_id = ""
+rule_type = 0

@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="ConsumableResource" load_steps=3 format=3 uid="uid://xkgvp26mryxo"]
+
+[ext_resource type="Script" uid="uid://6xq3oabgheeu" path="res://unit_resources/items/consumables/consumable_resource.gd" id="1_rrip7"]
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_t67yy"]
+
+[resource]
+resource_local_to_scene = true
+script = ExtResource("1_rrip7")
+target = 0
+min_reach = 0
+max_reach = 0
+personal = false
+level = 0
+use = true
+equippable = false
+breakable = true
+expendable = true
+trade = true
+max_dur = 1
+category = 12
+sub_group = 0
+effects = Array[ExtResource("1_t67yy")]([])
+id = ""
+rule_type = 0

@@ -59,9 +59,9 @@ static func get_named_unit_data():
 					},
 				"MaxInv": 6,
 				"Inv":[],
-				"SpawnGear":["GNG"],
-				"Skills":["LifeStealRem"],
-				"Passives":["RemAura", "Fated"],
+				"SpawnGear":["res://unit_resources/items/weapons/gungnir.tres"],
+				"Skills":["res://unit_resources/features/skills/life_steal_rem.tres"],
+				"Passives":["res://unit_resources/features/passives/rem_aura.tres", "res://unit_resources/features/passives/fated.tres"],
 				"Weapons": {
 					"Blade": false,
 					"Blunt": false,
@@ -121,9 +121,9 @@ static func get_named_unit_data():
 					},
 				"MaxInv": 6,
 				"Inv":[],
-				"SpawnGear":["SLVKNF","PWRELIX","DGR","TESTACC",],
-				"Skills":["ST05","LockedCorpse"],
-				"Passives":["NightPerson",],
+				"SpawnGear":["res://unit_resources/items/weapons/knife_silver.tres"],
+				"Skills":["res://unit_resources/features/skills/slow_time.tres","res://unit_resources/features/skills/locked_corpse.tres"],
+				"Passives":["res://unit_resources/features/passives/night_person.tres",],
 				"Weapons": {
 					"Blade": true,
 					"Blunt": false,
@@ -133,7 +133,7 @@ static func get_named_unit_data():
 					"Fan": false,
 					"Bow": false,
 					"Gun": false,
-					"Sub": ["KNIVES"]},
+					"Sub": ["KNIFE"]},
 				"MoveType": MOVE_TYPE.RANGER
 			},
 		"Patchouli": {
@@ -183,7 +183,7 @@ static func get_named_unit_data():
 					},
 				"MaxInv": 6,
 				"Inv":[],
-				"SpawnGear":["PZA",],
+				"SpawnGear":["res://unit_resources/items/weapons/book_fire.tres","res://unit_resources/items/consumables/pizza.tres",],
 				"Skills":[],
 				"Passives":[],
 				"Weapons": {
@@ -244,9 +244,9 @@ static func get_named_unit_data():
 					},
 				"MaxInv": 6,
 				"Inv":[],
-				"SpawnGear":[],
-				"Passives":["Martial"],
-				"Skills":["EnemyShove1", "EnemyToss1", "Rest"],
+				"SpawnGear":["res://unit_resources/items/weapons/club.tres"],
+				"Passives":["res://unit_resources/features/passives/martial.tres"],
+				"Skills":["res://unit_resources/features/skills/rest.tres","res://unit_resources/features/skills/shove_enemy01.tres", "res://unit_resources/features/skills/toss_enemy.tres",],
 				"Weapons": {
 					"Blade": false,
 					"Blunt": true,
@@ -306,9 +306,9 @@ static func get_named_unit_data():
 					},
 				"MaxInv": 6,
 				"Inv":[],
-				"SpawnGear":["SMPLGOHEI"],
-				"Skills":["SlayFairy"],
-				"Passives":["DodgeAura"],
+				"SpawnGear":["res://unit_resources/items/weapons/gohei_simple.tres"],
+				"Skills":["res://unit_resources/features/skills/slay_fairy.tres"],
+				"Passives":["res://unit_resources/features/passives/plot_armor.tres"],
 				"Weapons": {
 					"Blade": false,
 					"Blunt": false,
@@ -846,24 +846,6 @@ static func get_items():
 				"Equip":true,
 				"SubGroup": false,
 				},
-				
-				"THKN":{
-				"Name":"Throwing Knife",
-				"Icon": "res://sprites/gungnir.png",
-				"Type": Enums.DAMAGE_TYPE.PHYS,
-				"Level": 1,
-				"Dmg": 3,
-				"Hit": 0,
-				"Crit": 5,
-				"Barrier": 1,
-				"MinRange": 2,
-				"MaxRange": 2,
-				"Category": "Blade",
-				"MaxDur": 40,
-				"Equip":true,
-				"SubGroup": "KNIVES",
-				},
-				
 				"BK":{
 				"Name":"Book",
 				"Icon": "res://sprites/gungnir.png",
@@ -881,7 +863,6 @@ static func get_items():
 				"SubGroup": false,
 				"Effects":["GrantFire1"],
 				},
-				
 				"NaturalMartial":{
 				"Name": "PUNCH",
 				"Icon": "res://sprites/gungnir.png",
@@ -895,13 +876,12 @@ static func get_items():
 				"MaxRange": 1,
 				"Category": "",
 				"MaxDur": -1,
-				"Expendable": false,
+				"breakable": false,
 				"Equip": true,
 				"Trade": false,
 				"SubGroup": "NATURAL",
 				"Effects": ["MultiStrike2"],
 				},
-				
 				"SMPLGOHEI": {
 				"Name":"Simple Gohei",
 				"Icon": "res://sprites/gungnir.png",
@@ -1199,7 +1179,7 @@ static func get_passives():
 		"Martial":{
 			"Type": Enums.PASSIVE_TYPE.SUB_WEAPON,
 			"Name":"Unarmed Strike",
-			"SubType": Enums.WEAPON_CATEGORY.NATURAL,
+			"SubType": Enums.WEAPON_SUB.NATURAL,
 			"Icon": "res://sprites/icons/features/yuugi.ability.five.png",
 			"String": "NaturalMartial",
 		},
