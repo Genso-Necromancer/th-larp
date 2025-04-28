@@ -504,8 +504,8 @@ func set_buff(effect:Effect):
 			newId = effect.id + str(i)
 		effect = newId
 	if effect.DurationType == Enums.DURATION_TYPE.PERMANENT:
-		var stat : String = statKeys[effect.SubType]
-		unitData.Stats[stat] += effect.Value
+		var stat : String = statKeys[effect.sub_type]
+		unitData.Stats[stat] += effect.value
 	else:
 		buffs[effect] = effect.duplicate(true)
 	update_stats()
@@ -597,12 +597,14 @@ func _init_features() -> void:
 	var skillArray :Array[Skill] = []
 	var passiveArray : Array[Passive] = []
 	for skill in unitData.get("Skills", []):
-		if !ResourceLoader.exists(skill): continue
+		if skill is not String: continue
+		elif !ResourceLoader.exists(skill): continue
 		else: skillArray.append(load(skill))
 	if skillArray: unitData.Skills = skillArray
 	
 	for passive in unitData.get("Passives", []):
-		if !ResourceLoader.exists(passive): continue
+		if passive is not String: continue
+		elif !ResourceLoader.exists(passive): continue
 		else: passiveArray.append(load(passive))
 	if passiveArray: unitData.Passives = passiveArray
 
@@ -745,7 +747,7 @@ func _on_aura_entered(area):
 	if !area.aura:
 		return
 	
-	match area.aura.TargetTeam:
+	match area.aura.target_team:
 		Enums.TARGET_TEAM.ALLY:
 			if area.master.FACTION_ID != Enums.FACTION_ID.ENEMY and FACTION_ID == Enums.FACTION_ID.NPC:
 				pass
@@ -755,11 +757,10 @@ func _on_aura_entered(area):
 			if area.master.FACTION_ID == FACTION_ID:
 				return
 	
-	if area.aura.Target == Enums.EFFECT_TARGET.SELF:
+	if area.aura.target == Enums.EFFECT_TARGET.SELF:
 		return
 	elif !activeAuras.has(area):
-		activeAuras[area] = area.aura.Effects.duplicate()
-		
+		activeAuras[area] = area.aura.effects.duplicate()
 	update_stats()
 
 
@@ -808,7 +809,7 @@ func _on_self_aura_exited(area, ownArea):
 
 #region Equipment functions
 ##searches for first valid weapon if false, otherwise unequips current and equips the passed Item
-func set_equipped(item : Item = null) -> void:
+func set_equipped(item : Item = null, is_temp := false) -> void:
 	var alreadyEquipped:bool = false
 	for weapon in inventory:
 		if weapon is Weapon and weapon.equipped: alreadyEquipped = true
@@ -820,7 +821,7 @@ func set_equipped(item : Item = null) -> void:
 	elif !check_valid_equip(item) and item != unarmed and item != natural: 
 		return
 	if item is Weapon:
-		_equip_weapon(item)
+		_equip_weapon(item, is_temp)
 	if item is Accessory:
 		_equip_acc(item)
 	update_stats()
@@ -847,7 +848,7 @@ func get_equipped_accs() -> Array[Accessory]:
 
 
 ##Equips the given weapon, and unequips whatever was already equipped. if isTemp, it sets it as a temporary equip and remembers it's true equip.
-func _equip_weapon(weapon : Weapon, isTemp := false) -> void:
+func _equip_weapon(weapon : Weapon, is_temp := false) -> void:
 	var oldEquip : Array[Weapon]
 	var original : Weapon
 	var replaced : Weapon
@@ -860,13 +861,14 @@ func _equip_weapon(weapon : Weapon, isTemp := false) -> void:
 	
 	if !oldEquip.is_empty():
 		replaced = oldEquip.pop_front()
-		if isTemp and !original: replaced.temp_remove = isTemp
+		if is_temp and !original: replaced.temp_remove = is_temp
 		unequip(replaced)
 	weapon.equipped = true
-	if !isTemp and inventory.has(weapon):
+	if !is_temp and inventory.has(weapon):
 		var i := inventory.find(weapon)
 		var storage :Item = inventory.pop_at(i)
 		inventory.push_front(storage)
+	if !is_temp and original: original.temp_remove = false
 	_add_equip_effects(weapon)
 
 
@@ -980,11 +982,11 @@ func get_reach() -> Dictionary:
 	var aug = {"Max":-999, "Min":999}
 	var skill = {"Max":-999, "Min":999}
 	for s in unitData.Skills:
-		if UnitData.skillData[s].Augment: 
+		if s.augment: 
 			var r = get_aug_reach(s)
 			aug.Min = mini(r.Min, aug.Min)
 			aug.Max = maxi(r.Max, aug.Max)
-		elif UnitData.skillData[s].MaxRange > 0:
+		elif UnitData.skillData[s].max_reach > 0:
 			var r = get_skill_reach(s)
 			skill.Min = mini(r.Min, skill.Min)
 			skill.Max = maxi(r.Max, skill.Max)
@@ -1023,17 +1025,17 @@ func get_aug_reach(skill : Skill) -> Dictionary:
 	if skill.min_reach == 0 or skill.max_reach == 0:
 		for weapon:Weapon in inventory:
 			if !check_valid_equip(weapon): continue
-			elif weapon.category != skill.WepCat and weapon.sub_group != skill.WepCat: continue
+			elif weapon.category != skill.weapon_category and weapon.sub_group != skill.weapon_category: continue
 			reach.Min = mini(weapon.min_reach, reach.Min)
 			reach.Max = maxi(weapon.max_reach, reach.Max)
 		if natural:
-			reach.Min = mini(natural.MinRange, reach.Min)
-			reach.Max = maxi(natural.MaxRange, reach.Max)
+			reach.Min = mini(natural.min_reach, reach.Min)
+			reach.Max = maxi(natural.max_reach, reach.Max)
 	else:
 		reach.Min = skill.min_reach
 		reach.Max = skill.max_reach
-	reach.Min += skill.BonusMinRange
-	reach.Max += skill.BonusMaxRange
+	reach.Min += skill.bonus_min_range
+	reach.Max += skill.bonus_min_range
 	return reach
 #endregion
 
@@ -1205,11 +1207,11 @@ func update_combatdata():
 	var wep :Weapon = get_equipped_weapon()
 	combatData.Type = wep.damage_type
 	if wep.damage_type == Enums.DAMAGE_TYPE.PHYS:
-		combatData.dmg = wep.dmg + activeStats.Pwr + tBonus.PwrBonus
+		combatData.Dmg = wep.dmg + activeStats.Pwr + tBonus.PwrBonus
 	elif wep.damage_type == Enums.DAMAGE_TYPE.MAG:
-		combatData.dmg = wep.dmg + activeStats.Mag + tBonus.MagBonus
+		combatData.Dmg = wep.dmg + activeStats.Mag + tBonus.MagBonus
 	elif wep.damage_type == Enums.DAMAGE_TYPE.TRUE:
-		combatData.dmg = wep.dmg
+		combatData.Dmg = wep.dmg
 	combatData.Hit = activeStats.Eleg * 2 + (wep.hit + activeStats.Cha + tBonus.HitBonus)
 	combatData.Graze = activeStats.Cele * 2 + activeStats.Cha + tBonus.GrzBonus
 	combatData.Barrier = wep.barrier
@@ -1318,25 +1320,25 @@ func update_stats(): #GO BACK AND FINISH ACTIVE DEBUFFS AFTER THIS
 		for aura in activeAuras:
 			for effect in activeAuras[aura]:
 				var mod = effect
-				var stat = subKeys[mod.SubType].to_pascal_case()
-				if buffTotal.has(stat): buffTotal[stat] += mod.Value
+				var stat = subKeys[mod.sub_type].to_pascal_case()
+				if buffTotal.has(stat): buffTotal[stat] += mod.value
 		
 		for buff in activeBuffs:
-			var stat = subKeys[activeBuffs[buff].SubType].to_pascal_case()
-			if buffTotal.has(stat): buffTotal[stat] += activeBuffs[buff].Value
+			var stat = subKeys[activeBuffs[buff].sub_type].to_pascal_case()
+			if buffTotal.has(stat): buffTotal[stat] += activeBuffs[buff].value
 			
 		for debuff in activeDebuffs:
-			var stat = debuff.SubType.to_pascal_case()
-			if buffTotal.has(stat): buffTotal[stat] += debuff.Value
+			var stat = debuff.sub_type.to_pascal_case()
+			if buffTotal.has(stat): buffTotal[stat] += debuff.value
 			
 		for effect in activeEffects:
 			if effect.type == Enums.EFFECT_TYPE.BUFF or effect.type == Enums.EFFECT_TYPE.DEBUFF:
 				effSort.append(effect)
 					
 		for effect in effSort:
-			var stat = subKeys[effect.SubType].to_pascal_case()
+			var stat = subKeys[effect.sub_type].to_pascal_case()
 			if effect.Target == Enums.EFFECT_TARGET.EQUIPPED:
-				if buffTotal.has(stat): buffTotal[stat] += effect.Value
+				if buffTotal.has(stat): buffTotal[stat] += effect.value
 		
 		for stat in statKeys:
 			if !buffTotal.has(stat):
@@ -1396,7 +1398,7 @@ func update_sprite():
 				_animPlayer.play("disabled")
 				#print(unitId,":", _animPlayer.current_animation,"Update Sprite")
 				return
-	if !isWalking and !isShoved and !needDeath:
+	if !isWalking and !isShoved and !needDeath and !isSelected:
 		_animPlayer.play("idle")
 		#print(unitId,":", _animPlayer.current_animation,"Update Sprite")
 		
@@ -1494,7 +1496,7 @@ func set_status(effect): #Missing a check for "duration type", same goes for tic
 		print("No condition found")
 		return
 	var statusKeys : Array = Enums.SUB_TYPE.keys()
-	var s : String = statusKeys[effect.SubType].to_pascal_case()
+	var s : String = statusKeys[effect.sub_type].to_pascal_case()
 	status[s] = true
 	if sParam.has(s) and !sParam[s].Curable:
 		sParam[s].Duration = effect.Duration

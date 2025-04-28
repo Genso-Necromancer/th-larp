@@ -10,7 +10,7 @@ signal map_started
 signal gui_action_menu_canceled
 
 @onready var blocker : Panel = $PanelBlocker #used to block the map easily
-
+@onready var HUD : Control = $HUD
 #unvetted
 @export var mapCursorPath : NodePath
 @export var menuOffSet : int = 150
@@ -61,7 +61,6 @@ var turnTracker
 var isForecastPrompt = false
 
 ##nodes unassigned
-var HUD : Node
 var timer : Timer
 var tween : Tween
 var menuCursor : MenuCursor
@@ -102,7 +101,15 @@ func _ready():
 	SignalTower.prompt_accepted.connect(_on_prompt_accepted)
 	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
 	#menuCursor.visible = false
+	#_add_hud_children()
 	_connect_asset_signals()
+
+
+func _add_hud_children():
+	var hudElements := [chClock, turnTracker, focusViewer]
+	
+	for node in hudElements:
+		_relocate_child(node, HUD)
 
 
 func update_labels(): #Use this to cascade assigning strings from XML to all hard loaded buttons HERE
@@ -287,7 +294,8 @@ func call_setup(dLimit, forced, map):
 	var btns = mapSetUp.btnContainer
 	inSetup = true
 	mapSetUp.connect_buttons(self)
-	mapSetUp.set_chapter(map.chapterNumber, map.title, map.get_objectives(), map.get_loss_conditions())
+	mapSetUp.free_previous_obj()
+	mapSetUp.call_deferred("set_chapter",map.chapterNumber, map.title, map.get_objectives(), map.get_loss_conditions())
 	mapSetUp.set_mon(UnitData.playerMon)
 	mapSetUp.toggle_visible()
 	menuCursor.resignal_cursor(btns.get_children())
@@ -319,6 +327,8 @@ func _load_assets():
 	add_child(tradeScreen)
 	add_child(unitProf)
 	add_child(menuCursor)
+	chClock.add_to_group("hud")
+	
 	menuCursor.visible = false
 
 
@@ -697,18 +707,17 @@ func _on_weapon_selected(button): #weapon can change after selection if mouse mo
 	emit_signal("start_the_justice", button)
 
 
-
-
 #func _on_action_menu_weapon_changed(weapon):
 	#pass # Replace with function body.
 
 #Game State transitions
 
-func _start_load_screen():
-	pass
+func fade_map_out():
+	SignalTower.fader_fade_out.emit()
 
-func _end_load_screen():
-	pass
+func fade_map_in():
+	SignalTower.fader_fade_in.emit()
+
 
 func play_splash(chNum:int, chTitle:String, timeString:String):
 	var splashPlayer = load("res://scenes/GUI/chapter_splash.tscn").instantiate()
@@ -730,14 +739,12 @@ func _on_gameboard_player_lost():
 func _on_gameboard_player_win():
 	var winScreen = $WinScreen
 	winScreen.fade_in_win()
-	GameState.change_state(self, GameState.gState.WIN_STATE)
 
 func _on_win_screen_win_finished():
-	_start_load_screen()
 	turnTracker.free_tokens()
 
-func _on_gameboard_map_loaded(_map):
-	_end_load_screen()
+#func _on_gameboard_map_loaded(_map):
+	#end_load_screen()
 	
 
 func _on_animation_handler_sequence_complete():

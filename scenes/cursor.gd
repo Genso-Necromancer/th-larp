@@ -20,11 +20,8 @@ var cell := Vector2i.ZERO:
 
 		position = Global.flags.CurrentMap.map_to_local(newCell)
 		cell = newCell
+		cursor_moved.emit(newCell)
 		
-#		print(cursor.position)
-		call_deferred("emit_signal","cursor_moved", cell)
-		#emit_signal("cursor_moved", cell)
-#		cTimer.start()
 var snapPath := []
 var tick = 1
 var originPoint := Vector2i.ZERO
@@ -137,14 +134,18 @@ func _toggle_drag():
 func _region_clamp(gridPosition: Vector2i) -> Vector2i:
 	#Keeps cursor inside temporary boundaries without messing with it's map boundaries
 	var out := gridPosition
-	var mapSize = Global.flags.CurrentMap.get_used_rect().size
+	#var mapRect :Rect2i= Global.flags.CurrentMap.get_used_rect()
+	var usedCells : Array[Vector2i] = Global.flags.CurrentMap.ground.get_used_cells()
+	#mapRect = mapRect.grow_side(SIDE_RIGHT,1)
+	#mapRect = mapRect.grow_side(SIDE_BOTTOM,1)
 	if snapPath:
 		if !snapPath.has(gridPosition):
 			return cell
-		
-	else:
-		out.x = clamp(out.x, 0, mapSize.x - 1.0)
-		out.y = clamp(out.y, 0, mapSize.y - 1.0)
+	elif usedCells.has(cell) and !usedCells.has(out): return cell
+	elif !usedCells.has(out):
+		out = usedCells[0]
+		#out.x = clamp(out.x, 0, mapSize.x - 1.0)
+		#out.y = clamp(out.y, 0, mapSize.y - 1.0)
 	return out
 	
 #endregion

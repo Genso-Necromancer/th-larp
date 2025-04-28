@@ -33,16 +33,10 @@ theme_override_constants/margin_top = 100
 theme_override_constants/margin_right = 250
 theme_override_constants/margin_bottom = 100
 
-[node name="VFlowContainer" type="VFlowContainer" parent="ScreenMargin"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 8
-
 [node name="TradePnl" parent="ScreenMargin" instance=ExtResource("2_8r605")]
 layout_mode = 2
 size_flags_vertical = 8
-_style = "NONE"
+_style = "Trade"
 
 [node name="ActionBackgroundMargin" type="MarginContainer" parent="ScreenMargin"]
 layout_mode = 2
@@ -77,6 +71,10 @@ script = ExtResource("3_hhurs")
 [node name="TalkBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
 layout_mode = 2
 text = "Talk"
+
+[node name="SeizeBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+text = "Seize"
 
 [node name="AtkBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
 layout_mode = 2

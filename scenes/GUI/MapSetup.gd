@@ -33,7 +33,6 @@ func set_chapter(number : int, title: String, objectives : Array, loss : Array):
 	var objPath = load("res://scenes/GUI/objective_label.tscn")
 	var objBox := $PanelContainer/MarginContainer/SetUpVbox/ConditionsBox/ObjectiveVBox
 	var lossBox := $PanelContainer/MarginContainer/SetUpVbox/ConditionsBox/LossBox
-	
 	chNum.set_text(str(number))
 	titleLb.set_text(title)
 	for obj in objectives:
@@ -45,6 +44,23 @@ func set_chapter(number : int, title: String, objectives : Array, loss : Array):
 		var lb = objPath.instantiate()
 		lb.set_text(l)
 		lossBox.add_child(lb)
+
+
+func free_previous_obj():
+	var objs = $PanelContainer/MarginContainer/SetUpVbox/ConditionsBox/ObjectiveVBox.get_children()
+	var losses := $PanelContainer/MarginContainer/SetUpVbox/ConditionsBox/LossBox.get_children()
+	var first := true
+	for obj in objs:
+		if first:
+			first = false
+			continue
+		obj.queue_free()
+	first = true
+	for loss in losses:
+		if first:
+			first = false
+			continue
+		loss.queue_free()
 
 
 func set_mon(mon: int):

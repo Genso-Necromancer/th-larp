@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="OfudaResource" load_steps=3 format=3 uid="uid://dvjlnd2eys5yb"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_sfgcp"]
+[ext_resource type="Script" uid="uid://be7mkkw1sweve" path="res://unit_resources/items/consumables/ofuda_resource.gd" id="2_i8i2d"]
+
+[resource]
+script = ExtResource("2_i8i2d")
+target = 0
+min_reach = 0
+max_reach = 0
+personal = false
+level = 0
+use = false
+equippable = true
+breakable = true
+expendable = true
+trade = true
+max_dur = 1
+category = 0
+sub_group = 0
+effects = Array[ExtResource("1_sfgcp")]([])
+id = ""
+rule_type = 0

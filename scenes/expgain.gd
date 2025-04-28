@@ -31,10 +31,12 @@ func animation_skip():
 func init_exp_display(oldExp, expSteps, results, unitPrt, unitName):
 	var portrait = $MC/MC/UnitPrt
 	var isLeveled = 0
+	var texture : CompressedTexture2D
 	if tween: tween.kill()
 	tween = get_tree().create_tween()
-	
-	portrait.set_texture(unitPrt)
+	if ResourceLoader.exists(unitPrt):
+		texture = load(unitPrt)
+		portrait.set_texture(texture)
 	expBar.value = oldExp
 	expText.set_text(str(expBar.value))
 #	tween.tween_property(expBar, "value", finalExp, 1)

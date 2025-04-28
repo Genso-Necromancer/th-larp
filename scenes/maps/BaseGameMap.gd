@@ -5,14 +5,26 @@ signal map_ready
 signal events_checked
 signal danmaku_progressed
 
-
+enum MAP_EVENT{NONE, TIME, DEATH, SEIZE}
+enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
 @export_category("Map Values")
-@export var forcedUnits = ["Remilia"] ##Units required to participate in this chapter [Do not use units which can die and arrive prior to this map]
-@export var next_map : PackedScene
+##Units required to participate in this chapter.[br]
+##WARNING: Do not use units which can die and arrive prior to this map]
+@export var forcedUnits = ["Remilia"]
+@export_file("*.tscn") var next_map : String
 @export var chapterNumber: int = 0
 @export var title: String = ""
 @export_group("Conditions")
 @export_subgroup("Win Conditions")
+##Sequential: each objective in win_conidtions occurs one after the other. [br]
+##Simultaneous: Every objective in win_conditions is active at the same time.
+@export var win_style : OBJECTIVE_STYLE = OBJECTIVE_STYLE.SEQUENTIAL
+##Objective of the map.[br]
+##Make new of any desired style of objective, then input the desired requirements
+@export var win_conditions : Array[Objective] = []:
+	set(value):
+		win_conditions = value
+		update_configuration_warnings()
 @export var winEvents : Dictionary = {"Seize" : 0} ## 0 = false, input number of event occurences required for win
 @export var winKill : Array[Unit] = [] ##Use Add Element to select map units which trigger a win condition
 @export_subgroup("Loss Conditions")
@@ -22,15 +34,17 @@ signal danmaku_progressed
 @export_category("Danmaku")
 @export var dmkScript : DanmakuScript
 @export var dmkMaster : Unit
-@export_category("Scene Scripts")
-@export var start_script : SceneScript
-@export var end_script : SceneScript
+@export_category("Cute Scene Scripts")
+@export_file("res://scenes/cutscenes/*_event.json") var start_script = ""
+@export_file("res://scenes/cutscenes/*_event.json") var end_script = ""
+@export_file("res://scenes/cutscenes/*_event.json") var event_scripts : Array[String]
 ##ALL THE FUCKING LAYERS
 @onready var ground :TileMapLayer= $Ground
 @onready var modifier :TileMapLayer= $Modifier
 @onready var object :TileMapLayer= $Object
 @onready var deploy :TileMapLayer= $Deployments
-@onready var regions :TileMapLayer= $Regions ##tiles with Even region numbers are treated as "Enemy Team" regions, while odd are considered "player" regions.
+##tiles with Even region numbers are treated as "Enemy Team" regions, while odd are considered "player" regions.
+@onready var regions :TileMapLayer= $Regions
 @onready var pathAttack :TileMapLayer= $PathAttack
 @onready var narrative :TileMapLayer= $Narrative
 @onready var dev :TileMapLayer= $Dev
@@ -41,6 +55,8 @@ signal danmaku_progressed
 ##Ai Manager
 @onready var ai : AiManager = $AiManager
 
+
+
 var hours : int = 0
 var minutes : int = 0
 var mapSize
@@ -49,7 +65,11 @@ var eventQue := []
 var actingDanmaku := {"Spawning":[], "Collision":[]}
 #event trackers
 var victoryKills : Array = []
-
+var wasSeized : Array[Vector2i] = []
+var sequenceStep := 0:
+	set(value):
+		sequenceStep = clampi(value,0,win_conditions.size()-1)
+		Global.flags.ObjectiveComplete = true
 
 func _ready():
 	if not Engine.is_editor_hint():
@@ -59,10 +79,21 @@ func _ready():
 		dev.visible = false
 		narrative.visible = false
 		regions.visible = false
+		for obj in win_conditions:
+			if obj is KillUnit:
+				for path in obj.hit_list_paths:
+					obj.hit_list.append(get_node(path).unitId)
+
 	mapSize = ground.get_used_rect().size
+	SignalTower.action_seize.connect(self._on_seize)
 	#print(mapSize)
 	emit_signal("map_ready")
 	_initialize_unit_cells()
+
+#region warnings
+func _get_configuration_warnings():
+	if win_conditions.is_empty(): return ["Objective missing in win_condition, map is unbeatable."]
+	else: return []
 
 
 #region property list functions
@@ -218,9 +249,9 @@ func get_walls() -> Dictionary:
 			"WallShoot": shootOver.append(cell)
 			"WallFly": flyOver.append(cell)
 		
-		walls["Wall"] = noGo
-		walls["WallShoot"] = shootOver
-		walls["WallFly"] = flyOver
+	walls["Wall"] = noGo
+	walls["WallShoot"] = shootOver
+	walls["WallFly"] = flyOver
 	return walls
 
 
@@ -246,10 +277,15 @@ func get_narrative_tile(id:int) -> Vector2i:
 	return narrative.get_narrative_tile(id)
 
 
+func is_seize(cell:Vector2i) -> bool:
+	if dev.get_used_cells_by_id(1,Vector2i(0,0),0).has(cell) and !wasSeized.has(cell):
+		return true
+	return false
+
 
 func hide_deployment():
 	deploy.set_enabled(false)
-	
+#endregion
 
 #region Thanks Wokedot
 func map_to_local(mapPosition: Vector2i) -> Vector2:
@@ -262,25 +298,63 @@ func local_to_map(localPosition: Vector2) -> Vector2i:
 
 func get_used_rect() -> Rect2i:
 	return ground.get_used_rect()
-	
-	
-#region Event Functions
+#endregion
 
+#region Event Functions
 func _on_unit_death(unit):
-	check_event("Death", unit)
-	
-func check_event(trigger:String, parameter): ##Triggers: death, time, seize
+	check_event(MAP_EVENT.DEATH, unit)
+
+
+func _on_seize(cell:Vector2i):
+	check_event(MAP_EVENT.SEIZE,cell)
+
+
+func check_event(trigger:MAP_EVENT, parameter): ##Triggers: death, time, seize
 	var triggered := false
 	match trigger:
-		"Death": triggered = _check_death_conditionals(parameter)
-		"Time": triggered = _check_time_conditional(parameter)
+		MAP_EVENT.SEIZE: triggered = _check_seize_conditionals(parameter)
+		MAP_EVENT.DEATH: triggered = _check_death_conditionals(parameter)
+		MAP_EVENT.TIME: triggered = _check_time_conditional(parameter)
 	return triggered
+
+
+func _get_win_objective(event:MAP_EVENT) -> Objective:
+	var toCheck : Array[Objective] = []
+	var obj : Objective
+	match win_style:
+		OBJECTIVE_STYLE.SEQUENTIAL: return win_conditions[sequenceStep]
+		OBJECTIVE_STYLE.SIMULTANEOUS: toCheck = win_conditions
 	
-			
-func _check_death_conditionals(parameter):
+	for con in toCheck:
+		match event:
+			MAP_EVENT.TIME: pass
+			MAP_EVENT.SEIZE: if con is Seize: return con
+			MAP_EVENT.DEATH:  if con is KillUnit: return con
+	return obj
+
+
+func _check_seize_conditionals(cell) -> bool:
+	var c := 0
+	var obj : Seize = _get_win_objective(MAP_EVENT.SEIZE)
+	if !obj: return false
+	elif is_seize(cell): wasSeized.append(cell)
+	
+	for event in dev.get_used_cells_by_id(1,Vector2i(0,0),0):
+		if wasSeized.has(event): c += 1
+	
+	if c >= obj.seize_count:
+		obj.complete = true
+		sequenceStep += 1
+		_check_victory()
+		return true
+	return false
+
+
+func _check_death_conditionals(parameter) -> bool:
 	var unitId
 	var condition
 	var triggered := false
+	var winObj :KillUnit= _get_win_objective(MAP_EVENT.DEATH)
 	if parameter.FACTION_ID == Enums.FACTION_ID.PLAYER:
 		unitId = parameter.unitId
 		condition = "Player Death"
@@ -296,22 +370,26 @@ func _check_death_conditionals(parameter):
 			if lossKill.has(parameter):
 				Global.flags.gameOver = true
 				triggered = true
-			if winKill.has(parameter):
+			if winObj.hit_list.has(parameter.unitId):
 				_add_kill(parameter, true)
 	if triggered:
 		_check_off_event.call_deferred()
 	return triggered
-	
+
+
 func _add_kill(unit, victory):
+	var winObj :KillUnit = _get_win_objective(MAP_EVENT.DEATH)
 	if victory:
-		victoryKills.append(unit)
-		
-	for kill in winKill:
+		victoryKills.append(unit.unitId)
+	if !winObj: return
+	for kill in winObj.hit_list:
 		if !victoryKills.has(kill):
 			return
-			
-	Global.flags.victory = true
-		
+	winObj.complete = true
+	sequenceStep += 1
+	_check_victory()
+
+
 func _check_time_conditional(_time) -> bool:
 	var triggered := false
 	if hoursPassed == 0: triggered = false
@@ -329,23 +407,32 @@ func _check_time_conditional(_time) -> bool:
 			triggered = true
 	return triggered
 
+
 func check_events():
 	var triggered : bool
-	
-	triggered = check_event("Time", Global.gameTime)
+	triggered = check_event(MAP_EVENT.TIME, Global.gameTime)
 	if triggered:
 		eventQue.append(triggered)
 	if eventQue.size() == 0:
 		emit_signal("events_checked")
 	#put other event triggers here, too
 
+
 func _check_off_event():
 	eventQue.pop_back()
 	if eventQue.size() == 0:
 		emit_signal("events_checked")
 
+
+func _check_victory() -> void:
+	var flag : bool
+	for obj in win_conditions:
+		if !obj.complete: return
+	Global.flags.victory = true
+#endregion
+
 #region entity spawning
-func _spawn_premade_units(spawner : UnitSpawner): 
+func _spawn_premade_units(spawner : UnitSpawner):
 	# DIAGNOSIS: SIGNAL NEVER EMITS, BECAUSE ITS PROBABLY NOT SPAWNING THE UNIT. SOMETHING MIGHT NEED TO BE DEFERRED???
 	var units = []
 	var spawnPoints = spawner.get_spawn_points()

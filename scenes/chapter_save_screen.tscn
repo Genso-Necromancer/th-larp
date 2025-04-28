@@ -1,0 +1,190 @@
+[gd_scene load_steps=10 format=3 uid="uid://b60877p5nxbs0"]
+
+[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_u5mmv"]
+[ext_resource type="Script" uid="uid://bg1ilsnxs8q3s" path="res://scenes/chapter_save_screen.gd" id="2_hlip5"]
+[ext_resource type="FontFile" uid="uid://byluxrpq7rwkq" path="res://fonts/JimNightshade/JimNightshade.otf" id="2_ylpcs"]
+[ext_resource type="Theme" uid="uid://c1unty7g6500u" path="res://fonts/Izayoi_Prompt.tres" id="3_hj7dt"]
+[ext_resource type="PackedScene" uid="uid://br3hwrv0dbjeb" path="res://scenes/GUI/textured_label_button.tscn" id="4_gpo5m"]
+[ext_resource type="Theme" uid="uid://dj6umom8dugkc" path="res://fonts/Izayoi_Prompt_Big.tres" id="4_id620"]
+[ext_resource type="PackedScene" uid="uid://cmh8ono4w82cq" path="res://scenes/GUI/menu_cursor.tscn" id="5_gpo5m"]
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="7_id620"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ylpcs"]
+
+[node name="ChapterSaveScreen" type="Control" node_paths=PackedStringArray("input_box", "prompt_box")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_u5mmv")
+script = ExtResource("2_hlip5")
+input_box = NodePath("MainContainer/PromptScreenEdge/PromptVBox/InputHBox")
+prompt_box = NodePath("MainContainer/PromptContainer/PromptPositionContainer/PromptMargin/PromptVBox/InputHBox")
+
+[node name="Panel" type="Panel" parent="."]
+self_modulate = Color(0, 0, 0, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_ylpcs")
+
+[node name="MainContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="Panel" type="Panel" parent="MainContainer"]
+self_modulate = Color(0.2001, 0.251043, 0.29, 1)
+layout_mode = 2
+mouse_filter = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_ylpcs")
+
+[node name="PromptScreenEdge" type="MarginContainer" parent="MainContainer"]
+layout_mode = 2
+theme_override_constants/margin_top = 156
+
+[node name="PromptVBox" type="VBoxContainer" parent="MainContainer/PromptScreenEdge"]
+layout_mode = 2
+
+[node name="LabelMargin" type="MarginContainer" parent="MainContainer/PromptScreenEdge/PromptVBox"]
+layout_mode = 2
+
+[node name="PromptLabel" type="RichTextLabel" parent="MainContainer/PromptScreenEdge/PromptVBox/LabelMargin"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_colors/default_color = Color(0.77, 0.77, 0.77, 1)
+theme_override_colors/font_outline_color = Color(0.131161, 0.124859, 0.11843, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 9
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/shadow_offset_x = 4
+theme_override_constants/shadow_outline_size = 10
+theme_override_fonts/normal_font = ExtResource("2_ylpcs")
+theme_override_font_sizes/normal_font_size = 75
+bbcode_enabled = true
+text = "[center]Would you like to save?[/center]"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+drag_and_drop_selection_enabled = false
+
+[node name="InputHBox" type="HBoxContainer" parent="MainContainer/PromptScreenEdge/PromptVBox"]
+layout_mode = 2
+theme = ExtResource("4_id620")
+theme_override_constants/separation = 170
+alignment = 1
+
+[node name="Confirm" parent="MainContainer/PromptScreenEdge/PromptVBox/InputHBox" instance=ExtResource("4_gpo5m")]
+layout_mode = 2
+label_text = "Yes"
+
+[node name="Deny" parent="MainContainer/PromptScreenEdge/PromptVBox/InputHBox" instance=ExtResource("4_gpo5m")]
+layout_mode = 2
+label_text = "No"
+
+[node name="FileSelectScreenEdge" type="MarginContainer" parent="MainContainer"]
+layout_mode = 2
+theme_override_constants/margin_bottom = 45
+
+[node name="FilesVBox" type="VBoxContainer" parent="MainContainer/FileSelectScreenEdge"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+alignment = 1
+
+[node name="PromptContainer" type="PanelContainer" parent="MainContainer"]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="PromptPositionContainer" type="PanelContainer" parent="MainContainer/PromptContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 1
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="MainContainer/PromptContainer/PromptPositionContainer"]
+layout_mode = 2
+mouse_filter = 1
+texture = ExtResource("7_id620")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="PromptMargin" type="MarginContainer" parent="MainContainer/PromptContainer/PromptPositionContainer"]
+layout_mode = 2
+
+[node name="PromptVBox" type="VBoxContainer" parent="MainContainer/PromptContainer/PromptPositionContainer/PromptMargin"]
+layout_mode = 2
+
+[node name="LabelMargin" type="MarginContainer" parent="MainContainer/PromptContainer/PromptPositionContainer/PromptMargin/PromptVBox"]
+layout_mode = 2
+
+[node name="PromptLabel" type="RichTextLabel" parent="MainContainer/PromptContainer/PromptPositionContainer/PromptMargin/PromptVBox/LabelMargin"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_colors/default_color = Color(0.77, 0.77, 0.77, 1)
+theme_override_colors/font_outline_color = Color(0.131161, 0.124859, 0.11843, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 9
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/shadow_offset_x = 4
+theme_override_constants/shadow_outline_size = 10
+theme_override_fonts/normal_font = ExtResource("2_ylpcs")
+theme_override_font_sizes/normal_font_size = 55
+bbcode_enabled = true
+text = "[center]Continue Without Saving?[/center]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+drag_and_drop_selection_enabled = false
+
+[node name="InputHBox" type="HBoxContainer" parent="MainContainer/PromptContainer/PromptPositionContainer/PromptMargin/PromptVBox"]
+layout_mode = 2
+theme = ExtResource("3_hj7dt")
+theme_override_constants/separation = 160
+alignment = 1
+
+[node name="Continue" parent="MainContainer/PromptContainer/PromptPositionContainer/PromptMargin/PromptVBox/InputHBox" instance=ExtResource("4_gpo5m")]
+layout_mode = 2
+label_text = "Yes"
+
+[node name="Return" parent="MainContainer/PromptContainer/PromptPositionContainer/PromptMargin/PromptVBox/InputHBox" instance=ExtResource("4_gpo5m")]
+layout_mode = 2
+label_text = "No"
+
+[node name="menu_cursor" parent="MainContainer" instance=ExtResource("5_gpo5m")]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="Blocker" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[connection signal="button_pressed" from="MainContainer/PromptScreenEdge/PromptVBox/InputHBox/Confirm" to="." method="_on_confirm_button_pressed"]
+[connection signal="key_input" from="MainContainer/PromptScreenEdge/PromptVBox/InputHBox/Confirm" to="." method="_gui_input"]
+[connection signal="button_pressed" from="MainContainer/PromptScreenEdge/PromptVBox/InputHBox/Deny" to="." method="_on_deny_button_pressed"]
+[connection signal="key_input" from="MainContainer/PromptScreenEdge/PromptVBox/InputHBox/Deny" to="." method="_gui_input"]
+[connection signal="button_pressed" from="MainContainer/PromptContainer/PromptPositionContainer/PromptMargin/PromptVBox/InputHBox/Continue" to="." method="_on_continue_button_pressed"]
+[connection signal="key_input" from="MainContainer/PromptContainer/PromptPositionContainer/PromptMargin/PromptVBox/InputHBox/Continue" to="." method="_gui_input"]
+[connection signal="button_pressed" from="MainContainer/PromptContainer/PromptPositionContainer/PromptMargin/PromptVBox/InputHBox/Return" to="." method="_on_return_button_pressed"]
+[connection signal="key_input" from="MainContainer/PromptContainer/PromptPositionContainer/PromptMargin/PromptVBox/InputHBox/Return" to="." method="_gui_input"]

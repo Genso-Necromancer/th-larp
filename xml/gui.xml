@@ -44,6 +44,11 @@
 			<entry id = "target_target"><![CDATA[Target:]]></entry>
 			<entry id = "target_global"><![CDATA[Time:]]></entry>
 			<entry id = "target_equipped"><![CDATA[Equip:]]></entry>
+			<entry id = "new_save"><![CDATA[New Save]]></entry>
+			<entry id = "saving_file"><![CDATA[Saving...]]></entry>
+			<entry id = "save_complete"><![CDATA[Save Complete!]]></entry>
+			<entry id = "without_saving"><![CDATA[Continue Without Saving?]]></entry>
+			<entry id = "overwrite_save"><![CDATA[Overwrite Existing Save?]]></entry>
 			
 			<!-- Durations -->
 			<entry id = "duration_round"><![CDATA[Rounds]]></entry>

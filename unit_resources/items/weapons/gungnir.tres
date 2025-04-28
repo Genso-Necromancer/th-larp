@@ -6,7 +6,7 @@
 [resource]
 resource_name = "gungnir"
 script = ExtResource("2_jsf6o")
-dmg = 7
+dmg = 17
 hit = 90
 crit = 0
 barrier = 3

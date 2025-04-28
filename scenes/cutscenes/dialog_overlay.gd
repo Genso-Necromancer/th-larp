@@ -1,8 +1,11 @@
 extends Control
+##Dialogue Arrays are stored in /scenes/cutscenes as *_event.json files. Specifc file paths are stored on the relevant game map.[br]
+##Paths are sent via prepare_new_dialogue() where they're parsed using a JasonParser returning the Array[Dictionary] and sets the event in motion.
 class_name DialogueOverlay
 signal dialog_finished
 signal line_finished(textline_index)
 signal _dialogue_fade_finished
+#signal dialogue_loaded
 @onready var texturerect = $PortraitsNode/SpeakerPortrait
 @onready var text_body = $ForegroundElements/TextBody
 @onready var name_label = $ForegroundElements/HBoxContainer/NameLabel
@@ -14,7 +17,7 @@ var dialogue_finished := false
 var text_count := 0
 var textline_index := -1
 var line_is_finished = false
-var current_script : Array[Dictionary]
+var current_event : Array[Dictionary]
 var example_dict = [
 	{
 		"active_speaker": "Remi",
@@ -143,10 +146,20 @@ var speaker_setup = [
 
 #Would be nice to have a function to set a specific background image. With showing the game map as the default.
 func _ready():
-	SignalTower.prompt_accepted.connect(self._on_prompt_accepted) ##Now any input of ui_accept will work, which includes the mouse
 	self.visible = false
 	set_physics_process(false) #Added to halt the scene from auto-playing on load
 	line_finished.connect(_on_line_finished)
+
+
+func _gui_input(event):
+	if GameState.activeState == null:
+			return
+	if event is InputEventMouseMotion:
+		GameState.activeState.mouse_motion(event)
+	elif event is InputEventMouseButton:
+		GameState.activeState.mouse_pressed(event)
+	elif event is InputEventKey:
+		GameState.activeState.event_key(event)
 
 
 func _unhandled_input(event) -> void:
@@ -158,12 +171,13 @@ func _unhandled_input(event) -> void:
 	#elif event.is_action_released("ui_accept"): 
 		
 
-func _on_prompt_accepted():
+##input from control state DIALOGUE_SCENE
+func gui_accept():
 	if GameState.state != GameState.gState.DIALOGUE_SCENE: return
-	elif !current_script[textline_index].has("text"): return
+	elif !current_event[textline_index].has("text"): return
 	if !$TextStopper/AnimationPlayer.is_playing():
 		line_finished.emit(textline_index)
-	elif textline_index < current_script.size() - 1:
+	elif textline_index < current_event.size() - 1:
 		next_textline()
 	else: _conclude_dialog()
 		
@@ -182,21 +196,21 @@ var anim_proceed = false
 var effect_proceed = false
 func _physics_process(delta):
 	if !dialogue_finished && text_proceed && anim_proceed && effect_proceed && !$TextStopper.visible:
-		if !current_script[textline_index].has("text") and textline_index < current_script.size()-1:
+		if !current_event[textline_index].has("text") and textline_index < current_event.size()-1:
 			next_textline()
-		elif textline_index >= current_script.size()-1: _conclude_dialog()
+		elif textline_index >= current_event.size()-1: _conclude_dialog()
 		else:
 			$TextStopper.visible = true
 			$TextStopper/AnimationPlayer.play("ContinueBobber")
 	
-	if !current_script[textline_index].has("text"): return
+	if !current_event[textline_index].has("text"): return
 		
-	if text_count < current_script[textline_index]["text"].length():
+	if text_count < current_event[textline_index]["text"].length():
 		if text_body.text.ends_with("?") or text_body.text.ends_with(".") or text_body.text.ends_with("-") or text_body.text.ends_with("!"):
 			delta_speed += delta * draw_speed * 0.2
 		else:
 			delta_speed += delta * draw_speed
-		text_body.text += current_script[textline_index]["text"].substr(text_count, int(delta_speed))
+		text_body.text += current_event[textline_index]["text"].substr(text_count, int(delta_speed))
 		text_count += int(delta_speed)
 		delta_speed -= int(delta_speed)
 	elif !line_is_finished:
@@ -205,12 +219,14 @@ func _physics_process(delta):
 
 # Can I put these nodes into an array instead of using find_child?
 # yes, but I'd use a dictionary for your use case
-#Now called when a new map is loaded, right after the splash screen. See MapManager:_on_gui_splash_finished()
+#Now called when a new map is loaded, right after the splash screen. See MapManager:_on_gui_splash_finished(). Will be called in more varied ways
 ##SceneScripts are stored on the map associated with them. There is to be a Start and End scene to each Chapter that daisy chains things together with a moment for saving/loading in-between last End and new Start
-func prepare_new_dialogue(new_script:SceneScript = null):
+func prepare_new_dialogue(new_event:String= ""):
+	var parser = JasonParser.new()
+	var eventDick : Array[Dictionary] = parser.parse_json(new_event)
 	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE) #Used to avoid conflicting inputs. Currently only uses ACCEPT_PROMPT input script, could extend GenericScript to make a new one specifically for this scene. You'll know what to do when you look at existing ones.
-	if new_script: current_script = new_script.dialogue_script
-	else: current_script = example_dict #subverts variable typing to give a dictionary as default, normally only want to pass ScenScript Resource
+	if new_event: current_event = eventDick
+	else: current_event = example_dict #subverts variable typing to give a dictionary as default, normally only want to pass ScenScript Resource
 	toggle_dialog()
 	set_physics_process(true) #necessary with the new triggered way to start the scene
 	for speaker in speaker_setup:
@@ -227,10 +243,10 @@ func prepare_new_dialogue(new_script:SceneScript = null):
 
 
 func _on_line_finished(index):
-	if !current_script[index].has("text"): return
+	if !current_event[index].has("text"): return
 
-	text_count = current_script[index]["text"].length()
-	text_body.text = current_script[index]["text"]
+	text_count = current_event[index]["text"].length()
+	text_body.text = current_event[index]["text"]
 	line_is_finished = true
 	text_proceed = true
 
@@ -241,9 +257,9 @@ func next_textline():
 	text_count = 0
 	line_is_finished = false
 	
-	text_proceed = true if !current_script[textline_index].has("text") else false
-	anim_proceed = true if !current_script[textline_index].has("animations") else false
-	effect_proceed = true #if !current_script[textline_index].has("effects") else false #right now, not handling
+	text_proceed = true if !current_event[textline_index].has("text") else false
+	anim_proceed = true if !current_event[textline_index].has("animations") else false
+	effect_proceed = true #if !current_event[textline_index].has("effects") else false #right now, not handling
 	
 	delta_speed = 0.0
 	text_body.text = ""
@@ -251,7 +267,7 @@ func next_textline():
 	$TextStopper.visible = false
 	$TextStopper/AnimationPlayer.stop()
 	
-	var cur_line = current_script[textline_index]
+	var cur_line = current_event[textline_index]
 	if !cur_line.has("text"):
 		$ForegroundElements.visible = false
 	else:
@@ -275,10 +291,10 @@ func next_textline():
 		#else:
 			#name_label.text = cur_line["speaker"]
 	#
-	#if current_script[textline_index].has("title"):
+	#if current_event[textline_index].has("title"):
 		#title_label.text = cur_line["title"]
 	#
-	#if current_script[textline_index].has("portrait"):
+	#if current_event[textline_index].has("portrait"):
 		#texturerect.texture = load(cur_line["portrait"])
 	
 	if cur_line.has("effects"): # TODO Add a default-to-Active_Speaker fallback if no Target is specified
@@ -331,12 +347,13 @@ func toggle_dialog():
 	await toggle_dialog_tween.finished
 	_dialogue_fade_finished.emit()
 
+
 var anims_finished = 0
 func _on_anim_finished():
 	anims_finished += 1
-	print("Animation %s of %s" % [anims_finished, current_script[textline_index]["animations"].size()])
+	print("Animation %s of %s" % [anims_finished, current_event[textline_index]["animations"].size()])
 	
-	if anims_finished == current_script[textline_index]["animations"].size():
-		if !current_script[textline_index].has("text"):
+	if anims_finished == current_event[textline_index]["animations"].size():
+		if !current_event[textline_index].has("text"):
 			await get_tree().create_timer(0.6).timeout # Delay anim-only lines
 		anim_proceed = true

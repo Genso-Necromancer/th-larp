@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="Seize" load_steps=2 format=3 uid="uid://cwpajo2thxo27"]
+
+[ext_resource type="Script" uid="uid://b7a6ss8luhslm" path="res://scenes/maps/objectives/seize.gd" id="1_qgpd6"]
+
+[resource]
+script = ExtResource("1_qgpd6")
+seize_count = 0

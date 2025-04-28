@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="Ofuda" load_steps=2 format=3 uid="uid://cbwafn336efoc"]
+
+[ext_resource type="Script" uid="uid://dtxt6i4bhoqpo" path="res://unit_resources/items/consumables/ofuda.gd" id="1_vj512"]
+
+[resource]
+script = ExtResource("1_vj512")
+equipped = false
+dropped = false
+is_broken = false

@@ -36,6 +36,12 @@ func display_unit_actions(unit : Unit):
 		var bName = b.get_name()
 		match bName:
 			"TalkBtn": pass
+			"VisitBtn": pass
+			"ShopBtn": pass
+			"SeizeBtn":
+				b.visible = Global.flags.CurrentMap.is_seize(unit.cell)
+				b.disabled = !b.visible
+					
 			"AtkBtn": 
 				if itemFlags.hasWeapons and inReach.Hostiles:
 					b.visible = true

@@ -17,7 +17,6 @@ func _process(_delta):
 
 		
 func set_cursor(button = get_viewport().gui_get_focus_owner()):
-	
 	var cPosition = button.get_global_position()
 	var cSize = button.size
 	var newPos

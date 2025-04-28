@@ -1,0 +1,13 @@
+[
+	{
+		"active_speaker": "Remi",
+		"animations": [{"name": "slide", "target": "Remi", "pos": 0.75}]
+	},
+	{
+		"text": "Killunit Test Start.",
+		"effects": [{"name": "loud"},],
+	},
+	{
+		"animations": [{"name": "slide", "target": "Remi", "pos": 3.0}]
+	},
+]

@@ -110,7 +110,7 @@ func _assign_attack_animation():
 		activeAnim = animation
 	else:
 		activeAnim = default
-	add_weapon_fx(weapon.ID)
+	add_weapon_fx(weapon.id)
 	
 	
 		

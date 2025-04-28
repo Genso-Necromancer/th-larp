@@ -1,6 +1,0 @@
-[gd_resource type="Resource" script_class="SceneScript" load_steps=2 format=3 uid="uid://do3acn7e6lrmv"]
-
-[ext_resource type="Script" uid="uid://cruyvi5qpxqkk" path="res://scenes/cutscenes/scene_script/test_script.gd" id="1_hb0n3"]
-
-[resource]
-script = ExtResource("1_hb0n3")

@@ -2,20 +2,20 @@ extends Area2D
 class_name AuraArea
 
 var master : Unit
-var aura : Dictionary
+var aura : Aura
 @export var polygon : PackedVector2Array = [Vector2(-40,-24), Vector2(-80,0), Vector2(-40,24), Vector2(40,24), Vector2(80,0), Vector2(40,-24)]
 	
 	
-func set_aura(unit: Unit, auraData: Dictionary):
+func set_aura(unit: Unit, auraData: Aura):
 	var hexStar = AHexGrid2D.new($AuraMap)
 	var auraCells : Array
 	master = unit
 	aura = auraData
-	auraCells = hexStar.find_aura(Vector2i(0,0), aura.Range)
+	auraCells = hexStar.find_aura(Vector2i(0,0), aura.range)
 	#print("Aura Cells:","[",unit,"]",auraCells)
-	if !aura.IsSelf:
+	if !aura.is_self:
 		auraCells.erase(Vector2i(0,0))
-	if aura.Target == Enums.EFFECT_TARGET.SELF:
+	if aura.target == Enums.EFFECT_TARGET.SELF:
 			self.area_entered.connect(master._on_self_aura_entered.bind(self))
 			self.area_exited.connect(master._on_self_aura_exited.bind(self))
 	_place_areas(auraCells)

@@ -23,7 +23,8 @@ enum gState {
 	ACCEPT_PROMPT,
 	FAIL_STATE,
 	WIN_STATE,
-	SCENE_ACTIVE
+	SCENE_ACTIVE,
+	SAVE_SCENE,
 }
 
 
@@ -45,9 +46,8 @@ var previousSlave : Array[Node]
 var shouldChangeState = false
 
 
+
 func change_state(newSlave : Node = previousSlave.pop_back(), newState: gState = previousState.pop_back()):
-	
-	
 	previousState.append(state)
 	state = newState
 	
@@ -148,18 +148,16 @@ func _switch_state(value):
 			
 			activeState = AcceptState.new()
 		gState.DIALOGUE_SCENE:
-			activeState = AcceptState.new()
+			activeState = GUIConfirm.new()
 		gState.FAIL_STATE:
-			
 			activeState = FailState.new()
 		gState.WIN_STATE:
-			
-			activeState = AcceptState.new()
+			activeState = GUIConfirm.new()
 		gState.SCENE_ACTIVE:
-			
 			activeState = AcceptState.new()
 		gState.GB_END_OF_ROUND:
-			
 			activeState = LoadingState.new()
+		gState.SAVE_SCENE:
+			activeState = SaveMenuState.new()
 	add_child(activeState)
 	activeState.setup(activeSlave)

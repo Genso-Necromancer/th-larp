@@ -19,8 +19,8 @@ func _ready():
 		popUp.index_pressed.connect(self.on_index_pressed)
 		self.loadMapManager.connect(main.on_load_map_manager)
 		self.unloadMe.connect(main.unload_me)
-
 		firstLaunch = false
+
 
 func on_index_pressed(index):
 	itemId = popUp.get_item_id(index)
@@ -29,6 +29,10 @@ func on_index_pressed(index):
 func _on_load_button_pressed():
 	match itemId:
 		0: 
-			var map = preload("res://scenes/maps/test_map01.tscn")
+			var map = "res://scenes/maps/seize_test.tscn"
+			emit_signal("loadMapManager", map)
+			emit_signal("unloadMe", self)
+		1: 
+			var map = "res://scenes/maps/killunit_test.tscn"
 			emit_signal("loadMapManager", map)
 			emit_signal("unloadMe", self)

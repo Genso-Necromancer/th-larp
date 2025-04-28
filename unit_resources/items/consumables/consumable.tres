@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("1_rrip7")
-dur = 0
 equipped = false
 dropped = false
+is_broken = false

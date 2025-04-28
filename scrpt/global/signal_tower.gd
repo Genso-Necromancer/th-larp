@@ -10,6 +10,7 @@ signal cursor_tile_updated(unit: Unit, tile)
 signal inventory_weapon_changed(button : ItemButton)
 signal action_weapon_selected(button : ItemButton)
 signal action_skill_confirmed()
+signal action_seize(cell:Vector2i)
 
 ##Combat Animation Signals
 signal forecast_predicted(fcData : Dictionary)

@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=17 format=3 uid="uid://dae0fl1fnuwvk"]
+[gd_resource type="TileSet" load_steps=18 format=3 uid="uid://dae0fl1fnuwvk"]
 
 [ext_resource type="Texture2D" uid="uid://cwrqpj7en2cof" path="res://sprites/tiles/deployment.png" id="1_ggcxa"]
 [ext_resource type="Texture2D" uid="uid://b3kybcmn08s6d" path="res://sprites/tiles/forcedDeployment.png" id="2_e3vs3"]
@@ -57,6 +57,13 @@ texture_region_size = Vector2i(168, 104)
 0:3/0/texture_origin = Vector2i(0, 25)
 0:3/0/custom_data_0 = &"Shop"
 0:3/0/custom_data_1 = &"Shop"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ggcxa"]
+resource_name = "Seize Tile"
+texture = ExtResource("6_6ymmv")
+texture_region_size = Vector2i(160, 48)
+0:0/0 = 0
+0:0/0/modulate = Color(0.890196, 0.784314, 0, 1)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fntpe"]
 texture = ExtResource("5_ycrxn")
@@ -156,3 +163,4 @@ sources/7 = SubResource("TileSetAtlasSource_2ggml")
 sources/4 = SubResource("TileSetAtlasSource_fntpe")
 sources/1 = SubResource("TileSetAtlasSource_bkpol")
 sources/0 = SubResource("TileSetAtlasSource_qmxju")
+sources/2 = SubResource("TileSetAtlasSource_ggcxa")

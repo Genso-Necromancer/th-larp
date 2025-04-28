@@ -58,6 +58,7 @@ func _init_flags():
 		"DebugMode": true,
 		"gameOver": false,
 		"victory": false,
+		"ObjectiveComplete": false,
 		"activeUnit": false,
 		"focusUnit": false, #Does this get used?
 		"gameTime": 0,
@@ -65,8 +66,10 @@ func _init_flags():
 		"trueTimeFactor": 1,
 		"rotationFactor": 15,
 		"CurrentMap": 0,
+		"NextMap": null,
 		"traded": false,
 		"itemUsed" : false,
+		"ChaptersCompleted": []
 	}
 
 func set_rich_text_params(label):
@@ -89,6 +92,7 @@ func progress_time():
 
 func reset_time_factor():
 	timeFactor = trueTimeFactor
+
 
 ##multiplies timeFactor by value given, clamps value between 0.25 and 2
 func apply_time_factor(effectValue:float):
@@ -125,4 +129,15 @@ func time_to_string(hours:int, minutes:int) -> String:
 	else: timeM = str(minutes)
 	timeString = timeString % [timeH, timeM]
 	return timeString
+#endregion
+
+#region flag shit
+func reset_map_flags():
+	Global.flags.gameOver = false
+	Global.flags.victory = false
+	Global.flags.traded = false
+	Global.flags.itemUsed = false
+	Global.flags.gameOver = false
+	Global.flags.victory = false
+	Global.flags.ObjectiveComplete = false
 #endregion

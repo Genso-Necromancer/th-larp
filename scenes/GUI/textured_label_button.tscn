@@ -1,0 +1,52 @@
+[gd_scene load_steps=2 format=3 uid="uid://br3hwrv0dbjeb"]
+
+[ext_resource type="Script" uid="uid://p6xktq38drkq" path="res://scenes/GUI/textured_label_button.gd" id="1_8vuji"]
+
+[node name="TexturedLabelButton" type="PanelContainer"]
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 1
+script = ExtResource("1_8vuji")
+
+[node name="ButtonBackground" type="TextureRect" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ContentsHBox" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+alignment = 1
+
+[node name="Icon" type="TextureRect" parent="ContentsHBox"]
+visible = false
+layout_mode = 2
+mouse_filter = 2
+
+[node name="LabelMargin" type="MarginContainer" parent="ContentsHBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="ButtonText" type="RichTextLabel" parent="ContentsHBox/LabelMargin"]
+layout_mode = 2
+mouse_filter = 2
+bbcode_enabled = true
+text = "Null"
+fit_content = true
+autowrap_mode = 0
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TextureButton" type="TextureButton" parent="."]
+layout_mode = 2
+mouse_filter = 1
+mouse_force_pass_scroll_events = false
+
+[connection signal="focus_entered" from="TextureButton" to="." method="_on_texture_button_focus_entered"]
+[connection signal="gui_input" from="TextureButton" to="." method="_on_texture_button_gui_input"]
+[connection signal="mouse_entered" from="TextureButton" to="." method="_on_texture_button_mouse_entered"]
+[connection signal="pressed" from="TextureButton" to="." method="_on_texture_button_pressed"]

@@ -16,5 +16,6 @@ metadata/_custom_type_script = "uid://bas4mbl00uet6"
 [node name="Cirno" instance=ExtResource("1_77cbq")]
 generate = false
 unitId = "Cirno"
+isBoss = true
 archetype = 4
 inventory = Array[ExtResource("2_tawq4")]([SubResource("Resource_tawq4")])

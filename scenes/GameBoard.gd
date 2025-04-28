@@ -15,14 +15,12 @@ signal unit_move_ended(unit:Unit)
 signal gameboard_targeting_canceled
 signal camera_on_anchor
 signal danmaku_pathing_complete
-
 signal sequence_concluded
 signal post_queue_cleared
 signal continue_queue
-
-
-
 signal map_loaded(map)
+signal map_freed
+
 signal skill_target_canceled
 signal forecast_confirmed
 signal time_set
@@ -43,6 +41,7 @@ signal turn_order_updated
 
 enum ACTION_TYPE {ATTACK, SKILL, WAIT, END}
 
+var map_end := false
 # Mapping locations of units and danmaku {cell:node}
 var units :Dictionary[Vector2i, Unit]= {} 
 var danmaku := {}
@@ -138,7 +137,7 @@ var globalEffects = {}
 
 
 #unit variables
-var activeAction : Dictionary = {"Weapon":false,"Skill":false}
+var activeAction : Dictionary = {"Weapon":false,"Skill":null}
 var postQueue = []
 
 #controls pseudo UI elements, like HP bars
@@ -172,10 +171,11 @@ var unitScn := preload("res://scenes/Unit.tscn")
 
 
 func _process(_delta):
-	_check_flags()
 	
+	_check_flags()
 	if deathList.size() > 0 and turnComplete:
 		_wipe_dead()
+	elif map_end: return
 	elif endOfRound:
 		_check_eor_events()
 	elif collisionQue.size() > 0 and GameState.state == GameState.gState.GB_END_OF_ROUND:
@@ -265,27 +265,27 @@ func _get_current_map():
 		
 	
 	
-func change_map(map):
-	_reset_map_flags()
+func free_map()->void:
+	reset_flags()
 	turnComplete = false # find a better place to reinitialize this and above value HERE
 	if currMap:
 		currMap.queue_free()
 		await currMap.tree_exited
-	call_deferred("_load_new_map", map)
-		
-		
-func _load_new_map(map):
-	var newMap = map.instantiate()
+	map_freed.emit()
+	#call_deferred("_load_new_map", map)
+
+
+func load_map(map:String):
+	var newMap = load(map).instantiate()
 	Global.timePassed = 0
 	add_child(newMap)
-	
-	
+
+
 func _on_map_ready():
 	call_deferred("_initialize_new_map")
 	
-#func on_map_gone():
-	#self.call_deferred("_initialize_new_map")
-	
+
+
 func _initialize_new_map():
 	_connect_general_signals()
 	currMap = _get_current_map()
@@ -994,7 +994,7 @@ func on_directional_press(direction: Vector2i):
 
 func start_attack_targeting():
 	var reach :Dictionary = activeUnit.get_weapon_reach()
-	activeAction = {"Weapon": true, "Skill": false}
+	activeAction = {"Weapon": true, "Skill": null}
 	GameState.change_state(self, GameState.gState.GB_ATTACK_TARGETING)
 	_draw_range(activeUnit, reach.Max, reach.Min)
 	
@@ -1174,7 +1174,6 @@ func find_next_best_cell(currentCell, nextCell): #it's still pretty jank, but at
 #		combatManager.rng.qeue_free()
 		
 func on_death_done(unit: Unit):
-	
 	#Plan to alter this down the line for Seiga fight, where fallen units will be cached instead of completely removed
 	#Intention would be for Seiga to "reanimate" fallen units as part of her "danmaku"
 	var addingExp = false
@@ -1188,7 +1187,7 @@ func on_death_done(unit: Unit):
 	else:
 		unit.confirm_post_sequence_flags("Death")
 	deathList.append(unit)
-	currMap.check_event("Death", unit)
+	currMap.check_event(currMap.MAP_EVENT.DEATH, unit)
 	
 	
 #	var filterDick = []
@@ -1589,7 +1588,7 @@ func _on_action_weapon_selected(button = false):
 	sequencingUnits[target] = true
 	if activeAction.Weapon and button:
 		var weapon = button.get_meta("Item")
-		activeUnit.set_direct_equipped(weapon)
+		activeUnit.set_equipped(weapon)
 	GameState.change_state(self, GameState.gState.LOADING)
 	combatResults = combatManager.start_the_justice(activeUnit,target, activeAction)
 	#print(str(combatResults))
@@ -1603,8 +1602,7 @@ func _on_action_weapon_selected(button = false):
 
 
 func _on_win_screen_win_finished():
-	GameState.change_state(self, GameState.gState.LOADING)
-	change_map(currMap.next_map)
+	Global.flags.ChaptersCompleted.append(currMap.chapterNumber)
 	#currMap.progress_next_map()
 	#self.call_deferred("_load_next_map")
 	
@@ -1642,7 +1640,7 @@ func _on_inventory_weapon_changed(button) -> void:
 	
 	if button.disabled:
 		return
-	activeUnit.set_temp_equip(i) #See if it can find it's own index based on ID?
+	activeUnit._equip_weapon(i) #See if it can find it's own index based on ID?
 	combatManager.get_forecast(activeUnit, targetUnit, activeAction)
 	
 	
@@ -1651,17 +1649,23 @@ func _on_inventory_weapon_changed(button) -> void:
 func _check_flags():
 	var flags = Global.flags
 	
-	if flags.gameOver: #consider saving reason for loss in later versions
+	if map_end: return
+	elif flags.gameOver: #consider saving reason for loss in later versions
+		map_end = true
 		emit_signal("player_lost")
-		
-	if flags.victory:
+	elif flags.victory:
+		map_end = true
 		emit_signal("player_win")
 		
-func _reset_map_flags():
-	Global.flags.gameOver = false
-	Global.flags.victory = false
-	
-	
+func reset_flags():
+	Global.reset_map_flags()
+	map_end = false
+	aiTurn = false
+	aiNeedAct = false
+	turnComplete = false
+	endOfRound = false
+	startNextTurn = false
+
 #aura signals
 func _on_area_2d_area_entered(area):
 	#print("Entered: ", area.collision_layer)

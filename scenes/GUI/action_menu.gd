@@ -159,6 +159,12 @@ func _unhide_action_container():
 func _on_button_pressed(bName):
 	match bName:
 		"TalkBtn": pass
+		"SeizeBtn": 
+			SignalTower.action_seize.emit(currentUnit.cell)
+			_clear_states()
+			emit_signal("action_menu_selected", bName)
+		"VisitBtn": pass
+		"ShopBtn": pass
 		"AtkBtn": 
 			_change_state(MENU_STATES.WEAPONS_TARGETING)
 		"SklBtn": 

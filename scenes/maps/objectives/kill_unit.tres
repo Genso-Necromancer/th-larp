@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="KillUnit" load_steps=2 format=3 uid="uid://dgu5oubmwl68v"]
+
+[ext_resource type="Script" uid="uid://c7tvc3aqd1v3r" path="res://scenes/maps/objectives/kill_unit.gd" id="1_d2mog"]
+
+[resource]
+script = ExtResource("1_d2mog")
+hit_list = Array[NodePath]([])

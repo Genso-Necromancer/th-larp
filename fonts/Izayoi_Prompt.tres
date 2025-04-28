@@ -1,0 +1,58 @@
+[gd_resource type="Theme" load_steps=11 format=3 uid="uid://c1unty7g6500u"]
+
+[ext_resource type="FontFile" uid="uid://byluxrpq7rwkq" path="res://fonts/JimNightshade/JimNightshade.otf" id="1_5vlnt"]
+[ext_resource type="FontFile" uid="uid://cuuir1uibmfis" path="res://fonts/Marcellus/Marcellus.otf" id="2_8yr41"]
+[ext_resource type="FontFile" uid="uid://c2km1ktr8iwsb" path="res://fonts/Marcellus/Marcellus-sc.regular.otf" id="2_gh0fn"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_s7ira"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_t31wv"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_kl6js"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_hsiuf"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rfvx0"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_y8ifr"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_63pdl"]
+
+[resource]
+default_base_scale = 1.0
+default_font = ExtResource("2_8yr41")
+default_font_size = 12
+Button/colors/font_color = Color(0.87451, 0.87451, 0.87451, 1)
+Button/colors/font_disabled_color = Color(0.255659, 0.255659, 0.255659, 1)
+Button/colors/font_focus_color = Color(0.776471, 0.67451, 0.247059, 1)
+Button/colors/font_hover_color = Color(0.898039, 0.788235, 0.352941, 1)
+Button/colors/font_hover_pressed_color = Color(1, 1, 1, 1)
+Button/colors/font_outline_color = Color(1, 1, 1, 1)
+Button/colors/font_pressed_color = Color(1, 1, 1, 1)
+Button/colors/icon_disabled_color = Color(1, 1, 1, 0.4)
+Button/colors/icon_focus_color = Color(1, 1, 1, 1)
+Button/colors/icon_hover_color = Color(1, 1, 1, 1)
+Button/colors/icon_hover_pressed_color = Color(1, 1, 1, 1)
+Button/colors/icon_normal_color = Color(1, 1, 1, 1)
+Button/colors/icon_pressed_color = Color(1, 1, 1, 1)
+Button/constants/h_separation = 2
+Button/constants/outline_size = 0
+Button/font_sizes/font_size = 25
+Button/styles/disabled = SubResource("StyleBoxEmpty_s7ira")
+Button/styles/focus = SubResource("StyleBoxEmpty_t31wv")
+Button/styles/hover = SubResource("StyleBoxEmpty_kl6js")
+Button/styles/normal = SubResource("StyleBoxEmpty_hsiuf")
+Button/styles/pressed = SubResource("StyleBoxEmpty_rfvx0")
+Label/font_sizes/font_size = 42
+Label/fonts/font = ExtResource("1_5vlnt")
+MarginContainer/constants/margin_bottom = 15
+MarginContainer/constants/margin_left = 15
+MarginContainer/constants/margin_right = 15
+MarginContainer/constants/margin_top = 15
+Panel/styles/panel = SubResource("StyleBoxEmpty_y8ifr")
+PanelContainer/styles/panel = SubResource("StyleBoxEmpty_63pdl")
+RichTextLabel/colors/default_color = Color(0.621524, 0.621524, 0.621524, 1)
+RichTextLabel/colors/font_outline_color = Color(0.114897, 0.114897, 0.114897, 1)
+RichTextLabel/constants/outline_size = 13
+RichTextLabel/font_sizes/normal_font_size = 31
+RichTextLabel/fonts/normal_font = ExtResource("2_gh0fn")

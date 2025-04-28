@@ -6,6 +6,7 @@ class_name AHexGrid2D
 ##Active Unit is used in places, but never actually assigned??? Assess this.
 var mapSize
 var mapRect
+var mapCells :Array[Vector2i]
 
 var tileMap
 var oddq_directions = [
@@ -32,7 +33,11 @@ func reinit():
 func _init(map):
 	tileMap = map
 	mapRect = tileMap.get_used_rect()
-	mapSize = mapRect.size
+	
+	if map is GameMap: 
+		mapSize = tileMap.mapSize
+		mapCells = tileMap.ground.get_used_cells()
+	elif map is TileMapLayer: mapCells = tileMap.get_used_cells()
 	#tileSize = tileMap.tileSize
 	#lowest_f_cost
 	#lowest_node
@@ -250,10 +255,11 @@ func _slam_check(hex):
 
 func is_valid_position(neighbor): #not modified, was fine
 	var valid
-	if neighbor.x >= mapSize.x or neighbor.y >= mapSize.y:
-		valid = false
-	elif neighbor.x < 0 or neighbor.y < 0:
-		valid = false
+	if !mapCells.has(neighbor): valid = false
+	#if neighbor.x >= mapSize.x or neighbor.y >= mapSize.y:
+		#valid = false
+	#elif neighbor.x < 0 or neighbor.y < 0:
+		#valid = false
 	else:
 		valid = true
 	return valid

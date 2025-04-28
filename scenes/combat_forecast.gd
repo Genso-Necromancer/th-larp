@@ -8,6 +8,7 @@ var animationsLoaded = false
 
 func _ready():
 	self.visible = false
+	$ForecastMargin/ForecastBox/EffectRow.visible = false
 	SignalTower.forecast_predicted.connect(self.update_fc)
 	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
 
@@ -15,7 +16,7 @@ func show_fc() -> void:
 	self.visible = true
 	
 func hide_fc() -> void:
-	var effectPanels = [$ForecastMargin/ForecastBox/EffectRow/AtkEfPanel, $ForecastMargin/ForecastBox/EffectRow/Labels2, $ForecastMargin/ForecastBox/EffectRow/TargetEfPanel]
+	var effectPanels = [$ForecastMargin/ForecastBox/EffectRow, $ForecastMargin/ForecastBox/EffectRow/AtkEfPanel, $ForecastMargin/ForecastBox/EffectRow/Labels2, $ForecastMargin/ForecastBox/EffectRow/TargetEfPanel]
 	self.visible = false
 	for p in effectPanels:
 		p.visible = false
@@ -97,8 +98,8 @@ func _load_effects(cmbData) -> void:
 	var units : Array = cmbData.keys()
 	var lists : Dictionary
 	var panels : Array 
-	
-	if units.size() < 2: 
+	$ForecastMargin/ForecastBox/EffectRow.visible = true
+	if units.size() < 2:
 		lists = {units[0]:$ForecastMargin/ForecastBox/EffectRow/AtkEfPanel/AMa/AVB}
 		panels = [$ForecastMargin/ForecastBox/EffectRow/AtkEfPanel, $ForecastMargin/ForecastBox/EffectRow/Labels2]
 	else: 
@@ -157,7 +158,7 @@ func _add_effect_labels(lists, strings):
 
 func _close_effects() -> void:
 	var lists : Array = [$ForecastMargin/ForecastBox/EffectRow/TargetEfPanel/TMa/TVB, $ForecastMargin/ForecastBox/EffectRow/AtkEfPanel/AMa/AVB]
-	var panels : Array = [$ForecastMargin/ForecastBox/EffectRow/AtkEfPanel, $ForecastMargin/ForecastBox/EffectRow/Labels2, $ForecastMargin/ForecastBox/EffectRow/TargetEfPanel]
+	var panels : Array = [$ForecastMargin/ForecastBox/EffectRow, $ForecastMargin/ForecastBox/EffectRow/AtkEfPanel, $ForecastMargin/ForecastBox/EffectRow/Labels2, $ForecastMargin/ForecastBox/EffectRow/TargetEfPanel]
 	for l in lists:
 		for child in l.get_children():
 				child.queue_free()

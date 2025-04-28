@@ -25,6 +25,10 @@ func _init(): #Occurs when game first launches, sets to loading state
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		return
+	elif event.is_action_pressed("ui_snap"):
+		take_screenshot()
+	elif event.is_action_pressed("xml_debug"):
+		StringGetter.mash_test()
 	elif Input.is_action_just_pressed("ui_return"):
 		get_viewport().set_input_as_handled()
 		GameState.activeState._handle_bind("ui_return")
@@ -35,15 +39,10 @@ func _input(event: InputEvent) -> void:
 		return
 	elif Input.is_action_just_pressed("debug_kill_test") and !Global.flags.DebugMode:
 		return
-	
-func _unhandled_input(event: InputEvent) -> void: #Main picks up the inputs, then directs them to the currently active state for processing.
-	if event.is_action_pressed("ui_snap"):
-		take_screenshot()
-	if event.is_action_pressed("xml_debug"):
-		StringGetter.mash_test()
-#	var test = event.action
-#
-#	print(test)
+
+
+#Picks up the inputs, then directs them to the currently active state for processing.
+func _unhandled_input(event: InputEvent) -> void: 
 	if GameState.activeState == null:
 		return
 	if event is InputEventMouseMotion:
@@ -108,10 +107,9 @@ func is_file_duplicate(directory:String, fileName: String) -> bool:
 
 
 func on_load_map_manager(map):
-	var manager = preload("res://scenes/map_manager.tscn").instantiate()
+	var manager = load("res://scenes/map_manager.tscn").instantiate()
 	load_scene(manager)
 	manager.load_map(map)
-	manager.load_cutscene()
 	
 #func set_map(map):
 	#gameBoard = $mapManager/Gameboard

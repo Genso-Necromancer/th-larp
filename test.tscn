@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://ltg752np53s2"]
+
+[ext_resource type="Script" uid="uid://ce1ww16pdhi04" path="res://test.gd" id="1_37kl0"]
+
+[node name="Test" type="Node2D"]
+script = ExtResource("1_37kl0")
+json_event = "res://scenes/cutscenes/scene_script/seize_test_start_event.json"

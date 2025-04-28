@@ -1,0 +1,38 @@
+[gd_scene load_steps=6 format=4 uid="uid://dv2xsgcjyj8ub"]
+
+[ext_resource type="PackedScene" uid="uid://cl7ik2hxcwm08" path="res://scenes/maps/game_map.tscn" id="1_qpt4y"]
+[ext_resource type="Script" uid="uid://duoms4relhrfy" path="res://scenes/maps/objectives/objective.gd" id="3_jfjoi"]
+[ext_resource type="PackedScene" uid="uid://b6vorq2w1b5oa" path="res://scenes/units/cirno.tscn" id="3_m6ock"]
+[ext_resource type="Script" uid="uid://b7a6ss8luhslm" path="res://scenes/maps/objectives/seize.gd" id="4_nunlw"]
+
+[sub_resource type="Resource" id="Resource_cpkxf"]
+script = ExtResource("4_nunlw")
+seize_count = 1
+metadata/_custom_type_script = "uid://b7a6ss8luhslm"
+
+[node name="SeizeTest" instance=ExtResource("1_qpt4y")]
+next_map = "uid://dy7o507urgp83"
+chapterNumber = 1
+title = "Seize Test"
+win_conditions = Array[ExtResource("3_jfjoi")]([SubResource("Resource_cpkxf")])
+winEvents = {
+"Seize": 1
+}
+start_script = "res://scenes/cutscenes/scene_events/seize_test_start_event.json"
+end_script = "res://scenes/cutscenes/scene_events/seize_test_end_event.json"
+hours = 7
+
+[node name="Ground" parent="." index="0"]
+tile_map_data = PackedByteArray("AAADAAYABwABAAAAAAACAAcABwABAAAAAAACAAgABwABAAAAAAACAAkABwABAAAAAAADAAkABwABAAAAAAACAAoABwABAAAAAAADAAoABwABAAAAAAADAAsABwABAAAAAAAEAAsABwABAAAAAAAFAAoABwABAAAAAAAFAAkABwABAAAAAAAFAAgABwABAAAAAAAFAAcABwABAAAAAAAEAAcABwABAAAAAAADAAcABwABAAAAAAADAAgABwABAAAAAAAEAAkABwABAAAAAAAEAAgABwABAAAAAAAEAAoABwABAAAAAAAGAAgABwABAAAAAAAGAAkABwABAAAAAAAGAAoABwABAAAAAAAGAAcABwABAAAAAAAFAAYABwABAAAAAAAEAAYABwABAAAAAAACAAsABwABAAAAAAAGAAsABwABAAAAAAAFAAsABwABAAAAAAAEAAwABwABAAAAAAA=")
+
+[node name="Modifier" parent="." index="1"]
+tile_map_data = PackedByteArray("AAAFAAcAEwAAAAAAAAA=")
+
+[node name="Deployments" parent="." index="3"]
+tile_map_data = PackedByteArray("AAADAAkAAQAAAAAAAAAEAAoAAQAAAAAAAAA=")
+
+[node name="Dev" parent="." index="7"]
+tile_map_data = PackedByteArray("AAAFAAcAAQAAAAAAAAA=")
+
+[node name="Cirno" parent="." index="10" instance=ExtResource("3_m6ock")]
+position = Vector2(714, 504)

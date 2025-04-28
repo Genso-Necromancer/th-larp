@@ -6,7 +6,7 @@ signal warp_selected
 
 var ACTION_TYPE = Enums.ACTION_TYPE
 var rng = Global.rng
-var fcData : Dictionary[Unit,Dictionary] = {}
+var fcData : Dictionary
 var fateChance = 15
 
 #var canReach = false
@@ -50,7 +50,7 @@ func get_forecast(a: Unit, t: Unit, action:Dictionary) -> Dictionary: #HERE Augm
 	if a == t:
 		isSelf = true
 	else:
-		fcData[t]["Skill"] = false
+		fcData[t]["Skill"] = null
 		fcData[t]["Initiator"] = false
 	
 	for unit in fcData:
@@ -167,12 +167,12 @@ func _evaluate_clash(a:Unit, t:Unit, action:Dictionary) -> Dictionary:
 		skill = action.Skill
 	
 	if skill:
-		results["CanMiss"] = skill.CanMiss
+		results["CanMiss"] = skill.can_miss
 	else: results["CanMiss"] = true
 	results["Hit"] = aData.Hit - tData.Graze
 	results.Hit = clampi(results.Hit, 0, 1000)
 	
-	if skill and !skill.CanDmg:
+	if skill and !skill.can_dmg:
 		results["CanDmg"] = false
 	else:
 		var d := 0
@@ -187,7 +187,7 @@ func _evaluate_clash(a:Unit, t:Unit, action:Dictionary) -> Dictionary:
 		results["Dmg"] = aData.Dmg - d
 		results.Dmg = clampi(results.Dmg, 0, 1000)
 		
-	if skill and !skill.CanCrit:
+	if skill and !skill.can_crit:
 		results["CanCrit"] = false
 	else:
 		results["CanCrit"] = true
@@ -195,7 +195,7 @@ func _evaluate_clash(a:Unit, t:Unit, action:Dictionary) -> Dictionary:
 		results.Crit = clampi(results.Crit, 0, 1000)
 	
 	if !skill:
-		results["Barrier"] = results.Dmg - tData.Barrier
+		results["Barrier"] = clampi(results.Dmg - tData.Barrier,0,1000)
 		results["BarPrc"] = tData.BarPrc
 	else:
 		results["Barrier"] = false
@@ -370,27 +370,23 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 	var grzDef : int = 0
 	var slayerMulti := 1
 	var weapon : Weapon
-	var unitEffects
+	var unitEffects : Dictionary[String,Array]
 	var multiSwing = false
 	var swings = 1
 	var outcome : Dictionary = {}
-	var swingIndx
+	var swingIndx : String
 	var unitCompCost := 0
 	var targetCompCost := 0
 	var triggers = Enums.COMP_TRIGGERS
 	var fate = unit.search_passive_id(Enums.PASSIVE_TYPE.FATED)
-	var pData = UnitData.passiveData
-	var skillData
-	
-	
-	#target.apply_heal(healPower)
+	var skill : Skill
 	
 	print("Running Action....")
 	if action.Skill:
-		skillData = UnitData.skillData[action.Skill]
-		unitCompCost += _factor_combat_composure(unit, unit, skillData.Cost)
+		skill = skill
+		unitCompCost += _factor_combat_composure(unit, unit, skill.cost)
 		print("skill Cost comp loss added: ",unit.unitName, " ", unitCompCost)
-		multiSwing = _get_skill_swing_count(action.Skill)
+		multiSwing = _get_skill_swing_count(skill)
 	else:
 		multiSwing = unit.get_multi_swing()
 	
@@ -398,29 +394,25 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 		swings = multiSwing
 	print("Swing Count: ", swings)
 	for swing in swings:
-		if !action.Skill:
+		if !skill:
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.ATTACK)
 			print("Basic attack comp loss added: ",unit.unitName, " ", unitCompCost)
 		swingIndx = ("Swing" + str(swing))
 		print(str(swingIndx))
-		outcome[unit] = {swingIndx:{"ActionType": actionType, "Hit" : false, "CompLoss": 0, "Dmg" : 0, "Crit" : 0, "Skill" : action.Skill, "PassiveProc" : [], "Instant" : [], "Effects" : [], "Break" : false, "Slayer" : 0}}
+		outcome[unit] = {swingIndx:{"ActionType": actionType, "Hit" : false, "CompLoss": 0, "Dmg" : 0, "Crit" : 0, "Skill" : skill, "PassiveProc" : [], "Instant" : [], "Effects" : [], "Break" : false, "Slayer" : 0}}
 		outcome[target] = {swingIndx:{"Barrier" : 0, "CompLoss": 0, "PassiveProc" : [], "Effects" : [], "Dead" : false,}}
 		
-		if action.Skill and action.Weapon:
-			unitCd = unit.get_skill_combat_stats(action.Skill, true)
+		if skill and action.Weapon:
+			unitCd = unit.get_skill_combat_stats(skill, true)
 			weapon = unit.get_equipped_weapon()
-			
-			#augment = skillData[action.Skill]
-		elif action.Skill:
-			unitCd = unit.get_skill_combat_stats(action.Skill)
-			
+		elif skill: unitCd = unit.get_skill_combat_stats(skill)
 		elif action.Weapon:
 			unitCd = unit.combatData
 			weapon = unit.get_equipped_weapon()
 			
 		unitEffects = _get_action_effects(unit, action)
 		
-		for effect in unitEffects.instant:
+		for effect in unitEffects.Instant:
 			print("Checking Instant Effects....")
 			var effectResult = [_run_effect(unit, target, effect, actionType)]
 			outcome[unit][swingIndx].instant = outcome[unit][swingIndx].instant + effectResult
@@ -437,13 +429,13 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 		
 		#check accuracy
 		print("Rolling for Hit. Chance: ", str(unitCd.Hit - targetCd.Graze))
-		if skillData and !skillData.CanMiss:
+		if skill and !skill.can_miss:
 			outcome[unit][swingIndx].Hit = true
 			print("Was True Hit")
 		elif get_roll() <= unitCd.Hit - targetCd.Graze:
 			outcome[unit][swingIndx].Hit = true
 			print("Hit Success")
-		elif fate and get_roll() <= pData[fate].Value:
+		elif fate and get_roll() <= fate.value:
 			outcome[unit][swingIndx].Hit = true
 			outcome[unit][swingIndx].PassiveProc.append(fate)
 			print("Fated Hit!")
@@ -456,7 +448,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			
 		
 		if !outcome[unit][swingIndx].Hit:
-			for effect in unitEffects.always:
+			for effect in unitEffects.Always:
 				outcome[unit][swingIndx].Effects = outcome[unit][swingIndx].Effects + _run_effect(unit, target, effect, actionType)
 			#if outcome[unit][swingIndx].Effects and outcome[unit][swingIndx].Effects.size() <= 0:
 				#outcome[unit][swingIndx].Effects = false
@@ -476,7 +468,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 		
 		#check for crit
 		
-		if skillData and !skillData.CanCrit:
+		if skill and !skill.can_crit:
 			pass
 		elif  get_roll() <= unitCd.Crit - targetCd.Luck:
 			print("Rolling for Crit. Chance: ", str(unitCd.Crit - targetCd.Luck))
@@ -492,7 +484,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			
 			var finalDmg := 0
 			unitCd.Dmg = clampi(unitCd.Dmg, 0, 9999)
-			if skillData and !skillData.CanDmg:
+			if skill and !skill.can_dmg:
 				print("No Damage: ", unitCd.Dmg)
 			else:
 				print("Applying Damage")
@@ -515,11 +507,11 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			
 			targetCompCost += _factor_combat_composure(unit, target, triggers.WAS_HIT, finalDmg)
 			print("Was Hit Comp Loss added: ", target.unitName, " ", targetCompCost)
-			for effect in unitEffects.on_hit:
+			for effect in unitEffects.OnHit:
 				print("Checking On Hit Effects....")
 				outcome[unit][swingIndx].Effects.append(_run_effect(unit, target, effect, actionType, finalDmg))
 				
-			for effect in unitEffects.always:
+			for effect in unitEffects.Always:
 				print("Checking Always Effects....")
 				outcome[unit][swingIndx].Effects.append(_run_effect(unit, target, effect, actionType, finalDmg))
 			if outcome[unit][swingIndx].Effects:
@@ -536,7 +528,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 		if action.Weapon:
 			unit.reduce_durability(weapon)
 			
-		if action.Weapon and weapon.Dur == 0:
+		if action.Weapon and weapon.dur == 0:
 			outcome[unit][swingIndx].Break = true
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.BREAK)
 			print("Break Composure Loss added: ", unit.unitName, " ", unitCompCost)
@@ -586,16 +578,16 @@ func get_roll():
 	print("Roll: ", roll)
 	return roll
 
-func _get_effects(res:SlotWrapper) -> Array:
-	var effects := []
-	var seen := []
+func _get_effects(res:SlotWrapper) -> Array[Effect]:
+	var effects :Array[Effect]= []
+	var seen :Array[Effect]= []
 	for effect in res.effects:
 		if effect.target != Enums.EFFECT_TARGET.EQUIPPED and !seen.has(effect):
 			effects.append(effect)
 		seen.append(effect)
 	return effects
 
-func _get_action_effects(unit:Unit, action:Dictionary) -> Dictionary:
+func _get_action_effects(unit:Unit, action:Dictionary) -> Dictionary[String,Array]:
 	var weapon
 	var augment
 	var unitEffects : Array[Effect]
@@ -612,8 +604,8 @@ func _get_action_effects(unit:Unit, action:Dictionary) -> Dictionary:
 		unitEffects = _get_effects(weapon)
 	return _sort_instant(unitEffects)
 
-func _sort_instant(effectArray:Array[Effect]) -> Dictionary:
-	var effects := {"Instant":[], "OnHit":[], "Always":[]}
+func _sort_instant(effectArray:Array[Effect]) -> Dictionary[String,Array]:
+	var effects :Dictionary[String,Array]= {"Instant":[], "OnHit":[], "Always":[]}
 	for effect:Effect in effectArray:
 		if effect.instant:
 			effects.instant.append(effect)
