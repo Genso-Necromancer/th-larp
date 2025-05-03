@@ -6,19 +6,23 @@ signal dialog_finished
 signal line_finished(textline_index)
 signal _dialogue_fade_finished
 #signal dialogue_loaded
+@onready var background_texture_rect = $BackgroundTextureRect
 @onready var texturerect = $PortraitsNode/SpeakerPortrait
-@onready var text_body = $ForegroundElements/TextBody
-@onready var name_label = $ForegroundElements/HBoxContainer/NameLabel
-@onready var title_label = $ForegroundElements/HBoxContainer/TitleLabel
+@onready var text_body = $GradientRect/ForegroundElements/MarginContainer/VBoxContainer/TextBody
+@onready var name_label = $GradientRect/ForegroundElements/MarginContainer/VBoxContainer/HBoxContainer/NameLabel
+@onready var title_label = $GradientRect/ForegroundElements/MarginContainer/VBoxContainer/HBoxContainer/TitleLabel
+@onready var foreground_elements = $GradientRect/ForegroundElements
+@onready var default_font_size = text_body.label_settings.font_size
 @export var draw_speed = 30
 
 var portrait : = preload("res://scenes/cutscenes/speaker_portrait.tscn")
 var dialogue_finished := false
+var speaker_portraits := {}  # Dictionary<String, PortraitRect>
 var text_count := 0
 var textline_index := -1
 var line_is_finished = false
 var current_event : Array[Dictionary]
-var example_dict = [
+var example_dict : Array[Dictionary] = [
 	{
 		"active_speaker": "Remi",
 		"animations": [{"name": "slide", "target": "Remi", "pos": 0.75}]
@@ -38,7 +42,8 @@ var example_dict = [
 	},
 	{
 		"active_speaker": "Pakooli",
-		"text": "Hey-"
+		"text": "Hey-",
+		"background": "res://sprites/danmaku/danmaku.png"
 	},
 	{
 		"active_speaker": "Remi",
@@ -52,7 +57,8 @@ var example_dict = [
 	},
 	{
 		"text": "Were you talking to yourself ?",
-		"effects": [{"name": "quiet"}]
+		"effects": [{"name": "quiet"}],
+		"background": "null"
 	},
 	{
 		"active_speaker": "Remi",
@@ -139,7 +145,7 @@ var speaker_setup = [
 	},
 	{
 		"name": "Remi",
-		"title": "just racist",
+		"title": "fiary stomper",
 		"portrait": "res://sprites/th1.png"
 	}
 ]
@@ -148,18 +154,23 @@ var speaker_setup = [
 func _ready():
 	self.visible = false
 	set_physics_process(false) #Added to halt the scene from auto-playing on load
+	foreground_elements.visible = false
+	text_body.text = ""
+	name_label.text = ""
+	title_label.text = ""
+	# TODO Kill all children in PortaitsNode?
 	line_finished.connect(_on_line_finished)
 
 
-func _gui_input(event):
-	if GameState.activeState == null:
-			return
-	if event is InputEventMouseMotion:
-		GameState.activeState.mouse_motion(event)
-	elif event is InputEventMouseButton:
-		GameState.activeState.mouse_pressed(event)
-	elif event is InputEventKey:
-		GameState.activeState.event_key(event)
+#func _gui_input(event):
+	#if GameState.activeState == null:
+			#return
+	#if event is InputEventMouseMotion:
+		#GameState.activeState.mouse_motion(event)
+	#elif event is InputEventMouseButton:
+		#GameState.activeState.mouse_pressed(event)
+	#elif event is InputEventKey:
+		#GameState.activeState.event_key(event)
 
 
 func _unhandled_input(event) -> void:
@@ -168,14 +179,21 @@ func _unhandled_input(event) -> void:
 	elif GameState.state != GameState.gState.DIALOGUE_SCENE: return
 	elif event.is_action_released("ui_return"): toggle_dialog()
 	elif not visible and is_physics_processing(): return
-	#elif event.is_action_released("ui_accept"): 
+	elif event is InputEventMouseMotion:
+		GameState.activeState.mouse_motion(event)
+	elif event is InputEventMouseButton:
+		GameState.activeState.mouse_pressed(event)
+	elif event is InputEventKey:
+		GameState.activeState.event_key(event)
+	#elif event.is_action_released("ui_accept"): gui_accept() # For testing purposes, comment out for live game
 		
 
 ##input from control state DIALOGUE_SCENE
 func gui_accept():
 	if GameState.state != GameState.gState.DIALOGUE_SCENE: return
 	elif !current_event[textline_index].has("text"): return
-	if !$TextStopper/AnimationPlayer.is_playing():
+	
+	elif !$TextStopper/AnimationPlayer.is_playing():
 		line_finished.emit(textline_index)
 	elif textline_index < current_event.size() - 1:
 		next_textline()
@@ -185,6 +203,9 @@ func gui_accept():
 
 func _conclude_dialog() -> void:
 	dialogue_finished = true
+	background_texture_rect.texture = null # always remove BG so its opt-in
+	# TODO Kill all children in PortaitsNode?
+	speaker_portraits = {}
 	toggle_dialog()
 	await _dialogue_fade_finished
 	dialog_finished.emit()
@@ -198,7 +219,7 @@ func _physics_process(delta):
 	if !dialogue_finished && text_proceed && anim_proceed && effect_proceed && !$TextStopper.visible:
 		if !current_event[textline_index].has("text") and textline_index < current_event.size()-1:
 			next_textline()
-		elif textline_index >= current_event.size()-1: _conclude_dialog()
+		#elif textline_index >= current_event.size()-1: _conclude_dialog()
 		else:
 			$TextStopper.visible = true
 			$TextStopper/AnimationPlayer.play("ContinueBobber")
@@ -223,12 +244,12 @@ func _physics_process(delta):
 ##SceneScripts are stored on the map associated with them. There is to be a Start and End scene to each Chapter that daisy chains things together with a moment for saving/loading in-between last End and new Start
 func prepare_new_dialogue(new_event:String= ""):
 	var parser = JasonParser.new()
-	var eventDick : Array[Dictionary] = parser.parse_json(new_event)
 	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE) #Used to avoid conflicting inputs. Currently only uses ACCEPT_PROMPT input script, could extend GenericScript to make a new one specifically for this scene. You'll know what to do when you look at existing ones.
-	if new_event: current_event = eventDick
+	if new_event: 
+		var eventDick : Array[Dictionary] = parser.parse_json(new_event)
+		current_event = eventDick
 	else: current_event = example_dict #subverts variable typing to give a dictionary as default, normally only want to pass ScenScript Resource
 	toggle_dialog()
-	set_physics_process(true) #necessary with the new triggered way to start the scene
 	for speaker in speaker_setup:
 		var new_portrait:PortraitRect= portrait.instantiate()
 		new_portrait.name = speaker.name
@@ -238,6 +259,10 @@ func prepare_new_dialogue(new_event:String= ""):
 		new_portrait.visible = false
 		new_portrait.anim_finished.connect(_on_anim_finished)
 		$PortraitsNode.add_child(new_portrait)
+	for pr in $PortraitsNode.get_children():
+		speaker_portraits[ pr.name ] = pr
+	
+	# await _dialogue_fade_finished # works, but doesn't look good atm
 	textline_index = -1
 	next_textline()
 
@@ -263,18 +288,24 @@ func next_textline():
 	
 	delta_speed = 0.0
 	text_body.text = ""
-	text_body.label_settings.font_size = 24 # default size 24
+	text_body.label_settings.font_size = default_font_size
 	$TextStopper.visible = false
 	$TextStopper/AnimationPlayer.stop()
 	
 	var cur_line = current_event[textline_index]
 	if !cur_line.has("text"):
-		$ForegroundElements.visible = false
+		foreground_elements.visible = false
 	else:
-		$ForegroundElements.visible = true
+		foreground_elements.visible = true
+		
+	if cur_line.has("background"):
+		if cur_line.background == "null" or cur_line.background == "none":
+			background_texture_rect.texture = null
+		else:
+			background_texture_rect.texture = load(cur_line.background)
 	
 	if cur_line.has("active_speaker"):
-		var active_speaker = $PortraitsNode.find_child(cur_line["active_speaker"],true,false)
+		var active_speaker = speaker_portraits[ cur_line.active_speaker ]
 		name_label.text = active_speaker.speaker_name
 		title_label.text = active_speaker.speaker_title
 		active_speaker.visible = true
@@ -298,35 +329,38 @@ func next_textline():
 		#texturerect.texture = load(cur_line["portrait"])
 	
 	if cur_line.has("effects"): # TODO Add a default-to-Active_Speaker fallback if no Target is specified
-		for eff in cur_line["effects"]:
-			if eff.name == "portrait-sil":
-				$PortraitsNode.find_child(eff.target,true,false).modulate = Color(0,0,0)
-			if eff.name == "portrait-normal":
-				$PortraitsNode.find_child(eff.target,true,false).modulate = Color(1,1,1)
-			if eff.name == "dim":
-				$PortraitsNode.find_child(eff.target,true,false).dim()
-			if eff.name == "loud":
-				print("lets get louder")
-				text_body.label_settings.font_size = 36
-			if eff.name == "quiet":
-				text_body.label_settings.font_size = 16
-			if eff.name == "zoom":
-				$PortraitsNode.find_child(eff.target,true,false).zoom()
+		for eff in cur_line.effects:
+			match eff.name:
+				"portrait-sil":
+					speaker_portraits[eff.target].modulate = Color(0,0,0)
+				"portrait-normal":
+					speaker_portraits[eff.target].modulate = Color(1,1,1)
+				"dim":
+					speaker_portraits[eff.target].dim()
+				"loud":
+					text_body.label_settings.font_size *= 1.8
+				"quiet":
+					text_body.label_settings.font_size *= 0.8
+				"zoom":
+					speaker_portraits[eff.target].zoom()
+				"teleport":
+					speaker_portraits[eff.target].teleport(eff.pos)
 	
 	if cur_line.has("animations"):
-		for anim in cur_line["animations"]:
-			if anim.name == "slide":
-				$PortraitsNode.find_child(anim.target,true,false).slide(anim.pos)
-			if anim.name == "shake":
-				$PortraitsNode.find_child(anim.target,true,false).shake()
-			if anim.name == "hop":
-				$PortraitsNode.find_child(anim.target,true,false).hop()
-			if anim.name == "double_hop":
-				$PortraitsNode.find_child(anim.target,true,false).double_hop()
-			if anim.name == "interact":
-				$PortraitsNode.find_child(anim.target,true,false).interact()
-			if anim.name == "toggle_fade":
-				$PortraitsNode.find_child(anim.target,true,false).toggle_fade()
+		for anim in cur_line.animations:
+			match anim.name:
+				"slide":
+					speaker_portraits[anim.target].slide(anim.pos)
+				"shake":
+					speaker_portraits[anim.target].shake()
+				"hop":
+					speaker_portraits[anim.target].hop()
+				"double_hop":
+					speaker_portraits[anim.target].double_hop()
+				"interact":
+					speaker_portraits[anim.target].interact()
+				"toggle_fade":
+					speaker_portraits[anim.target].toggle_fade()
 
 
 var toggle_dialog_tween
@@ -346,12 +380,14 @@ func toggle_dialog():
 	toggle_dialog_tween.tween_callback(func(): if modulate == Color(1,1,1,0): visible = false)
 	await toggle_dialog_tween.finished
 	_dialogue_fade_finished.emit()
+	
+	set_physics_process(!is_physics_processing()) # toggle to prevent auto-starting
 
 
 var anims_finished = 0
 func _on_anim_finished():
 	anims_finished += 1
-	print("Animation %s of %s" % [anims_finished, current_event[textline_index]["animations"].size()])
+	print("(Alon) Animation %s of %s finished." % [anims_finished, current_event[textline_index]["animations"].size()])
 	
 	if anims_finished == current_event[textline_index]["animations"].size():
 		if !current_event[textline_index].has("text"):

@@ -3,7 +3,9 @@ class_name CutSceneData
 
 enum ACTORS {
 	SAKUYA = 0,
-	PATCHOULI = 1
+	PATCHOULI = 1,
+	REMILIA = 2,
+	CIRNO = 3,
 }
 
 
@@ -17,7 +19,17 @@ var ActorData: Dictionary = {
 		"name": "Patchouli Knowledge",
 		"title": "Librarian",
 		"portrait": preload("res://sprites/PatchouliPrt.png")
-	}
+	},
+	2: {
+		"name": "Remilia",
+		"title": "Head Lady",
+		"portrait": preload("res://sprites/th1.png")
+	},
+	3: {
+		"name": "Cirno",
+		"title": "The Strongest",
+		"portrait": preload("res://sprites/Fairy TroublemakerPrt.png"),
+	},
 }
 
 
