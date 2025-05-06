@@ -176,11 +176,9 @@ terrain_set_0/terrain_0/color = Color(0.501961, 0.345098, 0.25098, 1)
 navigation_layer_0/layers = 1
 sources/0 = SubResource("TileSetAtlasSource_wrhp6")
 
-[node name="UnitPath" type="TileMap"]
-modulate = Color(1, 1, 1, 0.627451)
+[node name="UnitPath" type="TileMapLayer"]
+z_index = 3
 y_sort_enabled = true
+use_parent_material = true
 tile_set = SubResource("TileSet_j4yij")
-format = 2
-layer_0/y_sort_enabled = true
-layer_0/z_index = 3
 script = ExtResource("2_eytxu")

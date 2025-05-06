@@ -16,6 +16,7 @@ func get_item_name(item:Item) -> String:
 	var type : String
 	if item is Weapon: type = "weapon"
 	elif item is Accessory: type = "accessory"
+	elif item is Ofuda: type = "ofuda"
 	elif item is Consumable: type = "consumable"
 
 	namePath = namePath % [type, item.id]
@@ -95,18 +96,18 @@ func mash_test():
 	var s : String = mash_string(base, varArray)
 	print(s)
 		
-func get_combat_effect_string(effect:Effect, cmbData) -> String: #Time to create the string XML and string getter, eh?
-	var effId := effect.id
-	var proc = cmbData.Effects[effId].proc
-	var value = cmbData.Effects[effId].value
+func get_combat_effect_string(effect:Effect) -> String: #Time to create the string XML and string getter, eh?
+	#var proc = cmbData.Effects[effect].proc
+	#var value = cmbData.Effects[effect].value
 	var typeKeys : Array = Enums.EFFECT_TYPE.keys()
 	var subKeys : Array = Enums.SUB_TYPE.keys()
 	#Get Template: "Buff %s"
-	var templatePath : String = "effect_template_%s" % [typeKeys[effect.Type].to_lower()]
+	var templatePath : String = "effect_template_%s" % [typeKeys[effect.type].to_lower()]
 	var s : String = get_template(templatePath)
 	var duration = false
 	var durationType = false
-	var effVal = effect.value
+	var value = effect.value
+	var proc := effect.proc
 	
 	#Get SubType "string": "Buff Pwr"
 	if effect.sub_type:
@@ -115,10 +116,10 @@ func get_combat_effect_string(effect:Effect, cmbData) -> String: #Time to create
 		s = s % [subType]
 		
 	#Check if Value: "Buff Power #"
-	if effVal and effVal > 0:
+	if value and value > 0:
 		var v
 		var path := "value_template"
-		if typeof(effVal) == Variant.Type.TYPE_FLOAT:
+		if typeof(value) == Variant.Type.TYPE_FLOAT:
 			v = value * 100
 			v = round(v)
 			path = "percent_value_template"
@@ -168,6 +169,7 @@ func get_effect_string(effect:Effect) -> String: #Needs reworking, see tooltip p
 	if effVal and effVal != 0:
 		var v
 		var path := "value_template"
+		var test = typeof(effVal)
 		if typeof(effVal) == Variant.Type.TYPE_FLOAT:
 			v = effVal * 100
 			v = round(v)

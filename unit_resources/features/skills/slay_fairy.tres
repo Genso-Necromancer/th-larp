@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://cppnbtvkv1i0t"]
+[gd_resource type="Resource" script_class="Skill" load_steps=4 format=3 uid="uid://cppnbtvkv1i0t"]
 
 [ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_p7hcn"]
+[ext_resource type="Resource" uid="uid://c5v0mrxv16wle" path="res://unit_resources/effects/slay_fairy.tres" id="2_ht2a8"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_pu4px"]
 
 [resource]
@@ -21,7 +22,7 @@ hit = 0
 dmg = 0
 crit = 0
 dmg_type = 0
-effects = Array[ExtResource("1_p7hcn")]([])
+effects = Array[ExtResource("1_p7hcn")]([ExtResource("2_ht2a8")])
 feature_id = "slay_fairy"
 rule_type = 0
 metadata/_custom_type_script = "uid://cc71mceo7glas"

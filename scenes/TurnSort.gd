@@ -2,12 +2,12 @@ extends Node
 class_name TurnSort
 
 
-func sort_turns(turns:Array[String]) -> Array[String]:
+func sort_turns(turns:Array[StringName]) -> Array[StringName]:
 	if turns.size() <= 1:
 		return turns
 	
-	var player_turns := []
-	var enemy_turns := []
+	var player_turns :Array[StringName]= []
+	var enemy_turns :Array[StringName]= []
 	for turn in turns:
 		match turn:
 			"Player": player_turns.append(turn)
@@ -15,8 +15,8 @@ func sort_turns(turns:Array[String]) -> Array[String]:
 			
 	return weave_turns(player_turns, enemy_turns)
 	
-func weave_turns(player_turns:Array, enemy_turns:Array) ->Array[String]:
-	var interleaved_turns :Array[String]= []
+func weave_turns(player_turns:Array[StringName], enemy_turns:Array[StringName]) ->Array[StringName]:
+	var interleaved_turns :Array[StringName]= []
 	
 	var player_index := 0
 	var enemy_index := 0

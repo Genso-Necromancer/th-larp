@@ -31,6 +31,7 @@ var disabled := false :
 	get:
 		return disabled
 
+
 var state : String = "Enabled" :
 	set(value):
 		var newState = _verify_state(value)
@@ -47,7 +48,6 @@ func _ready():
 	if  get_meta("Item") and get_meta("Item") is String: pass
 	elif get_meta("Item") and get_meta("Item").id == "unarmed":
 		toggle_icon()
-	
 
 
 func set_item_text(item : SlotWrapper):
@@ -56,19 +56,21 @@ func set_item_text(item : SlotWrapper):
 	var durString
 	var dur : int = item.dur
 	var mDur : int = item.max_dur
+	var cost : int
+	
 	if !item.breakable:
 		durString = str(" --")
 	elif mDur == -1:
 		durString = ""
 	else:
 		durString = (str(dur) + "/" + str(mDur))
+	#if item is Ofuda: 
+		#cost = item.cost
+		#durString = str(cost, " ") + durString
 	n.set_text(StringGetter.get_item_name(item))
 	d.set_text(durString)
-	
-	#if fSize:
-		#n.add_theme_font_size_override("font_size", fSize)
-		#d.add_theme_font_size_override("font_size", fSize)
-	
+
+
 func set_item_icon(icon_path : String):
 	var i = $ContentMargin/HBoxContainer/Icon
 	if ResourceLoader.exists(icon_path):
@@ -161,8 +163,30 @@ func _on_focus_entered():
 		focusBorder.visible = true
 
 
-
 func _on_focus_exited():
 	if useBorder:
 		var focusBorder := $FocusBorder
 		focusBorder.visible = false
+
+##Inserts it's own data, only intended for use in focus viewer
+func fill_yourself(unit:Unit) ->void:
+	var item = unit.get_equipped_weapon()
+	var dur = item.dur
+	var mDur = item.max_dur
+	var durString
+	var iconPath : String = "res://sprites/icons/items/%s/%s.png"
+	var folder : String
+	if item is Weapon: folder = "weapon"
+	elif item is Accessory: folder = "accessory"
+	elif item is Ofuda: folder = "ofuda"
+	elif item is Consumable: folder = "consumable"
+	iconPath = iconPath % [folder, item.id]
+	set_item_text(item)
+	set_item_icon(item.id)
+	#set_meta_data(item, unit, i, item.trade)
+	get_button().add_to_group("ItemTT")
+	#if isTrade and !item.trade:
+		#b.state = "Disabled"
+	#elif _style == _styles[1] and !unit.check_valid_equip(item):
+		#b.state = "Disabled"
+	#return b

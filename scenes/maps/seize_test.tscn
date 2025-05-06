@@ -29,7 +29,7 @@ tile_map_data = PackedByteArray("AAADAAYABwABAAAAAAACAAcABwABAAAAAAACAAgABwABAAA
 tile_map_data = PackedByteArray("AAAFAAcAEwAAAAAAAAA=")
 
 [node name="Deployments" parent="." index="3"]
-tile_map_data = PackedByteArray("AAADAAkAAQAAAAAAAAAEAAoAAQAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAADAAkAAQAAAAAAAAAEAAoAAQAAAAAAAAACAAoAAAAAAAAAAAADAAoAAAAAAAAAAAA=")
 
 [node name="Dev" parent="." index="7"]
 tile_map_data = PackedByteArray("AAAFAAcAAQAAAAAAAAA=")

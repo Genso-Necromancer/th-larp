@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="Effect" load_steps=2 format=3 uid="uid://byjs7jgphak7n"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_4pcfe"]
+
+[resource]
+script = ExtResource("1_4pcfe")
+type = 3
+target = 2
+instant = false
+on_hit = false
+proc = -1
+duration = 3
+duration_type = 1
+stack = false
+permanent = false
+curable = false
+from_item = false
+hostile = false
+multi_swing = 0
+multi_round = 0
+crit_dmg = Array[int]([0, 0])
+crit_mult = false
+crit_rate = 0
+value = 3
+sub_type = 12
+id = "buff_def3"
+rule_type = 0
+metadata/_custom_type_script = "uid://bu76i50vv08ad"

@@ -58,6 +58,13 @@ func display_unit_actions(unit : Unit):
 					b.disabled = true
 			"OpenBtn": pass
 			"StealBtn": pass
+			"OfudaBtn": 
+				if itemFlags.canOfuda:
+					b.visible = true
+					b.disabled = false
+				else:
+					b.visible = false
+					b.disabled = true
 			"ItmBtn": 
 				if itemFlags.hasItems: 
 					b.visible = true
@@ -100,17 +107,19 @@ func display_player_options():
 
 func _check_inv(unit:Unit) -> Dictionary:
 	var uInv = unit.inventory
-	var itemFlags := {"hasWeapons":false, "hasItems":false}
+	var itemFlags := {"hasWeapons":false, "hasItems":false, "canOfuda":false}
 	
 	if unit.get_equipped_weapon() != unit.unarmed:
 		itemFlags.hasWeapons = true
 		itemFlags.hasItems = true
-	elif uInv.size() > 0:
+	if uInv.size() > 0:
 		itemFlags.hasItems = true
 		for item in uInv:
 			if item is Weapon and unit.check_valid_equip(item):
 				itemFlags.hasWeapons = true
-				break
+			elif item is Ofuda and unit.is_proficient(item.category, item.sub_group):
+				itemFlags.canOfuda = true
+			if itemFlags.hasWeapons and itemFlags.canOfuda: break
 	return itemFlags
 
 

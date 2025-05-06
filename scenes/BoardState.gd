@@ -48,14 +48,15 @@ func update_unit_data(units):
 #	print(player)
 #	print(enemy)
 
-func update_remaining_turns(turns):
+func update_remaining_turns(turns)->void:
 	playerTurns = 0
 	enemyTurns = 0
 	npcTurns = 0
 	for turn in turns:
-		match turn[0]:
-			false: playerTurns += 1
-			true: enemyTurns += 1
+		match turn:
+			"Player": playerTurns += 1
+			"Enemy": enemyTurns += 1
+			"NPC":npcTurns += 1
 
 func add_acted(unit):
 	acted.append(unit)

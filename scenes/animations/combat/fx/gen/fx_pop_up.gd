@@ -34,8 +34,9 @@ class_name PopText
 var v := 0
 
 
-
-		
+func flip_text():
+	var lbl := $fxText
+	lbl.set_scale(Vector2(-1,1))
 
 func set_value(value):
 	v = value
@@ -94,10 +95,10 @@ func set_stylized_string(s = "damage"):
 	text.add_theme_color_override("font_outline_color", lColor)
 	
 func set_effect_result(effectResult):
-	var effect = UnitData.effectData[effectResult.EffectId]
+	var effect = effectResult.EffectId
 	
 	var type = effect.type
-	var subType = effect.SubType
+	var subType = effect.sub_type
 	var value = 0
 
 	if effectResult.Dmg:
@@ -108,7 +109,7 @@ func set_effect_result(effectResult):
 	if effectResult.Resisted:
 		type = false
 	_set_effect_style(type, subType)
-	
+
 func _set_effect_style(type, subType):
 	var EFF_TYPE = Enums.EFFECT_TYPE
 	var typeKeys = Enums.EFFECT_TYPE.keys()

@@ -3,8 +3,9 @@ extends Node
 
 
 signal prompt_accepted
-signal focus_unit_changed(unit : Unit)
-signal cursor_tile_updated(unit: Unit, tile)
+signal focus_unit_changed(unit:Unit)
+signal focus_danmaku_changed(dmku:Danmaku)
+#signal cursor_tile_updated(unit:Unit, tile)
 
 ##Unit Action Signals
 signal inventory_weapon_changed(button : ItemButton)
@@ -19,6 +20,7 @@ signal sequence_complete
 
 ##Time Signals
 signal time_changed(time:float)
+signal time_reset
 
 ##Fader signal chains. ugh.
 signal fader_fade_in(speedScale : float)

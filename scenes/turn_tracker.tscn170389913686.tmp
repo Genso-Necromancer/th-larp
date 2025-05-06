@@ -1,0 +1,110 @@
+[gd_scene load_steps=3 format=3 uid="uid://f4mximd4v0fx"]
+
+[ext_resource type="Script" uid="uid://cldaldwh8k0gw" path="res://scenes/TurnTracker.gd" id="1_13cpr"]
+[ext_resource type="PackedScene" uid="uid://bnnxx77j4atuk" path="res://scenes/turn_token.tscn" id="2_131kv"]
+
+[node name="TurnTracker" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_13cpr")
+token_limit = 11
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 200
+theme_override_constants/margin_bottom = 200
+
+[node name="TurnBar" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+theme_override_constants/separation = 75
+
+[node name="Control0" type="Control" parent="MarginContainer/TurnBar"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="TurnToken" parent="MarginContainer/TurnBar/Control0" instance=ExtResource("2_131kv")]
+scale = Vector2(0.25, 0.25)
+
+[node name="Control2" type="Control" parent="MarginContainer/TurnBar"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="TurnToken" parent="MarginContainer/TurnBar/Control2" instance=ExtResource("2_131kv")]
+scale = Vector2(0.25, 0.25)
+
+[node name="Control3" type="Control" parent="MarginContainer/TurnBar"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="TurnToken" parent="MarginContainer/TurnBar/Control3" instance=ExtResource("2_131kv")]
+scale = Vector2(0.25, 0.25)
+
+[node name="Control4" type="Control" parent="MarginContainer/TurnBar"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="TurnToken" parent="MarginContainer/TurnBar/Control4" instance=ExtResource("2_131kv")]
+scale = Vector2(0.25, 0.25)
+
+[node name="Control5" type="Control" parent="MarginContainer/TurnBar"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="TurnToken" parent="MarginContainer/TurnBar/Control5" instance=ExtResource("2_131kv")]
+scale = Vector2(0.25, 0.25)
+
+[node name="Control6" type="Control" parent="MarginContainer/TurnBar"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="TurnToken" parent="MarginContainer/TurnBar/Control6" instance=ExtResource("2_131kv")]
+scale = Vector2(0.25, 0.25)
+
+[node name="Control7" type="Control" parent="MarginContainer/TurnBar"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="TurnToken" parent="MarginContainer/TurnBar/Control7" instance=ExtResource("2_131kv")]
+scale = Vector2(0.25, 0.25)
+
+[node name="Control8" type="Control" parent="MarginContainer/TurnBar"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="TurnToken" parent="MarginContainer/TurnBar/Control8" instance=ExtResource("2_131kv")]
+scale = Vector2(0.25, 0.25)
+
+[node name="Control9" type="Control" parent="MarginContainer/TurnBar"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="TurnToken" parent="MarginContainer/TurnBar/Control9" instance=ExtResource("2_131kv")]
+scale = Vector2(0.25, 0.25)
+
+[node name="Control10" type="Control" parent="MarginContainer/TurnBar"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="TurnToken" parent="MarginContainer/TurnBar/Control10" instance=ExtResource("2_131kv")]
+scale = Vector2(0.25, 0.25)

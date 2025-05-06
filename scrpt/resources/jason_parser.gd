@@ -18,13 +18,13 @@ func parse_json(event_json:String) -> Array[Dictionary]:
 	for dic in parser.data:
 		data_received.append(dic)
 	
-	if error == OK:
-		if typeof(data_received) == TYPE_ARRAY: 
-			print("Was Array: ",data_received)
-		elif typeof(data_received) == TYPE_DICTIONARY:
-			print("Was Dictionary: ",data_received)
-		else:
-			print("Unexpected data")
+	if error == OK: pass
+		#if typeof(data_received) == TYPE_ARRAY: 
+			#print("Was Array: ",data_received)
+		#elif typeof(data_received) == TYPE_DICTIONARY:
+			#print("Was Dictionary: ",data_received)
+		#else:
+			#print("Unexpected data")
 	else:
 		print("JSON Parse Error: ", parser.get_error_message(), " in ", json, " at line ", parser.get_error_line())
 	return data_received

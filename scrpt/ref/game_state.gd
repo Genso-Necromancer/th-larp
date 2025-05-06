@@ -9,6 +9,7 @@ enum gState {
 	GB_ATTACK_TARGETING,
 	GB_COMBAT_FORECAST,
 	GB_SKILL_TARGETING,
+	GB_ITEM_TARGETING,
 	GB_TRADE_TARGETING,
 	GB_SKILL_MENU,
 	GB_ROUND_END,
@@ -101,7 +102,6 @@ func _switch_state(value):
 			
 			activeState = GBDefaultState.new()
 		gState.GB_SELECTED:
-			
 			activeState = GBSelectedState.new()
 		gState.GB_ACTION_MENU:
 			
@@ -110,21 +110,18 @@ func _switch_state(value):
 			
 			activeState = GBProfileState.new()
 		gState.GB_ATTACK_TARGETING:
-			
 			activeState = GBAttackState.new()
 		gState.GB_COMBAT_FORECAST:
-			
 			activeState = GBForeCastState.new()
 		gState.GB_SKILL_TARGETING:
-			
 			activeState = GBSkillTargetState.new()
+		gState.GB_ITEM_TARGETING:
+			activeState = GBItemTargetState.new()
 		gState.GB_TRADE_TARGETING: 
 			activeState = GBTradeTargetingState.new()
 		gState.GB_SKILL_MENU: #Deprecated
-			
 			activeState = GBSkillMenuState.new()
 		gState.GB_ROUND_END:
-			
 			activeState = GBRoundEndState.new()
 		gState.GB_WARP:
 			

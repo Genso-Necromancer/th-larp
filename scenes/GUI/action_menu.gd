@@ -5,16 +5,18 @@ class_name ActionMenu
 signal action_menu_canceled
 signal action_menu_selected(bName)
 signal action_menu_item_pressed(unit)
-signal action_menu_item_canceled
+#signal action_menu_item_canceled
 signal action_menu_trade_pressed(unit)
 
 
-enum MENU_STATES {NONE, OPTIONS, ACTION, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE}
-@export var aBox : VBoxContainer
-@export var aContainer : MarginContainer
-@export var sBox : VBoxContainer
-@export var sContainer : MarginContainer
-@export var cContainer : MarginContainer
+enum MENU_STATES {NONE, OPTIONS, ACTION, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE, OFUDA_OPEN, OFUDA_TARGETING}
+@onready var aContainer : MarginContainer = $ScreenMargin/ActionBackgroundMargin
+@onready var oContainer : MarginContainer = $ScreenMargin/OfudaBackgroundMargin
+@onready var sContainer : MarginContainer = $ScreenMargin/SkillBackgroundMargin
+@onready var cContainer : MarginContainer = $ScreenMargin/ConfirmBackgroundMargin
+@onready var aBox : ActionBox = $ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox
+@onready var sBox : SkillBox = $ScreenMargin/SkillBackgroundMargin/SkillMargin/SkillBox
+@onready var oBox : OfudaBox = $ScreenMargin/OfudaBackgroundMargin/OfudaMargin/OfudaBox
 @export var skillConfirm : Button
 @export var cursorOffset := Vector2(0,0)
 @onready var blocker :Panel = $Blocker
@@ -35,6 +37,7 @@ var state := MENU_STATES.NONE:
 					_assign_cursor(aBox.get_children())
 					cursor.setCursor = true
 				MENU_STATES.ACTION:
+					_close_inv()
 					aBox.display_unit_actions(currentUnit)
 					_hide_tertiary()
 					_unhide_action_container()
@@ -59,6 +62,14 @@ var state := MENU_STATES.NONE:
 					_assign_cursor([skillConfirm])
 					cursor.setCursor = true
 				MENU_STATES.ITEM_MANAGE, MENU_STATES.ITEM_TRADE:
+					#inv.visible = true
+					_hide_cursor()
+					_hide_action_container()
+				MENU_STATES.OFUDA_OPEN:
+					_swap_to_ofuda()
+					_assign_cursor(oBox.get_children())
+					cursor.setCursor = true
+				MENU_STATES.OFUDA_TARGETING:
 					_hide_cursor()
 					_hide_action_container()
 
@@ -70,6 +81,10 @@ func _ready():
 	self.visible = false
 	aBox.connect_signals(self)
 	inv.visible = false
+	aContainer.visible = false
+	oContainer.visible = false
+	sContainer.visible = false
+	cContainer.visible = false
 	#var parent = get_parent()
 	#self.weapon_selected.connect(parent._on_weapon_selected)
 	#self.item_used.connect(parent._on_item_used)
@@ -131,6 +146,14 @@ func _swap_to_skills():
 	_connect_skill_signals(skills)
 
 
+func _swap_to_ofuda():
+	var ofuda : Array
+	aContainer.visible = false
+	oContainer.visible = true
+	ofuda = oBox.fill_ofuda(currentUnit)
+	_connect_ofuda_signals(ofuda)
+
+
 func _close_self():
 	self.visible = false
 	currentUnit = null
@@ -142,7 +165,9 @@ func _close_self():
 func _hide_tertiary():
 	sContainer.visible = false
 	cContainer.visible = false
+	oContainer.visible = false
 	_free_skills()
+	_free_ofuda()
 
 
 func _hide_action_container():
@@ -165,12 +190,13 @@ func _on_button_pressed(bName):
 			emit_signal("action_menu_selected", bName)
 		"VisitBtn": pass
 		"ShopBtn": pass
-		"AtkBtn": 
-			_change_state(MENU_STATES.WEAPONS_TARGETING)
-		"SklBtn": 
-			_change_state(MENU_STATES.SKILLS_OPEN)
+		"AtkBtn": _change_state(MENU_STATES.WEAPONS_TARGETING)
+		"SklBtn": _change_state(MENU_STATES.SKILLS_OPEN)
 		"OpenBtn": pass
 		"StealBtn": pass
+		"OfudaBtn": 
+			_change_state(MENU_STATES.OFUDA_OPEN)
+			
 		"ItmBtn": 
 			_change_state(MENU_STATES.ITEM_MANAGE)
 			emit_signal("action_menu_item_pressed", currentUnit)
@@ -191,14 +217,33 @@ func _on_skill_pressed(sButton : Control):
 	_change_state(MENU_STATES.SKILL_TARGETING)
 
 
+func _on_ofuda_pressed(oButton : Control):
+	var unit: Unit = oButton.get_meta("Unit")
+	var ofuda : Ofuda = oButton.get_meta("Item")
+	unit.use_item(ofuda)
+	#Global.activeSkill = oButton.get_meta("ID")
+	_change_state(MENU_STATES.OFUDA_TARGETING)
+
+
 func _free_skills():
 	for s in sBox.get_children():
 		s.queue_free()
+
+
+func _free_ofuda():
+	for o in oBox.get_children():
+		o.queue_free()
+
 
 #Signal Functions
 func _connect_skill_signals(buttons : Array):
 	for b in buttons:
 		b.pressed.connect(self._on_skill_pressed.bind(b))
+
+
+func _connect_ofuda_signals(buttons : Array):
+	for b in buttons:
+		b.pressed.connect(self._on_ofuda_pressed.bind(b))
 
 
 func _connect_forecast_signal(weapons : Array):
@@ -235,7 +280,7 @@ func _change_state(newState):
 
 func return_previous_state() -> void:
 	var newState : MENU_STATES
-	var curState : MENU_STATES = state
+	#var curState : MENU_STATES = state
 	
 	
 	if state == MENU_STATES.ACTION and Global.flags.traded: return

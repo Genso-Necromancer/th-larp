@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://2ggl8hw7vq8n"]
+[gd_scene load_steps=8 format=3 uid="uid://2ggl8hw7vq8n"]
 
 [ext_resource type="Script" uid="uid://cpn1isih8n42y" path="res://scenes/GUI/action_menu.gd" id="1_ilauf"]
 [ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/inventory_panel.tscn" id="2_8r605"]
@@ -6,8 +6,9 @@
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="3_e8ygl"]
 [ext_resource type="Script" uid="uid://dqnbmfjx7exf0" path="res://scenes/GUI/action_box.gd" id="3_hhurs"]
 [ext_resource type="Script" uid="uid://bsj5frkjcqte4" path="res://scenes/GUI/skill_box.gd" id="6_v4nkc"]
+[ext_resource type="Script" uid="uid://ct0uvjp5nevg7" path="res://scenes/GUI/ofuda_box.gd" id="7_61ufj"]
 
-[node name="ActionMenu" type="PanelContainer" node_paths=PackedStringArray("aBox", "aContainer", "sBox", "sContainer", "cContainer", "skillConfirm")]
+[node name="ActionMenu" type="PanelContainer" node_paths=PackedStringArray("skillConfirm")]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -15,11 +16,6 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("1_ilauf")
-aBox = NodePath("ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox")
-aContainer = NodePath("ScreenMargin/ActionBackgroundMargin")
-sBox = NodePath("ScreenMargin/SkillBackgroundMargin/SkillMargin/SkillBox")
-sContainer = NodePath("ScreenMargin/SkillBackgroundMargin")
-cContainer = NodePath("ScreenMargin/ConfirmBackgroundMargin")
 skillConfirm = NodePath("ScreenMargin/ConfirmBackgroundMargin/ConfirmMargin/SkillConfirm")
 cursorOffset = Vector2(30, 6)
 
@@ -34,6 +30,7 @@ theme_override_constants/margin_right = 250
 theme_override_constants/margin_bottom = 100
 
 [node name="TradePnl" parent="ScreenMargin" instance=ExtResource("2_8r605")]
+visible = false
 layout_mode = 2
 size_flags_vertical = 8
 _style = "Trade"
@@ -106,6 +103,15 @@ text = "Open"
 layout_mode = 2
 text = "Steal"
 
+[node name="OfudaBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../SklBtn")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../TrdBtn")
+mouse_filter = 1
+text = "Ofuda"
+
 [node name="ItmBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
 layout_mode = 2
 focus_neighbor_left = NodePath(".")
@@ -172,6 +178,7 @@ action_mode = 0
 text = "Suspend"
 
 [node name="SkillBackgroundMargin" type="MarginContainer" parent="ScreenMargin"]
+visible = false
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 8
@@ -201,6 +208,37 @@ theme = ExtResource("3_e8ygl")
 theme_override_constants/separation = 0
 script = ExtResource("6_v4nkc")
 
+[node name="OfudaBackgroundMargin" type="MarginContainer" parent="ScreenMargin"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+theme_override_constants/margin_top = 6
+theme_override_constants/margin_bottom = 6
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="ScreenMargin/OfudaBackgroundMargin"]
+layout_mode = 2
+texture = ExtResource("2_38ob5")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="OfudaMargin" type="MarginContainer" parent="ScreenMargin/OfudaBackgroundMargin"]
+custom_minimum_size = Vector2(42, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 10
+
+[node name="OfudaBox" type="VBoxContainer" parent="ScreenMargin/OfudaBackgroundMargin/OfudaMargin"]
+layout_mode = 2
+theme = ExtResource("3_e8ygl")
+theme_override_constants/separation = 0
+script = ExtResource("7_61ufj")
+
 [node name="ConfirmBackgroundMargin" type="MarginContainer" parent="ScreenMargin"]
 visible = false
 layout_mode = 2
@@ -228,6 +266,6 @@ theme_override_constants/margin_bottom = 10
 
 [node name="SkillConfirm" type="Button" parent="ScreenMargin/ConfirmBackgroundMargin/ConfirmMargin"]
 layout_mode = 2
-text = "Initiate Skill"
+text = "Initiate Action"
 
 [connection signal="pressed" from="ScreenMargin/ConfirmBackgroundMargin/ConfirmMargin/SkillConfirm" to="." method="_on_skill_confirm_pressed"]

@@ -153,7 +153,7 @@ func get_skill(data:SlotWrapper) -> String:
 		if key != "effects" and key != "sub_rule": converted[key] = StringGetter.get_string(str(key+"_"+str(data[key])).to_snake_case())
 	
 	if ruleString and effectString:
-		working = ruleString + "\n" + effectString
+		working =  effectString + "\n" + ruleString
 	elif ruleString:
 		working += ruleString
 	elif effectString:

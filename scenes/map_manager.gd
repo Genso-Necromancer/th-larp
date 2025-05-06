@@ -22,8 +22,13 @@ func _connect_signals()-> void:
 	gameBoard.gameboard_targeting_canceled.connect(guiManager._on_gameboard_targeting_canceled)
 	gameBoard.cursor.cursor_moved.connect(self._on_cursor_moved)
 	gameBoard.map_freed.connect(self._on_map_freed)
+	gameBoard.turn_changed.connect(guiManager._on_turn_changed)
+	gameBoard.new_round.connect(guiManager._on_new_round)
+	gameBoard.turn_added.connect(guiManager._on_turn_added)
+	gameBoard.turn_removed.connect(guiManager._on_turn_removed)
 	guiManager.gui_splash_finished.connect(self._on_gui_splash_finished)
 	guiManager.gui_action_menu_canceled.connect(gameBoard._on_gui_action_menu_canceled)
+	
 
 
 #region scene loading

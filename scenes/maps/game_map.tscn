@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://cl7ik2hxcwm08"]
+[gd_scene load_steps=10 format=3 uid="uid://cl7ik2hxcwm08"]
 
 [ext_resource type="Script" uid="uid://2hx5flk7mcr3" path="res://scenes/maps/BaseGameMap.gd" id="1_ak6bi"]
 [ext_resource type="TileSet" uid="uid://dae0fl1fnuwvk" path="res://TileSets/TestTileSet2.tres" id="2_1xy5d"]
@@ -10,12 +10,6 @@
 [ext_resource type="Script" uid="uid://bdpbd4lp3x08s" path="res://scrpt/ai/ai_manager.gd" id="7_77vj4"]
 [ext_resource type="Resource" uid="uid://befkt7mur7ux" path="res://scrpt/ai/personality_test.tres" id="8_gm7ke"]
 
-[sub_resource type="GDScript" id="GDScript_1xy5d"]
-script/source = "extends Resource
-class_name SceneScript
-var dialogue_script :Array[Dictionary]
-"
-
 [node name="GameMap" type="Node2D"]
 z_index = -2
 script = ExtResource("1_ak6bi")
@@ -23,7 +17,6 @@ forcedUnits = ["Remilia", "Sakuya"]
 title = "Testing My Fucking Patience"
 start_script = null
 end_script = null
-event_scripts = Dictionary[int, SubResource("GDScript_1xy5d")]({})
 hours = 0
 minutes = 0
 

@@ -1,5 +1,5 @@
 extends MarginContainer
-
+class_name AnimationHandler
 
 signal animations_complete
 signal sequence_ready

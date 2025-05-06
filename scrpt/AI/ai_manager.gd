@@ -502,11 +502,11 @@ func _find_valid_attacks(aiUnit:Unit, path:Array) -> Array:
 	var archetype : float = 1.0
 	for wep :Weapon in aiInv:
 		if wep is not Weapon: continue
-		aiUnit.set_temp_equip(wep)
+		aiUnit.set_equipped(wep, true)
 		var ranges = aiUnit.get_weapon_reach()
 		var threat = aHex.find_threat(path, ranges)
 		for unit in oppContext:
-			match wep.type:
+			match wep.damage_type:
 				Enums.DAMAGE_TYPE.PHYS:
 					targetDef = "Def"
 					if (aiUnit.combatData.Dmg - unit.activeStats.Def <= 0):

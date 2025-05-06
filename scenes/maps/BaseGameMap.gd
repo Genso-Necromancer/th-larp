@@ -480,7 +480,10 @@ func _load_danmaku_scripts():
 		dmkScript.map = self
 	
 	
-func progress_danmaku_script():
+func progress_danmaku_script() -> void:
+	if !dmkScript: 
+		emit_signal("danmaku_progressed")
+		return
 	var step = dmkScript.get_step()
 	#var action = step.keys()[0]
 	_process_bullets(step)

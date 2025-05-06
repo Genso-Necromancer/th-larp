@@ -54,18 +54,24 @@ func update_fc(foreCast:Dictionary) -> void: #HERE labels need updating to using
 		var fcCounter = foreCast[units[i]].Counter
 		var fcReach = foreCast[units[i]].Reach
 		var fcSwings = foreCast[units[i]].Swings
+		var fcSkill = foreCast[units[i]].Skill
+		var fcItem = foreCast[units[i]].Item
 		var lifeTemplate : String = StringGetter.get_template("combat_hp")
 		var remainTemplate : String = StringGetter.get_template("combat_hp_remain")
 		var lifeText : String = "[center]%s[/center]"
 		var hp = lifeTemplate % [active.CurLife, units[i].baseStats.Life]
 		#var iconPath : String = "res://sprites/icons/items/%s/%s.png"
-		var wNamePath : String = "weapon_%s"
+		var actionPath : String
+		var actionString : String = "--"
 		#var folder : String
 		#if item is Weapon: folder = "weapon"
 		#if item is Accessory: folder = "accessory"
 		#if item is Consumable: folder = "consumable"
 		#iconPath = iconPath % [folder, units[i].get_equipped_weapon().id]
-		wNamePath = wNamePath % [units[i].get_equipped_weapon().id]
+		if fcSkill: actionPath = "skill_name_%s" % [fcSkill.id]
+		elif fcItem: actionPath = "ofuda_%s" % [fcItem.id]
+		else: actionPath = "weapon_%s" % [units[i].get_equipped_weapon().id]
+		if fcCounter: actionString = StringGetter.get_string(actionPath)
 		
 		if !fcCombat.CanMiss and fcCounter and fcReach: hit = "TRUE" 
 		elif fcCombat.CanMiss and fcCounter and fcReach: hit = str(fcCombat.Hit)
@@ -87,7 +93,7 @@ func update_fc(foreCast:Dictionary) -> void: #HERE labels need updating to using
 		groups[g][2].set_text(hit)
 		groups[g][3].set_text(dmg)
 		groups[g][4].set_text(crit)
-		groups[g][5].set_text(StringGetter.get_string(wNamePath))
+		groups[g][5].set_text(actionString)
 		#HERE check for swing count for visual representation
 		i += 1
 	if foreCast[units[0]].Effects or foreCast[units[(i-1)]].Effects:
@@ -122,8 +128,8 @@ func _load_effects(cmbData) -> void:
 			continue
 		#var keys : Array = cmbData[unit].Effects.keys()
 		for effId in cmbData[unit].Effects:
-			var string : String = "[center]%s[/center]" % StringGetter.get_combat_effect_string(effId, cmbData[unit])
-			match UnitData.effectData[effId].Target:
+			var string : String = "[center]%s[/center]" % StringGetter.get_combat_effect_string(effId)
+			match effId.target:
 				Enums.EFFECT_TARGET.SELF: selfEff.append(string)
 				Enums.EFFECT_TARGET.TARGET: targEff.append(string)
 				Enums.EFFECT_TARGET.GLOBAL: globEff.append(string)

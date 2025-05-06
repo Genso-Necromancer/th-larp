@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_uxxec")
 type = 3
-target = 1
+target = 4
 instant = false
 on_hit = false
 proc = 0
@@ -13,7 +13,7 @@ duration = 2
 duration_type = 1
 stack = true
 permanent = false
-curable = true
+curable = false
 from_item = false
 hostile = false
 multi_swing = 0

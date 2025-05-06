@@ -40,12 +40,8 @@ func _ready():
 	timeModData = {}
 	
 	_load_unique_units()
-	
 	_load_terrain_data()
-	_load_skills()
-
 	_load_time_mods()
-	
 	#print(timeModData)
 	init_roster()
 	init_supply()
@@ -54,42 +50,6 @@ func _load_unique_units():
 	unitData = pStats.get_named_unit_data()
 	#for unit in unitData:
 		#unitData[unit]["DataType"] = Enums.DATA_TYPE.UNIT
-
-func _load_skills():
-	var rawData = pStats.get_skills()
-	var keys = rawData.keys()
-	
-	for key in keys:
-		skillData[key] = {
-			"SkillId": key,
-			"SkillName": "no_name",
-			"Icon": load(("res://sprites/gungnir.png")),
-			"Category": Enums.CATEGORY.NONE,
-			"Augment": false, #Set true if weapon stats should be used.
-			"Target": "Enemy", #Enemy, Self, Ally, Self+(This is Self and Ally), Other(Enemy or Ally, not Self)
-			"CanMiss": true, #default true
-			"CanCrit": true,
-			"CanDmg": true,
-			##Only if Augment
-			"WepCat": Enums.WEAPON_CATEGORY.ANY, #Set to required weapon category, or sub type, for skill use.
-			"BonusMinRange": 0,
-			"BonusMaxRange": 0,
-			##If !augment, these are the parameters used as if it was a weapon. If Augment, these values are added as bonus/penalty if altered.
-			"Hit": 0, #Int only. negative values acceptable for Hit penalties to the skill
-			"Dmg": 0, #set an int value for damage, set false to prevent dealing damage
-			"Crit": 0, #set an int value for crit bonus, set false to prevent crits
-			"Type": Enums.DAMAGE_TYPE.PHYS, #use enum types. Set False if augment should use weapon's type.
-			##Used regardless of Augment
-			"MinRange": 1, #if 0, ignored by Augment. Set value to require specific weapon reach.
-			"MaxRange": 1,
-			"Cost": 0,
-			"Effects": [], #any attacking effects for an augment skill must be set to instant.
-			"RuleType": false,
-			"Rule": false,
-		}
-		var innerKeys = rawData[key].keys()
-		for iKey in innerKeys:
-			skillData[key][iKey] = rawData[key][iKey]
 
 
 func _load_time_mods():
@@ -302,9 +262,10 @@ func init_roster():
 	if !rosterOnce:
 		rosterData.append("Remilia")
 		rosterData.append("Sakuya")
-		rosterData.append("Meiling")
-		rosterData.append("Patchouli")
 		rosterData.append("Reimu")
+		rosterData.append("Patchouli")
+		rosterData.append("Meiling")
+		
 		rosterOnce = true
 	return
 
@@ -316,7 +277,7 @@ func init_supply():
 		"STICK":[],
 		"GOHEI":[],
 		"BOOK":[],
-		"FAN":[],
+		"OFUDA":[],
 		"BOW":[],
 		"GUN":[],
 		"ACC":[],

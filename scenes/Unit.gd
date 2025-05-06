@@ -496,14 +496,14 @@ func set_buff(effect:Effect):
 	if effect == null:
 		print("No effect found")
 		return
-	if effect.Stack:
+	if effect.stack:
 		var i = 0
 		var newId = effect.id + str(i)
 		while buffs.has(newId):
 			i += 1
 			newId = effect.id + str(i)
 		effect = newId
-	if effect.DurationType == Enums.DURATION_TYPE.PERMANENT:
+	if effect.duration_type == Enums.DURATION_TYPE.PERMANENT:
 		var stat : String = statKeys[effect.sub_type]
 		unitData.Stats[stat] += effect.value
 	else:
@@ -519,36 +519,28 @@ func remove_buff(effect):
 	update_stats()
 	
 	
-#tracks duration of effects, then removes them when reaching 0
-func status_duration_tick():
-	var idKeys = activeBuffs.keys()
+##tracks duration of effects, then removes them when reaching 0.
+func status_duration_tick(duration:Enums.DURATION_TYPE)->void:
+	var keys = activeBuffs.keys()
+	for i in range(0,1):
+		if i == 1: keys = activeDebuffs.keys()
+		for effect in keys:
+			if activeBuffs[effect].duration_type != duration: continue
+			if activeBuffs[effect].duration > 0: activeBuffs[effect].duration -= 1
+			if activeBuffs[effect].duration == 0: remove_buff(effect)
 	
-	for effect in idKeys:
-#		var statKeys = activeBuffs[effect].keys()
-#		for stat in statKeys:
-		if activeBuffs[effect].Duration > 0:
-			activeBuffs[effect].Duration -= 1
-		if activeBuffs[effect].Duration == 0:
-			remove_buff(effect)
-			
-	#for key in statusKeys:
-		#if status[key] and sParam[key].Duration > 0:
-			#status[key].Duration -= 1
-		#if status[key] and sParam[key].Duration == 0:
-			#status[key] = {"Active": false}
-			
-	for key in status:
+	for key in status: #Why is status conditions so fucking convoluted????
+			if status[key] and sParam.has(key) and sParam[key].DurationType != duration: continue
 			if status[key] and sParam.has(key) and sParam[key].Duration > 0:
 				sParam[key].Duration -= 1
-			elif status[key] and sParam.has(key) and sParam[key].Duration <= 0:
+			if status[key] and sParam.has(key) and sParam[key].Duration <= 0:
 				status[key] = false
 				sParam.erase(key)
-			
+	
 	$PathFollow2D/Cell2.set_text(str(status.Sleep))
-#	print(activeBuffs)
 	update_stats()
-	
-	
+
+
 func _load_sprites():
 	if !generate: 
 		_sprite.texture = unitData["Profile"]["Sprite"]
@@ -572,6 +564,7 @@ func _init_inv():
 		elif !ResourceLoader.exists(item): continue
 		else: res = load(item)
 		if res is WeaponResource: newSlot = Weapon.new().duplicate()
+		elif res is OfudaResource: newSlot = Ofuda.new().duplicate()
 		elif res is ConsumableResource: newSlot = Consumable.new().duplicate()
 		elif res is AccessoryResource: newSlot = Accessory.new().duplicate()
 		
@@ -686,7 +679,7 @@ func _assign_auras(passive:Passive) -> Aura:
 func check_time_prot() -> bool:
 	var passives = unitData.Passives
 	var validTime
-	Global.timeOfDay
+	#Global.timeOfDay
 	for p in passives:
 		match p.type:
 			Enums.PASSIVE_TYPE.NIGHT_PROT:
@@ -772,9 +765,8 @@ func _on_aura_exited(area):
 	update_stats()
 
 func _on_self_aura_entered(area, ownArea):
-	var effectData = UnitData.effectData
 	#print("on_self_aura_entered: ", area.master)
-	match ownArea.aura.TargetTeam:
+	match ownArea.aura.target_team:
 		Enums.TARGET_TEAM.ALLY:
 			if area.master.FACTION_ID != Enums.FACTION_ID.ENEMY and FACTION_ID == Enums.FACTION_ID.NPC:
 				pass
@@ -784,12 +776,12 @@ func _on_self_aura_entered(area, ownArea):
 			if area.master.FACTION_ID == FACTION_ID:
 				return
 	
-	if ownArea.aura.Target == Enums.EFFECT_TARGET.SELF:
+	if ownArea.aura.target == Enums.EFFECT_TARGET.SELF:
 		if !activeAuras.has(ownArea):
-			activeAuras[ownArea] = ownArea.aura.Effects.duplicate()
+			activeAuras[ownArea] = ownArea.aura.effects.duplicate()
 		else: 
-			for effect in ownArea.aura.Effects:
-				if effectData[effect].Stack:
+			for effect in ownArea.aura.effects:
+				if effect.stack:
 					activeAuras[ownArea].append(effect)
 	
 	
@@ -943,7 +935,7 @@ func is_rule_met(rule_type:Enums.RULE_TYPE, sub_type:Enums.SUB_RULE) -> bool:
 
 ##Restores the temporarily unequipped weapon
 func restore_equip() -> void:
-	for weapon :Weapon in inventory:
+	for weapon :Item in inventory:
 		if weapon is Weapon and weapon.temp_remove:
 			weapon.temp_remove = false
 			set_equipped(weapon)
@@ -986,7 +978,7 @@ func get_reach() -> Dictionary:
 			var r = get_aug_reach(s)
 			aug.Min = mini(r.Min, aug.Min)
 			aug.Max = maxi(r.Max, aug.Max)
-		elif UnitData.skillData[s].max_reach > 0:
+		elif s.max_reach > 0:
 			var r = get_skill_reach(s)
 			skill.Min = mini(r.Min, skill.Min)
 			skill.Max = maxi(r.Max, skill.Max)
@@ -1000,8 +992,11 @@ func get_reach() -> Dictionary:
 ##Returns reach = {"Max":int, "Min":int} of given currently equipped weapon
 func get_weapon_reach() -> Dictionary:
 	var reach = {"Max":-999, "Min":999}
-	for weapon: Weapon in inventory:
-			if !check_valid_equip(weapon): continue
+	for weapon: Item in inventory:
+			if weapon is not Weapon and weapon is not Ofuda: 
+				continue
+			elif !check_valid_equip(weapon): 
+				continue
 			reach.Min = mini(weapon.min_reach, reach.Min)
 			reach.Max = maxi(weapon.max_reach, reach.Max)
 	if natural:
@@ -1023,7 +1018,8 @@ func get_skill_reach(skill : Skill) -> Dictionary:
 func get_aug_reach(skill : Skill) -> Dictionary:
 	var reach = {"Max":-999, "Min":999}
 	if skill.min_reach == 0 or skill.max_reach == 0:
-		for weapon:Weapon in inventory:
+		for weapon:Item in inventory:
+			if weapon is not Weapon and weapon is not Ofuda: continue
 			if !check_valid_equip(weapon): continue
 			elif weapon.category != skill.weapon_category and weapon.sub_group != skill.weapon_category: continue
 			reach.Min = mini(weapon.min_reach, reach.Min)
@@ -1234,7 +1230,7 @@ func update_combatdata():
 		combatData.BarPrc = 0
 	baseCombat = combatData.duplicate()
 	
-func get_skill_combat_stats(skill:Skill, augmented := false):
+func get_skill_combat_stats(skill:SlotWrapper, augmented := false):
 	var stats = combatData.duplicate()
 	var dmgStat := 0
 	var attack : SlotWrapper
@@ -1243,8 +1239,8 @@ func get_skill_combat_stats(skill:Skill, augmented := false):
 		attack = get_equipped_weapon()
 	else: attack = skill
 	
-	if augmented and skill.type: typeLord = skill.type
-	else: typeLord = attack.type
+	if augmented and skill.dmg_type: typeLord = skill.dmg_type
+	else: typeLord = attack.dmg_type
 	
 	match typeLord:
 		Enums.DAMAGE_TYPE.PHYS: dmgStat = stats.PwrBase
@@ -1451,9 +1447,8 @@ func apply_composure(comp := 0):
 	activeStats.CurComp = clampi(activeStats.CurComp, 0, activeStats.Comp)
 
 
-func has_enough_comp(skill:Skill) -> bool:
+func has_enough_comp(cost:int) -> bool:
 	var isValid := false
-	var cost = skill.cost
 	if cost <= activeStats.CurComp: isValid = true
 	return isValid
 
@@ -1498,10 +1493,10 @@ func set_status(effect): #Missing a check for "duration type", same goes for tic
 	var statusKeys : Array = Enums.SUB_TYPE.keys()
 	var s : String = statusKeys[effect.sub_type].to_pascal_case()
 	status[s] = true
-	if sParam.has(s) and !sParam[s].Curable:
-		sParam[s].Duration = effect.Duration
+	if sParam.has(s) and !sParam[s].curable:
+		sParam[s].duration = effect.duration
 	else:
-		sParam[s] = {"Duration":effect.Duration, "Curable":effect.Curable}
+		sParam[s] = {"Duration":effect.duration, "Curable":effect.curable, "DurationType":effect.duration_type}
 	fxPath = fxPath % [s.to_snake_case()]
 	var fxAnimation = load(fxPath).instantiate()
 	if fxAnimation:
@@ -1540,9 +1535,12 @@ func on_turn_changed():
 	update_stats()
 	
 	
-func on_turn_order_updated(_to):
-	status_duration_tick()
-	
+func _on_new_round(_to):
+	status_duration_tick(Enums.DURATION_TYPE.ROUND)
+
+
+func _on_turn_changed():
+	status_duration_tick(Enums.DURATION_TYPE.TURN)
 	
 #DEATH
 func run_death():

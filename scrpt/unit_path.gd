@@ -1,6 +1,7 @@
 ## Draws the unit's movement path using an autotile.
+extends TileMapLayer
 class_name UnitPath
-extends TileMap
+
 
 #@export var grid: Resource
 
@@ -26,7 +27,7 @@ func draw(path: PackedVector2Array) -> void:
 #	cell_end = grid.calculate_grid_coordinates(cell_end)
 	current_path = path
 #	print("current_path: ", current_path)
-	set_cells_terrain_connect(0, current_path, 0, 0)
+	set_cells_terrain_connect(current_path, 0, 0)
 
 
 ## Stops drawing, clearing the drawn path and the `_pathfinder`.

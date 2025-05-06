@@ -99,8 +99,10 @@ func _generate_item_button(bPath, item : Item, i : int, unit : Unit, isTrade : b
 	var iconPath : String = "res://sprites/icons/items/%s/%s.png"
 	var folder : String
 	if item is Weapon: folder = "weapon"
-	if item is Accessory: folder = "accessory"
-	if item is Consumable: folder = "consumable"
+	elif item is Accessory: folder = "accessory"
+	elif item is Ofuda: folder = "ofuda"
+	elif item is Consumable: folder = "consumable"
+
 	iconPath = iconPath % [folder, item.id]
 	
 	
@@ -145,18 +147,6 @@ func add_empty(unit) -> ItemButton:
 
 
 func remove_empty():
-	#var i := 0
-	#var killList := []
-	#while i < items.size():
-		#if items[i].button.get_meta("Item"):
-			#continue
-		#else:
-			#killList.append(i)
-		#i += 1
-		#
-	#for k in killList:
-		#var b = items.pop_at(k)
-		#b.queue_free()
 	for b in itemList.get_children():
 		if b.button.get_meta("Item"):
 			continue

@@ -385,7 +385,7 @@ frame = 1
 
 [node name="CombatPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_456y4")
+&"": SubResource("AnimationLibrary_456y4")
 }
 
 [node name="CombatSkeleton" type="Skeleton2D" parent="."]

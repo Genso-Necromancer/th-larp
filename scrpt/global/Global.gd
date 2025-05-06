@@ -10,7 +10,7 @@ var focusUnit : Unit:
 var focusDanmaku : Danmaku:
 	set(value):
 		focusDanmaku = value
-		#SignalTower.emit_signal("focus_unit_changed", value)
+		SignalTower.emit_signal("focus_danmaku_changed", value)
 	get:
 		return focusDanmaku
 var aiTarget : Unit

@@ -10,7 +10,7 @@ enum tabTypes {
 	GUN,
 	GOHEI,
 	BOOK,
-	FAN,
+	OFUDA,
 	ACC,
 	ITEM
 }

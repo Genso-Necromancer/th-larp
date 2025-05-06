@@ -8,8 +8,11 @@
 script = ExtResource("1_o0i0e")
 
 [node name="Gameboard" parent="." instance=ExtResource("1_1o3kx")]
+mouseSens = null
+smoothing = null
+uiCooldown = null
 
-[node name="Cursor" parent="Gameboard" index="3"]
+[node name="Cursor" parent="Gameboard" index="1"]
 position = Vector2(0, 0)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
@@ -27,16 +30,13 @@ mapCursorPath = NodePath("../../Gameboard/Cursor")
 [connection signal="map_loaded" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_map_loaded"]
 [connection signal="player_lost" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_player_lost"]
 [connection signal="player_win" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_player_win"]
-[connection signal="skill_target_canceled" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_skill_target_canceled"]
 [connection signal="target_focused" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_target_focused"]
-[connection signal="time_set" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_time_set"]
 [connection signal="toggle_prof" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_prof"]
 [connection signal="toggle_skills" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_skills"]
 [connection signal="turn_changed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_turn_changed"]
 [connection signal="turn_order_updated" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_turn_order_updated"]
 [connection signal="unit_move_ended" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_unit_move_ended"]
 [connection signal="unit_selected" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_unit_selected"]
-[connection signal="combat_resolved" from="Gameboard/CombatManager" to="Gameboard" method="_on_combat_manager_combat_resolved"]
 [connection signal="time_factor_changed" from="Gameboard/CombatManager" to="Gameboard" method="_on_combat_manager_time_factor_changed"]
 [connection signal="warp_selected" from="Gameboard/CombatManager" to="Gameboard" method="_on_combat_manager_warp_selected"]
 [connection signal="deploy_toggled" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_deploy_toggled"]

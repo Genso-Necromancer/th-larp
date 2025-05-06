@@ -167,7 +167,7 @@ horizontal_alignment = 1
 
 [node name="TradePnl1" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1" instance=ExtResource("8_hil8c")]
 layout_mode = 2
-_style = "NONE"
+_style = "Trade"
 
 [node name="TradeBox2" type="VBoxContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer"]
 layout_mode = 2
@@ -200,10 +200,11 @@ horizontal_alignment = 1
 
 [node name="TradePnl2" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2" instance=ExtResource("8_hil8c")]
 layout_mode = 2
-_style = "NONE"
+_style = "Trade"
 
 [node name="ConvoyPnl" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer" instance=ExtResource("9_fjgok")]
 layout_mode = 2
+_style = "Trade"
 
 [node name="InfoPanel" parent="TradeContainer/MarginContainer/TradeScreenVBox" instance=ExtResource("10_pdk1d")]
 layout_mode = 2

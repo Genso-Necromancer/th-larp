@@ -2,7 +2,7 @@ extends VBoxContainer
 
 class_name SkillBox
 
-func fill_skills(unit:Unit) -> Array:
+func fill_skills(unit:Unit) -> Array: #Needs a context check for if a skill is valid to use
 	var sPath = load("res://scenes/GUI/skill_button.tscn")
 	var s : SkillButton
 	var buttons := []
@@ -13,7 +13,7 @@ func fill_skills(unit:Unit) -> Array:
 		s.get_button().add_to_group("SkillsTT")
 		s.set_meta_data(skill, unit, false)
 		if !_check_composure(unit, skill): s.state = "Disabled"
-		if UnitData.skillData[skill].Augment and !_check_aug(unit, skill): s.state = "Disabled"
+		if skill.augment and !_check_aug(unit, skill): s.state = "Disabled"
 		add_child(s)
 	buttons[0].call_deferred("grab_focus")
 	return buttons
@@ -21,18 +21,18 @@ func fill_skills(unit:Unit) -> Array:
 		
 func generate_skillbutton(path, data) -> SkillButton:
 	var b : SkillButton
-	
+	var iconPath : String = "res://sprites/icons/features/%s.png" % [data.id]
 	b = path.instantiate()
 	b.isIconMode = false
 	b.set_item_text(data)
-	b.set_item_icon(data.Icon)
+	b.set_item_icon(iconPath)
 	#_connect_focus_signals(b)
 	return b
 	
 
 
 func _check_composure(unit : Unit, skill : Skill) -> bool:
-	var valid : bool = unit.has_enough_comp(skill)
+	var valid : bool = unit.has_enough_comp(skill.cost)
 	return valid
 
 

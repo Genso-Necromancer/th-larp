@@ -22,6 +22,7 @@ signal gui_action_menu_canceled
 
 #states
 enum sStates {
+	END,
 	HOME,
 	TRADING,
 	UNITOP,
@@ -40,10 +41,13 @@ var sState := sStates.HOME:
 		match value: #Temporary, may be best to have HUD groups to control?
 			sStates.FORM: focusViewer.enableViewer = true
 			sStates.BEGIN: focusViewer.enableViewer = true
-			_: focusViewer.enableViewer = false
+			_: 
+				turnTracker.hide_self()
+				focusViewer.enableViewer = false
+			
 			
 		sState = value
-		print("sState Changed: ", sStates.keys()[value])
+		#print("sState Changed: ", sStates.keys()[value])
 
 ##preloads (this is how I should have been doing shit from the start!)
 var turnTrackerRes = preload("res://scenes/turn_tracker.tscn")
@@ -55,7 +59,7 @@ var actMenu : ActionMenu
 var foreCast : CombatForecast
 
 ##scenes
-var turnTracker
+var turnTracker : TurnTracker
 
 ##prompts
 var isForecastPrompt = false
@@ -118,10 +122,6 @@ func update_labels(): #Use this to cascade assigning strings from XML to all har
 
 func _on_prompt_accepted():
 	_initiate_ai_sequence()
-
-
-func _on_gameboard_turn_order_updated(turns):
-	turnTracker.display_turns(turns)
 
 
 func _on_jobs_done(id, node):
@@ -198,7 +198,7 @@ func _on_gameboard_toggle_prof():
 		
 			
 func toggle_profile() -> void: 
-	if sState < 4: return #profile should not open in these states.
+	if sState < sStates.TRDSEEK: return #profile should not open in these states.
 	
 	if unitProf.visible and Global.focusUnit != profFocus:
 		update_prof()
@@ -279,7 +279,7 @@ func _initiate_ai_sequence():
 func _swap_to_forecast():
 	var fc = $CombatForecast
 	fc.show_fc()
-	turnTracker.visible = false
+	turnTracker.hide_self()
 
 
 #HERE
@@ -339,6 +339,7 @@ func _connect_asset_signals():
 	actMenu.action_menu_selected.connect(GRANDDAD._on_action_menu_selected)
 	actMenu.action_menu_item_pressed.connect(self._on_action_item_pressed)
 	actMenu.action_menu_trade_pressed.connect(self._on_action_trade_pressed)
+	#actMenu.action_menu_ofuda_open.connect(self._on_action_ofuda_open)
 	
 #SetUp Buttons
 func _on_btn_deploy_pressed():
@@ -368,7 +369,7 @@ func _on_begin_btn_pressed():
 	menuCursor.visible = false
 	mapSetUp.toggle_visible()
 	sState = sStates.BEGIN
-	turnTracker.visible = true
+	#turnTracker.unhide_self()
 	chClock.visible = true
 	emit_signal("map_started")
 
@@ -622,6 +623,12 @@ func _on_action_item_pressed(unit:Unit):
 	tradeScreen.open_manage_menu(unit)
 
 
+#func _on_action_ofuda_open(unit:Unit):
+	#GameState.change_state(self,GameState.gState.GB_SETUP)
+	#sState = sStates.MANAGE
+	#tradeScreen.open_manage_menu(unit)
+
+
 func _on_action_trade_pressed(unit:Unit):
 	trade1 = unit
 	GRANDDAD.trade_seeking(unit)
@@ -651,14 +658,10 @@ func _on_profile_request(newParent):
 
 func _on_item_used(unit, item):
 	emit_signal("item_used", unit, item)
-	
-#########
+
 
 #Action/Generic options menu functions
-
 func regress_act_menu():
-	#foreCast.hide_fc()
-	#actMenu.close_menu()
 	actMenu.return_previous_state()
 	
 func _on_action_menu_canceled():
@@ -668,6 +671,7 @@ func _on_action_menu_canceled():
 
 func cancel_forecast():
 	#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
+	turnTracker.unhide_self()
 	foreCast.hide_fc()
 	regress_act_menu()
 
@@ -694,26 +698,21 @@ func _on_gameboard_forecast_confirmed():
 	_strip_menuCursor()
 	emit_signal("start_the_justice")
 
-func _on_gameboard_skill_target_canceled():
-	actMenu.open_skill_menu()
 
 func _on_action_menu_menu_opened(container):
 	#_resignal_menuCursor(container)
 	call_deferred("_resignal_menuCursor",container)
-	
+
+
 func _on_weapon_selected(button): #weapon can change after selection if mouse moves at wrong time. HERE Fix this, you absolute fucking retard
 	#foreCast.hide_fc()
 	_strip_menuCursor()
 	emit_signal("start_the_justice", button)
 
 
-#func _on_action_menu_weapon_changed(weapon):
-	#pass # Replace with function body.
-
-#Game State transitions
-
 func fade_map_out():
 	SignalTower.fader_fade_out.emit()
+
 
 func fade_map_in():
 	SignalTower.fader_fade_in.emit()
@@ -733,24 +732,43 @@ func _on_splash_player_finished():
 
 func _on_gameboard_player_lost():
 	var failScreen = $FailScreen
+	sState = sStates.END
 	failScreen.fade_in_failure()
 	GameState.change_state(self, GameState.gState.FAIL_STATE)
 
+
 func _on_gameboard_player_win():
 	var winScreen = $WinScreen
+	sState = sStates.END
 	winScreen.fade_in_win()
+
 
 func _on_win_screen_win_finished():
 	turnTracker.free_tokens()
 
-#func _on_gameboard_map_loaded(_map):
-	#end_load_screen()
-	
 
 func _on_animation_handler_sequence_complete():
 	foreCast.hide_fc()
-	turnTracker.visible = true
+	turnTracker.unhide_self()
 
 
 func _on_gameboard_sequence_initiated(_sequence):
 	GameState.change_state(self, GameState.gState.SCENE_ACTIVE)
+
+#region turn tracker signal routing
+func _on_turn_changed()->void:
+	turnTracker.change_turn()
+	
+
+func _on_new_round(turn_order:Array[StringName])->void:
+	turnTracker.display_turns(turn_order)
+
+
+func _on_turn_added(team:StringName)->void:
+	turnTracker.add_turn(team)
+
+
+func _on_turn_removed(team:StringName)->void:
+	turnTracker.remove_turn(team)
+
+#endregion

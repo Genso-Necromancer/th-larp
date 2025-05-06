@@ -212,7 +212,7 @@ func _close_supply_menu():
 	emit_signal("trade_closed")
 	
 	
-func open_manage_menu(unit):
+func open_manage_menu(unit:Unit):
 	_load_names([unit])
 	_load_sprites([unit])
 	firstUnit = unit
@@ -223,6 +223,7 @@ func open_manage_menu(unit):
 	list1.set_meta("Unit", unit)
 	#_refresh_list()
 	call_deferred("_refresh_list")
+
 
 func close_manage_menu():
 	firstUnit = null
@@ -789,17 +790,17 @@ func _swap_items(b1, b2):
 	var item1 = b1.button.get_meta("Item")
 	var i1 = b1.get_meta("Index")
 	var inv1 = unit1.inventory
-	var btns1 = list1.itemList.get_children()
+	#var btns1 = list1.itemList.get_children()
 	var unit2 = b2.get_meta("Unit")
 	var item2 = b2.button.get_meta("Item")
 	var i2 = b2.get_meta("Index")
 	var inv2 = unit2.inventory
-	var home
-
-	if btns1.has(b1):
-		home = list1
-	else:
-		home = list2
+	#var home
+#
+	#if btns1.has(b1):
+		#home = list1
+	#else:
+		#home = list2
 	item1.equipped = false
 	if item2:
 		#home.add_child(b2)

@@ -1,9 +1,10 @@
-[gd_scene load_steps=15 format=3 uid="uid://bn4l14oxi8vt8"]
+[gd_scene load_steps=19 format=3 uid="uid://bn4l14oxi8vt8"]
 
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_ckdua"]
 [ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="1_oay4f"]
 [ext_resource type="Script" uid="uid://cu0id8wd4v4h2" path="res://scenes/GUI/cursor_focus_viewer.gd" id="2_f5i04"]
 [ext_resource type="Script" uid="uid://cadn212l0oo2l" path="res://scenes/GUI/terrain_panel.gd" id="3_psmhf"]
+[ext_resource type="Texture2D" uid="uid://da3t2akwt1so2" path="res://scenes/GUI/focus_viewer/terrain_tracker_hex.png" id="4_rtypo"]
 [ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="5_k63fk"]
 [ext_resource type="Script" uid="uid://dh5a7imlr8hal" path="res://scenes/profile.gd" id="5_nxk8q"]
 [ext_resource type="Texture2D" uid="uid://c0w3tlvvk2fdi" path="res://sprites/icons/misc/lock_stock_image.png" id="5_p6ryq"]
@@ -12,8 +13,11 @@
 [ext_resource type="Script" uid="uid://dmmoxkqdbbiuj" path="res://scenes/GUI/short_label.gd" id="6_ifhg5"]
 [ext_resource type="TileSet" uid="uid://vvc8vnsncejj" path="res://TileSets/PreviewTileSet.tres" id="6_p6ryq"]
 [ext_resource type="Script" uid="uid://v7tjpaq578at" path="res://scenes/GUI/terrain_name.gd" id="6_yxgd6"]
+[ext_resource type="Texture2D" uid="uid://bxufrvbyoeegj" path="res://scenes/GUI/focus_viewer/terrain_tracker_textbox.png" id="7_ae8gg"]
 [ext_resource type="PackedScene" uid="uid://b011nm5up2wry" path="res://scenes/GUI/status_tray_margin.tscn" id="7_u1j3q"]
 [ext_resource type="Script" uid="uid://1x1m002ekv0q" path="res://scenes/GUI/danmaku_profile.gd" id="14_covod"]
+[ext_resource type="PackedScene" uid="uid://cpayroch3dxjg" path="res://scenes/GUI/item_button.tscn" id="16_m2ebb"]
+[ext_resource type="FontFile" uid="uid://cuuir1uibmfis" path="res://fonts/Marcellus/Marcellus.otf" id="17_n6bnq"]
 
 [node name="CursorFocusViewer" type="Control" node_paths=PackedStringArray("terrainPanel", "unitPanel", "dmkPanel")]
 layout_mode = 3
@@ -66,18 +70,16 @@ layout_mode = 2
 mouse_filter = 2
 
 [node name="TexturePanel" type="PanelContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox"]
-custom_minimum_size = Vector2(184, 72)
 layout_mode = 2
-size_flags_vertical = 0
+size_flags_horizontal = 4
+size_flags_vertical = 4
 mouse_filter = 2
 
-[node name="BackgroundCenter" type="NinePatchRect" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/TexturePanel"]
+[node name="BackgroundCenter" type="TextureRect" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/TexturePanel"]
+custom_minimum_size = Vector2(220, 74)
 layout_mode = 2
-texture = ExtResource("1_ckdua")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
+texture = ExtResource("4_rtypo")
+expand_mode = 2
 
 [node name="TextureMargin" type="MarginContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/TexturePanel"]
 layout_mode = 2
@@ -98,11 +100,11 @@ expand_mode = 1
 stretch_mode = 4
 
 [node name="BaseLayer" type="TileMapLayer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/TexturePanel"]
-position = Vector2(8, 11)
+position = Vector2(26, -7)
 tile_set = ExtResource("6_p6ryq")
 
 [node name="ModLayer" type="TileMapLayer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/TexturePanel"]
-position = Vector2(8, 11)
+position = Vector2(26, -7)
 tile_set = ExtResource("6_p6ryq")
 
 [node name="InfoPanel" type="PanelContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox"]
@@ -111,7 +113,7 @@ mouse_filter = 2
 
 [node name="BackgroundCenter" type="NinePatchRect" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel"]
 layout_mode = 2
-texture = ExtResource("1_ckdua")
+texture = ExtResource("7_ae8gg")
 patch_margin_left = 16
 patch_margin_top = 16
 patch_margin_right = 16
@@ -120,10 +122,10 @@ patch_margin_bottom = 16
 [node name="InfoMagin" type="MarginContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 9
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = -4
 
 [node name="InfoVBox" type="VBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin"]
 layout_mode = 2
@@ -353,7 +355,7 @@ mouse_filter = 2
 
 [node name="BackgroundCenter" type="NinePatchRect" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel"]
 layout_mode = 2
-texture = ExtResource("1_ckdua")
+texture = ExtResource("7_ae8gg")
 patch_margin_left = 16
 patch_margin_top = 16
 patch_margin_right = 16
@@ -362,10 +364,10 @@ patch_margin_bottom = 16
 [node name="InfoMagin" type="MarginContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 11
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 13
 
 [node name="InfoVBox" type="VBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin"]
 layout_mode = 2
@@ -411,7 +413,7 @@ mouse_filter = 2
 layout_mode = 2
 mouse_filter = 2
 
-[node name="UnitHpTag" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox1" groups=["ActiveTT", "ToolTipLabels"]]
+[node name="UnitHpTag" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox1"]
 layout_mode = 2
 focus_neighbor_left = NodePath("../../../../../../../DerivedMargin/DerivedStatsHBox/VTags/UnitAcc")
 focus_neighbor_top = NodePath("../../../../../../../../../../../MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/SpeciesVBox/SpeciesLb")
@@ -422,7 +424,7 @@ text = "Life:"
 horizontal_alignment = 2
 metadata/ToolTip = &"Life"
 
-[node name="UnitCmpTag" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox1" groups=["ActiveTT", "ToolTipLabels"]]
+[node name="UnitCmpTag" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox1"]
 layout_mode = 2
 focus_neighbor_top = NodePath("../UnitHpTag")
 focus_neighbor_bottom = NodePath("../../../../../StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitStrTag")
@@ -431,11 +433,6 @@ mouse_filter = 1
 text = "Cmp.:"
 horizontal_alignment = 2
 metadata/ToolTip = &"Comp"
-
-[node name="Hit" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox1"]
-layout_mode = 2
-text = "Hit:"
-horizontal_alignment = 2
 
 [node name="Graze" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox1"]
 layout_mode = 2
@@ -525,15 +522,6 @@ script = ExtResource("6_f5i04")
 key1 = &"activeStats"
 key2 = &"Comp"
 
-[node name="Acc" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1" groups=["ProfileLabels"]]
-layout_mode = 2
-mouse_filter = 1
-text = "%s"
-vertical_alignment = 1
-script = ExtResource("6_f5i04")
-key1 = &"combatData"
-key2 = &"Hit"
-
 [node name="Graze" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1" groups=["ProfileLabels"]]
 layout_mode = 2
 mouse_filter = 1
@@ -547,128 +535,178 @@ key2 = &"Graze"
 layout_mode = 2
 mouse_filter = 2
 
-[node name="UnitHpTag" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2" groups=["ActiveTT", "ToolTipLabels"]]
+[node name="ResLb" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2"]
 layout_mode = 2
-focus_neighbor_left = NodePath("../../../../../../../DerivedMargin/DerivedStatsHBox/VTags/UnitAcc")
-focus_neighbor_top = NodePath("../../../../../../../../../../../MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/SpeciesVBox/SpeciesLb")
-focus_neighbor_bottom = NodePath("../UnitCmpTag")
+focus_neighbor_top = NodePath("../EffLb")
+focus_neighbor_right = NodePath("../../../../StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitCeleTag")
+focus_neighbor_bottom = NodePath("../UnitBar")
 focus_mode = 2
 mouse_filter = 1
-text = "Life:"
+text = "Resist:"
 horizontal_alignment = 2
-metadata/ToolTip = &"Life"
+vertical_alignment = 1
+metadata/ToolTip = &"Resist"
 
-[node name="UnitCmpTag" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2" groups=["ActiveTT", "ToolTipLabels"]]
+[node name="UnitBar" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2" groups=["ToolTipLabels"]]
 layout_mode = 2
-focus_neighbor_top = NodePath("../UnitHpTag")
-focus_neighbor_bottom = NodePath("../../../../../StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitStrTag")
+focus_neighbor_top = NodePath("../ResLb")
+focus_neighbor_right = NodePath("../../../../StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitDefTag")
+focus_neighbor_bottom = NodePath("../MoveTag")
 focus_mode = 2
 mouse_filter = 1
-text = "Composure:"
-metadata/ToolTip = &"Comp"
-
-[node name="Graze" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2"]
-layout_mode = 2
-text = "Graze"
+text = "Barrier:"
 horizontal_alignment = 2
+vertical_alignment = 1
+metadata/ToolTip = &"Barrier"
 
-[node name="Barrier" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2"]
+[node name="MoveTag" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/LabelsVBox2" groups=["ActiveTT", "ToolTipLabels"]]
 layout_mode = 2
-text = "Barrier"
+focus_neighbor_top = NodePath("../UnitBar")
+focus_neighbor_right = NodePath("../../VStats/MoveHBox/MoveType")
+focus_mode = 2
+mouse_filter = 1
+text = "Move:"
 horizontal_alignment = 2
+vertical_alignment = 1
+metadata/ToolTip = &"Move"
 
 [node name="ValuesVBox2" type="VBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox"]
 layout_mode = 2
 mouse_filter = 2
 
-[node name="HpVBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2"]
+[node name="Resist" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(0, 17)
 layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Hp" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/HpVBox" groups=["ProfileLabels"]]
-custom_minimum_size = Vector2(24, 10)
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 8
 mouse_filter = 1
-theme_override_colors/font_color = Color(0.670588, 0, 0, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 2
-text = "%s"
-horizontal_alignment = 2
+text = "%s%%"
+vertical_alignment = 1
 script = ExtResource("6_f5i04")
-key1 = &"activeStats"
-key2 = &"CurLife"
+key1 = &"combatData"
+key2 = &"Resist"
 
-[node name="Split" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/HpVBox"]
+[node name="BarHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2"]
+custom_minimum_size = Vector2(97, 17)
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Bar" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/BarHBox" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(0, 17)
 layout_mode = 2
 mouse_filter = 1
-text = "/"
-horizontal_alignment = 2
-
-[node name="HpMax" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/HpVBox" groups=["ProfileLabels"]]
-custom_minimum_size = Vector2(24, 10)
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 8
-mouse_filter = 1
-theme_override_colors/font_color = Color(0.670588, 0, 0, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 2
 text = "%s"
+vertical_alignment = 1
 script = ExtResource("6_f5i04")
-key1 = &"activeStats"
-key2 = &"Life"
+key1 = &"combatData"
+key2 = &"Barrier"
 
-[node name="VBoxContainer2" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2"]
+[node name="BarPrc" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/BarHBox" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(0, 17)
 layout_mode = 2
-size_flags_horizontal = 0
-
-[node name="Composure" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/VBoxContainer2" groups=["ProfileLabels"]]
-custom_minimum_size = Vector2(24, 0)
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 8
 mouse_filter = 1
-theme_override_colors/font_color = Color(0.741176, 0.764706, 1, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 2
+text = "(%s%%)"
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"combatData"
+key2 = &"BarPrc"
+
+[node name="MoveHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2"]
+custom_minimum_size = Vector2(97, 17)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="Move" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/MoveHBox" node_paths=PackedStringArray("pairedIcon") groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(22, 17)
+layout_mode = 2
+size_flags_vertical = 0
+mouse_filter = 1
 text = "%s"
-horizontal_alignment = 2
 vertical_alignment = 1
 script = ExtResource("6_f5i04")
 key1 = &"activeStats"
-key2 = &"CurComp"
+key2 = &"Move"
+pairedIcon = NodePath("../MoveType")
+iconDir = "res://sprites/icons/move_types"
 
-[node name="Split" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/VBoxContainer2"]
+[node name="VSeparator" type="VSeparator" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/MoveHBox"]
+self_modulate = Color(1, 1, 1, 0)
 layout_mode = 2
 mouse_filter = 1
-text = "/"
+
+[node name="MoveType" type="TextureRect" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/MoveHBox" groups=["ActiveTT", "ToolTipLabels"]]
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+focus_neighbor_left = NodePath("../../../VTags/MoveTag")
+focus_neighbor_top = NodePath("../../../VTags/UnitBar")
+focus_neighbor_right = NodePath("../../../../../StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VTags/UnitChaTag")
+focus_mode = 2
+texture = ExtResource("5_k63fk")
+expand_mode = 1
+metadata/MoveType = &""
+metadata/ToolTip = &"MoveType"
+
+[node name="OffenseBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox"]
+layout_mode = 2
+
+[node name="HitBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox"]
+layout_mode = 2
+
+[node name="Hit" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/HitBox"]
+layout_mode = 2
+text = "Hit:"
 horizontal_alignment = 2
 
-[node name="ComposureMax" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2/VBoxContainer2" groups=["ProfileLabels"]]
-custom_minimum_size = Vector2(24, 0)
+[node name="Acc" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/HitBox" groups=["ProfileLabels"]]
 layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 8
 mouse_filter = 1
-theme_override_colors/font_color = Color(0.741176, 0.764706, 1, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 2
 text = "%s"
+vertical_alignment = 1
 script = ExtResource("6_f5i04")
-key1 = &"activeStats"
-key2 = &"Comp"
+key1 = &"combatData"
+key2 = &"Hit"
 
-[node name="GrazeValue" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2"]
+[node name="DmgBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox"]
 layout_mode = 2
-text = "%+-d"
-horizontal_alignment = 1
 
-[node name="BarValue" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox2"]
+[node name="UnitDmg" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/DmgBox"]
 layout_mode = 2
-text = "%+-d"
-horizontal_alignment = 1
+focus_neighbor_top = NodePath("../UnitAVD")
+focus_neighbor_right = NodePath("../../../../StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox/UnitHpTag")
+focus_neighbor_bottom = NodePath("../UnitCrit")
+focus_mode = 2
+mouse_filter = 1
+text = "Dmg:"
+horizontal_alignment = 2
+vertical_alignment = 1
+metadata/ToolTip = &"Dmg"
+
+[node name="Dmg" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/DmgBox" groups=["ProfileLabels"]]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+mouse_filter = 1
+text = "%s"
+vertical_alignment = 1
+script = ExtResource("6_f5i04")
+key1 = &"combatData"
+key2 = &"Dmg"
+
+[node name="ItemButton" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox" instance=ExtResource("16_m2ebb")]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Icon" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/ItemButton/ContentMargin/HBoxContainer" index="0"]
+custom_minimum_size = Vector2(24, 24)
+
+[node name="Name" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/ItemButton/ContentMargin/HBoxContainer" index="1"]
+custom_minimum_size = Vector2(120, 26)
+theme_override_colors/default_color = Color(0.800491, 0.800491, 0.800491, 1)
+theme_override_fonts/normal_font = ExtResource("17_n6bnq")
+theme_override_font_sizes/normal_font_size = 13
+
+[node name="Durability" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/ItemButton/ContentMargin/HBoxContainer" index="2"]
+visible = false
 
 [node name="DanmakuPanel" type="AspectRatioContainer" parent="PanelViewer/ViewerVBox" node_paths=PackedStringArray("portrait")]
 layout_mode = 2
@@ -729,7 +767,7 @@ mouse_filter = 2
 
 [node name="BackgroundCenter" type="NinePatchRect" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel"]
 layout_mode = 2
-texture = ExtResource("1_ckdua")
+texture = ExtResource("7_ae8gg")
 patch_margin_left = 16
 patch_margin_top = 16
 patch_margin_right = 16
@@ -738,10 +776,10 @@ patch_margin_bottom = 16
 [node name="InfoMagin" type="MarginContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 6
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_top = 11
 theme_override_constants/margin_right = 6
-theme_override_constants/margin_bottom = 6
+theme_override_constants/margin_bottom = 15
 
 [node name="InfoVBox" type="VBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin"]
 layout_mode = 2
@@ -883,3 +921,5 @@ metadata/ToolTip = &"Comp"
 
 [node name="EffectIcons" type="HBoxContainer" parent="PanelViewer/ViewerVBox/DanmakuPanel/DanmakuMargin/DanmakuHBox/InfoPanel/InfoMagin/InfoVBox/ImpactHBox"]
 layout_mode = 2
+
+[editable path="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/ItemButton"]

@@ -20,24 +20,31 @@ signal post_queue_cleared
 signal continue_queue
 signal map_loaded(map)
 signal map_freed
+signal turn_added(team:StringName)
+signal turn_removed(team:StringName)
+signal turn_changed
+signal new_round(turn_order:Array[StringName])
 
-signal skill_target_canceled
+signal turn_order_updated
+
+#signal skill_target_canceled
+#signal item_target_canceled
+
 signal forecast_confirmed
-signal time_set
+
 
 
 signal toggle_prof
 signal toggle_skills
 signal target_focused
 signal aimove_finished
-signal turn_changed
 signal round_changed
 signal exp_display
 signal continue_turn
 signal deploy_toggled
 signal formation_closed
 signal gb_ready
-signal turn_order_updated
+
 
 enum ACTION_TYPE {ATTACK, SKILL, WAIT, END}
 
@@ -118,7 +125,7 @@ var snapPath := []:
 var pathingArray := []
 
 #game turns
-var turnOrder :Array[String]= []
+var turnOrder :Array[StringName]= []
 var roundCounter = 0
 var turnCounter = 0
 var maxTurns = 0
@@ -137,7 +144,7 @@ var globalEffects = {}
 
 
 #unit variables
-var activeAction : Dictionary = {"Weapon":false,"Skill":null}
+var activeAction : Dictionary = {"Weapon":false,"Skill":null,"Item":null}
 var postQueue = []
 
 #controls pseudo UI elements, like HP bars
@@ -271,6 +278,7 @@ func free_map()->void:
 	if currMap:
 		currMap.queue_free()
 		await currMap.tree_exited
+	SignalTower.time_reset.emit()
 	map_freed.emit()
 	#call_deferred("_load_new_map", map)
 
@@ -283,7 +291,6 @@ func load_map(map:String):
 
 func _on_map_ready():
 	call_deferred("_initialize_new_map")
-	
 
 
 func _initialize_new_map():
@@ -364,7 +371,7 @@ func _load_units(): #merge with store enemy units
 	
 
 
-func _connect_unit_signals(unit):
+func _connect_unit_signals(unit:Unit):
 #	if !combatManager.combat_resolved.is_connected(unit.on_combat_resolved):
 #		combatManager.combat_resolved.connect(unit.on_combat_resolved)
 	if !unit.death_done.is_connected(self.on_death_done):
@@ -375,8 +382,10 @@ func _connect_unit_signals(unit):
 		unit.unit_relocated.connect(self.on_unit_relocated)
 	if !unit.exp_gained.is_connected(self.on_exp_gained) and unit.FACTION_ID == Enums.FACTION_ID.PLAYER:
 		unit.exp_gained.connect(self.on_exp_gained)
-	if !self.turn_order_updated.is_connected(unit.on_turn_order_updated):
-		self.turn_order_updated.connect(unit.on_turn_order_updated)
+	if !self.new_round.is_connected(unit._on_new_round):
+		self.new_round.connect(unit._on_new_round)
+	if !self.turn_changed.is_connected(unit._on_turn_changed):
+		self.turn_changed.connect(unit._on_turn_changed)
 	if !self.sequence_concluded.is_connected(unit.on_sequence_concluded):
 		self.sequence_concluded.connect(unit.on_sequence_concluded)
 	if !unit.turn_complete.is_connected(self.on_turn_complete):
@@ -667,6 +676,7 @@ func grab_target(cell):
 	targetUnit = units[cell]
 	var distance := hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit) #HEX REF
 	var reach := [distance, distance]
+	#if activeAction.Item: activeAction.Skill = activeAction.Item
 	if activeAction.Weapon:
 		combatManager.get_forecast(activeUnit, targetUnit, activeAction)
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
@@ -674,7 +684,12 @@ func grab_target(cell):
 	else:
 		combatManager.get_forecast(activeUnit, targetUnit, activeAction)
 		mode = 1
+		
 	emit_signal("target_focused", mode, reach)
+
+
+func confirm_forecast():
+	emit_signal("forecast_confirmed")
 
 
 func _start_trade(cell):
@@ -754,20 +769,13 @@ func toggle_unit_profile():
 	elif focusUnit:
 		emit_signal("toggle_prof")
 	else: toggle_extra_info()
-	
+
+
 func request_deselect():
 	_wipe_region()
 	currMap.pathAttack.clear()
 	GameState.change_state(self, GameState.gState.GB_DEFAULT)
 	_deselect_active_unit(false)
-
-
-func skill_target_cancel():
-	_wipe_region()
-	currMap.pathAttack.clear()
-	GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-	_snap_cursor(activeUnit.cell)
-	emit_signal("skill_target_canceled")
 
 
 func end_targeting():
@@ -791,31 +799,38 @@ func attack_target_selected():
 #				$Cursor.visible = false
 		grab_target(cursor.cell)
 
+
 func trade_target_selected():
 	if is_occupied(cursor.cell) and _check_friendly(activeUnit, focusUnit, true):
 		_start_trade(cursor.cell)
 
-func confirm_forecast():
-	emit_signal("forecast_confirmed")
 
+
+func item_target_selected()->void:
+	if activeAction.Item is Ofuda: _feature_target(activeAction.Item)
+	else: _activate_item(activeAction.Item,activeUnit,focusUnit)
 
 func skill_target_selected():
+	_feature_target(activeAction.Skill)
+
+
+func _feature_target(feature:SlotWrapper)-> void:
 	if !is_occupied(cursor.cell):
 		return
-	if !activeAction.Skill:
+	if !feature:
 		print("No Valid SkillID")
 		return
 	var friendly := false
 	var valid := false
-	var skill = activeAction.Skill
-	
+
+
 	if focusUnit.FACTION_ID == activeUnit.FACTION_ID or focusUnit.FACTION_ID == Enums.FACTION_ID.NPC:
 		friendly = true
-	match skill.target:
-		"Self":
+	match feature.target:
+		Enums.SKILL_TARGET.SELF:
 			if activeUnit == focusUnit:
 				valid = true
-		"Enemy":
+		Enums.SKILL_TARGET.ENEMY:
 			if !friendly:
 				valid = true
 			#if skill.RuleType:
@@ -823,20 +838,18 @@ func skill_target_selected():
 					#Enums.RULE_TYPE.TARGET_SPEC:
 						#if skill.Rule != focusUnit.SPEC_ID:
 							#valid = false
-		"Ally":
+		Enums.SKILL_TARGET.ALLY:
 			if friendly and activeUnit != focusUnit:
 				valid = true
-		"Self+":
+		Enums.SKILL_TARGET.SELF_ALLY:
 			if friendly:
 				valid = true
-		"Other":
+		Enums.SKILL_TARGET.MAP:
 			if activeUnit != focusUnit:
 				valid = true
-				
 	
-					
-	if valid:
-		grab_target(cursor.cell)
+	if valid: grab_target(cursor.cell)
+
 
 func _check_friendly(unit1, unit2, sameOnly:=false) ->bool:
 	if unit1.FACTION_ID == unit2.FACTION_ID: return true
@@ -853,100 +866,8 @@ func return_targeting():
 			start_attack_targeting()
 		GameState.gState.GB_SKILL_TARGETING:
 			start_skill_targeting()
-
-#Old marked for deletion
-#func gb_mouse_pressed():
-	#cursor_accept_pressed(currMap.map_to_local(cursor.cell))
-
-#func cursor_accept_pressed(cell: Vector2i) -> void: #IS THIS EVEN RELEVANT ANYMORE???
-	## Controls what happens when an element is selected by the player based on input Global.state
-	##Includes: Selecting Unit, Destinations; Targets
-	##Currently also checks if selection is valid
-	#
-	#
-	#cell = currMap.ground.local_to_map(cell)
-##	print(cell, activeUnit)
-	#match GameState.state:
-		#GameState.gState.GB_DEFAULT: 
-			#var test = focusUnit.status.Acted
-			#if !activeUnit and is_occupied(cell) and focusUnit.is_in_group("Player") and !focusUnit.status.Acted:
-				#
-				#GameState.state = GameState.gState.GB_SELECTED
-				#_select_unit(cell)
-			#else: 
-				#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-				#
-				#emit_signal("toggle_action", false, true)
-		#GameState.gState.GB_SELECTED: 
-			#if !is_occupied(cell) and walkableCells.has(cell):
-				#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-				#_move_active_unit(cell)
-			#elif cell == activeUnit.cell:
-				#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-				#emit_signal("toggle_action")
-			#else:
-				#return
-		#GameState.gState.GB_ATTACK_TARGETING: #Attacks
-			#var friendly = false
-			#var team = null
-			#if activeUnit.is_in_group("Player"):
-				#team = "Player"
-			#if activeUnit.is_in_group("Enemy"):
-				#team = "Enemy"
-			#if focusUnit.is_in_group(team):
-				#friendly = true
-			#if is_occupied(cell) and !friendly:
-				#GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
-##				$Cursor.visible = false
-				#grab_target(cell)
-				#
-				#
-			#else: return
-		#GameState.gState.GB_COMBAT_FORECAST:
-			#return
-#
-		#GameState.gState.GB_SKILL_TARGETING:
-			#var friendly = false
-			#var team = null
-			#var targeting = UnitData.skillData[activeAction.Skill].Target
-			#if activeUnit.is_in_group("Player"):
-				#team = "Player"
-			#if activeUnit.is_in_group("Enemy"):
-				#team = "Enemy"
-			#match targeting:
-				#"Self":
-					#if is_occupied(cell) and activeUnit == focusUnit:
-						#GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
-##						$Cursor.visible = false
-						#grab_target(cell)
-				#"Enemy":
-					#if focusUnit.is_in_group(team):
-						#friendly = true
-					#if is_occupied(cell) and !friendly:
-						#GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
-##						$Cursor.visible = false
-						#grab_target(cell)
-				#"Ally":
-					#if focusUnit.is_in_group(team):
-						#friendly = true
-					#if is_occupied(cell) and friendly and activeUnit != focusUnit:
-						#GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
-##						$Cursor.visible = false
-						#grab_target(cell)
-				#"Self+":
-					#if focusUnit.is_in_group(team):
-						#friendly = true
-					#if is_occupied(cell) and friendly:
-						#GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
-##						$Cursor.visible = false
-						#grab_target(cell)
-				#"Other":
-					#if is_occupied(cell) and activeUnit != focusUnit:
-						#GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
-##						$Cursor.visible = false
-						#grab_target(cell)
-	
-
+		GameState.gState.GB_SKILL_TARGETING:
+			start_item_targeting(activeAction.Item)
 
 
 func _on_cursor_moved(new_cell: Vector2i) -> void: #Pathing
@@ -987,25 +908,27 @@ func on_directional_press(direction: Vector2i):
 	else: cursor.cell += direction
 
 
-
-
-
 #Targeting Code
-
 func start_attack_targeting():
 	var reach :Dictionary = activeUnit.get_weapon_reach()
-	activeAction = {"Weapon": true, "Skill": null}
+	activeAction = {"Weapon": true, "Skill": null, "Item": null}
 	GameState.change_state(self, GameState.gState.GB_ATTACK_TARGETING)
 	_draw_range(activeUnit, reach.Max, reach.Min)
 	
 	
 func start_skill_targeting():
 	var reach : Dictionary
-	activeAction = {"Weapon": Global.activeSkill.augment, "Skill": Global.activeSkill}
+	activeAction = {"Weapon": Global.activeSkill.augment, "Skill": Global.activeSkill, "Item": null}
 	if activeAction.Weapon: reach = activeUnit.get_aug_reach(activeAction.Skill)
 	else: reach = activeUnit.get_skill_reach(activeAction.Skill)
 	_draw_range(activeUnit, reach.Max, reach.Min)
 	GameState.change_state(self, GameState.gState.GB_SKILL_TARGETING)
+	
+
+func start_item_targeting(item:Item):
+	activeAction = {"Weapon": false, "Skill": null, "Item": item}
+	_draw_range(activeUnit, item.min_reach, item.max_reach)
+	GameState.change_state(self, GameState.gState.GB_ITEM_TARGETING)
 
 
 func seek_trade(unit:Unit):
@@ -1046,17 +969,22 @@ func initiate_warp():
 
 #actions code
 func _on_unit_item_targeting(item, unit):
-	#combatManager.use_item(unit, unit, item)
-	pass
+	activeUnit = unit
+	start_item_targeting(item)
 
 
-func _on_unit_item_activated(item, unit, target):
+func _on_unit_item_activated(item:Consumable, unit:Unit, target:Unit)->void:
+	_activate_item(item,unit,target)
+
+
+func _activate_item(item:Consumable, unit:Unit, target:Unit):
 	var results = combatManager.use_item(unit, unit, item)
-	
+	GameState.change_state(self, GameState.gState.LOADING)
+	#insert map animations for items here
+	_on_animation_handler_sequence_complete()
 
 func combat_sequence(scenario):
 	GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
-	
 	SignalTower.emit_signal("sequence_initiated", scenario)
 
 
@@ -1079,7 +1007,7 @@ func _run_post_queue():
 	for actor in eventKeys:
 		for event in postEvents[actor]:
 			var t = event.Type
-			var effect = UnitData.effectData[event.EffectId]
+			var effect = event.EffectId
 			var target = event.Target
 			var isWait = true
 			match t:
@@ -1239,7 +1167,6 @@ func turn_change():
 	Global.flags.traded = false
 	Global.flags.itemUsed = false
 	emit_signal("turn_changed")
-	emit_signal("turn_order_updated", turnOrder)
 
 
 func _start_next_turn():
@@ -1267,7 +1194,7 @@ func _start_next_turn():
 	
 
 func _add_turn(faction):
-	var team : String
+	var team : StringName
 
 	match faction:
 		Enums.FACTION_ID.PLAYER: team = "Player"
@@ -1275,21 +1202,23 @@ func _add_turn(faction):
 		Enums.FACTION_ID.NPC: team = "NPC"
 		
 	turnOrder.append(team)
-	emit_signal("turn_order_updated", turnOrder)
-	
-func _remove_turn(factionId):
-	var faction : String
+	emit_signal("turn_added", team)
+
+
+func _remove_turn(teamId):
+	var team : StringName
 	print("Before Removed Turn:",turnOrder)
-	match factionId:
-		Enums.FACTION_ID.PLAYER: faction = "Player"
-		Enums.FACTION_ID.ENEMY: faction = "Enemy"
-		Enums.FACTION_ID.NPC: faction = "NPC"
-	if turnOrder[0] != faction:
-		var i = turnOrder.rfind(faction)
+	match teamId:
+		Enums.FACTION_ID.PLAYER: team = "Player"
+		Enums.FACTION_ID.ENEMY: team = "Enemy"
+		Enums.FACTION_ID.NPC: team = "NPC"
+	if turnOrder[0] != team:
+		var i = turnOrder.rfind(team)
 		turnOrder.remove_at(i)
-	print("Removed Turn:",faction, ":",turnOrder)
-	emit_signal("turn_order_updated", turnOrder)
-	
+	print("Removed Turn:",team, ":",turnOrder)
+	emit_signal("turn_removed", team)
+
+
 func round_change():
 	#Changes the round and reloads the "turn order" magazine
 	#Return HERE to make sure turns flow properly, I can already see conflicting issues cropping up
@@ -1298,7 +1227,7 @@ func round_change():
 	boardState.clear_acted()
 	round_duration_tick() #Outdated! Just handles global time effect durations! Doesn't utilize new skill system, or duration types! SHOULD CHECK UNIT'S VERSION OF THIS, TOO.
 	endOfRound = true
-	emit_signal("round_changed")
+	emit_signal("new_round",turnOrder)
 #	print(units)
 	
 func _check_eor_events():
@@ -1351,7 +1280,7 @@ func _initialize_turns(ignoreActed = false): #not quite right Groups might be th
 	turnOrder = turnSort.sort_turns(turnOrder)
 	aiTurn = false
 	boardState.update_remaining_turns(turnOrder)
-	emit_signal("turn_order_updated", turnOrder)
+	emit_signal("new_round", turnOrder)
 	print(turnOrder)
 
 
@@ -1460,31 +1389,30 @@ func _on_combat_manager_combat_resolved():
 func round_duration_tick():
 	var keys = globalEffects.keys()
 	for effId in keys:
-		globalEffects[effId].Duration -= 1
-		if globalEffects[effId].Duration <= 0 and globalEffects[effId].type == "Time":
+		globalEffects[effId].duration -= 1
+		if globalEffects[effId].duration <= 0 and globalEffects[effId].type == "Time":
 			Global.reset_time_factor()
 			globalEffects.erase(effId)
 		else: #no other global effects exist, this needs to be expanded if a new one is made
 			globalEffects.erase(effId)
 
 ##Does not have a stacking check
-func add_global_effect_time_factor(effId:StringName):
-	var effect = UnitData.effectData[effId]
-	globalEffects[effId] = {}
-	globalEffects[effId]["Type"] = effect.SubType
-	globalEffects[effId]["Factor"] = effect.Value
-	globalEffects[effId]["Duration"] = effect.Duration
-	Global.apply_time_factor(effect.Value)
+func add_global_effect_time_factor(effect:Effect):
+	var effId = effect.id
+	globalEffects[effId] = effect
+	#globalEffects[effId]["Type"] = effect.sub_type
+	#globalEffects[effId]["Factor"] = effect.value
+	#globalEffects[effId]["Duration"] = effect.duration
+	Global.apply_time_factor(effect.value)
 
 
-func _on_combat_manager_time_factor_changed(effId):
-	add_global_effect_time_factor(effId)
+func _on_combat_manager_time_factor_changed(effect:Effect):
+	add_global_effect_time_factor(effect)
 
 
 func _set_game_time():
 	var newTime = Global.time_to_float(currMap.hours, currMap.minutes)
 	Global.gameTime = newTime
-	emit_signal("time_set")
 	check_passives()
 
 
@@ -1497,6 +1425,7 @@ func check_passives():
 func _on_combat_manager_warp_selected(actor, target, reach):
 	warpTarget = target
 	warp_targeting(actor, reach)
+
 
 func on_exp_gained(oldExp, expSteps, results, portrait, unitName):
 	emit_signal("exp_display", oldExp, expSteps, results, portrait, unitName)

@@ -18,7 +18,7 @@ var text_count := 0
 var textline_index := -1
 var line_is_finished = false
 var current_event : Array[Dictionary]
-var example_dict = [
+var example_dict :Array[Dictionary]= [
 	{
 		"active_speaker": "Remi",
 		"animations": [{"name": "slide", "target": "Remi", "pos": 0.75}]
@@ -151,28 +151,28 @@ func _ready():
 	line_finished.connect(_on_line_finished)
 
 
-func _gui_input(event):
-	if GameState.activeState == null:
-			return
-	if event is InputEventMouseMotion:
-		GameState.activeState.mouse_motion(event)
-	elif event is InputEventMouseButton:
-		GameState.activeState.mouse_pressed(event)
-	elif event is InputEventKey:
-		GameState.activeState.event_key(event)
+#func _gui_input(event):
+	#
 
 
 func _unhandled_input(event) -> void:
 	if event.is_action_released("debug_dialogue") and Global.flags.DebugMode and !is_physics_processing(): #For solo testing, intend to simply call this below function when ready to play scene 
 		prepare_new_dialogue()
-	elif GameState.state != GameState.gState.DIALOGUE_SCENE: return
 	elif event.is_action_released("ui_return"): toggle_dialog()
 	elif not visible and is_physics_processing(): return
+	elif GameState.state != GameState.gState.DIALOGUE_SCENE: return
+	elif event is InputEventMouseMotion:
+		GameState.activeState.mouse_motion(event)
+	elif event is InputEventMouseButton:
+		GameState.activeState.mouse_pressed(event)
+	elif event is InputEventKey:
+		GameState.activeState.event_key(event)
 	#elif event.is_action_released("ui_accept"): 
 		
 
 ##input from control state DIALOGUE_SCENE
 func gui_accept():
+	accept_event()
 	if GameState.state != GameState.gState.DIALOGUE_SCENE: return
 	elif !current_event[textline_index].has("text"): return
 	if !$TextStopper/AnimationPlayer.is_playing():
@@ -223,9 +223,10 @@ func _physics_process(delta):
 ##SceneScripts are stored on the map associated with them. There is to be a Start and End scene to each Chapter that daisy chains things together with a moment for saving/loading in-between last End and new Start
 func prepare_new_dialogue(new_event:String= ""):
 	var parser = JasonParser.new()
-	var eventDick : Array[Dictionary] = parser.parse_json(new_event)
-	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE) #Used to avoid conflicting inputs. Currently only uses ACCEPT_PROMPT input script, could extend GenericScript to make a new one specifically for this scene. You'll know what to do when you look at existing ones.
-	if new_event: current_event = eventDick
+	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE) #Used to avoid conflicting inputs. Uses GUIConfirm
+	if new_event: 
+		var eventDick : Array[Dictionary] = parser.parse_json(new_event)
+		current_event = eventDick
 	else: current_event = example_dict #subverts variable typing to give a dictionary as default, normally only want to pass ScenScript Resource
 	toggle_dialog()
 	set_physics_process(true) #necessary with the new triggered way to start the scene

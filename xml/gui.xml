@@ -76,6 +76,7 @@
 			<entry id = "effect_sub_type_resist"><![CDATA[Resist]]></entry>
 			<entry id = "effect_sub_type_effhit"><![CDATA[Effect Chance]]></entry>
 			<entry id = "effect_sub_type_def"><![CDATA[Defense]]></entry>
+			<entry id = "effect_sub_type_dres"><![CDATA[Damage Reduction]]></entry>
 			<!-- Effect Rules -->
 			<entry id = "effect_target_spec"><![CDATA[vs {sub_rule}]]></entry>
 			<!-- Effect Pop Text -->
@@ -157,11 +158,20 @@
 			<entry id = "passive_name_terror"><![CDATA[Terror]]></entry>
 			<entry id = "passive_name_charisma"><![CDATA[Charisma]]></entry>
 			<entry id = "passive_name_night_person"><![CDATA[Night Person]]></entry>
+			<entry id = "passive_name_plot_armor"><![CDATA[Plot Armor]]></entry>
 			<!-- Skill Names -->
-			<entry id = "skill_name_life_steal_rem"><![CDATA[Scarlet Thirst]]></entry>
-			<entry id = "skill_name_spell_basic_fire"><![CDATA[Fire Ball]]></entry>
-			<entry id = "skill_name_enemy_toss_1"><![CDATA[Toss]]></entry>
+			<!--Sakuya-->
 			<entry id = "skill_name_locked_corpse"><![CDATA[Locked Corpse]]></entry>
+			<!--Remilia-->
+			<entry id = "skill_name_life_steal_rem"><![CDATA[Scarlet Thirst]]></entry>
+			<!--Reimu-->
+			<entry id = "skill_name_slay_fairy"><![CDATA[Fairy Slayer]]></entry>
+			<!--Meiling-->
+			<entry id = "skill_name_enemy_toss_1"><![CDATA[Toss]]></entry>
+			<!--Patchouli-->
+			<!--Spells-->
+			<entry id = "skill_name_spell_basic_fire"><![CDATA[Fire Ball]]></entry>
+			
 			
 			<!-- Tool Tips:Rules-->
 			<entry id = "rule_type_1"><![CDATA[Feature is restricted to {sub_rule}]]></entry>
@@ -259,6 +269,8 @@
 			<entry id = "accesory_pwr_ring01"><![CDATA[Power Ring]]></entry>
 			<!-- Consumables -->
 			<entry id = "consumable_pizza"><![CDATA[Pizza]]></entry>
+			<!-- Ofuda -->
+			<entry id = "ofuda_defense_prayer"><![CDATA[Defense Prayer]]></entry>
 			
 			
 			<entry id = "lore_night_prot"><![CDATA[{rule_type}, negate {sub_rule} stat penalties at [color=#230f8c]Night[/color].]]></entry>

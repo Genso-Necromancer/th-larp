@@ -117,7 +117,7 @@ func _on_animation_finished(anim):
 func _update_info(control:Control) -> void:
 	var unit :Unit = Global.focusUnit
 	var type : StringName
-	var tt : Control = $ToolTipContainer/VBoxContainer/ToolTipDisplay
+	var tt : ToolTipDisplay = $ToolTipContainer/VBoxContainer/ToolTipDisplay
 	var statDisplay : ItemDisplay = $ToolTipContainer/VBoxContainer/ItemDisplayMargin
 	var toolTip : String
 	var parser := ToolTipParser.new()
@@ -132,19 +132,20 @@ func _update_info(control:Control) -> void:
 	activeRefs.clear()
 	if isRoaming: set_panel(control)
 	
-	itemDisplay.visible = true
+	itemDisplay.visible = false
 	match type:
 		"ItemTT": 
 			var data = control.get_meta("Item")
 			toolTip = parser.get_skill(data)
 			statDisplay.update_stat_values(control)
 			activeRefs.append(statDisplay)
-			
+			itemDisplay.visible = true
 		"SkillsTT": 
 			var data = control.get_meta("ID")
 			toolTip = parser.get_skill(data)
 			statDisplay.update_stat_values(control)
 			activeRefs.append(statDisplay)
+			itemDisplay.visible = true
 		"ProfileTT":
 			var data = unit.unitData.Profile
 			toolTip = parser.get_lore(data, control.get_meta("ToolTip"))
@@ -156,7 +157,7 @@ func _update_info(control:Control) -> void:
 			toolTip = parser.get_active(unit, control.get_meta("ToolTip"))
 			
 		"PassivesTT":
-			itemDisplay.visible = false
+			
 			var passive = control.get_meta("ID")
 			toolTip = parser.get_passive(passive)
 			

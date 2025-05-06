@@ -94,12 +94,19 @@ _critColor = Color(0.858824, 0.733333, 0.219608, 1)
 _grazeColor = Color(0.678431, 0.686275, 0.901961, 1)
 _damageColor = Color(0.976471, 0, 0, 1)
 _dodgeColor = Color(1, 1, 1, 1)
+_resistColor = Color(0.688426, 0.140996, 0.384858, 1)
 _healColor = Color(0.278431, 1, 0.254902, 1)
+_cureColor = Color(0.773517, 0.732801, 0.710102, 1)
+_buffColor = Color(0.228015, 0.292421, 0.605703, 1)
+_debuffColor = Color(0.778847, 0.366923, 0.0427758, 1)
+_statusColor = Color(0.129168, 0.416595, 0.323682, 1)
+_compHealColor = Color(0.889966, 0.827972, 0.586, 1)
+_compDmgColor = Color(0.713386, 0.205891, 0.166606, 1)
 
 [node name="fxText" type="Label" parent="."]
 self_modulate = Color(1, 1, 1, 0)
-offset_right = 81.0
-offset_bottom = 77.0
+offset_right = 83.0
+offset_bottom = 100.0
 scale = Vector2(2, 2)
 pivot_offset = Vector2(20, 12.5)
 size_flags_horizontal = 4
@@ -112,5 +119,5 @@ vertical_alignment = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
-"": SubResource("AnimationLibrary_u1i7a")
+&"": SubResource("AnimationLibrary_u1i7a")
 }

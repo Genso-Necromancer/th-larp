@@ -1,4 +1,5 @@
 extends Node2D
+class_name CombatAnimator
 
 signal pop_up_requested
 signal target_fx_requested
@@ -114,8 +115,8 @@ func _assign_attack_animation():
 	
 	
 		
-func _assign_skill_animation(skillId):
-	var variant : String = skillId.to_pascal_case()
+func _assign_skill_animation(skill:SlotWrapper):
+	var variant : String = skill.id.to_pascal_case()
 	var default := "Cast"
 	var list = combatPlayer.get_animation_list()
 	var animation := "Cast_%s" % [variant]
@@ -210,9 +211,9 @@ func add_skill_fx(skillId):
 		skillFx = load("res://scenes/animations/combat/fx/weapon/fx_self_knife.tscn").instantiate()
 		
 
-	#if isFlipped:
-		#skillNameFx.flip_text()
-		#skillFx.set_scale(Vector2(-1,1))
+	if isFlipped:
+		skillNameFx.flip_text()
+		skillFx.set_scale(Vector2(-1,1))
 	skillFx.connect_signal(self)
 	attackBone.add_child(skillFx)
 	
@@ -290,6 +291,8 @@ func queue_instant_cut_in(instants):
 func load_effect_result(effect : Dictionary):
 	var bone = $CombatSkeleton/HeadFx
 	var effectText = TEXT_POP_PATH.instantiate()
+	if isFlipped: effectText.flip_text()
+		
 	effectText.set_effect_result(effect)
 	effectQue.append(effectText)
 	bone.add_child(effectText)
