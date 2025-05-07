@@ -13,7 +13,7 @@ signal _dialogue_fade_finished
 @onready var title_label = $GradientRect/ForegroundElements/MarginContainer/VBoxContainer/HBoxContainer/TitleLabel
 @onready var foreground_elements = $GradientRect/ForegroundElements
 @onready var default_font_size = text_body.label_settings.font_size
-@export var draw_speed = 30
+@export var draw_speed = 30 # base characters per second, not including modifiers
 
 var portrait : = preload("res://scenes/cutscenes/speaker_portrait.tscn")
 var dialogue_finished := false
@@ -227,10 +227,14 @@ func _physics_process(delta):
 	if !current_event[textline_index].has("text"): return
 		
 	if text_count < current_event[textline_index]["text"].length():
-		if text_body.text.ends_with("?") or text_body.text.ends_with(".") or text_body.text.ends_with("-") or text_body.text.ends_with("!"):
-			delta_speed += delta * draw_speed * 0.2
-		else:
-			delta_speed += delta * draw_speed
+		match text_body.text.right(1):
+			"?", ".", "-", "!", ",":
+				delta_speed += delta * draw_speed * 0.17
+			" ":
+				delta_speed += delta * draw_speed * 0.5	
+			_:
+				delta_speed += delta * draw_speed
+
 		text_body.text += current_event[textline_index]["text"].substr(text_count, int(delta_speed))
 		text_count += int(delta_speed)
 		delta_speed -= int(delta_speed)
@@ -306,9 +310,13 @@ func next_textline():
 	
 	if cur_line.has("active_speaker"):
 		var active_speaker = speaker_portraits[ cur_line.active_speaker ]
-		name_label.text = active_speaker.speaker_name
-		title_label.text = active_speaker.speaker_title
-		active_speaker.visible = true
+		if active_speaker != "none":
+			name_label.text = active_speaker.speaker_name
+			title_label.text = active_speaker.speaker_title
+			active_speaker.visible = true
+		else:
+			name_label.text = ""
+			title_label.text = ""
 	
 	#if cur_line.has("speaker"):
 		#if cur_line["speaker"] is int:
