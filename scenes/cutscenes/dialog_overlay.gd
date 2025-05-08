@@ -8,7 +8,7 @@ signal bobber_check(flag: String)
 signal _dialogue_fade_finished
 
 @onready var background_texture_rect = $BackgroundTextureRect
-@onready var audio_player = $AudioStreamPlayer
+@onready var audio_player = $AudioStreamPlayer_speech
 @onready var texturerect = $PortraitsNode/SpeakerPortrait
 @onready var text_body = $GradientRect/ForegroundElements/MarginContainer/VBoxContainer/TextBody
 @onready var name_label = $GradientRect/ForegroundElements/MarginContainer/VBoxContainer/HBoxContainer/NameLabel
@@ -64,7 +64,7 @@ var example_dict : Array[Dictionary] = [
 	},
 	{
 		"text": "were you talking to yourself ..?",
-		"effects": [{"name": "quiet"}],
+		"effects": [{"name": "quiet"}, {"name": "sound", "sound": "surprise"}],
 		"background": "null"
 	},
 	{
@@ -260,6 +260,12 @@ func next_textline():
 					speaker_portraits[eff.target].zoom()
 				"teleport":
 					speaker_portraits[eff.target].teleport(eff.pos)
+				"sound":
+					match eff.sound:
+						"surprise":
+							$AudioStreamPlayer_surprise.play()
+						_:
+							pass
 	else:
 		bobber_check.emit("effects_complete")
 	
@@ -272,8 +278,10 @@ func next_textline():
 					speaker_portraits[anim.target].shake()
 				"hop":
 					speaker_portraits[anim.target].hop()
+					$AudioStreamPlayer_fwip.play()
 				"double_hop":
 					speaker_portraits[anim.target].double_hop()
+					$AudioStreamPlayer_fwip.play()
 				"interact":
 					speaker_portraits[anim.target].interact()
 				"toggle_fade":
@@ -306,7 +314,8 @@ func toggle_dialog():
 var anims_finished = 0
 func _on_anim_finished():
 	anims_finished += 1
-	print("(Alon) Animation %s of %s finished." % [anims_finished, current_event[textline_index]["animations"].size()])
+	if Global.flags.DebugMode:
+		print("(Alon) Animation %s of %s finished." % [anims_finished, current_event[textline_index]["animations"].size()])
 	
 	if anims_finished == current_event[textline_index]["animations"].size():
 		if !current_event[textline_index].has("text"):
@@ -318,6 +327,9 @@ var skip_text := false
 func _type_text(line: String) -> void:
 	text_body.text = ""
 	text_body.label_settings.font_size = default_font_size
+	
+	if current_event[textline_index].has("animations") or current_event[textline_index].has("effects"):
+		await get_tree().create_timer(0.5).timeout # Delay to let anim/effect SFX play
 	
 	for char in line:
 		if skip_text:
@@ -334,16 +346,18 @@ func _type_text(line: String) -> void:
 				await get_tree().create_timer(letter_time).timeout
 				
 				if !(text_body.text.right(1) in ["?", ".", "-", "!", ",", " "]):
-					audio_player.pitch_scale = randf_range(0.95, 1.05)
+					audio_player.pitch_scale = randf_range(0.90, 1.05)
+					if text_body.text.right(2).left(1) == char: # scream is previous letter is duplicate AAAA
+						audio_player.pitch_scale += 0.2
 					if text_body.text.right(1) in ["a", "e", "i", "o", "u"]:
 						audio_player.pitch_scale += 0.2
 					if text_body.text.right(1) == text_body.text.right(1).capitalize():
-						audio_player.pitch_scale += 0.5
+						audio_player.pitch_scale += 0.2
 					if current_event[textline_index].has("effects"):
 						if current_event[textline_index].effects.find({"name": "loud"}, 0):
 							audio_player.pitch_scale -= 0.2
 						if current_event[textline_index].effects.find({"name": "quiet"}, 0):
-							audio_player.pitch_scale += 0.2
+							audio_player.pitch_scale += 0.4
 					audio_player.play()
 					await audio_player.finished
 	
@@ -356,8 +370,8 @@ func _check_bobber(signal_name):
 	var proceed : bool = _ready_flags.text_complete and _ready_flags.animations_complete and _ready_flags.effects_complete
 	if !proceed: return
 	
-	if current_event[textline_index].has("text"):
-		await get_tree().create_timer(0.25).timeout # small delay to prevent double clicking
+	if current_event[textline_index].has("text") && !skip_text:
+		await get_tree().create_timer(0.1).timeout # small delay to prevent double clicking
 	$TextStopper.visible = true
 	$TextStopper/AnimationPlayer.play("ContinueBobber")
 		
