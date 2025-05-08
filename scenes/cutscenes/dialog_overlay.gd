@@ -2,10 +2,11 @@ extends Control
 ##Dialogue Arrays are stored in /scenes/cutscenes as *_event.json files. Specifc file paths are stored on the relevant game map.[br]
 ##Paths are sent via prepare_new_dialogue() where they're parsed using a JasonParser returning the Array[Dictionary] and sets the event in motion.
 class_name DialogueOverlay
+
 signal dialog_finished
 signal bobber_check(flag: String)
 signal _dialogue_fade_finished
-#signal dialogue_loaded
+
 @onready var background_texture_rect = $BackgroundTextureRect
 @onready var audio_player = $AudioStreamPlayer
 @onready var texturerect = $PortraitsNode/SpeakerPortrait
@@ -18,13 +19,11 @@ signal _dialogue_fade_finished
 var letter_time : float = 0.003
 var space_time : float = letter_time * 2.0
 var punctuation_time : float = letter_time * 6.5
-
 var _ready_flags := {
 	"text_complete": false,
 	"animations_complete": false,
 	"effects_complete": false
 }
-
 var portrait : = preload("res://scenes/cutscenes/speaker_portrait.tscn")
 var dialogue_finished := false
 var speaker_portraits := {}  # Dictionary<String, PortraitRect>
@@ -74,8 +73,6 @@ var example_dict : Array[Dictionary] = [
 		"animations": [{"name": "hop", "target": "Remi"}]
 	},
 ]
-
-
 var speaker_setup = [
 	{
 		"name": "Sirno",
@@ -321,10 +318,12 @@ var skip_text := false
 func _type_text(line: String) -> void:
 	text_body.text = ""
 	text_body.label_settings.font_size = default_font_size
+	
 	for char in line:
 		if skip_text:
 			text_body.text = line
 			break
+			
 		text_body.text += char
 		match char:
 			"?", ".", "-", "!", ",":
@@ -347,24 +346,7 @@ func _type_text(line: String) -> void:
 							audio_player.pitch_scale += 0.2
 					audio_player.play()
 					await audio_player.finished
-				
-				#if !(text_body.text.right(1) in ["?", ".", "-", "!", ",", " "]):
-					#var new_audio_player = audio_player.duplicate()
-					#new_audio_player.pitch_scale += randf_range(-0.05, 0.05)
-					#if text_body.text.right(1) in ["a", "e", "i", "o", "u"]:
-						#new_audio_player.pitch_scale += 0.2
-					#if text_body.text.right(1) == text_body.text.right(1).capitalize():
-						#new_audio_player.pitch_scale += 0.5
-					#if current_event[textline_index].has("effects"):
-						#if current_event[textline_index].effects.find({"name": "loud"}, 0):
-							#new_audio_player.pitch_scale -= 0.2
-						#if current_event[textline_index].effects.find({"name": "quiet"}, 0):
-							#new_audio_player.pitch_scale += 0.2
-					#get_tree().root.add_child(new_audio_player)
-					#new_audio_player.play()
-					#await new_audio_player.finished
-					#new_audio_player.queue_free()
-					
+	
 	bobber_check.emit("text_complete")
 
 
