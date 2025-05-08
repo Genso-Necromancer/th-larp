@@ -1,9 +1,10 @@
-[gd_scene load_steps=14 format=3 uid="uid://b3nkakox8f2oh"]
+[gd_scene load_steps=15 format=3 uid="uid://b3nkakox8f2oh"]
 
 [ext_resource type="Script" uid="uid://dufsetm4cjq6w" path="res://scenes/cutscenes/dialog_overlay.gd" id="1_ik6st"]
 [ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="2_5q3ap"]
 [ext_resource type="PackedScene" uid="uid://d3fuiykqjxb5h" path="res://scenes/cutscenes/speaker_portrait.tscn" id="3_mj8x4"]
 [ext_resource type="Texture2D" uid="uid://4lca2aumdu2g" path="res://sprites/testCursor.png" id="4_m3j4u"]
+[ext_resource type="AudioStream" uid="uid://bctvii3ak6rs1" path="res://sounds/speech_blip.wav" id="5_hf1ps"]
 
 [sub_resource type="Gradient" id="Gradient_oxt7h"]
 offsets = PackedFloat32Array(0.0714286, 0.74026, 0.961039)
@@ -193,9 +194,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 115
+theme_override_constants/margin_left = 190
 theme_override_constants/margin_top = 74
-theme_override_constants/margin_right = 115
+theme_override_constants/margin_right = 190
 
 [node name="ColorRect" type="ColorRect" parent="GradientRect/ForegroundElements/MarginContainer2"]
 custom_minimum_size = Vector2(0, 2)
@@ -213,9 +214,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/margin_left = 125
+theme_override_constants/margin_left = 200
 theme_override_constants/margin_top = 30
-theme_override_constants/margin_right = 125
+theme_override_constants/margin_right = 200
 theme_override_constants/margin_bottom = 0
 
 [node name="VBoxContainer" type="VBoxContainer" parent="GradientRect/ForegroundElements/MarginContainer"]
@@ -277,3 +278,8 @@ metadata/_edit_use_anchors_ = true
 libraries = {
 &"": SubResource("AnimationLibrary_qyow0")
 }
+speed_scale = 0.3
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_hf1ps")
+volume_db = -0.5

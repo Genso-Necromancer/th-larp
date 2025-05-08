@@ -3,25 +3,33 @@ extends Control
 ##Paths are sent via prepare_new_dialogue() where they're parsed using a JasonParser returning the Array[Dictionary] and sets the event in motion.
 class_name DialogueOverlay
 signal dialog_finished
-signal line_finished(textline_index)
+signal bobber_check(flag: String)
 signal _dialogue_fade_finished
 #signal dialogue_loaded
 @onready var background_texture_rect = $BackgroundTextureRect
+@onready var audio_player = $AudioStreamPlayer
 @onready var texturerect = $PortraitsNode/SpeakerPortrait
 @onready var text_body = $GradientRect/ForegroundElements/MarginContainer/VBoxContainer/TextBody
 @onready var name_label = $GradientRect/ForegroundElements/MarginContainer/VBoxContainer/HBoxContainer/NameLabel
 @onready var title_label = $GradientRect/ForegroundElements/MarginContainer/VBoxContainer/HBoxContainer/TitleLabel
 @onready var foreground_elements = $GradientRect/ForegroundElements
 @onready var default_font_size = text_body.label_settings.font_size
-@export var draw_speed = 30 # base characters per second, not including modifiers
+
+var letter_time : float = 0.003
+var space_time : float = letter_time * 2.0
+var punctuation_time : float = letter_time * 6.5
+
+var _ready_flags := {
+	"text_complete": false,
+	"animations_complete": false,
+	"effects_complete": false
+}
 
 var portrait : = preload("res://scenes/cutscenes/speaker_portrait.tscn")
 var dialogue_finished := false
 var speaker_portraits := {}  # Dictionary<String, PortraitRect>
-var text_count := 0
 var textline_index := -1
-var line_is_finished = false
-var current_event : Array[Dictionary]
+var current_event : Array[Dictionary] = []
 var example_dict : Array[Dictionary] = [
 	{
 		"active_speaker": "Remi",
@@ -56,7 +64,7 @@ var example_dict : Array[Dictionary] = [
 		"text": "uh, like sorry for scaring you or whatever.",
 	},
 	{
-		"text": "Were you talking to yourself ?",
+		"text": "were you talking to yourself ..?",
 		"effects": [{"name": "quiet"}],
 		"background": "null"
 	},
@@ -66,65 +74,6 @@ var example_dict : Array[Dictionary] = [
 		"animations": [{"name": "hop", "target": "Remi"}]
 	},
 ]
-
-	#{
-		#"active_speaker": "Sakula",
-		#"text": "Just know, the milady's with me. With that out of the way, how may I be of service?",
-		#"effects": [{"name": "portrait-sil", "target": "Sakula"}]
-	#},
-	#{
-		#"text": "This was just a test... OK!",
-		#"effects": [{"name": "portrait-normal", "target": "Sakula"},{"name": "loud"}],
-		#"animations": [{"name": "slide", "target": "Sakula", "pos": 0.5}]
-	#},
-	#{
-		#"active_speaker": "Pakooli",
-		#"text": "Hey I just ordered a pizz- ...oh sorry for interrupting.",
-		#"effects": [{"name": "quiet"}]
-	#},
-	#{
-		#"active_speaker": "Sirno",
-		#"text": "Erm... What the sigma?",
-		#"animations": [{"name": "slide", "target": "Sakula", "pos": 0.9},{"name": "slide", "target": "Pakooli", "pos": 0.5}]
-	#},
-	#{
-		#"animations": [{"name": "shake", "target": "Pakooli"}, {"name": "shake", "target": "Sakula"},{"name": "interact", "target": "Sirno"}]
-	#},
-	#{
-		#"active_speaker": "Pakooli",
-		#"text": "dieee!!",
-		#"animations": [{"name": "slide", "target": "Pakooli", "pos": 0.25}, {"name": "hop", "target": "Pakooli"}],
-		#"effects": [{"name": "dim", "target": "Sakula"}]
-	#},
-	#{
-		#"animations": [{"name": "double_hop", "target": "Sirno"}]
-	#},
-	#{
-		#"animations": [{"name": "slide", "target": "Sirno", "pos": -0.2}]
-	#},
-	#{
-		#"active_speaker": "Sirno",
-		#"text": "im died."
-	#},
-	#{
-		#"active_speaker": "Sakula",
-		#"text": "boy am i glad shes gone.",
-		#"effects": [{"name": "portrait-normal", "target": "Sakula"}],
-		#"animations": [{"name": "slide", "target": "Sakula", "pos": 0.6}]
-	#},
-	#{
-		#"active_speaker": "Sakula",
-		#"text": "lets get out of here.",
-		#"animations": [{"name": "toggle_fade", "target": "Sakula"}, {"name": "toggle_fade", "target": "Pakooli"}]
-	#},
-	#{
-		#"animations": [{"name": "slide", "target": "Sirno", "pos": 0.5}]
-	#},
-	#{
-		#"active_speaker": "Sirno",
-		#"text": "but spring all ways return. !!!",
-		#"effects": [{"name": "zoom", "target": "Sirno"}]
-	#}
 
 
 var speaker_setup = [
@@ -141,7 +90,7 @@ var speaker_setup = [
 	{
 		"name": "Pakooli",
 		"title": "magical girl",
-		"portrait": "res://sprites/th2.png" #"res://sprites/PatchouliPrt.png"
+		"portrait": "res://sprites/th2.png"
 	},
 	{
 		"name": "Remi",
@@ -150,16 +99,16 @@ var speaker_setup = [
 	}
 ]
 
-#Would be nice to have a function to set a specific background image. With showing the game map as the default.
+
 func _ready():
 	self.visible = false
-	set_physics_process(false) #Added to halt the scene from auto-playing on load
 	foreground_elements.visible = false
+	set_physics_process(false)
 	text_body.text = ""
 	name_label.text = ""
 	title_label.text = ""
 	# TODO Kill all children in PortaitsNode?
-	line_finished.connect(_on_line_finished)
+	bobber_check.connect(_check_bobber)
 
 
 #func _gui_input(event):
@@ -194,11 +143,11 @@ func gui_accept():
 	elif !current_event[textline_index].has("text"): return
 	
 	elif !$TextStopper/AnimationPlayer.is_playing():
-		line_finished.emit(textline_index)
+		skip_text = true
 	elif textline_index < current_event.size() - 1:
 		next_textline()
-	else: _conclude_dialog()
-		
+	else:
+		_conclude_dialog()
 
 
 func _conclude_dialog() -> void:
@@ -209,41 +158,8 @@ func _conclude_dialog() -> void:
 	toggle_dialog()
 	await _dialogue_fade_finished
 	dialog_finished.emit()
-	
-
-var delta_speed = 0.0
-var text_proceed = false
-var anim_proceed = false
-var effect_proceed = false
-func _physics_process(delta):
-	if !dialogue_finished && text_proceed && anim_proceed && effect_proceed && !$TextStopper.visible:
-		if !current_event[textline_index].has("text") and textline_index < current_event.size()-1:
-			next_textline()
-		#elif textline_index >= current_event.size()-1: _conclude_dialog()
-		else:
-			$TextStopper.visible = true
-			$TextStopper/AnimationPlayer.play("ContinueBobber")
-	
-	if !current_event[textline_index].has("text"): return
-		
-	if text_count < current_event[textline_index]["text"].length():
-		match text_body.text.right(1):
-			"?", ".", "-", "!", ",":
-				delta_speed += delta * draw_speed * 0.17
-			" ":
-				delta_speed += delta * draw_speed * 0.5	
-			_:
-				delta_speed += delta * draw_speed
-
-		text_body.text += current_event[textline_index]["text"].substr(text_count, int(delta_speed))
-		text_count += int(delta_speed)
-		delta_speed -= int(delta_speed)
-	elif !line_is_finished:
-		line_finished.emit(textline_index)
 
 
-# Can I put these nodes into an array instead of using find_child?
-# yes, but I'd use a dictionary for your use case
 #Now called when a new map is loaded, right after the splash screen. See MapManager:_on_gui_splash_finished(). Will be called in more varied ways
 ##SceneScripts are stored on the map associated with them. There is to be a Start and End scene to each Chapter that daisy chains things together with a moment for saving/loading in-between last End and new Start
 func prepare_new_dialogue(new_event:String= ""):
@@ -271,37 +187,30 @@ func prepare_new_dialogue(new_event:String= ""):
 	next_textline()
 
 
-func _on_line_finished(index):
-	if !current_event[index].has("text"): return
-
-	text_count = current_event[index]["text"].length()
-	text_body.text = current_event[index]["text"]
-	line_is_finished = true
-	text_proceed = true
-
-
 func next_textline():
 	textline_index += 1
 	anims_finished = 0
-	text_count = 0
-	line_is_finished = false
+	skip_text = false
 	
-	text_proceed = true if !current_event[textline_index].has("text") else false
-	anim_proceed = true if !current_event[textline_index].has("animations") else false
-	effect_proceed = true #if !current_event[textline_index].has("effects") else false #right now, not handling
+	_ready_flags = {
+		"text_complete": false,
+		"animations_complete": false,
+		"effects_complete": false
+	}
 	
-	delta_speed = 0.0
-	text_body.text = ""
-	text_body.label_settings.font_size = default_font_size
 	$TextStopper.visible = false
 	$TextStopper/AnimationPlayer.stop()
 	
 	var cur_line = current_event[textline_index]
-	if !cur_line.has("text"):
-		foreground_elements.visible = false
-	else:
+	
+	if cur_line.has("text"):
 		foreground_elements.visible = true
-		
+		_type_text(cur_line.text)
+	else:
+		foreground_elements.visible = false
+		bobber_check.emit("text_complete")
+	
+	
 	if cur_line.has("background"):
 		if cur_line.background == "null" or cur_line.background == "none":
 			background_texture_rect.texture = null
@@ -309,8 +218,8 @@ func next_textline():
 			background_texture_rect.texture = load(cur_line.background)
 	
 	if cur_line.has("active_speaker"):
-		var active_speaker = speaker_portraits[ cur_line.active_speaker ]
-		if active_speaker != "none":
+		if cur_line.active_speaker != "none":
+			var active_speaker = speaker_portraits[ cur_line.active_speaker ]
 			name_label.text = active_speaker.speaker_name
 			title_label.text = active_speaker.speaker_title
 			active_speaker.visible = true
@@ -336,7 +245,8 @@ func next_textline():
 	#if current_event[textline_index].has("portrait"):
 		#texturerect.texture = load(cur_line["portrait"])
 	
-	if cur_line.has("effects"): # TODO Add a default-to-Active_Speaker fallback if no Target is specified
+	if cur_line.has("effects"): # TODO Add a default-to-Active_Speaker fallback if no Target is specified?
+		bobber_check.emit("effects_complete")
 		for eff in cur_line.effects:
 			match eff.name:
 				"portrait-sil":
@@ -353,6 +263,8 @@ func next_textline():
 					speaker_portraits[eff.target].zoom()
 				"teleport":
 					speaker_portraits[eff.target].teleport(eff.pos)
+	else:
+		bobber_check.emit("effects_complete")
 	
 	if cur_line.has("animations"):
 		for anim in cur_line.animations:
@@ -369,6 +281,8 @@ func next_textline():
 					speaker_portraits[anim.target].interact()
 				"toggle_fade":
 					speaker_portraits[anim.target].toggle_fade()
+	else:
+		bobber_check.emit("animations_complete")
 
 
 var toggle_dialog_tween
@@ -389,7 +303,7 @@ func toggle_dialog():
 	await toggle_dialog_tween.finished
 	_dialogue_fade_finished.emit()
 	
-	set_physics_process(!is_physics_processing()) # toggle to prevent auto-starting
+	set_physics_process(!is_physics_processing())
 
 
 var anims_finished = 0
@@ -400,4 +314,70 @@ func _on_anim_finished():
 	if anims_finished == current_event[textline_index]["animations"].size():
 		if !current_event[textline_index].has("text"):
 			await get_tree().create_timer(0.6).timeout # Delay anim-only lines
-		anim_proceed = true
+		bobber_check.emit("animations_complete")
+
+
+var skip_text := false
+func _type_text(line: String) -> void:
+	text_body.text = ""
+	text_body.label_settings.font_size = default_font_size
+	for char in line:
+		if skip_text:
+			text_body.text = line
+			break
+		text_body.text += char
+		match char:
+			"?", ".", "-", "!", ",":
+				await get_tree().create_timer(punctuation_time).timeout
+			" ":
+				await get_tree().create_timer(space_time).timeout
+			_:
+				await get_tree().create_timer(letter_time).timeout
+				
+				if !(text_body.text.right(1) in ["?", ".", "-", "!", ",", " "]):
+					audio_player.pitch_scale = randf_range(0.95, 1.05)
+					if text_body.text.right(1) in ["a", "e", "i", "o", "u"]:
+						audio_player.pitch_scale += 0.2
+					if text_body.text.right(1) == text_body.text.right(1).capitalize():
+						audio_player.pitch_scale += 0.5
+					if current_event[textline_index].has("effects"):
+						if current_event[textline_index].effects.find({"name": "loud"}, 0):
+							audio_player.pitch_scale -= 0.2
+						if current_event[textline_index].effects.find({"name": "quiet"}, 0):
+							audio_player.pitch_scale += 0.2
+					audio_player.play()
+					await audio_player.finished
+				
+				#if !(text_body.text.right(1) in ["?", ".", "-", "!", ",", " "]):
+					#var new_audio_player = audio_player.duplicate()
+					#new_audio_player.pitch_scale += randf_range(-0.05, 0.05)
+					#if text_body.text.right(1) in ["a", "e", "i", "o", "u"]:
+						#new_audio_player.pitch_scale += 0.2
+					#if text_body.text.right(1) == text_body.text.right(1).capitalize():
+						#new_audio_player.pitch_scale += 0.5
+					#if current_event[textline_index].has("effects"):
+						#if current_event[textline_index].effects.find({"name": "loud"}, 0):
+							#new_audio_player.pitch_scale -= 0.2
+						#if current_event[textline_index].effects.find({"name": "quiet"}, 0):
+							#new_audio_player.pitch_scale += 0.2
+					#get_tree().root.add_child(new_audio_player)
+					#new_audio_player.play()
+					#await new_audio_player.finished
+					#new_audio_player.queue_free()
+					
+	bobber_check.emit("text_complete")
+
+
+func _check_bobber(signal_name):
+	_ready_flags[signal_name] = true
+	
+	var proceed : bool = _ready_flags.text_complete and _ready_flags.animations_complete and _ready_flags.effects_complete
+	if !proceed: return
+	
+	if current_event[textline_index].has("text"):
+		await get_tree().create_timer(0.25).timeout # small delay to prevent double clicking
+	$TextStopper.visible = true
+	$TextStopper/AnimationPlayer.play("ContinueBobber")
+		
+	if !current_event[textline_index].has("text") and textline_index < current_event.size()-1:
+		next_textline() # auto play non-text lines
