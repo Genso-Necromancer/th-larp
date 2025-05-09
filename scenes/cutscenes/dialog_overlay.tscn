@@ -285,13 +285,16 @@ speed_scale = 0.3
 [node name="AudioStreamPlayer_speech" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_hf1ps")
 volume_db = -6.0
+bus = &"SFX"
 
 [node name="AudioStreamPlayer_fwip" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("6_hvxoq")
+bus = &"SFX"
 
 [node name="AudioStreamPlayer_surprise" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("7_7dch3")
 pitch_scale = 1.25
+bus = &"SFX"
 
 [node name="DebugLineTrack" type="HSlider" parent="."]
 visible = false
