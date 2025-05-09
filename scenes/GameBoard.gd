@@ -25,8 +25,6 @@ signal turn_removed(team:StringName)
 signal turn_changed
 signal new_round(turn_order:Array[StringName])
 
-signal turn_order_updated
-
 #signal skill_target_canceled
 #signal item_target_canceled
 
@@ -35,16 +33,13 @@ signal forecast_confirmed
 
 
 signal toggle_prof
-signal toggle_skills
+
 signal target_focused
 signal aimove_finished
-signal round_changed
 signal exp_display
 signal continue_turn
 signal deploy_toggled
 signal formation_closed
-signal gb_ready
-
 
 enum ACTION_TYPE {ATTACK, SKILL, WAIT, END}
 
@@ -335,7 +330,6 @@ func _load_units(): #merge with store enemy units
 	deploymentCells = currMap.get_deployment_cells()
 	forcedDeploy = currMap.get_forced_deploy()
 	depCap = deploymentCells.size() + forcedDeploy.size()
-	var forcedUnits = forcedDeploy.keys()
 	
 	
 	for unit in roster:
@@ -430,57 +424,17 @@ func gb_mouse_motion(_event):
 	var mousePos: Vector2i = currMap.get_local_mouse_position()
 	var toMap = currMap.ground.local_to_map(mousePos)
 #	print(toMap)
-
 	cursor.cell = Vector2i(toMap)
-	
 
 
 ## Returns `true` if the cell is occupied by a unit
 func is_occupied(cell: Vector2i) -> bool:
 		return units.has(cell)
-	
-
-
-## Returns an array of cells a given unit can walk using the flood fill algorithm.
-##SHIT DONT WORK FOR FUCK
-func get_region_rect(region: Array) -> Rect2i:
-	var minPos = Vector2i.MAX
-	var maxPos = Vector2i.MIN
-	
-	for hex in region:
-		minPos = _minv(minPos, hex)
-		maxPos = _maxv(maxPos, hex)
-	
-	#for hex in region:
-		#minPos.x = min(minPos.x, hex.x)
-		#minPos.y = min(minPos.y, hex.y)
-		#maxPos.x = max(maxPos.x, hex.x)
-		#maxPos.y = max(maxPos.y, hex.y)
-	var rectSize = maxPos - minPos
-	var rect = Rect2i(minPos, rectSize)
-	#var exp = Vector2i(maxPos.x+1,maxPos.y+1)
-	#rect = rect.expand(exp)
-	return rect
-
-
-func _maxv(a:Vector2i, b:Vector2i) -> Vector2i:
-	var al = a.length()
-	var bl = b.length()
-	
-	return b if a < b else a
-	
-
-func _minv(a:Vector2i, b:Vector2i) -> Vector2i:
-	var al = a.length()
-	var bl = b.length()
-	
-	return b if a > b else a
 
 
 func get_walkable_cells(unit: Unit) -> Array: #Pathing
 	var hexStar = AHexGrid2D.new(currMap)
 	var path = hexStar.find_all_unit_paths(unit)
-	
 	return path
 
 
@@ -871,13 +825,8 @@ func return_targeting():
 
 
 func _on_cursor_moved(new_cell: Vector2i) -> void: #Pathing
-	# Updates the dynamic visual path if there's an active and selected unit.
-#	print(currMap.map_to_local(new_cell))
-#	print(new_cell)
-	
-	var area = get_region_rect(walkableCells)
 	var path := []
-	area = area.abs()
+	
 	if units.has(new_cell) and units[new_cell] == null: #safety measure, catches any uncleared cell storage that slips through the cracks
 		units.erase(new_cell)
 	
@@ -891,7 +840,6 @@ func _on_cursor_moved(new_cell: Vector2i) -> void: #Pathing
 		unitPath.clear()
 	else:
 		return
-		
 	unitPath.draw(path)
 
 
@@ -931,7 +879,7 @@ func start_item_targeting(item:Item):
 	GameState.change_state(self, GameState.gState.GB_ITEM_TARGETING)
 
 
-func seek_trade(unit:Unit):
+func seek_trade(_unit:Unit):
 	GameState.change_state(self, GameState.gState.GB_TRADE_TARGETING)
 	_draw_range(activeUnit, 1, 1)
 
@@ -977,7 +925,7 @@ func _on_unit_item_activated(item:Consumable, unit:Unit, target:Unit)->void:
 	_activate_item(item,unit,target)
 
 
-func _activate_item(item:Consumable, unit:Unit, target:Unit):
+func _activate_item(item:Consumable, unit:Unit, _target:Unit): #HERE Unfinished
 	var results = combatManager.use_item(unit, unit, item)
 	GameState.change_state(self, GameState.gState.LOADING)
 	#insert map animations for items here
@@ -1016,7 +964,6 @@ func _run_post_queue():
 				_: isWait = false
 			if isWait:
 				await self.continue_queue
-		
 	call_deferred("_clear_post_queue")
 
 
@@ -1091,16 +1038,8 @@ func find_next_best_cell(currentCell, nextCell): #it's still pretty jank, but at
 			shortestCurrent = distanceCurrent
 			nextBest = cell
 	return nextBest
-	
-#func free_up():	#Free Up, worst show on television
-#	#Not really used atm, exists for when a map is completed
-#	#Prevents memory leaks by freeing the pathfinding and combat manage from memory
-#	#SKill Manager, turn sorter, etc will need to be added to this later, unless things fundamentally change down the line once the game is threaded together
-#	if hexStar != null:
-#		hexStar.qeue_free()
-#	if combatManager.rng != null:
-#		combatManager.rng.qeue_free()
-		
+
+
 func on_death_done(unit: Unit):
 	#Plan to alter this down the line for Seiga fight, where fallen units will be cached instead of completely removed
 	#Intention would be for Seiga to "reanimate" fallen units as part of her "danmaku"
@@ -1116,17 +1055,13 @@ func on_death_done(unit: Unit):
 		unit.confirm_post_sequence_flags("Death")
 	deathList.append(unit)
 	currMap.check_event(currMap.MAP_EVENT.DEATH, unit)
-	
-	
-#	var filterDick = []
-#	for entry in units:
-#		filterDick.append(entry)
-#	units = filterDick
-#	print(units)
+
+
 func _wipe_dead():
 	for dead in deathList:
 		_clear_unit(dead)
 	deathList.clear()
+
 
 func _clear_unit(unit):
 	var remove = unit.cell
@@ -1135,7 +1070,8 @@ func _clear_unit(unit):
 	units.erase(remove)
 	unit.queue_free()
 	#clear non-player units from unitData HERE!!!
-	
+
+
 func _remove_from_grid(unit: Unit):
 	var remove = unit.cell
 	if units.has(remove):

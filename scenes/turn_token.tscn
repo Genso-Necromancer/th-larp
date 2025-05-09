@@ -1,22 +1,7 @@
 [gd_scene load_steps=10 format=3 uid="uid://bnnxx77j4atuk"]
 
 [ext_resource type="Texture2D" uid="uid://bumofv4hd5kef" path="res://sprites/UI/turn_tokens.png" id="1_drgm0"]
-[ext_resource type="Script" uid="uid://bn6hc5xtnbkxp" path="res://scenes/turn_token.gd" id="2_flun0"]
-
-[sub_resource type="Animation" id="Animation_drgm0"]
-resource_name = "enter_list"
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:position")
-tracks/0/interp = 2
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.8, 1),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Vector2(575, 0), Vector2(-68, 0), Vector2(0, 0)]
-}
+[ext_resource type="Script" path="res://scenes/turn_token.gd" id="2_flun0"]
 
 [sub_resource type="Animation" id="Animation_flun0"]
 resource_name = "RESET"
@@ -43,6 +28,21 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_drgm0"]
+resource_name = "enter_list"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.8, 1),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(575, 0), Vector2(-68, 0), Vector2(0, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_uyxf1"]
@@ -99,33 +99,6 @@ tracks/1/keys = {
 "values": [2.29404, 0.0]
 }
 
-[sub_resource type="Animation" id="Animation_hcnaj"]
-resource_name = "init_idle"
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(77, 0)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath(".:rotation")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [2.29404]
-}
-
 [sub_resource type="Animation" id="Animation_jlsgb"]
 resource_name = "group_exit"
 tracks/0/type = "value"
@@ -151,6 +124,33 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [0.0, 2.30383]
+}
+
+[sub_resource type="Animation" id="Animation_hcnaj"]
+resource_name = "init_idle"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(77, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath(".:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [2.29404]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_uyxf1"]
