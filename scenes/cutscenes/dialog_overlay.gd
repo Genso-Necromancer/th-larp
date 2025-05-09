@@ -16,7 +16,7 @@ signal _dialogue_fade_finished
 @onready var foreground_elements = $GradientRect/ForegroundElements
 @onready var default_font_size = text_body.label_settings.font_size
 
-var letter_time : float = 0.003
+var letter_time : float = 0.02
 var space_time : float = letter_time * 2.0
 var punctuation_time : float = letter_time * 6.5
 var _ready_flags := {
@@ -346,20 +346,18 @@ func _type_text(line: String) -> void:
 				await get_tree().create_timer(letter_time).timeout
 				
 				if !(text_body.text.right(1) in ["?", ".", "-", "!", ",", " "]):
-					audio_player.pitch_scale = randf_range(0.90, 1.05)
-					if text_body.text.right(2).left(1) == char: # scream is previous letter is duplicate AAAA
-						audio_player.pitch_scale += 0.2
-					if text_body.text.right(1) in ["a", "e", "i", "o", "u"]:
-						audio_player.pitch_scale += 0.2
-					if text_body.text.right(1) == text_body.text.right(1).capitalize():
-						audio_player.pitch_scale += 0.2
-					if current_event[textline_index].has("effects"):
-						if current_event[textline_index].effects.find({"name": "loud"}, 0):
-							audio_player.pitch_scale -= 0.2
-						if current_event[textline_index].effects.find({"name": "quiet"}, 0):
-							audio_player.pitch_scale += 0.4
+					if text_body.text.right(2).left(1) != char: # if same character, continue same pitch
+						audio_player.pitch_scale = randf_range(0.90, 1.05)
+						if text_body.text.right(1) in ["a", "e", "i", "o", "u"]:
+							audio_player.pitch_scale += 0.2
+						if text_body.text.right(1) == text_body.text.right(1).capitalize():
+							audio_player.pitch_scale += 0.2
+						if current_event[textline_index].has("effects"):
+							if current_event[textline_index].effects.find({"name": "loud"}, 0):
+								audio_player.pitch_scale -= 0.2
+							if current_event[textline_index].effects.find({"name": "quiet"}, 0):
+								audio_player.pitch_scale += 0.4
 					audio_player.play()
-					await audio_player.finished
 	
 	bobber_check.emit("text_complete")
 
