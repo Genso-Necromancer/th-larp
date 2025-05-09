@@ -292,3 +292,15 @@ stream = ExtResource("6_hvxoq")
 [node name="AudioStreamPlayer_surprise" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("7_7dch3")
 pitch_scale = 1.25
+
+[node name="DebugLineTrack" type="HSlider" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.25
+anchor_top = 0.01
+anchor_right = 0.75
+anchor_bottom = 0.01
+offset_bottom = 16.0
+grow_horizontal = 2
+max_value = 0.0

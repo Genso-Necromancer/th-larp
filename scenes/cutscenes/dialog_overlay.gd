@@ -14,6 +14,7 @@ signal _dialogue_fade_finished
 @onready var name_label = $GradientRect/ForegroundElements/MarginContainer/VBoxContainer/HBoxContainer/NameLabel
 @onready var title_label = $GradientRect/ForegroundElements/MarginContainer/VBoxContainer/HBoxContainer/TitleLabel
 @onready var foreground_elements = $GradientRect/ForegroundElements
+@onready var debug_line_track : HSlider = $DebugLineTrack
 @onready var default_font_size = text_body.label_settings.font_size
 
 var letter_time : float = 0.02
@@ -32,7 +33,8 @@ var current_event : Array[Dictionary] = []
 var example_dict : Array[Dictionary] = [
 	{
 		"active_speaker": "Remi",
-		"animations": [{"name": "slide", "target": "Remi", "pos": 0.75}]
+		"animations": [{"name": "slide", "target": "Remi", "pos": 0.75}],
+		"effects":[{"name": "teleport", "target": "Remi", "pos": 0.25}, {"name": "teleport", "target": "Pakooli", "pos": -0.5}]
 	},
 	{
 		"animations": [{"name": "interact", "target": "Remi"}]
@@ -65,6 +67,7 @@ var example_dict : Array[Dictionary] = [
 	{
 		"text": "were you talking to yourself ..?",
 		"effects": [{"name": "quiet"}, {"name": "sound", "sound": "surprise"}],
+		"animations": [{"name": "question", "target": "Pakooli"}],
 		"background": "null"
 	},
 	{
@@ -101,11 +104,12 @@ func _ready():
 	self.visible = false
 	foreground_elements.visible = false
 	set_physics_process(false)
-	text_body.text = ""
-	name_label.text = ""
-	title_label.text = ""
+	_reset()
 	# TODO Kill all children in PortaitsNode?
 	bobber_check.connect(_check_bobber)
+	
+	debug_line_track.connect("drag_ended", Callable(self, "_on_debug_slider_drag_ended"))
+	debug_line_track.visible = Global.flags.DebugMode
 
 
 #func _gui_input(event):
@@ -147,11 +151,20 @@ func gui_accept():
 		_conclude_dialog()
 
 
+func _reset() -> void:
+	text_body.text = ""
+	name_label.text = ""
+	title_label.text = ""
+	background_texture_rect.texture = null
+	textline_index = -1
+
+
 func _conclude_dialog() -> void:
-	dialogue_finished = true
-	background_texture_rect.texture = null # always remove BG so its opt-in
-	# TODO Kill all children in PortaitsNode?
+	_reset()
 	speaker_portraits = {}
+	for child in $PortraitsNode:
+		child.queue_free()
+	dialogue_finished = true
 	toggle_dialog()
 	await _dialogue_fade_finished
 	dialog_finished.emit()
@@ -179,15 +192,23 @@ func prepare_new_dialogue(new_event:String= ""):
 	for pr in $PortraitsNode.get_children():
 		speaker_portraits[ pr.name ] = pr
 	
+	debug_line_track.min_value = 0
+	debug_line_track.max_value = current_event.size()-1
+	debug_line_track.value = 0
+	
 	# await _dialogue_fade_finished # works, but doesn't look good atm
 	textline_index = -1
 	next_textline()
 
 
-func next_textline():
+func next_textline(scrub : bool = false):
 	textline_index += 1
+	if !scrub:
+		debug_line_track.value = textline_index
 	anims_finished = 0
-	skip_text = false
+	skip_text = scrub
+	var speed = 1.0
+	if scrub: speed = 0.1
 	
 	_ready_flags = {
 		"text_complete": false,
@@ -200,13 +221,12 @@ func next_textline():
 	
 	var cur_line = current_event[textline_index]
 	
-	if cur_line.has("text"):
+	if cur_line.has("text") && !scrub:
 		foreground_elements.visible = true
 		_type_text(cur_line.text)
 	else:
 		foreground_elements.visible = false
 		bobber_check.emit("text_complete")
-	
 	
 	if cur_line.has("background"):
 		if cur_line.background == "null" or cur_line.background == "none":
@@ -261,6 +281,7 @@ func next_textline():
 				"teleport":
 					speaker_portraits[eff.target].teleport(eff.pos)
 				"sound":
+					if scrub: break
 					match eff.sound:
 						"surprise":
 							$AudioStreamPlayer_surprise.play()
@@ -273,19 +294,21 @@ func next_textline():
 		for anim in cur_line.animations:
 			match anim.name:
 				"slide":
-					speaker_portraits[anim.target].slide(anim.pos)
+					speaker_portraits[anim.target].slide(anim.pos, speed)
 				"shake":
-					speaker_portraits[anim.target].shake()
+					speaker_portraits[anim.target].shake(speed)
 				"hop":
 					speaker_portraits[anim.target].hop()
-					$AudioStreamPlayer_fwip.play()
+					if !scrub: $AudioStreamPlayer_fwip.play(speed)
 				"double_hop":
-					speaker_portraits[anim.target].double_hop()
-					$AudioStreamPlayer_fwip.play()
+					speaker_portraits[anim.target].double_hop(speed)
+					if !scrub: $AudioStreamPlayer_fwip.play()
 				"interact":
-					speaker_portraits[anim.target].interact()
+					speaker_portraits[anim.target].interact(speed)
 				"toggle_fade":
-					speaker_portraits[anim.target].toggle_fade()
+					speaker_portraits[anim.target].toggle_fade(speed)
+				"question":
+					speaker_portraits[anim.target].show_question(speed)
 	else:
 		bobber_check.emit("animations_complete")
 
@@ -313,6 +336,8 @@ func toggle_dialog():
 
 var anims_finished = 0
 func _on_anim_finished():
+	if !current_event[textline_index].has("animations"): return
+	
 	anims_finished += 1
 	if Global.flags.DebugMode:
 		print("(Alon) Animation %s of %s finished." % [anims_finished, current_event[textline_index]["animations"].size()])
@@ -332,6 +357,10 @@ func _type_text(line: String) -> void:
 		await get_tree().create_timer(0.5).timeout # Delay to let anim/effect SFX play
 	
 	for char in line:
+		if _abort_text: 
+			_abort_text = false
+			return
+		
 		if skip_text:
 			text_body.text = line
 			break
@@ -369,9 +398,23 @@ func _check_bobber(signal_name):
 	if !proceed: return
 	
 	if current_event[textline_index].has("text") && !skip_text:
-		await get_tree().create_timer(0.1).timeout # small delay to prevent double clicking
+		await get_tree().create_timer(0.2).timeout # small delay to prevent double clicking
 	$TextStopper.visible = true
 	$TextStopper/AnimationPlayer.play("ContinueBobber")
 		
 	if !current_event[textline_index].has("text") and textline_index < current_event.size()-1:
 		next_textline() # auto play non-text lines
+
+
+var _abort_text : bool = false
+func _on_debug_slider_drag_ended(value_changed : bool):		
+	_reset()
+	_abort_text = !value_changed
+	$TextStopper.visible = false
+	$TextStopper/AnimationPlayer.stop()
+	textline_index = -1
+	while textline_index < int(debug_line_track.value)-1:
+		next_textline(true)
+	
+	skip_text = false
+	next_textline()
