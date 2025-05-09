@@ -1,9 +1,16 @@
-[gd_scene load_steps=4 format=3 uid="uid://d3fuiykqjxb5h"]
+[gd_scene load_steps=6 format=3 uid="uid://d3fuiykqjxb5h"]
 
 [ext_resource type="Script" uid="uid://cqwq5hsah214n" path="res://scenes/cutscenes/PortraitRect.gd" id="1_2fb7x"]
+[ext_resource type="Shader" uid="uid://d1rhopbmt0th7" path="res://scenes/cutscenes/questionMarkWobble.gdshader" id="2_bo3gh"]
 [ext_resource type="Texture2D" uid="uid://dbrsogpaaf7by" path="res://sprites/dialogue_particles/question_mark_particle.png" id="2_h500h"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_gaf50"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_h0lpj"]
+shader = ExtResource("2_bo3gh")
+shader_parameter/amplitude = 0.3
+shader_parameter/frequency = 8.0
+shader_parameter/rect_size = Vector2(0, 0)
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -38,6 +45,7 @@ stretch_mode = 5
 
 [node name="QuestionMarkParticle" type="TextureRect" parent="."]
 visible = false
+material = SubResource("ShaderMaterial_h0lpj")
 layout_mode = 1
 anchors_preset = -1
 anchor_left = -0.00195313

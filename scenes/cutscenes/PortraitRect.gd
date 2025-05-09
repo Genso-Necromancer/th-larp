@@ -15,6 +15,8 @@ signal effect_finished
 func _ready():
 	starting_pos = position
 	tex_rect.texture = texture
+	var mat = question_mark.material as ShaderMaterial
+	mat.set_shader_parameter("rect_size", question_mark.size)
 
 
 func _unhandled_input(_event):
