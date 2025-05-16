@@ -143,6 +143,9 @@ func gui_accept():
 	if GameState.state != GameState.gState.DIALOGUE_SCENE: return
 	elif !current_event[textline_index].has("text"): return
 	
+	if dialogue_finished && Global.flags.DebugMode:
+		prepare_new_dialogue()
+	
 	elif !$TextStopper/AnimationPlayer.is_playing():
 		skip_text = true
 	elif textline_index < current_event.size() - 1:
@@ -162,7 +165,8 @@ func _reset() -> void:
 func _conclude_dialog() -> void:
 	_reset()
 	speaker_portraits = {}
-	for child in $PortraitsNode:
+	for child in $PortraitsNode.get_children():
+		print(child)
 		child.queue_free()
 	dialogue_finished = true
 	toggle_dialog()
@@ -173,6 +177,7 @@ func _conclude_dialog() -> void:
 #Now called when a new map is loaded, right after the splash screen. See MapManager:_on_gui_splash_finished(). Will be called in more varied ways
 ##SceneScripts are stored on the map associated with them. There is to be a Start and End scene to each Chapter that daisy chains things together with a moment for saving/loading in-between last End and new Start
 func prepare_new_dialogue(new_event:String= ""):
+	dialogue_finished = false
 	var parser = JasonParser.new()
 	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE) #Used to avoid conflicting inputs. Currently only uses ACCEPT_PROMPT input script, could extend GenericScript to make a new one specifically for this scene. You'll know what to do when you look at existing ones.
 	if new_event: 
@@ -356,7 +361,7 @@ func _type_text(line: String) -> void:
 	if current_event[textline_index].has("animations") or current_event[textline_index].has("effects"):
 		await get_tree().create_timer(0.5).timeout # Delay to let anim/effect SFX play
 	
-	for char in line:
+	for c in line:
 		if _abort_text: 
 			_abort_text = false
 			return
@@ -365,8 +370,8 @@ func _type_text(line: String) -> void:
 			text_body.text = line
 			break
 			
-		text_body.text += char
-		match char:
+		text_body.text += c
+		match c:
 			"?", ".", "-", "!", ",":
 				await get_tree().create_timer(punctuation_time).timeout
 			" ":
@@ -375,7 +380,7 @@ func _type_text(line: String) -> void:
 				await get_tree().create_timer(letter_time).timeout
 				
 				if !(text_body.text.right(1) in ["?", ".", "-", "!", ",", " "]):
-					if text_body.text.right(2).left(1) != char: # if same character, continue same pitch
+					if text_body.text.right(2).left(1) != c: # if same character, continue same pitch
 						audio_player.pitch_scale = randf_range(0.90, 1.05)
 						if text_body.text.right(1) in ["a", "e", "i", "o", "u"]:
 							audio_player.pitch_scale += 0.2
