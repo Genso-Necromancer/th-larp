@@ -166,7 +166,6 @@ func _conclude_dialog() -> void:
 	_reset()
 	speaker_portraits = {}
 	for child in $PortraitsNode.get_children():
-		print(child)
 		child.queue_free()
 	dialogue_finished = true
 	toggle_dialog()
@@ -204,6 +203,8 @@ func prepare_new_dialogue(new_event:String= ""):
 	# await _dialogue_fade_finished # works, but doesn't look good atm
 	textline_index = -1
 	next_textline()
+	
+	_rebuild_editor_list()
 
 
 func next_textline(scrub : bool = false):
@@ -234,7 +235,7 @@ func next_textline(scrub : bool = false):
 		bobber_check.emit("text_complete")
 	
 	if cur_line.has("background"):
-		if cur_line.background == "null" or cur_line.background == "none":
+		if cur_line.background == "null" or cur_line.background == "none" or cur_line.background == "":
 			background_texture_rect.texture = null
 		else:
 			background_texture_rect.texture = load(cur_line.background)
@@ -304,7 +305,7 @@ func next_textline(scrub : bool = false):
 					speaker_portraits[anim.target].shake(speed)
 				"hop":
 					speaker_portraits[anim.target].hop()
-					if !scrub: $AudioStreamPlayer_fwip.play(speed)
+					if !scrub: $AudioStreamPlayer_fwip.play()
 				"double_hop":
 					speaker_portraits[anim.target].double_hop(speed)
 					if !scrub: $AudioStreamPlayer_fwip.play()
@@ -363,6 +364,7 @@ func _type_text(line: String) -> void:
 	
 	for c in line:
 		if _abort_text: 
+			text_body.text = ""
 			_abort_text = false
 			return
 		
@@ -412,7 +414,7 @@ func _check_bobber(signal_name):
 
 
 var _abort_text : bool = false
-func _on_debug_slider_drag_ended(value_changed : bool):		
+func _on_debug_slider_drag_ended(value_changed : bool):
 	_reset()
 	_abort_text = !value_changed
 	$TextStopper.visible = false
@@ -423,3 +425,105 @@ func _on_debug_slider_drag_ended(value_changed : bool):
 	
 	skip_text = false
 	next_textline()
+
+
+const LineEditorScene = preload("res://scenes/LineEditor.tscn")
+func _rebuild_editor_list():
+	var le_prefix = "HBoxContainer"
+	for child in $ScrollContainer/LineEditorContainer.get_children():  # remove all children first
+		$ScrollContainer/LineEditorContainer.remove_child(child)
+		child.free()
+		
+	for i in current_event.size():
+		var le = LineEditorScene.instantiate()
+		le.name = str(i)
+		le.get_node(le_prefix + "/IndexLabel").text = str(i)
+		le.get_node(le_prefix + "/LineEdit").text = current_event[i].get("text","")
+
+		var ob = le.get_node(le_prefix + "/ActiveSpeakerOptionButton")
+		ob.clear()
+		var ob_list = ["none"]
+		for s in speaker_setup:
+			ob_list.append(s.name)
+		var sel = ob_list.find(current_event[i].get("active_speaker","none"), 0)
+		for s in ob_list:
+			ob.add_item(s)
+		ob.selected = sel
+
+		ob.connect("item_selected", Callable(self, "_on_speaker_changed").bind(i), 1)
+		le.get_node(le_prefix + "/LineEdit").connect("text_changed", Callable(self, "_on_text_changed").bind(i), 1)
+		le.get_node(le_prefix + "/MoveUpButton").connect("pressed", Callable(self, "swap_lines").bind(i, i-1), 1)
+		le.get_node(le_prefix + "/MoveDownButton").connect("pressed", Callable(self, "swap_lines").bind(i, i+1), 1)
+		le.get_node(le_prefix + "/RemoveLineButton").connect("pressed", Callable(self, "_on_remove_line").bind(i), 1)
+		
+		_populate_animations_for_line(le, i)
+		
+		$ScrollContainer/LineEditorContainer.add_child(le)
+
+
+func _on_text_changed(index:int):
+	var le_txt = $ScrollContainer/LineEditorContainer.get_node(str(index) + "/HBoxContainer/LineEdit")
+	current_event[index]["text"] = le_txt.text
+
+
+func _on_speaker_changed(selected_id:int, index:int):
+	current_event[index]["active_speaker"] = ("none" if selected_id < 0 else speaker_setup[selected_id-1].name)
+
+
+func swap_lines(a:int, b:int):
+	if a < 0 or b < 0 or a >= current_event.size() or b >= current_event.size():
+		return
+	var tmp = current_event[a]
+	current_event[a] = current_event[b]
+	current_event[b] = tmp
+	_rebuild_editor_list()
+
+
+func _on_remove_line(index:int):
+	current_event.remove_at(index)
+	_rebuild_editor_list()
+
+
+func _on_add_line_button_pressed():
+	var new_line = {}
+	# insert after the current slider index
+	var insert_at = clamp(textline_index + 1, 0, current_event.size())
+	current_event.insert(insert_at, new_line)
+	_rebuild_editor_list()
+
+
+const AnimEditorScene = preload("res://scenes/animation_editor.tscn")
+func _populate_animations_for_line(le:Control, line_idx:int):
+	var hasAnims = current_event[line_idx].get("animations",[])
+	if hasAnims.is_empty(): return
+	
+	var list  = le.get_node("AnimList") as VBoxContainer
+	for child in list.get_children():  # remove all children first
+		child.queue_free()
+	
+	for j in range(current_event[line_idx]["animations"].size()):
+		var data = current_event[line_idx]["animations"][j]
+		var ae = AnimEditorScene.instantiate() as HBoxContainer
+		var speaker_names = speaker_setup.map(func(x): return x["name"])
+		list.add_child(ae)
+		await ae.call_deferred("setup", data, speaker_names)
+		ae.connect("changed", Callable(self, "_on_animation_changed").bind(line_idx, j), 1)
+		ae.connect("remove_anim_pressed", Callable(self, "_on_animation_removed").bind(line_idx, j), 1)
+	
+	le.get_node("Header/AddAnimButton").connect("pressed", Callable(self, "_on_add_animation").bind(line_idx), 1)
+
+
+func _on_animation_changed(new_data:Dictionary, line_idx:int, anim_idx:int):
+	current_event[line_idx]["animations"][anim_idx] = new_data
+
+
+func _on_animation_removed(line_idx:int, anim_idx:int):
+	current_event[line_idx]["animations"].remove_at(anim_idx)
+	call_deferred("_rebuild_editor_list")
+
+
+func _on_add_animation(line_idx:int):
+	var arr = current_event[line_idx].get("animations", [])
+	arr.append({ "name":"slide", "target":speaker_setup[0].name, "pos":0.0 })
+	current_event[line_idx]["animations"] = arr
+	call_deferred("_rebuild_editor_list")

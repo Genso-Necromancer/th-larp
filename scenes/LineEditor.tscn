@@ -1,0 +1,70 @@
+[gd_scene load_steps=3 format=3 uid="uid://b6ywrlj6pp16e"]
+
+[ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="1_r6kpo"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_kyiig"]
+line_spacing = 12.0
+font = ExtResource("1_r6kpo")
+font_size = 36
+
+[node name="LineEditPanel" type="VBoxContainer"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 104.0
+grow_horizontal = 2
+theme_override_constants/separation = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+
+[node name="IndexLabel" type="Label" parent="HBoxContainer"]
+custom_minimum_size = Vector2(30, 0)
+layout_mode = 2
+size_flags_vertical = 1
+text = "00"
+label_settings = SubResource("LabelSettings_kyiig")
+
+[node name="LineEdit" type="TextEdit" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ActiveSpeakerOptionButton" type="OptionButton" parent="HBoxContainer"]
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+
+[node name="MoveUpButton" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(35, 0)
+layout_mode = 2
+text = "^"
+
+[node name="MoveDownButton" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(35, 0)
+layout_mode = 2
+text = "v"
+
+[node name="RemoveLineButton" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(35, 0)
+layout_mode = 2
+text = "X"
+
+[node name="Header" type="HBoxContainer" parent="."]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+theme_override_constants/separation = 50
+
+[node name="AnimLabel" type="Label" parent="Header"]
+layout_mode = 2
+text = "Anims"
+label_settings = SubResource("LabelSettings_kyiig")
+
+[node name="AddAnimButton" type="Button" parent="Header"]
+layout_mode = 2
+text = "ADD"
+
+[node name="AnimList" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+size_flags_vertical = 3

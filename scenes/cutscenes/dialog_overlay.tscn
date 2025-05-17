@@ -297,7 +297,6 @@ pitch_scale = 1.25
 bus = &"SFX"
 
 [node name="DebugLineTrack" type="HSlider" parent="."]
-visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.25
@@ -307,3 +306,36 @@ anchor_bottom = 0.01
 offset_bottom = 16.0
 grow_horizontal = 2
 max_value = 0.0
+
+[node name="AddLineButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1841.0
+offset_top = 1.0
+offset_right = -1.0
+offset_bottom = -1036.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "ADD"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+custom_minimum_size = Vector2(0, 400)
+layout_mode = 0
+offset_left = 1262.0
+offset_top = 44.0
+offset_right = 1912.0
+offset_bottom = 444.0
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
+
+[node name="LineEditorContainer" type="VBoxContainer" parent="ScrollContainer"]
+clip_contents = true
+custom_minimum_size = Vector2(0, 1000)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+
+[connection signal="pressed" from="AddLineButton" to="." method="_on_add_line_button_pressed"]
