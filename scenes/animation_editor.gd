@@ -1,7 +1,7 @@
 extends HBoxContainer
 
 signal changed(new_data: Dictionary)
-signal remove_anim_pressed()
+signal remove_anim_pressed
 
 @onready var name_btn	: OptionButton	= $AnimNameOptionButton
 @onready var tgt_btn	: OptionButton	= $AnimTargetOptionButton
@@ -19,7 +19,7 @@ func _ready():
 # TODO inherit options from singleton or something
 func setup(data:Dictionary, speaker_names:Array):
 	name_btn.clear()
-	var anim_list = ["slide","shake","hop","double_hop","interact","toggle_fade","teleport","question"]
+	var anim_list = ["slide","shake","hop","double_hop","interact","toggle_fade","question"]
 	for n in anim_list:
 		name_btn.add_item(n)
 	name_btn.selected = anim_list.find(data.get("name","slide"))
@@ -27,10 +27,10 @@ func setup(data:Dictionary, speaker_names:Array):
 	tgt_btn.clear()
 	for n in speaker_names:
 		tgt_btn.add_item(n)
-	tgt_btn.selected = speaker_names.find(data.get("target",0))
+	tgt_btn.selected = speaker_names.find(data.get("target",speaker_names[0]))
 	
 	pos_sb.value = data.get("pos", 0.0)
-	var show = name_btn.get_item_text(name_btn.selected) in ["slide","teleport"]
+	var show = name_btn.get_item_text(name_btn.selected) in ["slide"]
 	pos_sb.modulate.a = 1 if show else 0
 
 

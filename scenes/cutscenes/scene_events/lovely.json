@@ -1,0 +1,124 @@
+[
+	{
+		"active_speaker": "Remi",
+		"animations": [
+			{
+				"name": "slide",
+				"pos": 0.8,
+				"target": "Remi"
+			}
+		],
+		"effects": [
+			{
+				"name": "teleport",
+				"pos": 0.3,
+				"target": "Remi"
+			},
+			{
+				"name": "teleport",
+				"pos": -0.5,
+				"target": "Pakooli"
+			}
+		]
+	},
+	{
+		"animations": [
+			{
+				"name": "interact",
+				"target": "Remi"
+			}
+		]
+	},
+	{
+		"animations": [
+			{
+				"name": "slide",
+				"pos": 0.3,
+				"target": "Remi"
+			}
+		]
+	},
+	{
+		"animations": [
+			{
+				"name": "interact",
+				"target": "Remi"
+			}
+		]
+	},
+	{
+		"animations": [
+			{
+				"name": "slide",
+				"pos": -0.2,
+				"target": "Pakooli"
+			}
+		],
+		"text": "Hmm... I know I left my wing caps around here somewhere..."
+	},
+	{
+		"active_speaker": "Pakooli",
+		"background": "res://sprites/danmaku/danmaku.png",
+		"text": "Hey-"
+	},
+	{
+		"active_speaker": "Remi",
+		"animations": [
+			{
+				"name": "slide",
+				"pos": 0.8,
+				"target": "Remi"
+			},
+			{
+				"name": "double_hop",
+				"target": "Remi"
+			},
+			{
+				"name": "slide",
+				"pos": 0.3,
+				"target": "Pakooli"
+			}
+		],
+		"effects": [
+			{
+				"name": "loud",
+				"target": "Sirno"
+			}
+		],
+		"text": "GGIAYAAAAAAGHGH !!"
+	},
+	{
+		"active_speaker": "Pakooli",
+		"text": "uh, like sorry for scaring you or whatever."
+	},
+	{
+		"animations": [
+			{
+				"name": "question",
+				"target": "Pakooli"
+			}
+		],
+		"background": "null",
+		"effects": [
+			{
+				"name": "quiet",
+				"target": "Sirno"
+			},
+			{
+				"name": "sound",
+				"target": "Sirno"
+			}
+		],
+		"text": "were you talking to yourself ..?"
+	},
+	{
+		"active_speaker": "Remi",
+		"animations": [
+			{
+				"name": "hop",
+				"target": "Remi"
+			}
+		],
+		"text": "Get out of my room I'm playing Minecraft!!"
+	}
+]

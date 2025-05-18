@@ -17,6 +17,8 @@ signal _dialogue_fade_finished
 @onready var debug_line_track : HSlider = $DebugLineTrack
 @onready var default_font_size = text_body.label_settings.font_size
 
+const EVENTS_DIR = "res://scenes/cutscenes/scene_events"
+
 var letter_time : float = 0.02
 var space_time : float = letter_time * 2.0
 var punctuation_time : float = letter_time * 6.5
@@ -109,7 +111,7 @@ func _ready():
 	bobber_check.connect(_check_bobber)
 	
 	debug_line_track.connect("drag_ended", Callable(self, "_on_debug_slider_drag_ended"))
-	debug_line_track.visible = Global.flags.DebugMode
+	_populate_load_dropdown()
 
 
 #func _gui_input(event):
@@ -145,6 +147,9 @@ func gui_accept():
 	
 	if dialogue_finished && Global.flags.DebugMode:
 		prepare_new_dialogue()
+		debug_line_track.visible = Global.flags.DebugMode
+		$HBoxContainer.visible = debug_line_track.visible
+		$ScrollContainer.visible = debug_line_track.visible
 	
 	elif !$TextStopper/AnimationPlayer.is_playing():
 		skip_text = true
@@ -227,20 +232,23 @@ func next_textline(scrub : bool = false):
 	
 	var cur_line = current_event[textline_index]
 	
-	if cur_line.has("text") && !scrub:
+	var has_text = true if cur_line.get("text","") != "" else false
+	if has_text && !scrub:
 		foreground_elements.visible = true
 		_type_text(cur_line.text)
 	else:
 		foreground_elements.visible = false
 		bobber_check.emit("text_complete")
 	
-	if cur_line.has("background"):
+	var has_bg = true if cur_line.get("background","") != "" else false
+	if has_bg:
 		if cur_line.background == "null" or cur_line.background == "none" or cur_line.background == "":
 			background_texture_rect.texture = null
 		else:
 			background_texture_rect.texture = load(cur_line.background)
 	
-	if cur_line.has("active_speaker"):
+	var has_active_speaker = true if cur_line.get("active_speaker","") != "" else false
+	if has_active_speaker:
 		if cur_line.active_speaker != "none":
 			var active_speaker = speaker_portraits[ cur_line.active_speaker ]
 			name_label.text = active_speaker.speaker_name
@@ -268,7 +276,8 @@ func next_textline(scrub : bool = false):
 	#if current_event[textline_index].has("portrait"):
 		#texturerect.texture = load(cur_line["portrait"])
 	
-	if cur_line.has("effects"): # TODO Add a default-to-Active_Speaker fallback if no Target is specified?
+	var has_effects = true if !cur_line.get("effects",[]).is_empty() else false
+	if has_effects: # TODO Add a default-to-Active_Speaker fallback if no Target is specified?
 		bobber_check.emit("effects_complete")
 		for eff in cur_line.effects:
 			match eff.name:
@@ -293,10 +302,13 @@ func next_textline(scrub : bool = false):
 							$AudioStreamPlayer_surprise.play()
 						_:
 							pass
+				_:
+					break
 	else:
 		bobber_check.emit("effects_complete")
 	
-	if cur_line.has("animations"):
+	var has_animations = true if !cur_line.get("animations",[]).is_empty() else false
+	if has_animations:
 		for anim in cur_line.animations:
 			match anim.name:
 				"slide":
@@ -315,6 +327,8 @@ func next_textline(scrub : bool = false):
 					speaker_portraits[anim.target].toggle_fade(speed)
 				"question":
 					speaker_portraits[anim.target].show_question(speed)
+				_:
+					break
 	else:
 		bobber_check.emit("animations_complete")
 
@@ -411,6 +425,8 @@ func _check_bobber(signal_name):
 		
 	if !current_event[textline_index].has("text") and textline_index < current_event.size()-1:
 		next_textline() # auto play non-text lines
+	elif !current_event[textline_index].has("text") and textline_index == current_event.size()-1:
+		_conclude_dialog()
 
 
 var _abort_text : bool = false
@@ -456,6 +472,7 @@ func _rebuild_editor_list():
 		le.get_node(le_prefix + "/MoveDownButton").connect("pressed", Callable(self, "swap_lines").bind(i, i+1), 1)
 		le.get_node(le_prefix + "/RemoveLineButton").connect("pressed", Callable(self, "_on_remove_line").bind(i), 1)
 		
+		_populate_effects_for_line(le, i)
 		_populate_animations_for_line(le, i)
 		
 		$ScrollContainer/LineEditorContainer.add_child(le)
@@ -482,6 +499,7 @@ func swap_lines(a:int, b:int):
 func _on_remove_line(index:int):
 	current_event.remove_at(index)
 	_rebuild_editor_list()
+	debug_line_track.max_value = current_event.size()-1
 
 
 func _on_add_line_button_pressed():
@@ -490,10 +508,13 @@ func _on_add_line_button_pressed():
 	var insert_at = clamp(textline_index + 1, 0, current_event.size())
 	current_event.insert(insert_at, new_line)
 	_rebuild_editor_list()
+	debug_line_track.max_value = current_event.size()-1
 
 
 const AnimEditorScene = preload("res://scenes/animation_editor.tscn")
 func _populate_animations_for_line(le:Control, line_idx:int):
+	le.get_node("AddAnimButton").connect("pressed", Callable(self, "_on_add_animation").bind(line_idx), 1)
+	
 	var hasAnims = current_event[line_idx].get("animations",[])
 	if hasAnims.is_empty(): return
 	
@@ -509,8 +530,6 @@ func _populate_animations_for_line(le:Control, line_idx:int):
 		await ae.call_deferred("setup", data, speaker_names)
 		ae.connect("changed", Callable(self, "_on_animation_changed").bind(line_idx, j), 1)
 		ae.connect("remove_anim_pressed", Callable(self, "_on_animation_removed").bind(line_idx, j), 1)
-	
-	le.get_node("Header/AddAnimButton").connect("pressed", Callable(self, "_on_add_animation").bind(line_idx), 1)
 
 
 func _on_animation_changed(new_data:Dictionary, line_idx:int, anim_idx:int):
@@ -527,3 +546,115 @@ func _on_add_animation(line_idx:int):
 	arr.append({ "name":"slide", "target":speaker_setup[0].name, "pos":0.0 })
 	current_event[line_idx]["animations"] = arr
 	call_deferred("_rebuild_editor_list")
+
+
+const EffectEditorScene = preload("res://scenes/effect_editor.tscn")
+func _populate_effects_for_line(le:Control, line_idx:int):
+	le.get_node("AddEffectButton").connect("pressed", Callable(self, "_on_add_effect").bind(line_idx), 1)
+	
+	var hasEffects = current_event[line_idx].get("effects",[])
+	if hasEffects.is_empty(): return
+	
+	var list  = le.get_node("EffectList") as VBoxContainer
+	for child in list.get_children():  # remove all children first
+		child.queue_free()
+	
+	for j in range(current_event[line_idx]["effects"].size()):
+		var data = current_event[line_idx]["effects"][j]
+		var ae = EffectEditorScene.instantiate() as HBoxContainer
+		var speaker_names = speaker_setup.map(func(x): return x["name"])
+		list.add_child(ae)
+		await ae.call_deferred("setup", data, speaker_names)
+		ae.connect("changed", Callable(self, "_on_effect_changed").bind(line_idx, j), 1)
+		ae.connect("remove_effect_pressed", Callable(self, "_on_effect_removed").bind(line_idx, j), 1)
+
+
+func _on_effect_changed(new_data:Dictionary, line_idx:int, eff_idx:int):
+	current_event[line_idx]["effects"][eff_idx] = new_data
+
+
+func _on_effect_removed(line_idx:int, eff_idx:int):
+	current_event[line_idx]["effects"].remove_at(eff_idx)
+	call_deferred("_rebuild_editor_list")
+
+
+func _on_add_effect(line_idx:int):
+	var arr = current_event[line_idx].get("effects", [])
+	arr.append({ "name":"portrait-sil", "target":speaker_setup[0].name, "pos":0.0 })
+	current_event[line_idx]["effects"] = arr
+	call_deferred("_rebuild_editor_list")
+
+
+func _populate_load_dropdown():
+	var dir = DirAccess.open(EVENTS_DIR)
+	var load_dropdown = $HBoxContainer/LoadOptionButton
+	if not dir:
+		push_error("(Alon) Could not open events folder: " + EVENTS_DIR)
+		return
+	load_dropdown.clear()
+	dir.list_dir_begin()
+	var fname = dir.get_next()
+	while fname != "":
+		if not dir.current_is_dir() and fname.ends_with(".json"):
+			load_dropdown.add_item(fname)
+		fname = dir.get_next()
+	dir.list_dir_end()
+	if load_dropdown.get_item_count() > 0:
+		load_dropdown.selected = 0
+
+
+func _on_load_scene_button_pressed():
+	var load_dropdown = $HBoxContainer/LoadOptionButton
+	var idx = load_dropdown.selected
+	if idx < 0: return
+	
+	var file_name = load_dropdown.get_item_text(idx)
+	var path = EVENTS_DIR + "/" + file_name
+	var parser = JasonParser.new()
+	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE)
+	var eventDick : Array[Dictionary] = parser.parse_json(path)
+	current_event = eventDick
+	
+	dialogue_finished = false
+	debug_line_track.min_value = 0
+	debug_line_track.max_value = current_event.size()-1
+	debug_line_track.value = 0
+	textline_index = -1
+	_reset()
+	next_textline()
+	_rebuild_editor_list()
+
+
+func _on_save_scene_button_pressed():
+	var load_dropdown = $HBoxContainer/LoadOptionButton
+	var name = $HBoxContainer/SaveTextEdit.text.strip_edges()
+	if name == "":
+		push_error("(Alon) Please enter a name before saving.")
+		return
+	if not name.ends_with(".json"):
+		name += ".json"
+	var path = EVENTS_DIR + "/" + name
+	
+	var json = JSON.new()
+	json = json.stringify(current_event, "\t")
+	var file = FileAccess.open(path, FileAccess.WRITE)
+	if not file:
+		push_error("(Alon) Cannot write to: " + path)
+		return
+	file.store_string(json)
+	file.close()
+	
+	_populate_load_dropdown()
+
+
+#TODO make this better ?
+func _on_new_scene_button_pressed():
+	dialogue_finished = false
+	current_event = [{},{}]
+	debug_line_track.min_value = 0
+	debug_line_track.max_value = current_event.size()-1
+	debug_line_track.value = 0
+	textline_index = -1
+	_reset()
+	next_textline()
+	_rebuild_editor_list()

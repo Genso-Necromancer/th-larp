@@ -297,30 +297,55 @@ pitch_scale = 1.25
 bus = &"SFX"
 
 [node name="DebugLineTrack" type="HSlider" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = -1
 anchor_left = 0.25
 anchor_top = 0.01
 anchor_right = 0.75
 anchor_bottom = 0.01
+offset_left = -152.0
+offset_right = -152.0
 offset_bottom = 16.0
 grow_horizontal = 2
 max_value = 0.0
 
-[node name="AddLineButton" type="Button" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+visible = false
 layout_mode = 1
-anchors_preset = 15
+anchors_preset = 1
+anchor_left = 1.0
 anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 1841.0
-offset_top = 1.0
-offset_right = -1.0
-offset_bottom = -1036.0
-grow_horizontal = 2
-grow_vertical = 2
-text = "ADD"
+offset_left = -290.0
+offset_bottom = 40.0
+grow_horizontal = 0
+theme_override_constants/separation = 25
+
+[node name="NewSceneButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "NEW"
+
+[node name="LoadSceneButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "LOAD"
+
+[node name="LoadOptionButton" type="OptionButton" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="SaveSceneButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "SAVE"
+
+[node name="SaveTextEdit" type="TextEdit" parent="HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="AddLineButton" type="Button" parent="HBoxContainer"]
+layout_mode = 2
+text = "Add Line"
 
 [node name="ScrollContainer" type="ScrollContainer" parent="."]
+visible = false
 custom_minimum_size = Vector2(0, 400)
 layout_mode = 0
 offset_left = 1262.0
@@ -338,4 +363,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 theme_override_constants/separation = 8
 
-[connection signal="pressed" from="AddLineButton" to="." method="_on_add_line_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/NewSceneButton" to="." method="_on_new_scene_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/LoadSceneButton" to="." method="_on_load_scene_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/SaveSceneButton" to="." method="_on_save_scene_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/AddLineButton" to="." method="_on_add_line_button_pressed"]
