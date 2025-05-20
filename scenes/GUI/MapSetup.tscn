@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://miyng6xfo4u2"]
+[gd_scene load_steps=9 format=3 uid="uid://miyng6xfo4u2"]
 
 [ext_resource type="Theme" uid="uid://bi2ve4mbgqqd0" path="res://fonts/Izayoi_Theme_setup.tres" id="1_e5j75"]
 [ext_resource type="Script" uid="uid://ji4etic8rs41" path="res://scenes/GUI/MapSetup.gd" id="2_274cj"]
@@ -7,6 +7,7 @@
 [ext_resource type="FontFile" uid="uid://b1ahq708k5luc" path="res://fonts/Rotunda/Rotunda.otf" id="4_n6pe2"]
 [ext_resource type="FontFile" uid="uid://b4in3wjmpvqcv" path="res://fonts/NewRocker/new-rocker.regular.otf" id="5_ujh55"]
 [ext_resource type="FontFile" uid="uid://ckgxohqlgjy7p" path="res://fonts/Quintessential/Quintessential.otf" id="5_vmj44"]
+[ext_resource type="AudioStream" uid="uid://c0yfjqq72v7te" path="res://audio/SFX/GUI/scrolling.ogg" id="8_0voi7"]
 
 [node name="MapSetup" type="Control"]
 layout_mode = 3
@@ -164,3 +165,10 @@ text = "0000000"
 vertical_alignment = 1
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_0voi7")
+bus = &"SFX"
+
+[connection signal="focus_exited" from="PanelContainer/MarginContainer/SetUpVbox/OptionsVBox/BTNDeploy" to="." method="_on_btn_deploy_focus_exited"]
+[connection signal="focus_exited" from="PanelContainer/MarginContainer/SetUpVbox/OptionsVBox/FrmBtn" to="." method="_on_frm_btn_focus_exited"]
+[connection signal="focus_exited" from="PanelContainer/MarginContainer/SetUpVbox/OptionsVBox/MngBtn" to="." method="_on_mng_btn_focus_exited"]
+[connection signal="focus_exited" from="PanelContainer/MarginContainer/SetUpVbox/OptionsVBox/BeginBtn" to="." method="_on_begin_btn_focus_exited"]

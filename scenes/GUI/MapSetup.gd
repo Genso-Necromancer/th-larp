@@ -2,7 +2,7 @@ extends Control
 class_name MapGui
 
 @onready var btnContainer := $PanelContainer/MarginContainer/SetUpVbox/OptionsVBox
-
+var enableSFX := false
 
 func _init():
 	toggle_visible()
@@ -25,6 +25,7 @@ func connect_buttons(parent):
 func toggle_visible():
 	var isVisible = visible
 	visible = !isVisible
+	enableSFX = !isVisible
 
 
 func set_chapter(number : int, title: String, objectives : Array, loss : Array):
@@ -66,3 +67,27 @@ func free_previous_obj():
 func set_mon(mon: int):
 	var monLb := $PanelContainer/MarginContainer/SetUpVbox/MonVBox/MonCount
 	monLb.set_text(str(mon))
+
+#region btn focus exit
+func _on_btn_deploy_focus_exited():
+	_focus_switched_fx()
+
+
+func _on_frm_btn_focus_exited():
+	_focus_switched_fx()
+
+
+func _on_mng_btn_focus_exited():
+	_focus_switched_fx()
+
+
+func _on_begin_btn_focus_exited():
+	_focus_switched_fx()
+#endregion
+
+#region SFX
+func _focus_switched_fx():
+	var ASP := $AudioStreamPlayer
+	if visible:
+		ASP.play(0.0)
+#endregion
