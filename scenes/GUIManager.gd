@@ -409,17 +409,20 @@ func _toggle_unit(b):
 	var state = b.buttonState
 	var unit = b.get_unit()
 	match state:
-		"Forced": #create feedback for user when unable to deploy forced unit
+		"Forced": 
+			SignalTower.audio_called.emit("Deny")
 			print("Unit is Forced")
 		"Deployed":
+			SignalTower.audio_called.emit("Confirm")
 			b.set_state("Undeployed")
 			emit_signal("deploy_toggled", unit, true)
 		"Undeployed":
 			if depCount < depLimit:
+				SignalTower.audio_called.emit("Confirm")
 				b.set_state("Deployed")
 				emit_signal("deploy_toggled", unit, false)
 			else:
-				#create feedback for user
+				SignalTower.audio_called.emit("Deny")
 				print("Deploy Limit Reached")
 		
 	

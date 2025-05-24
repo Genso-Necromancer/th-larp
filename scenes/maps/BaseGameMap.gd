@@ -35,9 +35,9 @@ enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
 @export var dmkScript : DanmakuScript
 @export var dmkMaster : Unit
 @export_category("Cute Scene Scripts")
-@export_file("res://scenes/cutscenes/*_event.json") var start_script = ""
-@export_file("res://scenes/cutscenes/*_event.json") var end_script = ""
-@export_file("res://scenes/cutscenes/*_event.json") var event_scripts : Array[String]
+@export_file("res://scenes/cutscenes/scene_events/*_event.json") var start_script = ""
+@export_file("res://scenes/cutscenes/scene_events/*_event.json") var end_script = ""
+@export_file("res://scenes/cutscenes/scene_events/*_event.json") var event_scripts : Array[String]
 ##ALL THE FUCKING LAYERS
 @onready var ground :TileMapLayer= $Ground
 @onready var modifier :TileMapLayer= $Modifier

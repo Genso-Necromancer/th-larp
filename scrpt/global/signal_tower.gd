@@ -27,3 +27,6 @@ signal fader_fade_in(speedScale : float)
 signal fader_fade_out(speedScale : float)
 signal fade_out_complete
 signal fade_in_complete
+
+##Audio Ques
+signal audio_called(type:String)

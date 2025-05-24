@@ -68,26 +68,45 @@ func set_mon(mon: int):
 	var monLb := $PanelContainer/MarginContainer/SetUpVbox/MonVBox/MonCount
 	monLb.set_text(str(mon))
 
-#region btn focus exit
+#region btn sfx triggers
 func _on_btn_deploy_focus_exited():
-	_focus_switched_fx()
+	_focus_switched_sfx()
 
 
 func _on_frm_btn_focus_exited():
-	_focus_switched_fx()
+	_focus_switched_sfx()
 
 
 func _on_mng_btn_focus_exited():
-	_focus_switched_fx()
+	_focus_switched_sfx()
 
 
 func _on_begin_btn_focus_exited():
-	_focus_switched_fx()
+	_focus_switched_sfx()
+
+
+func _on_btn_deploy_pressed():
+	_button_confirm_sfx()
+
+
+func _on_frm_btn_pressed():
+	_button_confirm_sfx()
+
+
+func _on_mng_btn_pressed():
+	_button_confirm_sfx()
+
+
+func _on_begin_btn_pressed():
+	_button_confirm_sfx()
 #endregion
 
 #region SFX
-func _focus_switched_fx():
-	var ASP := $AudioStreamPlayer
+func _focus_switched_sfx():
 	if visible:
-		ASP.play(0.0)
+		SignalTower.audio_called.emit("FocusChange")
+		
+func _button_confirm_sfx():
+	if visible:
+		SignalTower.audio_called.emit("Confirm")
 #endregion
