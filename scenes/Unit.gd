@@ -814,10 +814,11 @@ func _set_art_paths():
 	var directory: String
 	if unique_art:
 		directory = unitId.to_snake_case()
-		
+		print("Unique Art Set")
 	else:
 		var specKeys : Array = Enums.SPEC_ID.keys()
 		directory = specKeys[SPEC_ID].to_snake_case()
+		print("Generic Art Set")
 	artPaths["Sprite"] = "res://sprites/character/%s/%s_sprite.png" % [directory, role]
 	artPaths["Prt"] = "res://sprites/character/%s/%s_portrait.png" % [directory, role]
 	artPaths["FullPrt"] = "res://sprites/character/%s/%s_portrait_full.png" % [directory, role]
@@ -827,6 +828,7 @@ func _set_art_paths():
 	#unitData[unitId]["Profile"]["FullPrt"] = "res://sprites/character/%s/%s_portrait_full.png" % [directory, role]
 
 func _load_sprites():
+	print(artPaths.Sprite)
 	_sprite.set_texture(load(artPaths.Sprite))
 
 

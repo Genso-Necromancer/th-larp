@@ -1,10 +1,12 @@
-[gd_scene load_steps=11 format=3 uid="uid://x6dmleipd452"]
+[gd_scene load_steps=13 format=3 uid="uid://x6dmleipd452"]
 
 [ext_resource type="Script" uid="uid://ctodvlhm5amph" path="res://scenes/Unit.gd" id="1_torj4"]
-[ext_resource type="Texture2D" uid="uid://wnmi00k2g1y6" path="res://sprites/character/fairy/thief_sprite.png" id="2_j6hc7"]
+[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_o0n82"]
 [ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="3_57a4v"]
 [ext_resource type="AnimationLibrary" uid="uid://d4f2xcrr7c15q" path="res://scenes/unit_anim.tres" id="3_ceinp"]
+[ext_resource type="Resource" uid="uid://bsclg2utruovi" path="res://unit_resources/features/skills/toss_enemy.tres" id="3_itmwl"]
 [ext_resource type="Script" uid="uid://bv74dylssenec" path="res://scenes/UnitArea.gd" id="3_mqts7"]
+[ext_resource type="Texture2D" uid="uid://n8mv3mdtsqf6" path="res://sprites/character/youkai/trblr_sprite.png" id="4_l3jwn"]
 [ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="4_qp4n5"]
 [ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="5_nwi43"]
 [ext_resource type="Script" uid="uid://3uafufnjrn24" path="res://scenes/HPbar.gd" id="7_x5rnn"]
@@ -17,30 +19,28 @@ size = Vector2(84, 37.5)
 z_index = 2
 y_sort_enabled = true
 script = ExtResource("1_torj4")
-unit_level = 2
-ROLE_ID = 2
-move_type = 2
+SPEC_ID = 6
 total_growth = {
-"Cele": 0.55,
-"Cha": 0.1,
+"Cele": 0.0,
+"Cha": 0.0,
 "Comp": 0.3,
 "Def": 0.2,
-"Eleg": 0.2,
+"Eleg": 0.3,
 "Life": 0.4,
 "Mag": 0.0,
 "Move": 0.0,
-"Pwr": 0.3
+"Pwr": 0.4
 }
 total_stats = {
-"Cele": 7,
-"Cha": 2,
+"Cele": 2,
+"Cha": 1,
 "Comp": 110,
-"Def": 0,
-"Eleg": 4,
-"Life": 14,
-"Mag": 1,
-"Move": 5,
-"Pwr": 4
+"Def": 5,
+"Eleg": 5,
+"Life": 20,
+"Mag": 3,
+"Move": 4,
+"Pwr": 7
 }
 total_caps = {
 "Cele": 20,
@@ -53,14 +53,15 @@ total_caps = {
 "Move": 10,
 "Pwr": 20
 }
+skills = Array[ExtResource("2_o0n82")]([ExtResource("3_itmwl")])
 weapon_prof = {
-"Blade": true,
-"Blunt": false,
+"Blade": false,
+"Blunt": true,
 "Book": false,
 "Bow": false,
 "Gohei": false,
 "Gun": false,
-"Knife": true,
+"Knife": false,
 "Natural": false,
 "Ofuda": false,
 "Stick": false
@@ -75,7 +76,7 @@ loop = false
 self_modulate = Color(1, 1, 1, 0)
 position = Vector2(-1, -36)
 scale = Vector2(4, 4)
-texture = ExtResource("2_j6hc7")
+texture = ExtResource("4_l3jwn")
 hframes = 12
 region_rect = Rect2(0.0799732, -0.0518999, 17.0268, 24.8617)
 
