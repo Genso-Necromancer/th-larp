@@ -1,6 +1,7 @@
 @tool
 extends Node
 
+##persistant variables
 var focusUnit : Unit:
 	set(value):
 		focusUnit = value
@@ -29,6 +30,13 @@ var timeFactor : float = 1.0
 const trueTimeFactor : float = 1.0
 var hour : float = 1.0
 var minute : float = 0.01666666666666666666666666666667
+var play_time:= 0
+var currentMap:GameMap
+var currentMapPath:String
+var nextMap: String
+var chapterNumber:int
+var chapterTitle:String
+var chapters_complete:Array = []
 
 
 var rng
@@ -43,34 +51,63 @@ var critRange := [10, 20]
 var knifeCrit := [15, 25]
 var slayerMulti := 3
 var compCosts := {"Attack": 1, "WasHit":1, "Miss":1, "Dodge": 1, "NegEff": 1, "Healed":-1, "Move":0, "Crit": -1, "Kill": -1, "Break": 1}
-#combat variables
+
+
 func _init():
 	language = Enums.LANGUAGE.AMERICAN
 	rng = RandomNumberGenerator.new()
 	randomize()
 	_init_flags()
+
+#region saving/loading
+func save()->Dictionary:
+	var pers : Dictionary = {
+		"NodeType": "Globals",
+		"TimeOfDay":timeOfDay,
+		"GameTime":gameTime,
+		"TimeFactor":timeFactor,
+		"RNG":rng,
+		"UnitObjs":unitObjs,
+		"Flags":flags,
+		"TimePassed":timePassed,
+		"Language":language,
+		"CurrentMap":currentMapPath,
+		"ChapterNumber":chapterNumber,
+		"NextMap":nextMap,
+		"ChaptersComplete":chapters_complete
+	}
+	return pers
+
+
+func load_persistant(Data:Dictionary):
+	if Data.NodeType != "Globals": 
+		print("ERROR: ATTEMPTED TO LOAD NON-GLOBAL DATA IN GLOBALS")
+		return
+	timeOfDay = Data.TimeOfDay
+	gameTime = Data.GameTime
+	timeFactor = Data.TimeFactor
+	rng = Data.RNG
+	unitObjs = Data.UnitObjs
+	flags = Data.Flags
+	timePassed = Data.TimePassed
+	language = Data.Language
+	currentMap = Data.CurrentMapPath
+	chapterNumber = Data.ChapterNumber
+	nextMap = Data.NextMap
+	chapters_complete = Data.ChaptersComplete
 	
-#func set_flags(f):
-	#pass
-	
+#endregion
+
 func _init_flags():
 	flags = {
 		"DebugMode": true,
 		"gameOver": false,
 		"victory": false,
 		"ObjectiveComplete": false,
-		"activeUnit": false,
-		"focusUnit": false, #Does this get used?
-		"gameTime": 0,
-		"timeFactor": 1,
-		"trueTimeFactor": 1,
-		"rotationFactor": 15,
-		"CurrentMap": 0,
-		"NextMap": null,
 		"traded": false,
 		"itemUsed" : false,
-		"ChaptersCompleted": []
 	}
+
 
 func set_rich_text_params(label):
 	label.set_use_bbcode(true)
@@ -79,6 +116,15 @@ func set_rich_text_params(label):
 	label.set_mouse_filter(Control.MOUSE_FILTER_PASS)
 	label.set_autowrap_mode(TextServer.AUTOWRAP_OFF)
 
+
+func update_map_header(map:GameMap):
+	var newTime = time_to_float(map.hours, map.minutes)
+	Global.gameTime = newTime
+	Global.currentMap = map
+	Global.currentMapPath = map.get_scene_file_path()
+	Global.chapterNumber = map.chapterNumber
+	Global.nextMap = map.next_map
+	Global.chapterTitle = map.title
 
 #region Time bullshitery
 ##Passively progresses time, factoring any timeFactor

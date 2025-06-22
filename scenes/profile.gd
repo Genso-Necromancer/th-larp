@@ -66,7 +66,7 @@ func update_prof():
 		focusLabels.append_array(statusTray.get_icons())
 	
 	
-	#var unitStats = focusUnit.activeStats
+	#var unitStats = focusUnit.active_stats
 	#var unitBuffs = focusUnit.activeBuffs
 	
 	if inventory: focusLabels += _update_inventory(focusUnit)

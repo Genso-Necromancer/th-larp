@@ -1,15 +1,170 @@
-[gd_scene load_steps=4 format=3 uid="uid://bwo5p3vwi56ky"]
+[gd_scene load_steps=5 format=3 uid="uid://bwo5p3vwi56ky"]
 
 [ext_resource type="PackedScene" uid="uid://br3hwrv0dbjeb" path="res://scenes/GUI/textured_label_button.tscn" id="1_3wf18"]
 [ext_resource type="Theme" uid="uid://dj6umom8dugkc" path="res://fonts/Izayoi_Prompt_Big.tres" id="2_0wlxj"]
 [ext_resource type="Script" uid="uid://coq6wrm1sc0td" path="res://scenes/GUI/save_file_button.gd" id="2_sp3ij"]
+[ext_resource type="Theme" uid="uid://mk7trl8hoeqa" path="res://fonts/Izayoi_Theme_Save_File.tres" id="4_svugd"]
 
 [node name="SaveFileButton" instance=ExtResource("1_3wf18")]
-offset_right = 362.0
-offset_bottom = 150.0
+offset_right = 188.0
+offset_bottom = 94.0
 theme = ExtResource("2_0wlxj")
 script = ExtResource("2_sp3ij")
 label_text = "New Save"
 
+[node name="ContentsHBox" parent="." index="1"]
+size_flags_horizontal = 0
+
+[node name="LabelMargin" parent="ContentsHBox" index="1"]
+visible = false
+
 [node name="ButtonText" parent="ContentsHBox/LabelMargin" index="0"]
 text = "New Save"
+
+[node name="SaveMargin" type="MarginContainer" parent="ContentsHBox" index="2"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme = ExtResource("4_svugd")
+
+[node name="SaveVBox" type="VBoxContainer" parent="ContentsHBox/SaveMargin" index="0"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="HeaderVBox" type="HBoxContainer" parent="ContentsHBox/SaveMargin/SaveVBox" index="0"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="FileLb" type="Label" parent="ContentsHBox/SaveMargin/SaveVBox/HeaderVBox" index="0"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Save "
+
+[node name="FileSlot" type="Label" parent="ContentsHBox/SaveMargin/SaveVBox/HeaderVBox" index="1"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "##"
+
+[node name="Date" type="Label" parent="ContentsHBox/SaveMargin/SaveVBox/HeaderVBox" index="2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "##/##/## - ##:##"
+
+[node name="PlayTimeHBox" type="HBoxContainer" parent="ContentsHBox/SaveMargin/SaveVBox" index="1"]
+layout_mode = 2
+
+[node name="PTLabel" type="Label" parent="ContentsHBox/SaveMargin/SaveVBox/PlayTimeHBox" index="0"]
+layout_mode = 2
+text = "Play Time: "
+
+[node name="PlayTime" type="Label" parent="ContentsHBox/SaveMargin/SaveVBox/PlayTimeHBox" index="1"]
+layout_mode = 2
+text = "##:##:##"
+
+[node name="ChapterHBox" type="HBoxContainer" parent="ContentsHBox/SaveMargin/SaveVBox" index="2"]
+layout_mode = 2
+
+[node name="ChapterLabel" type="RichTextLabel" parent="ContentsHBox/SaveMargin/SaveVBox/ChapterHBox" index="0"]
+visible = false
+clip_contents = false
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 2
+bbcode_enabled = true
+text = "Chapter"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ChapterNumber" type="RichTextLabel" parent="ContentsHBox/SaveMargin/SaveVBox/ChapterHBox" index="1"]
+visible = false
+clip_contents = false
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 2
+bbcode_enabled = true
+text = "##"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer" type="RichTextLabel" parent="ContentsHBox/SaveMargin/SaveVBox/ChapterHBox" index="2"]
+visible = false
+clip_contents = false
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 2
+bbcode_enabled = true
+text = "-"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ChapterTitle" type="RichTextLabel" parent="ContentsHBox/SaveMargin/SaveVBox/ChapterHBox" index="3"]
+clip_contents = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+mouse_filter = 2
+bbcode_enabled = true
+text = "Title"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Spacer2" type="RichTextLabel" parent="ContentsHBox/SaveMargin/SaveVBox/ChapterHBox" index="4"]
+clip_contents = false
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 2
+bbcode_enabled = true
+text = "-"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ChapterTime" type="RichTextLabel" parent="ContentsHBox/SaveMargin/SaveVBox/ChapterHBox" index="5"]
+clip_contents = false
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 2
+bbcode_enabled = true
+text = "##:##"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="IsComplete" type="RichTextLabel" parent="ContentsHBox/SaveMargin/SaveVBox/ChapterHBox" index="6"]
+visible = false
+clip_contents = false
+layout_mode = 2
+size_flags_horizontal = 0
+mouse_filter = 2
+bbcode_enabled = true
+text = "Victory!"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1

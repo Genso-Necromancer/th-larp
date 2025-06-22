@@ -1,9 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://c0kd6nsixg18j"]
+[gd_scene load_steps=3 format=3 uid="uid://c0kd6nsixg18j"]
 
 [ext_resource type="Script" uid="uid://ddmx3e0le4ioa" path="res://scenes/start.gd" id="1_c7cgp"]
+[ext_resource type="FontFile" uid="uid://c2km1ktr8iwsb" path="res://fonts/Marcellus/Marcellus-sc.regular.otf" id="2_u80x2"]
 
-[node name="StartMenu" type="Control"]
-layout_mode = 3
+[node name="StartMenu" type="PanelContainer"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -13,22 +13,22 @@ size_flags_horizontal = 0
 script = ExtResource("1_c7cgp")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -44.5
-offset_top = -33.0
-offset_right = 44.5
-offset_bottom = 33.0
-grow_horizontal = 2
-grow_vertical = 2
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+alignment = 1
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_u80x2")
+theme_override_font_sizes/font_size = 31
+text = "Map Test"
 
 [node name="SceneMenu" type="MenuButton" parent="VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_font_sizes/font_size = 24
 text = "Pick Scene"
 item_count = 2
 popup/item_0/text = "seize_test"

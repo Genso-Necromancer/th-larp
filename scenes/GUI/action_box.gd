@@ -29,7 +29,7 @@ func display_unit_actions(unit : Unit):
 	var hasSkills := false
 	var noFocus := true
 	
-	if unit.activeStats.Skills:
+	if unit.active_stats.Skills:
 		hasSkills = true
 	
 	for b in buttons:

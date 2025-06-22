@@ -13,19 +13,10 @@ var unitData : = {}:
 	set(value):
 		if not Engine.is_editor_hint():
 			unitData = value
-			
-var skillData : = {}
-
 var timeModData := {}
-
 var terrainData := {}
-
-
 var rosterData := []
-
 var supply : Dictionary[String,Array] = {}
-var npcInv = {}
-
 var rosterOnce := false
 
 
@@ -35,7 +26,6 @@ var rosterOnce := false
 func _ready():
 	#var index = 0
 	unitData = {}
-	skillData = {}
 
 	timeModData = {}
 	
@@ -45,6 +35,27 @@ func _ready():
 	#print(timeModData)
 	init_roster()
 	init_supply()
+
+
+func save()->Dictionary:
+	var pers : Dictionary = {
+		"NodeType": "Globals",
+		"RosterData": rosterData,
+		"Supply":supply,
+		"PlayerMon":playerMon,
+		"SupplyStats":supplyStats,
+		"UnitData":unitData,
+		}
+	return pers
+
+
+func load_persistant(data:Dictionary):
+	rosterData = data.RosterData
+	supply = data.Supply
+	playerMon = data.PlayerMon
+	supplyStats = data.SupplyStats
+	unitData = data.UnitData
+
 
 func _load_unique_units():
 	unitData = pStats.get_named_unit_data()
@@ -137,9 +148,67 @@ func _load_terrain_data():
 				terrainData[key][iKey] = rawData[key][iKey]
 
 
-func get_generated_sprite(species, job):
-	var s = pStats.load_generated_sprite(species, job)
-	return s
+
+
+
+#region unit stat generation
+func get_unit_stats(spec:int, role:int)->Dictionary:
+	var stats:Dictionary = {"Stats":{},"Growths":{},"Caps":{}, "WeaponProf":{}}
+	var sData :Dictionary= pStats.get_spec(spec)
+	var jData :Dictionary= pStats.get_job(role)
+	
+	for group in sData.StatGroups.keys():
+		#print(group)
+		for stat in sData.StatGroups[group]:
+			#print(stat)
+			stats[group][stat] = sData.StatGroups[group][stat] + jData.StatGroups[group][stat]
+	stats["Passives"] = sData.Passives + jData.Passives
+	#print(stats.Passives)
+	stats["Skills"] = sData.Skills + jData.Skills
+	#print(stats.Skills)
+	if sData.get("MoveType"): stats["MoveType"] = maxi(sData.MoveType, jData.MoveType)
+	else: stats["MoveType"] = jData.MoveType
+	#print(stats.MoveType)
+	if sData.get("MaxInv") and jData.get("MaxInv"): stats["MaxInv"] = maxi(sData.MaxInv, jData.MaxInv)
+	else: stats["MaxInv"] = jData.MaxInv
+	#print(stats.MaxInv)
+	for wep in jData.Weapons:
+		var nextProf : bool = false
+		if jData.get("Weapons") and jData.Weapons[wep]: nextProf = jData.Weapons[wep]
+		elif sData.get("Weapons") and sData.Weapons[wep]: nextProf = sData.Weapons[wep]
+		stats.WeaponProf[wep] = nextProf
+	#print(stats.WeaponProf)
+	
+	return stats
+#endregion
+
+func level_up(unit:Unit, levelups:int): #consider reach bands for stat normalization. Growth rates are a spook tho.
+	var rng = RandomNumberGenerator.new()
+	randomize()
+	var growth_check
+	var i = 0
+	var results = {}
+	var firstLoop = true
+	
+	results["LVL"] = 0
+	while levelups > 0:
+		if unit.unit_level >= 20: break
+		unit.unit_level += 1
+		results["LVL"] += 1
+		for stat in unit.base_stats:
+			growth_check = rng.randf_range(0.00, 1.0)
+			if growth_check <= unit.total_growth[stat] and unit.base_stats[stat] < unit.total_caps[stat]:
+				unit.base_stats[stat] += 1
+				if firstLoop: results[stat] = 1
+				else: results[stat] += 1
+			growth_check = rng.randf_range(0.00, 1.0)
+			if unit.total_growth[stat] >= 1.0 and growth_check <= (unit.total_growth[stat] - 1.0) and unit.base_stats[stat] < unit.total_caps[stat]:
+				unit.base_stats[stat] += 1
+				results[stat] += 1
+			i += 1
+		levelups -= 1
+		firstLoop = false
+	return results
 
 
 func stat_gen(job :int, spec : int):
@@ -231,32 +300,32 @@ func _validate_art(art:Dictionary) -> Dictionary:
 #		unitStats = level_up(unitStats, growths, caps)
 #	return [totalExp, unitStats]
 	
-func level_up(uData, loops): #consider reach bands for stat normalization. Growth rates are a spook tho.
-	var rng = RandomNumberGenerator.new()
-	randomize()
-	var growth_check
-	var i = 0
-	var results = {}
-	var firstLoop = true
-	var stats = uData.Stats.keys()
-	results["LVL"] = 0
-	while loops > 0:
-		uData.Profile.Level += 1
-		results["LVL"] += 1
-		while i < stats.size():
-			growth_check = rng.randf_range(0.00, 1.0)
-			if growth_check <= uData.Growths[stats[i]] and uData.Stats[stats[i]] < uData.Caps[stats[i]]:
-				uData.Stats[stats[i]] += 1
-				if firstLoop: results[stats[i]] = 1
-				else: results[stats[i]] += 1
-			growth_check = rng.randf_range(0.00, 1.0)
-			if uData.Growths[stats[i]] >= 1.0 and growth_check <= (uData.Growths[stats[i]] - 1.0) and uData.Stats[stats[i]] < uData.Caps[stats[i]]:
-				uData.Stats[stats[i]] += 1
-				results[stats[i]] += 1
-			i += 1
-		loops -= 1
-		firstLoop = false
-	return results
+#func level_up(uData, loops): #consider reach bands for stat normalization. Growth rates are a spook tho.
+	#var rng = RandomNumberGenerator.new()
+	#randomize()
+	#var growth_check
+	#var i = 0
+	#var results = {}
+	#var firstLoop = true
+	#var stats = uData.Stats.keys()
+	#results["LVL"] = 0
+	#while loops > 0:
+		#uData.Profile.Level += 1
+		#results["LVL"] += 1
+		#while i < stats.size():
+			#growth_check = rng.randf_range(0.00, 1.0)
+			#if growth_check <= uData.Growths[stats[i]] and uData.Stats[stats[i]] < uData.Caps[stats[i]]:
+				#uData.Stats[stats[i]] += 1
+				#if firstLoop: results[stats[i]] = 1
+				#else: results[stats[i]] += 1
+			#growth_check = rng.randf_range(0.00, 1.0)
+			#if uData.Growths[stats[i]] >= 1.0 and growth_check <= (uData.Growths[stats[i]] - 1.0) and uData.Stats[stats[i]] < uData.Caps[stats[i]]:
+				#uData.Stats[stats[i]] += 1
+				#results[stats[i]] += 1
+			#i += 1
+		#loops -= 1
+		#firstLoop = false
+	#return results
 	
 func init_roster():
 	if !rosterOnce:

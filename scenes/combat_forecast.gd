@@ -49,7 +49,7 @@ func update_fc(foreCast:Dictionary) -> void: #HERE labels need updating to using
 		var hit := "--"
 		var dmg := "--"
 		var crit := "--"
-		var active : Dictionary = units[i].activeStats
+		var active : Dictionary = units[i].active_stats
 		var fcCombat : Dictionary = foreCast[units[i]].Combat
 		var fcCounter = foreCast[units[i]].Counter
 		var fcReach = foreCast[units[i]].Reach

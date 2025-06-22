@@ -74,6 +74,7 @@ var sequenceStep := 0:
 func _ready():
 	if not Engine.is_editor_hint():
 		var p = get_parent()
+		
 		self.map_ready.connect(p._on_map_ready)
 		_load_danmaku_scripts()
 		dev.visible = false
@@ -466,7 +467,7 @@ func _spawn_from_spawner(unit, spawn):
 
 	
 func _spawn_new_units():
-	var unitPackage := {"Faction" : Enums.FACTION_ID.ENEMY, "Id" : "none", "GenLv" : 1, "Species" : Enums.SPEC_ID.FAIRY, "Job" : Enums.JOB_ID.TRBLR, "Cell" : Vector2i(1,1), "IsForced":false, "IsElite" : false}
+	var unitPackage := {"Faction" : Enums.FACTION_ID.ENEMY, "Id" : "none", "GenLv" : 1, "Species" : Enums.SPEC_ID.FAIRY, "Job" : Enums.ROLE_ID.TRBLR, "Cell" : Vector2i(1,1), "IsForced":false, "IsElite" : false}
 	get_parent().spawn_raw_unit(unitPackage)
 
 

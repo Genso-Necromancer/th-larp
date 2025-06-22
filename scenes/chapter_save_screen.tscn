@@ -1,6 +1,6 @@
 [gd_scene load_steps=10 format=3 uid="uid://b60877p5nxbs0"]
 
-[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_u5mmv"]
+[ext_resource type="Theme" uid="uid://mk7trl8hoeqa" path="res://fonts/Izayoi_Theme_Save_File.tres" id="1_id620"]
 [ext_resource type="Script" uid="uid://bg1ilsnxs8q3s" path="res://scenes/chapter_save_screen.gd" id="2_hlip5"]
 [ext_resource type="FontFile" uid="uid://byluxrpq7rwkq" path="res://fonts/JimNightshade/JimNightshade.otf" id="2_ylpcs"]
 [ext_resource type="Theme" uid="uid://c1unty7g6500u" path="res://fonts/Izayoi_Prompt.tres" id="3_hj7dt"]
@@ -18,7 +18,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_u5mmv")
+theme = ExtResource("1_id620")
 script = ExtResource("2_hlip5")
 input_box = NodePath("MainContainer/PromptScreenEdge/PromptVBox/InputHBox")
 prompt_box = NodePath("MainContainer/PromptContainer/PromptPositionContainer/PromptMargin/PromptVBox/InputHBox")
@@ -103,6 +103,9 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 alignment = 1
+
+[node name="VScrollBar" type="VScrollBar" parent="MainContainer/FileSelectScreenEdge/FilesVBox"]
+layout_mode = 2
 
 [node name="PromptContainer" type="PanelContainer" parent="MainContainer"]
 layout_mode = 2

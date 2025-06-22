@@ -13,12 +13,12 @@ var ActorData: Dictionary = {
 	0: {
 		"name": "Sakuya Izayoi",
 		"title": "Maid",
-		"portrait": preload("res://sprites/SakuyaPrt.png")
+		"portrait": preload("res://sprites/character/sakuya/maid_portrait.png")
 	},
 	1: {
 		"name": "Patchouli Knowledge",
 		"title": "Librarian",
-		"portrait": preload("res://sprites/PatchouliPrt.png")
+		"portrait": preload("res://sprites/character/patchouli/magician_portrait.png")
 	},
 	2: {
 		"name": "Remilia",
@@ -28,7 +28,7 @@ var ActorData: Dictionary = {
 	3: {
 		"name": "Cirno",
 		"title": "The Strongest",
-		"portrait": preload("res://sprites/Fairy TroublemakerPrt.png"),
+		"portrait": preload("res://sprites/character/cirno/trblr_portrait.png"),
 	},
 }
 

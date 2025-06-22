@@ -250,7 +250,7 @@ func _get_walkable(unit:Unit) -> Array:
 
 func find_best_move(validMoves:Array, unit:Unit) -> Dictionary:
 	var movePairs = []
-	var curLife = unit.activeStats.CurLife
+	var curLife = unit.active_stats.CurLife
 	var maxLife = unit.unitData.Stats.Life
 	var lifePrc:float = (maxLife - ((maxLife-curLife) / maxLife)) / 10
 #	var value:float = 0
@@ -339,7 +339,7 @@ func _value_unit(unit:Unit, isOpp := false) -> float:
 	if !isOpp: 
 		value = 1 - value
 	#else:
-		#var lifeValue: float = ((unit.activeStats.Life - unit.activeStats.CurLife) / unit.unitData.Stats.Life)
+		#var lifeValue: float = ((unit.active_stats.Life - unit.active_stats.CurLife) / unit.unitData.Stats.Life)
 		#value += lifeValue * mind.finishOffUnits
 	return value
 	
@@ -350,7 +350,7 @@ func _value_unit(unit:Unit, isOpp := false) -> float:
 	#teamValues[unit] = value
 func _get_dying_value(unit:Unit) -> float:
 	var value : float = 0.0
-	var lifeValue: float = ((unit.activeStats.Life - unit.activeStats.CurLife) / unit.unitData.Stats.Life)
+	var lifeValue: float = ((unit.active_stats.Life - unit.active_stats.CurLife) / unit.unitData.Stats.Life)
 	value += lifeValue * mind.finishOffUnits
 	return value
 
@@ -358,7 +358,7 @@ func _get_combat_value(unit:Unit, target:Unit, targetDef):
 	var aiInv = unit.unitData.Inv
 	var value: float
 	var dmgDealt = unit.combatData.Dmg - target.unitData.Stats[targetDef]
-	var remHP = target.activeStats.CurLife - dmgDealt
+	var remHP = target.active_stats.CurLife - dmgDealt
 	remHP = clampf(remHP, 0, 1000)
 	var dmgTaken = 0
 	if remHP == 0:
@@ -397,7 +397,7 @@ func _get_combat_value(unit:Unit, target:Unit, targetDef):
 		Enums.DAMAGE_TYPE.TRUE:
 			dmgTaken = target.combatData.Dmg
 			
-	if unit.activeStats.CurLife - dmgTaken <= 0 and target.activeStats.CurLife - dmgDealt > 0:
+	if unit.active_stats.CurLife - dmgTaken <= 0 and target.active_stats.CurLife - dmgDealt > 0:
 		value = value * mind.survival
 	return value
 #endregion
@@ -509,11 +509,11 @@ func _find_valid_attacks(aiUnit:Unit, path:Array) -> Array:
 			match wep.damage_type:
 				Enums.DAMAGE_TYPE.PHYS:
 					targetDef = "Def"
-					if (aiUnit.combatData.Dmg - unit.activeStats.Def <= 0):
+					if (aiUnit.combatData.Dmg - unit.active_stats.Def <= 0):
 						continue
 				Enums.DAMAGE_TYPE.MAG:
 					targetDef = "Mag"
-					if (aiUnit.combatData.Dmg - unit.activeStats.Mag <= 0):
+					if (aiUnit.combatData.Dmg - unit.active_stats.Mag <= 0):
 						continue
 			
 			if threat.has(unit.cell):
@@ -564,15 +564,15 @@ func combat_values(aiUnit, attack, targetDef):
 	var aiInv = aiUnit.unitData.Inv
 	var value: float
 	var target = attack.Target
-	var dmgDealt = aiUnit.combatData.Dmg - target.activeStats[targetDef]
-	var remHP = attack.Target.activeStats.CurLife - dmgDealt
+	var dmgDealt = aiUnit.combatData.Dmg - target.active_stats[targetDef]
+	var remHP = attack.Target.active_stats.CurLife - dmgDealt
 	remHP = clampf(remHP, 0, 1000)
 	var dmgTaken = 0
 	if remHP == 0:
 		value += 1 * mind.dmgWeight
 	else:
 #		print(value)
-		value += ((target.activeStats.Life - remHP) / target.activeStats.Life)
+		value += ((target.active_stats.Life - remHP) / target.active_stats.Life)
 #		print(target.unitData.Stats.Life)
 #		print(value)
 		value = value * mind.dmgWeight
@@ -597,12 +597,12 @@ func combat_values(aiUnit, attack, targetDef):
 	
 			
 	match target.combatData.Type:
-		Enums.DAMAGE_TYPE.PHYS: dmgTaken = target.combatData.Dmg - aiUnit.activeStats.Def
-		Enums.DAMAGE_TYPE.MAG: dmgTaken = target.combatData.Dmg - aiUnit.activeStats.Mag
+		Enums.DAMAGE_TYPE.PHYS: dmgTaken = target.combatData.Dmg - aiUnit.active_stats.Def
+		Enums.DAMAGE_TYPE.MAG: dmgTaken = target.combatData.Dmg - aiUnit.active_stats.Mag
 		Enums.DAMAGE_TYPE.TRUE: dmgTaken = target.combatData.Dmg
 			
-	if aiUnit.activeStats.CurLife - dmgTaken >= 0 and target.activeStats.CurLife - dmgDealt > 0:
-		value -= (aiUnit.activeStats.CurLife - dmgTaken / aiUnit.activeStats.Life) * mind.survival
+	if aiUnit.active_stats.CurLife - dmgTaken >= 0 and target.active_stats.CurLife - dmgDealt > 0:
+		value -= (aiUnit.active_stats.CurLife - dmgTaken / aiUnit.active_stats.Life) * mind.survival
 	return value
 	
 func _check_safe(aiUnit:Unit, target:Unit, launch:Vector2i) -> bool:
@@ -670,7 +670,7 @@ func assign_unit_value(team:Array[Unit], isTargets:bool = false):
 			"Lady": oldValue += 1
 		value = ((oldValue-(avgLv - 20))*newRange/oldRange) + 0
 		value = value * mind.units
-		var lifeValue: float = ((unit.activeStats.Life - unit.activeStats.CurLife) / unit.unitData.Stats.Life)
+		var lifeValue: float = ((unit.active_stats.Life - unit.active_stats.CurLife) / unit.unitData.Stats.Life)
 		if isTargets:
 			value += lifeValue * mind.ulWeight
 		else:

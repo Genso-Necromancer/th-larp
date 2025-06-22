@@ -1,0 +1,70 @@
+[gd_scene load_steps=6 format=3 uid="uid://chfnaj0nkvx5l"]
+
+[ext_resource type="Script" uid="uid://b4h1cv67pvkso" path="res://scenes/GUI/title/title_screen.gd" id="1_4vcgj"]
+[ext_resource type="Theme" uid="uid://cmbkrdenflan0" path="res://fonts/Izayoi_Theme_Title.tres" id="1_usgly"]
+[ext_resource type="Texture2D" uid="uid://baxv2trix4oee" path="res://scenes/GUI/title/title_mock.png" id="3_k4dnx"]
+[ext_resource type="PackedScene" uid="uid://br3hwrv0dbjeb" path="res://scenes/GUI/textured_label_button.tscn" id="4_jymba"]
+[ext_resource type="PackedScene" uid="uid://c0kd6nsixg18j" path="res://scenes/start.tscn" id="5_k4dnx"]
+
+[node name="TitleScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_usgly")
+script = ExtResource("1_4vcgj")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_top = 126
+
+[node name="VBox" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+size_flags_vertical = 0
+alignment = 1
+
+[node name="TitleMargin" type="MarginContainer" parent="Margin/VBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="Margin/VBox/TitleMargin"]
+layout_mode = 2
+texture = ExtResource("3_k4dnx")
+stretch_mode = 5
+
+[node name="ButtonMargin" type="MarginContainer" parent="Margin/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/margin_top = 100
+
+[node name="Vbox" type="VBoxContainer" parent="Margin/VBox/ButtonMargin"]
+layout_mode = 2
+
+[node name="TexturedLabelButton" parent="Margin/VBox/ButtonMargin/Vbox" instance=ExtResource("4_jymba")]
+layout_mode = 2
+label_text = "New Game"
+
+[node name="TexturedLabelButton2" parent="Margin/VBox/ButtonMargin/Vbox" instance=ExtResource("4_jymba")]
+layout_mode = 2
+label_text = "Load Game"
+
+[node name="TexturedLabelButton3" parent="Margin/VBox/ButtonMargin/Vbox" instance=ExtResource("4_jymba")]
+layout_mode = 2
+label_text = "Options"
+
+[node name="TexturedLabelButton4" parent="Margin/VBox/ButtonMargin/Vbox" instance=ExtResource("4_jymba")]
+layout_mode = 2
+label_text = "Exit"
+
+[node name="StartMenu" parent="Margin/VBox" instance=ExtResource("5_k4dnx")]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4

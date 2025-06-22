@@ -8,7 +8,7 @@ static var dataDir := root + gameFolder
 var gameBoard
 
 func _ready():
-	var startScene = preload("res://scenes/start.tscn").instantiate()
+	var startScene = preload("res://scenes/GUI/title/title_screen.tscn").instantiate()
 	load_scene(startScene)
 	_check_directory()
 	

@@ -9,6 +9,7 @@ signal key_input(event:InputEvent)
 @onready var icon : TextureRect = $ContentsHBox/Icon
 @onready var background : TextureRect = $ButtonBackground
 @onready var button : TextureButton = $TextureButton
+@onready var highlight : TextureRect = $ButtonHighlight
 @export var label_text : String = "Null":
 	set(value):
 		label_text = value
@@ -21,12 +22,17 @@ signal key_input(event:InputEvent)
 	set(value):
 		background_texture = value
 		if is_node_ready(): _set_background(value)
+@export var highlight_border:CompressedTexture2D:
+	set(value):
+		highlight_border = value
+		if is_node_ready(): _set_highlight(value)
 
 
 func _ready():
 	_set_label_text(label_text)
 	_set_icon(icon_texture)
 	_set_background(background_texture)
+	_set_highlight(highlight_border)
 
 
 func _set_icon(texture : CompressedTexture2D) -> void:
@@ -44,6 +50,10 @@ func _set_background(texture:CompressedTexture2D) -> void:
 	background.set_texture(texture)
 
 
+func _set_highlight(texture:CompressedTexture2D) -> void:
+	highlight.set_texture(texture)
+
+
 func set_neighbor(side:Side, neighbor:Control) -> void:
 	var path :NodePath= button.get_path_to(neighbor)
 	button.set_focus_neighbor(side,path)
@@ -51,6 +61,11 @@ func set_neighbor(side:Side, neighbor:Control) -> void:
 
 func _on_texture_button_focus_entered():
 	button_focus_entered.emit(button)
+	if highlight_border: highlight.visible = true
+
+
+func _on_texture_button_focus_exited():
+	if highlight_border: highlight.visible = false
 
 
 func _on_texture_button_mouse_entered():

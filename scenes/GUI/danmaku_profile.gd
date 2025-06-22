@@ -20,7 +20,7 @@ func update_prof():
 		statusTray.connect_icons(self)
 		focusLabels.append_array(statusTray.get_icons())
 	
-	#var unitStats = focusDmk.activeStats
+	#var unitStats = focusDmk.active_stats
 	#var unitBuffs = focusDmk.activeBuffs
 	
 	if inventory: focusLabels += _update_inventory(focusDmk)

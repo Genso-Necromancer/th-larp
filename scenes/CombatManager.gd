@@ -164,7 +164,7 @@ func _evaluate_clash(a:Unit, t:Unit, action:Dictionary) -> Dictionary:
 	var results := {}
 	var aData
 	var tData := t.combatData
-	var tAct := t.activeStats
+	var tAct := t.active_stats
 	var special : SlotWrapper
 	
 	if action.Item: 
@@ -224,7 +224,7 @@ func _get_remaining_life(unit, dmg, swings = false):
 	var rLife
 	if swings:
 		dmg = dmg * (1 + swings)
-	rLife = unit.activeStats.CurLife - dmg
+	rLife = unit.active_stats.CurLife - dmg
 	rLife = clampi(rLife, 0, 1000)
 	return rLife
 
@@ -363,8 +363,8 @@ func _validate_response(actor, target, lastAct, deathMatch, actionType) -> bool:
 
 func _speed_check(unit1, unit2) -> bool:
 	
-	var unit1Spd = unit1.activeStats.Cele
-	var unit2Spd = unit2.activeStats.Cele
+	var unit1Spd = unit1.active_stats.Cele
+	var unit2Spd = unit2.active_stats.Cele
 	print("Checking speed... ","Unit1 Spd: ", unit1Spd, " Required Spd: ", str(unit2Spd+Global.spdGap))
 	if unit1Spd >= (unit2Spd + Global.spdGap):
 		print("Passed, follow-up allowed")
@@ -496,7 +496,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			
 		#determine damage outcome
 		if outcome[unit][swingIndx].Hit:
-			print("Target HP: ", str(target.activeStats.CurLife))
+			print("Target HP: ", str(target.active_stats.CurLife))
 			
 			var finalDmg := 0
 			unitCd.Dmg = clampi(unitCd.Dmg, 0, 9999)
@@ -519,7 +519,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 				finalDmg = clampi(finalDmg, 0, 9999)
 				outcome[unit][swingIndx].Dmg = finalDmg
 				target.apply_dmg(finalDmg, unit)
-				print("Dmg: ", finalDmg, " Target HP: ", str(target.activeStats.CurLife))
+				print("Dmg: ", finalDmg, " Target HP: ", str(target.active_stats.CurLife))
 			
 			if actionType != ACTION_TYPE.FRIENDLY_SKILL:
 				targetCompCost += _factor_combat_composure(unit, target, triggers.WAS_HIT, finalDmg)
@@ -536,7 +536,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 				targetCompCost += _get_composure_total(target, outcome[unit][swingIndx].Effects)
 				print("Harvesting Effect Comp Loss.... ", unit.unitName, ": ", unitCompCost, " ", target.unitName, ": ", targetCompCost)
 		
-		if target.activeStats.CurLife <= 0:
+		if target.active_stats.CurLife <= 0:
 			print("Shit dude, it says here ", target.unitName, " is dead.")
 			outcome[target][swingIndx].Dead = true
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.KILL)
@@ -690,14 +690,14 @@ func _run_effect(actor:Unit, target:Unit, effect:Effect, actionType:Enums.ACTION
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				target.apply_dmg(result.Dmg, actor)
 				target.apply_composure(result.Comp)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Inflicted Damage: ", effect.value, " HP: ", target.activeStats.CurLife)
+				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Inflicted Damage: ", effect.value, " HP: ", target.active_stats.CurLife)
 			type.HEAL:
 				result.Heal = _factor_healing(actor, focus, effect)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				target.apply_heal(result.Heal)
 				target.apply_composure(result.Comp)
 				
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Healed For: ", result.Heal, " HP: ", target.activeStats.CurLife)
+				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Healed For: ", result.Heal, " HP: ", target.active_stats.CurLife)
 			type.CURE:
 				target.cure_status(effect.sub_type)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
@@ -711,7 +711,7 @@ func _run_effect(actor:Unit, target:Unit, effect:Effect, actionType:Enums.ACTION
 				result.Comp = _factor_effect_composure(actor, focus, effect, result.Heal)
 				focus.apply_heal(result.Heal)
 				focus.apply_composure(result.Comp)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Life Steal: ", result.Heal, " HP: ", target.activeStats.CurLife)
+				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Life Steal: ", result.Heal, " HP: ", target.active_stats.CurLife)
 			#type.ADD_SKILL: pass
 			#type.ADD_PASSIVE: pass
 			#type.MULTI_SWING: pass
@@ -757,7 +757,7 @@ func shove_or_toss_unit(actor, target, reach, pivotHex, matchHex, mode = 0):
 	var aHex = AHexGrid2D.new(gameBoard.currMap)
 	var neighbors = aHex.get_BFS_nhbr(pivotHex, true)
 	var shoveResult = aHex.resolve_shove(matchHex, target.cell, neighbors, reach)
-	var slamDmg = Global.slamage + actor.activeStats.Pwr + (shoveResult.Travel * 2)
+	var slamDmg = Global.slamage + actor.active_stats.Pwr + (shoveResult.Travel * 2)
 	
 	
 	if shoveResult.Slam and !shoveResult.UniColl:
@@ -789,9 +789,9 @@ func _factor_healing(actor, target, effect) -> int:
 	if effect.from_item:
 		statBonus = 0
 	else:
-		statBonus = actor.activeStats.Mag
+		statBonus = actor.active_stats.Mag
 	healPower = effect.value + statBonus + bonusEff
-	print("Target Life: ", target.activeStats.CurLife, " Heal:", healPower, " New Life Total: ", target.activeStats.CurLife)
+	print("Target Life: ", target.active_stats.CurLife, " Heal:", healPower, " New Life Total: ", target.active_stats.CurLife)
 	return healPower
 
 
@@ -799,7 +799,7 @@ func _factor_life_steal(target, effect, dmg) -> int:
 	var bonusEff := 0
 	var healPower : int
 	healPower = (dmg * effect.value) + bonusEff
-	print("Target Life: ", target.activeStats.CurLife, " Life Steal:", healPower, " New Life Total: ", target.activeStats.CurLife)
+	print("Target Life: ", target.active_stats.CurLife, " Life Steal:", healPower, " New Life Total: ", target.active_stats.CurLife)
 	return healPower
 
 

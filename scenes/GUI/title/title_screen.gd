@@ -1,0 +1,17 @@
+extends Control
+class_name TitleScreen
+signal unload_me
+
+@onready var debug_menu := $Margin/VBox/StartMenu
+
+
+func _ready():
+	var main :MainNode= get_parent()
+	GameState.change_state(self, GameState.gState.START)
+	debug_menu.loadMapManager.connect(main.on_load_map_manager)
+	debug_menu.map_picked.connect(self._unload_scene)
+
+
+func _unload_scene():
+	var main :MainNode= get_parent()
+	main.unload_me(self)

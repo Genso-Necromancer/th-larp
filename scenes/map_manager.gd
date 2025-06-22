@@ -66,6 +66,7 @@ func _on_map_loaded(map:GameMap):
 func _on_map_freed()->void:
 	var saveScreen :SaveScreen= load("res://scenes/chapter_save_screen.tscn").instantiate()
 	$CanvasLayer.add_child(saveScreen)
+	
 	saveScreen.save_scene_finished.connect(self._on_save_scene_finished.bind(saveScreen))
 	#end_load_screen()
 

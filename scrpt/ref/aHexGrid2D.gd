@@ -44,7 +44,7 @@ func _init(map):
 
 ##New Code
 #region
-func find_all_unit_paths(unit : Unit, customCell:Vector2i = unit.cell, leash : int = unit.activeStats.Move) -> Array:
+func find_all_unit_paths(unit : Unit, customCell:Vector2i = unit.cell, leash : int = unit.active_stats.Move) -> Array:
 	var path : Array
 	_set_units()
 	_sort_solids() 
@@ -109,14 +109,14 @@ func _sort_hostiles(unit: Unit) -> void:
 	for cell in unitList:
 			if !_is_hostile(mainFaction, unitList[cell]):
 				passableList.append(cell)
-			elif unit.activeStats.MoveType == Enums.MOVE_TYPE.FLY or unit.search_passive_id(Enums.PASSIVE_TYPE.PASS): 
+			elif unit.active_stats.MoveType == Enums.MOVE_TYPE.FLY or unit.search_passive_id(Enums.PASSIVE_TYPE.PASS): 
 				passableList.append(cell)
 			else:
 				solidList.append(cell)
 
 
 func _sort_walls(unit : Unit = null, walls : Dictionary = tileMap.get_walls()): #With another function you can nest anywhere
-	if unit and unit.activeStats.MoveType == Enums.MOVE_TYPE.FLY:
+	if unit and unit.active_stats.MoveType == Enums.MOVE_TYPE.FLY:
 		passableList.append_array(walls.WallFly)
 	else: solidList.append_array(walls.WallFly)
 	solidList.append_array(walls.WallShoot)
@@ -285,7 +285,7 @@ func compute_cost(a: Vector2i, b: Vector2i, unit = false) -> float:
 	var distance = axial_distance(ac, bc)
 	var final = 0
 	if unit: 
-		moveType = unit.activeStats.MoveType
+		moveType = unit.active_stats.MoveType
 		tileWeight += tileMap.get_movement_cost(b, moveType)
 	
 	

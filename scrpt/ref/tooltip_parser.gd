@@ -193,7 +193,7 @@ func get_lore(data: Dictionary, key:String) -> String:
 
 func get_active(unit:Unit, keyStat:String) -> String:
 	var keyBase : String = "baseStats"
-	var keyTotal : String = "activeStats"
+	var keyTotal : String = "active_stats"
 	var string = _generate_stat_tt(unit, keyBase, keyTotal,keyStat,)
 	return string
 	

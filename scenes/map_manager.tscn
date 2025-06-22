@@ -8,9 +8,9 @@
 script = ExtResource("1_o0i0e")
 
 [node name="Gameboard" parent="." instance=ExtResource("1_1o3kx")]
-mouseSens = null
-smoothing = null
-uiCooldown = null
+mouseSens = 0.4
+smoothing = 0.2
+uiCooldown = 0.2
 
 [node name="Cursor" parent="Gameboard" index="1"]
 position = Vector2(0, 0)
@@ -21,20 +21,24 @@ follow_viewport_scale = 0.001
 [node name="GUIManager" parent="CanvasLayer" instance=ExtResource("2_3ng14")]
 mapCursorPath = NodePath("../../Gameboard/Cursor")
 
+[node name="AudioHub" parent="CanvasLayer/GUIManager" index="7" node_paths=PackedStringArray("audio_players")]
+audio_players = {
+"Confirm": NodePath("Confirm"),
+"Deny": NodePath("Deny"),
+"FocusChange": NodePath("FocusChange")
+}
+
 [connection signal="cell_selected" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_cell_selected"]
 [connection signal="deploy_toggled" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_deploy_toggled"]
 [connection signal="exp_display" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_exp_display"]
 [connection signal="forecast_confirmed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_forecast_confirmed"]
 [connection signal="formation_closed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_formation_closed"]
-[connection signal="gb_ready" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_gb_ready"]
 [connection signal="map_loaded" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_map_loaded"]
 [connection signal="player_lost" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_player_lost"]
 [connection signal="player_win" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_player_win"]
 [connection signal="target_focused" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_target_focused"]
 [connection signal="toggle_prof" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_prof"]
-[connection signal="toggle_skills" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_toggle_skills"]
 [connection signal="turn_changed" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_turn_changed"]
-[connection signal="turn_order_updated" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_turn_order_updated"]
 [connection signal="unit_move_ended" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_unit_move_ended"]
 [connection signal="unit_selected" from="Gameboard" to="CanvasLayer/GUIManager" method="_on_gameboard_unit_selected"]
 [connection signal="time_factor_changed" from="Gameboard/CombatManager" to="Gameboard" method="_on_combat_manager_time_factor_changed"]

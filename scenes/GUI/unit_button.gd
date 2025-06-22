@@ -89,7 +89,7 @@ func refresh_data():
 	var role = unitLink.unitData.Profile.Role
 	var lv = unitLink.unitData.Profile.Level
 	var comp = unitLink.unitData.Stats.Comp
-	var curComp = unitLink.activeStats.CurComp
+	var curComp = unitLink.active_stats.CurComp
 	var prt = unitLink.unitData.Profile.Prt
 	
 	if prt and ResourceLoader.exists(prt):

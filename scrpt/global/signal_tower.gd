@@ -30,3 +30,7 @@ signal fade_in_complete
 
 ##Audio Ques
 signal audio_called(type:String)
+
+##Saving
+signal save_called(fileName:String)
+signal save_complete

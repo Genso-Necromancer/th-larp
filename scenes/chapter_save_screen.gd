@@ -29,7 +29,7 @@ var initial_focus : TextureLabelButton
 		prompt_offset = value
 		if cursor and value: cursor.cursor_offset = value
 var last_focus : Control
-
+var save_slots:Dictionary[String,SaveFileButton] = {}
 
 func _gui_input(event):
 	if GameState.activeState == null:
@@ -60,6 +60,7 @@ func _ready():
 	call_deferred("_init_cursor")
 	_init_signals()
 	GameState.change_state(self,GameState.gState.SAVE_SCENE)
+	SaveHub.save_complete.connect(self._on_save_complete)
 
 
 func _init_cursor() -> void:
@@ -149,17 +150,17 @@ func _new_state_chain() -> void:
 	
 
 func _load_save_files() -> void:
-	var buttonPath := load("res://scenes/GUI/save_file_button.tscn")
-	var saveFiles : Array = []
+	
+	var saveFiles : Array = SaveHub.get_save_files()
 	var remainder := 10 - saveFiles.size()
 	var first : SaveFileButton = null
 	var previous : SaveFileButton
-	
+	#var plusOne := false
+	var fileCount := 0
 	#call for existing save files
+	
 	for save in saveFiles:
-		#Initialize buttons and assign save files
-		var b : SaveFileButton = buttonPath.instantiate()
-		file_list.add_child(b)
+		var b : SaveFileButton = _instantiate_save_button(save)
 		if !first: 
 			first = b
 			previous = b
@@ -167,17 +168,11 @@ func _load_save_files() -> void:
 			b.set_neighbor(SIDE_TOP, previous.button)
 			previous.set_neighbor(SIDE_BOTTOM, b.button)
 			previous = b
-		cursor._connect_btn_to_cursor(b.button)
-		b.button_pressed.connect(self._on_save_pressed)
-		b.button_focus_entered.connect(self._new_focus)
-		b.key_input.connect(self._gui_input)
-		b.set_neighbor(SIDE_LEFT,b.button)
-		b.set_neighbor(SIDE_RIGHT, b.button)
-		_format_save(save, b)
-		
+		fileCount += 1
+
 	while remainder > 0:
-		var b :SaveFileButton= buttonPath.instantiate()
-		file_list.add_child(b)
+		var b : SaveFileButton = _instantiate_save_button("save_%d" % [fileCount + 1])
+		
 		if !first: 
 			first = b
 			previous = b
@@ -185,12 +180,6 @@ func _load_save_files() -> void:
 			b.set_neighbor(SIDE_TOP, previous.button)
 			previous.set_neighbor(SIDE_BOTTOM, b.button)
 			previous = b
-		cursor._connect_btn_to_cursor(b.button)
-		b.button_pressed.connect(self._on_save_pressed)
-		b.button_focus_entered.connect(self._new_focus)
-		b.key_input.connect(self._gui_input)
-		b.set_neighbor(SIDE_LEFT,b.button)
-		b.set_neighbor(SIDE_RIGHT, b.button)
 		remainder -= 1
 		
 	if first:
@@ -200,6 +189,22 @@ func _load_save_files() -> void:
 	await file_container.draw
 	call_deferred("_move_cursor", first)
 	#_move_cursor(first)
+
+
+func _instantiate_save_button(save_file:String) -> SaveFileButton:
+	var buttonPath := load("res://scenes/GUI/save_file_button.tscn")
+	var b : SaveFileButton = buttonPath.instantiate()
+	file_list.add_child(b)
+	save_slots[save_file] = b
+	cursor._connect_btn_to_cursor(b.button)
+	b.button_pressed.connect(self._on_save_pressed)
+	b.button_focus_entered.connect(self._new_focus)
+	b.key_input.connect(self._gui_input)
+	b.set_neighbor(SIDE_LEFT,b.button)
+	b.set_neighbor(SIDE_RIGHT, b.button)
+	_format_save(save_file, b)
+	return b
+	
 
 
 func _close_save_prompt() -> void:
@@ -294,19 +299,20 @@ func _format_save(save_file, button:SaveFileButton) -> void:
 
 #region saving
 func _make_new_save(button:SaveFileButton) -> void:
-	var saveFile = null
-	print("creating new save....")
+	var saveFile = button.get_save_file()
+	print("["+saveFile+"]"+"creating new save....")
 	_change_state(SCENE_STATE.SAVING)
 	cursor.visible = false
 	button.label_text = StringGetter.get_string("saving_file")
-	#emit new_save signal and then retrieve the save file
-	print("This is where I'd put saving code, IF I HAD ANY")
-	button.label_text = StringGetter.get_string("save_complete")
+	SaveHub.save_to_file(saveFile)
+	print("["+saveFile+"]"+"Awaiting signal....")
+	#button.label_text = StringGetter.get_string("save_complete")
 	
+	
+func _on_save_complete(save_file):
 	saved_once = true
-	await get_tree().create_timer(0.5).timeout
-	print("Done Saving")
-	_format_save(saveFile, button)
+	print("["+save_file+"]"+"Done Saving")
+	_format_save(save_file, save_slots[save_file])
 	_new_state_chain()
 #endregion
 

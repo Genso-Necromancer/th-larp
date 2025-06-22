@@ -5,9 +5,9 @@ const UNIT_ID := Enums.UNIT_ID
 const MOVE_TYPE = Enums.MOVE_TYPE
 const SPEC_ID = Enums.SPEC_ID
 #, Human, Kappa, Lunarian, Oni, Doll, Devil, Yukionna, Zombie, Hermit, Magician, Spirit
-const JOB_ID = Enums.JOB_ID
+const ROLE_ID = Enums.ROLE_ID
 
-const WEP_ID = Enums.WEP_ID
+
 
 
 static func get_named_unit_data():
@@ -468,7 +468,7 @@ static func get_spec(specInd):
 					}
 					},
 			"Passives":[],
-			"Skills":[],
+			"Skills":[load("res://unit_resources/features/skills/toss_enemy.tres")],
 			"MoveType": MOVE_TYPE.FOOT
 				}
 		SPEC_ID.HUMAN:
@@ -516,7 +516,7 @@ static func get_spec(specInd):
 	
 static func get_job(jobInd):
 	match jobInd:
-		JOB_ID.TRBLR: 
+		ROLE_ID.TRBLR: 
 			return {
 			"Role": "Troublemaker",
 			"StatGroups":{
@@ -554,21 +554,24 @@ static func get_job(jobInd):
 					"Cha": 20
 					}
 					},
-				"Passives":[],
-				"Skills":[],
-				"Weapons": {
-					"Blade": false,
-					"Blunt": true,
-					"Stick": false,
-					"Book": false,
-					"Gohei": false,
-					"Ofuda": false,
-					"Bow": false,
-					"Gun": false,
-					"Sub": [],
+			"Passives":[],
+			"Skills":[],
+			"MaxInv": 6,
+			"Weapons": {
+				"Blade": false,
+				"Blunt": true,
+				"Stick": false,
+				"Book": false,
+				"Gohei": false,
+				"Ofuda": false,
+				"Bow": false,
+				"Gun": false,
+				"Knife": false,
+				"Natural": false,
+				},
+			"MoveType": MOVE_TYPE.FOOT
 				}
-				}
-		JOB_ID.THIEF: return {
+		ROLE_ID.THIEF: return {
 			"Role": "Cointaker",
 			"StatGroups":{
 				"Stats": {
@@ -605,19 +608,22 @@ static func get_job(jobInd):
 					"Cha": 20
 					}
 					},
-				"Passives":[],
-				"Skills":[],
-				"Weapons": {
-					"Blade": true,
-					"Blunt": false,
-					"Stick": false,
-					"Book": false,
-					"Gohei": false,
-					"Ofuda": false,
-					"Bow": false,
-					"Gun": false,
-					"Sub": ["KNIVES"],
-					}
+			"Passives":[],
+			"Skills":[],
+			"MaxInv": 6,
+			"Weapons": {
+				"Blade": true,
+				"Blunt": false,
+				"Stick": false,
+				"Book": false,
+				"Gohei": false,
+				"Ofuda": false,
+				"Bow": false,
+				"Gun": false,
+				"Knife": true,
+				"Natural":false,
+				},
+			"MoveType": MOVE_TYPE.RANGER
 				}
 
 static func get_art(unit):
@@ -628,13 +634,7 @@ static func get_art(unit):
 		}
 	return p
 	
-static func load_generated_sprite(species, job):
-	var specKeys : Array = SPEC_ID.keys()
-	var specPath : String = specKeys[species]
-	var jobKeys : Array = JOB_ID.keys()
-	var jobPath : String = jobKeys[job]
-	var s = load(("res://sprites/%s/%sSpr.png" % [specPath, jobPath]))
-	return s
+
 	
 	
 static func get_terrain_data():

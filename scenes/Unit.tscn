@@ -1,10 +1,10 @@
 [gd_scene load_steps=11 format=3 uid="uid://x6dmleipd452"]
 
 [ext_resource type="Script" uid="uid://ctodvlhm5amph" path="res://scenes/Unit.gd" id="1_torj4"]
+[ext_resource type="Texture2D" uid="uid://wnmi00k2g1y6" path="res://sprites/character/fairy/thief_sprite.png" id="2_j6hc7"]
 [ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="3_57a4v"]
 [ext_resource type="AnimationLibrary" uid="uid://d4f2xcrr7c15q" path="res://scenes/unit_anim.tres" id="3_ceinp"]
 [ext_resource type="Script" uid="uid://bv74dylssenec" path="res://scenes/UnitArea.gd" id="3_mqts7"]
-[ext_resource type="Texture2D" uid="uid://bix6u63iahalq" path="res://sprites/FAIRY/TRBLRSpr.png" id="3_p2yex"]
 [ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="4_qp4n5"]
 [ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="5_nwi43"]
 [ext_resource type="Script" uid="uid://3uafufnjrn24" path="res://scenes/HPbar.gd" id="7_x5rnn"]
@@ -17,6 +17,55 @@ size = Vector2(84, 37.5)
 z_index = 2
 y_sort_enabled = true
 script = ExtResource("1_torj4")
+unit_level = 2
+ROLE_ID = 2
+move_type = 2
+total_growth = {
+"Cele": 0.55,
+"Cha": 0.1,
+"Comp": 0.3,
+"Def": 0.2,
+"Eleg": 0.2,
+"Life": 0.4,
+"Mag": 0.0,
+"Move": 0.0,
+"Pwr": 0.3
+}
+total_stats = {
+"Cele": 7,
+"Cha": 2,
+"Comp": 110,
+"Def": 0,
+"Eleg": 4,
+"Life": 14,
+"Mag": 1,
+"Move": 5,
+"Pwr": 4
+}
+total_caps = {
+"Cele": 20,
+"Cha": 20,
+"Comp": 20,
+"Def": 20,
+"Eleg": 20,
+"Life": 20,
+"Mag": 20,
+"Move": 10,
+"Pwr": 20
+}
+weapon_prof = {
+"Blade": true,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": true,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
+max_inv = 6
 
 [node name="PathFollow2D" type="PathFollow2D" parent="."]
 rotates = false
@@ -26,7 +75,7 @@ loop = false
 self_modulate = Color(1, 1, 1, 0)
 position = Vector2(-1, -36)
 scale = Vector2(4, 4)
-texture = ExtResource("3_p2yex")
+texture = ExtResource("2_j6hc7")
 hframes = 12
 region_rect = Rect2(0.0799732, -0.0518999, 17.0268, 24.8617)
 

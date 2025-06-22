@@ -29,7 +29,7 @@ func validate_buttons(b) -> bool:
 			if effect.type == Enums.EFFECT_TYPE.HEAL and effect.target == Enums.EFFECT_TARGET.SELF: 
 				isSelfHealing = true
 				break
-	if isSelfHealing and unit.activeStats.CurLife >= unit.activeStats.Life: 
+	if isSelfHealing and unit.active_stats.CurLife >= unit.active_stats.Life: 
 		use.disabled = true
 	
 		

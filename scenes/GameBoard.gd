@@ -282,6 +282,7 @@ func load_map(map:String):
 	var newMap = load(map).instantiate()
 	Global.timePassed = 0
 	add_child(newMap)
+	Global.update_map_header(newMap)
 
 
 func _on_map_ready():
@@ -662,14 +663,15 @@ func _clear_active_unit() -> void:
 func select_destination() -> void: #SELECTED STATE Pathing Related
 	var isOccupied = is_occupied(cursor.cell)
 	var isWalkable = walkableCells.has(cursor.cell)
-	var moveRemain :int = activeUnit.activeStats.Move - pathingArray.size()
+	var moveRemain :int = activeUnit.active_stats.Move - pathingArray.size()
+	
 	if !isOccupied and isWalkable and moveRemain > 0 and !pathingArray.has(cursor.cell):
 		_update_pathing_array(cursor.cell)
-		moveRemain = activeUnit.activeStats.Move - pathingArray.size()
+		moveRemain = activeUnit.active_stats.Move - pathingArray.size()
 		_update_walkable_range(moveRemain)
 	elif cursor.cell == activeUnit.cell:
 		emit_signal("unit_move_ended", activeUnit)
-	elif isOccupied: return
+	elif !isWalkable or isOccupied: return
 	elif pathingArray[-1] == cursor.cell:
 		_move_active_unit(cursor.cell)
 	
@@ -1467,7 +1469,7 @@ func _on_action_weapon_selected(button = false):
 
 
 func _on_win_screen_win_finished():
-	Global.flags.ChaptersCompleted.append(currMap.chapterNumber)
+	Global.chapters_complete.append(currMap.get_name())
 	#currMap.progress_next_map()
 	#self.call_deferred("_load_next_map")
 	

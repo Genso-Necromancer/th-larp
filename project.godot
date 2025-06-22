@@ -25,6 +25,7 @@ SignalTower="*res://scrpt/global/signal_tower.gd"
 Options="*res://scrpt/global/Options.gd"
 GameState="*res://scrpt/ref/game_state.gd"
 CutsceneManager="*res://scenes/cutscenes/CutsceneManager.gd"
+SaveHub="*res://scrpt/global/save_hub.gd"
 
 [display]
 
