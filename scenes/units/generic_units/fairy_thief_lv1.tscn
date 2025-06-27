@@ -1,8 +1,6 @@
-[gd_scene load_steps=11 format=3 uid="uid://7ltk2yfwant2"]
+[gd_scene load_steps=9 format=3 uid="uid://7ltk2yfwant2"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/Unit.tscn" id="1_weqvp"]
-[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_5goft"]
-[ext_resource type="Resource" uid="uid://bsclg2utruovi" path="res://unit_resources/features/skills/toss_enemy.tres" id="3_l6k54"]
 [ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="4_hy345"]
 [ext_resource type="Resource" uid="uid://co546romn6pwr" path="res://unit_resources/features/passives/rem_aura.tres" id="5_j6kew"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="6_4yorx"]
@@ -13,7 +11,7 @@
 [sub_resource type="Resource" id="Resource_tb71p"]
 script = ExtResource("7_ft0k7")
 stats = ExtResource("8_jfw54")
-equipped = false
+equipped = true
 dropped = false
 is_broken = false
 metadata/_custom_type_script = "uid://bas4mbl00uet6"
@@ -22,18 +20,6 @@ metadata/_custom_type_script = "uid://bas4mbl00uet6"
 unit_level = 2
 ROLE_ID = 2
 move_type = 1
-mod_stats = {
-"Cele": 0,
-"Cha": 0,
-"Comp": 0,
-"Def": 0,
-"Eleg": 0,
-"Life": 0,
-"Mag": 0,
-"Move": 0,
-"Pwr": 2
-}
-skills = Array[ExtResource("2_5goft")]([ExtResource("3_l6k54")])
 passives = Array[ExtResource("4_hy345")]([ExtResource("5_j6kew")])
 weapon_prof = {
 "Blade": true,

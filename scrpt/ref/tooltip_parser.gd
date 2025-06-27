@@ -163,23 +163,36 @@ func get_skill(data:SlotWrapper) -> String:
 	return finished
 	
 	
-func get_lore(data: Dictionary, key:String) -> String:
+func get_lore(unit:Unit, key:String) -> String:
 	var string : String
 	var finished : String
 	
-	var stringPath:= "lore_"
+	var stringPath:= "lore_%s"
 	
 	key.to_pascal_case()
 	
 	match key:
 		"UnitName": 
-			var title : String = StringGetter.get_string("lore_title_" + data[key].to_snake_case())
-			var uName : String = StringGetter.get_string("unit_name_" + data[key].to_snake_case())
-			var titleString = "%s - %s" % [uName, title]
-			stringPath = str(stringPath,uName).to_snake_case()
+			var title : String
+			var titleString : String
+			var uName : String = unit.unit_name
+			if unit.unique_art: 
+				title= StringGetter.get_string("lore_title_" + unit.unitId.to_snake_case())
+				titleString = "%s - %s" % [uName, title]
+				stringPath = str(stringPath,unit.unitId)
+			else:
+				var spec :String= Enums.SPEC_ID.keys()[unit.SPEC_ID].to_snake_case()
+				var role :String= Enums.ROLE_ID.keys()[unit.ROLE_ID].to_snake_case()
+				titleString = uName
+				stringPath = stringPath + "_" + spec + "_" + role
 			string = titleString + "\n" + StringGetter.get_string(stringPath)
-		"Role", "Species": 
-			stringPath = str(stringPath,key,"_",data[key]).to_snake_case()
+		"Role":
+			var role :String= Enums.ROLE_ID.keys()[unit.ROLE_ID].to_snake_case()
+			stringPath = str(stringPath,key,"_",role).to_snake_case()
+			string = StringGetter.get_string(stringPath)
+		"Species": 
+			var spec :String= Enums.SPEC_ID.keys()[unit.SPEC_ID].to_snake_case()
+			stringPath = str(stringPath,key,"_",spec).to_snake_case()
 			string = StringGetter.get_string(stringPath)
 		"Level", "EXP": 
 			stringPath = str(stringPath,key).to_snake_case()

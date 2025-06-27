@@ -25,7 +25,6 @@ var rosterOnce := false
 
 func _ready():
 	#var index = 0
-	unitData = {}
 
 	timeModData = {}
 	
@@ -59,8 +58,6 @@ func load_persistant(data:Dictionary):
 
 func _load_unique_units():
 	unitData = pStats.get_named_unit_data()
-	#for unit in unitData:
-		#unitData[unit]["DataType"] = Enums.DATA_TYPE.UNIT
 
 
 func _load_time_mods():

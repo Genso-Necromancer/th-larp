@@ -7,7 +7,7 @@ func fill_skills(unit:Unit) -> Array: #Needs a context check for if a skill is v
 	var s : SkillButton
 	var buttons := []
 	#var buttons : Array = []
-	for skill in unit.unitData.Skills:
+	for skill in unit.skills:
 		s = generate_skillbutton(sPath, skill)
 		buttons.append(s.get_button())
 		s.get_button().add_to_group("SkillsTT")

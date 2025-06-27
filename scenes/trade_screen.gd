@@ -242,7 +242,7 @@ func _load_sprites(units:Array):
 	for unit in units:
 		var path = "res://sprites/character/%s/portrait_full.png" 
 		var fallBack = "debug"
-		var texture = load(path % [unit.unitData.Profile.UnitName])
+		var texture = load(path % [unit.unit_name])
 		if !texture:
 			texture = load(path % [fallBack])
 		sprites[i].set_texture(texture)
@@ -261,7 +261,7 @@ func _load_names(units:Array):
 	var names = [name1, name2]
 	var i = 0
 	for unit in units:
-		names[i].set_text(unit.unitData.Profile.UnitName)
+		names[i].set_text(unit.unit_name)
 		names[i].add_theme_font_size_override("font_size", nFSize)
 		i += 1
 
@@ -487,7 +487,7 @@ func _connect_item(b, isSupply := false):
 	else: b.pressed.connect(self._item_pressed.bind(b.get_parent()))
 	
 func _check_empty_unit_inv(unit):
-	var inv = unit.unitData.Inv
+	var inv = unit.inventory
 	var count = inv.size()
 	if count > 0:
 		return false
@@ -495,9 +495,9 @@ func _check_empty_unit_inv(unit):
 		return true
 		
 func _check_full_unit_inv(unit):
-	var inv = unit.unitData.Inv
+	var inv = unit.inventory
 	var count = inv.size()
-	var maxInv = unit.unitData.MaxInv
+	var maxInv = unit.max_inv
 	if count < maxInv:
 		return false
 	else:
@@ -517,7 +517,7 @@ func _check_empty_supply():
 
 
 #func _check_usable_inv(unit): #Old Delete
-	#var inv = unit.unitData.Inv
+	#var inv = unit.inventory
 	#
 	#var noUse = true
 	#for instance in inv:
@@ -770,7 +770,7 @@ func _remove_empty():
 
 
 func _check_i_space(unit, list):
-	var iLimit = unit.unitData.MaxInv
+	var iLimit = unit.max_inv
 	var iCount = list.itemList.get_children().size()
 	
 	if iCount < iLimit:

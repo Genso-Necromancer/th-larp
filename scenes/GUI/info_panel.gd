@@ -147,8 +147,7 @@ func _update_info(control:Control) -> void:
 			activeRefs.append(statDisplay)
 			itemDisplay.visible = true
 		"ProfileTT":
-			var data = unit.unitData.Profile
-			toolTip = parser.get_lore(data, control.get_meta("ToolTip"))
+			toolTip = parser.get_lore(unit, control.get_meta("ToolTip"))
 			
 		"CombatTT":
 			toolTip = parser.get_combat(unit, control.get_meta("ToolTip"))

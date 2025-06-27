@@ -78,26 +78,29 @@ func get_unit() -> Unit:
 
 
 func refresh_data():
-	var unitLink = get_unit()
-	var n = $MarginContainer/HBoxContainer3/HBoxContainer/Name
-	var l = $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2/Lv
-	var r = $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2/Role
-	var c = $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer/CompCurrent
-	var cap = $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer/CompCap
-	var texture = $PortraitMargin/TextureRect
-	var unitName = unitLink.unitData.Profile.UnitName
-	var role = unitLink.unitData.Profile.Role
-	var lv = unitLink.unitData.Profile.Level
-	var comp = unitLink.unitData.Stats.Comp
-	var curComp = unitLink.active_stats.CurComp
-	var prt = unitLink.unitData.Profile.Prt
+	var unitLink :Unit= get_unit()
+	var n := $MarginContainer/HBoxContainer3/HBoxContainer/Name
+	var l := $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2/Lv
+	var r := $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2/Role
+	var c := $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer/CompCurrent
+	var cap := $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer/CompCap
+	var texture := $PortraitMargin/TextureRect
+	var unitName :String= unitLink.unit_name
+	var spec :String= Enums.SPEC_ID.keys()[unitLink.SPEC_ID]
+	var role :String= Enums.ROLE_ID.keys()[unitLink.ROLE_ID]
+	spec = StringGetter.get_string("species_name_"+spec.to_snake_case())
+	role = StringGetter.get_string("role_name_"+role.to_snake_case())
+	var lv :int = unitLink.unit_level
+	var comp :int= unitLink.active_stats.Comp
+	var curComp :int= unitLink.active_stats.CurComp
+	var prt :String = unitLink.artPaths.Prt
 	
 	if prt and ResourceLoader.exists(prt):
 		texture.set_texture(load(prt))
 	else: texture.set_texture(load("res://sprites/ERROR.png"))
 	n.set_text(unitName)
 	l.set_text("Lv."+str(lv))
-	r.set_text(role)
+	r.set_text(spec+" "+role)
 	c.set_text(str(comp))
 	if comp < (comp/2): _change_font_color(c, "Overstressed")
 	else: _change_font_color(c)

@@ -610,11 +610,11 @@ func trim_path(path: Array, invalid: Array):
 func find_range(current):
 	var maxRange = 0
 	var minRange = 1000
-	for wep in current.unitData.Inv:
-		if current.unitData.Inv[wep].LIMIT and current.unitData.Inv[wep].USES == 0:
+	for wep in current.inventory:
+		if current.inventory[wep].LIMIT and current.inventory[wep].USES == 0:
 			continue
-		maxRange = max(maxRange, current.unitData.Inv[wep].MaxRange, maxRange)
-		minRange = min(minRange, current.unitData.Inv[wep].MinRange, minRange)
+		maxRange = max(maxRange, current.inventory[wep].MaxRange, maxRange)
+		minRange = min(minRange, current.inventory[wep].MinRange, minRange)
 	var unitRange = [minRange, maxRange]
 	return unitRange
 	

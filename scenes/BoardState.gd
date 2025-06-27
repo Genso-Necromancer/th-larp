@@ -37,13 +37,13 @@ func update_unit_data(units):
 		match units[unit].FACTION_ID:
 			Enums.FACTION_ID.PLAYER: 
 				player.append(units[unit])
-				pLvl += units[unit].unitData.Profile.Level
+				pLvl += units[unit].unit_level
 			Enums.FACTION_ID.ENEMY: 
 				enemy.append(units[unit])
-				eLvl += units[unit].unitData.Profile.Level
+				eLvl += units[unit].unit_level
 			Enums.FACTION_ID.NPC: 
 				npc.append(units[unit])
-				nLvl += units[unit].unitData.Profile.Level
+				nLvl += units[unit].unit_level
 	occupied = units.duplicate()
 #	print(player)
 #	print(enemy)

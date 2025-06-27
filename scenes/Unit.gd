@@ -34,7 +34,7 @@ enum AI_TYPE {
 	set(value):
 		disabled = value
 		set_process(!value)
-var unitName := "" #Presented strings will eventually be taken from a seperate file
+var unit_name := "" #Presented strings will eventually be taken from a seperate file
 @export var FACTION_ID :Enums.FACTION_ID = Enums.FACTION_ID.ENEMY
 @export_group("Spawn Parameters")
 @export var isForced := false
@@ -59,12 +59,12 @@ var unitName := "" #Presented strings will eventually be taken from a seperate f
 @export var simulate_leveling : bool = true
 ##Level of unit at run time. Will simulate leveling to this value if simulate_leveling == true.
 @export var unit_level : int = 1
-@export var SPEC_ID :Enums.SPEC_ID= Enums.SPEC_ID.FAIRY:
+@export var SPEC_ID :Enums.SPEC_ID= Enums.SPEC_ID.NONE:
 	set(value):
 		SPEC_ID = value
 		if simulate_leveling: _generate_base_stats()
 			
-@export var ROLE_ID :Enums.ROLE_ID= Enums.ROLE_ID.TRBLR:
+@export var ROLE_ID :Enums.ROLE_ID= Enums.ROLE_ID.NONE:
 	set(value):
 		ROLE_ID = value
 		if simulate_leveling: _generate_base_stats()
@@ -120,7 +120,7 @@ var unitName := "" #Presented strings will eventually be taken from a seperate f
 							_update_totals()
 
 @export_group("Stat Totals")
-@export var total_growth:Dictionary = { 
+@export var total_growth:Dictionary[StringName,float] = { 
 					"Move": 0.0,
 					"Life": 0.0,
 					"Comp": 0.0,
@@ -131,7 +131,7 @@ var unitName := "" #Presented strings will eventually be taken from a seperate f
 					"Def": 0.0,
 					"Cha": 0.0,
 					}
-@export var total_stats:Dictionary = { 
+@export var total_stats:Dictionary[StringName,int] = { 
 					"Move": 0, 
 					"Life": 0,
 					"Comp": 0,
@@ -142,7 +142,7 @@ var unitName := "" #Presented strings will eventually be taken from a seperate f
 					"Def": 0,
 					"Cha": 0,
 					}
-@export var total_caps: = { 
+@export var total_caps:Dictionary[StringName,int] = { 
 					"Move": 0, 
 					"Life": 0,
 					"Comp": 0,
@@ -186,7 +186,7 @@ var base_caps: = {
 					"Def": 0,
 					"Cha": 0,
 					}
-var exp:int = 0
+var unit_exp:int = 0
 
 
 @export_category("Features")
@@ -273,7 +273,6 @@ var isAmbushing := false
 
 #base stats of the unit
 var baseCombat := {}
-var baseStats := {}
 #aura owned by unit
 
 
@@ -363,7 +362,8 @@ func _update_totals():
 	if SPEC_ID and ROLE_ID:
 		for stat in base_stats:
 			total_stats[stat] = base_stats[stat] + mod_stats[stat]
-			total_growth[stat] = base_growth[stat] + mod_growth[stat]
+			total_growth[stat] = snappedf(base_growth[stat] + mod_growth[stat], 0.01)
+			#print(total_growth[stat])
 			total_caps[stat] = base_caps[stat] + mod_caps[stat]
 		#base_stats = newStats.Stats
 		#base_growth = newStats.Growths
@@ -406,6 +406,18 @@ func _add_features(new_skills:Array, new_passives:Array) -> void:
 	for feature in devPassives: 
 		passives.append(feature)
 	print("unit features Updated")
+
+func _set_unit_name():
+	var stringId:StringName = "%s_name_%s"
+	if unique_art: 
+		stringId % ["unit",unitId.to_snake_case()]
+		unit_name = StringGetter.get_string(stringId)
+	else:
+		var role :StringName= Enums.ROLE_ID.keys()[ROLE_ID].to_snake_case()
+		var spec :StringName= Enums.SPEC_ID.keys()[SPEC_ID].to_snake_case()
+		var specId := stringId % ["species",spec]
+		var roleId := stringId % ["role",role]
+		unit_name = "%s %s" % [StringGetter.get_string(specId), StringGetter.get_string(roleId)]
 #endregion
 
 func _ready() -> void:
@@ -420,15 +432,12 @@ func _ready() -> void:
 	_initialize_parameters()
 	#_load_stats()
 	_load_sprites()
-	_validate_skills()
 	_init_inv()
 	
 	hitBox.set_master(self)
 	hitBox.area_entered.connect(self._on_aura_entered)
 	hitBox.area_exited.connect(self._on_aura_exited)
-	if map.get_class() != "TileMap": #may not need in future, too specific to "test map"
-		pass
-	elif !map.map_ready.is_connected(self._on_test_map_map_ready):
+	if !map.map_ready.is_connected(self._on_test_map_map_ready):
 		map.map_ready.connect(self._on_test_map_map_ready)
 	_animPlayer.play("idle")
 
@@ -439,7 +448,7 @@ func _ready() -> void:
 	update_stats()
 	#move type debugging
 	#var testKey = UnitData.MOVE_TYPE.keys()[unitData.MoveType]
-	#print(str(unitName) + " Move Type: " + str(testKey))
+	#print(str(unit_name) + " Move Type: " + str(testKey))
 
 func init_unit(currentMap:GameMap, unique:bool = !simulate_leveling, newFaction := FACTION_ID, id : String = "none", elite = false, lv = unit_level, spec = SPEC_ID, job = ROLE_ID):
 	FACTION_ID = newFaction
@@ -668,19 +677,18 @@ func _initialize_parameters() -> void:
 		return
 	if unitId == "UnitId" and not Engine.is_editor_hint(): unitId = UnitData.generate_id()
 	update_stats()
+	active_stats["CurLife"] = active_stats.Life
+	active_stats["CurComp"] = active_stats.Comp
 	if simulate_leveling: _simulate_levels()
 	_send_parameters()
 
 
 func _send_parameters():
 	var data :Dictionary
-	UnitData.unitData[unitId] = {}
-	data = UnitData.unitData[unitId]
-	active_stats["CurLife"] = total_stats.Life
-	active_stats["CurComp"] = total_stats.Comp
-	active_stats["MoveType"] = move_type
-	active_stats["Weapons"] = weapon_prof
-	active_stats["Skills"] = unitData.Skills
+	UnitData.unitData[unitId] = {
+		
+	}
+	
 	
 
 
@@ -689,9 +697,12 @@ func _get_parameters():
 
 
 func _simulate_levels():
-	UnitData.level_up(self, unit_level)
-	
-	
+	var loops:int = 0
+	if unit_level > 1:
+		loops = unit_level - 1
+		UnitData.level_up(self, loops)
+		update_stats()
+	else: return
 #endregion
 
 
@@ -722,34 +733,29 @@ func _simulate_levels():
 			#add_to_group("Enemy")
 		#Enums.FACTION_ID.NPC:
 			#add_to_group("NPC")
-	#if unitName == "" and !simulate_leveling:
+	#if unit_name == "" and !simulate_leveling:
 		#path = "unit_name_%s" % [unitId.to_snake_case()]
-		#unitName = StringGetter.get_string(path)
-	#elif unitName == "" and simulate_leveling:
+		#unit_name = StringGetter.get_string(path)
+	#elif unit_name == "" and simulate_leveling:
 		#var strings : Array = []
 		#var template : String = StringGetter.get_template("unit_name")
 		#strings.append(StringGetter.get_string("species_name_%s" % [specKeys[unitData.Profile.Species].to_snake_case()]))
-		#strings.append(StringGetter.get_string("role_name_%s" % [unitData.Profile.Role.to_snake_case()]))
-		#unitName = StringGetter.mash_string(template, strings)
+		#strings.append(StringGetter.get_string("role_name_%s" % [ROLE_ID.to_snake_case()]))
+		#unit_name = StringGetter.mash_string(template, strings)
 		#
 		#
 	#if simulate_leveling and unit_level > 1:
 		#UnitData.level_up(unitData, unit_level-1)
 	#
-	#baseStats = unitData.Stats.duplicate(true)
+	#baseStats = active_stats.duplicate(true)
 	#active_stats["CurLife"] = baseStats.Life
 	#active_stats["CurComp"] = baseStats.Comp
 	#active_stats["MoveType"] = unitData.MoveType
-	#active_stats["Weapons"] = unitData.Weapons
-	#active_stats["Skills"] = unitData.Skills
+	#active_stats["Weapons"] = weapon_prof
+	#active_stats["Skills"] = skills
 	#
 	#update_stats()
 	#firstLoad = true
-
-func _validate_skills(): ##Uhhh....whoops? Old Delete
-	if !unitData.has("Skills"):
-		return
-		
 
 #keep track of active de/buffs during gameplay, seperate from actual stats
 #re-evaluate the variable names, and if so many are necessary. VOODOO WARNING HERE
@@ -772,7 +778,7 @@ func set_buff(effect:Effect):
 		effect = newId
 	if effect.duration_type == Enums.DURATION_TYPE.PERMANENT:
 		var stat : String = statKeys[effect.sub_type]
-		unitData.Stats[stat] += effect.value
+		mod_stats[stat] += effect.value
 	else:
 		buffs[effect] = effect.duplicate(true)
 	update_stats()
@@ -822,14 +828,12 @@ func _set_art_paths():
 	artPaths["Sprite"] = "res://sprites/character/%s/%s_sprite.png" % [directory, role]
 	artPaths["Prt"] = "res://sprites/character/%s/%s_portrait.png" % [directory, role]
 	artPaths["FullPrt"] = "res://sprites/character/%s/%s_portrait_full.png" % [directory, role]
-	_load_sprites()
-	#unitData[unitId]["Profile"]["Sprite"] = "res://sprites/character/%s/%s_sprite.png" % [directory, role]
-	#unitData[unitId]["Profile"]["Prt"] = "res://sprites/character/%s/%s_portrait.png" % [directory, role]
-	#unitData[unitId]["Profile"]["FullPrt"] = "res://sprites/character/%s/%s_portrait_full.png" % [directory, role]
+	if Engine.is_editor_hint(): _load_sprites()
+
 
 func _load_sprites():
 	print(artPaths.Sprite)
-	_sprite.set_texture(load(artPaths.Sprite))
+	if _sprite: _sprite.set_texture(load(artPaths.Sprite))
 
 
 	match FACTION_ID:
@@ -843,10 +847,10 @@ func _load_sprites():
 
 
 func _init_inv():
-	for item in unitData.get("SpawnGear", []):
+	for item in unitData.get("Inventory", []):
 		var newSlot : Item
 		var res : UnitResource
-		if inventory.size()>unitData.MaxInv: break
+		if inventory.size()>max_inv: break
 		elif !ResourceLoader.exists(item): continue
 		else: res = load(item)
 		if res is WeaponResource: newSlot = Weapon.new().duplicate()
@@ -879,13 +883,13 @@ func _init_features() -> void:
 		if skill is not String: continue
 		elif !ResourceLoader.exists(skill): continue
 		else: skillArray.append(load(skill))
-	if skillArray: unitData.Skills = skillArray
+	if skillArray: skills = skillArray
 	
 	for passive in unitData.get("Passives", []):
 		if passive is not String: continue
 		elif !ResourceLoader.exists(passive): continue
 		else: passiveArray.append(load(passive))
-	if passiveArray: unitData.Passives = passiveArray
+	if passiveArray: passives = passiveArray
 
 func get_condition() -> Dictionary: #maybe expand this in the future, for now that's all
 	var c: Dictionary = {}
@@ -902,7 +906,6 @@ func can_act() -> bool:
 
 #Passive Functions
 func check_passives():
-	var passives = unitData.Passives
 	var valid = []
 	
 	for p in passives:
@@ -917,7 +920,7 @@ func check_passives():
 
 ##Non-permanent Skills Function
 func validate_skills():
-	var skills = unitData.Skills
+	var skills = skills
 	var valid = []
 	for s in skills:
 		match s.target:
@@ -929,7 +932,7 @@ func validate_skills():
 ##Validate skills from effects
 func validate_active_effect_skills():
 	for skill in bonusSkills:
-		unitData.Skills.erase(skill)
+		skills.erase(skill)
 	bonusSkills.clear()
 
 
@@ -939,10 +942,10 @@ func validate_active_effect_skills():
 
 
 func _resolve_bonus_skill(effect: Effect) -> void:
-	if unitData.Skills.has(effect.skill): return
+	if skills.has(effect.skill): return
 	else: 
 		bonusSkills.append(effect.skill)
-		unitData.Skills.append(effect.skill)
+		skills.append(effect.skill)
 
 
 func _add_sub_type(subType):
@@ -964,7 +967,6 @@ func _assign_auras(passive:Passive) -> Aura:
 
 
 func check_time_prot() -> bool:
-	var passives = unitData.Passives
 	var validTime
 	#Global.timeOfDay
 	for p in passives:
@@ -982,7 +984,7 @@ func check_time_prot() -> bool:
 func search_passive_id(type):
 	var highest = 0
 	var found = false
-	for p in unitData.Passives:
+	for p in passives:
 		if p.type == type and p.value > highest:
 			highest = p.value
 			found = p
@@ -1210,8 +1212,8 @@ func is_proficient(i_cat : Enums.WEAPON_CATEGORY, sub_cat : Enums.WEAPON_SUB) ->
 	if sub_cat == Enums.WEAPON_SUB.NONE and i_cat == Enums.WEAPON_CATEGORY.NONE: return true
 	elif i_cat == Enums.WEAPON_CATEGORY.ITEM: return false
 	elif i_cat == Enums.WEAPON_CATEGORY.ACC: return true
-	elif sub_cat != Enums.WEAPON_SUB.NONE and unitData.Weapons[subKeys[sub_cat].to_pascal_case()]: return true
-	elif unitData.Weapons[catKeys[i_cat].to_pascal_case()]: return true
+	elif sub_cat != Enums.WEAPON_SUB.NONE and weapon_prof[subKeys[sub_cat].to_pascal_case()]: return true
+	elif weapon_prof[catKeys[i_cat].to_pascal_case()]: return true
 	return false
 
 
@@ -1260,7 +1262,7 @@ func get_reach() -> Dictionary:
 	var wep = get_weapon_reach()
 	var aug = {"Max":-999, "Min":999}
 	var skill = {"Max":-999, "Min":999}
-	for s in unitData.Skills:
+	for s in skills:
 		if s.augment: 
 			var r = get_aug_reach(s)
 			aug.Min = mini(r.Min, aug.Min)
@@ -1398,13 +1400,13 @@ func _update_natural(passive) -> void:
 	var dmgScale := 0
 	var hitScale := 0
 	var barrierScale := 0
-	var tier : int = unitData.Profile.Level
+	var tier : int = unit_level
 	
 	match scaleType: 
 		"NaturalMartial": 
-			dmgScale = 2 + ceili(unitData.Profile.Level/4)
-			hitScale = 65 + ceili(unitData.Profile.Level)
-			barrierScale = 2 + ceili(unitData.Profile.Level/6)
+			dmgScale = 2 + ceili(unit_level/4)
+			hitScale = 65 + ceili(unit_level)
+			barrierScale = 2 + ceili(unit_level/6)
 	
 	match tier:
 		40: tier = 6
@@ -1560,21 +1562,21 @@ func get_skill_combat_stats(skill:SlotWrapper, augmented := false):
 func update_stats(): #GO BACK AND FINISH ACTIVE DEBUFFS AFTER THIS
 	var effSort := []
 	var time := Global.timeOfDay
-	var timeMod : Dictionary = UnitData.timeModData[unitData.Profile.Species][time]
-	var statKeys := baseStats.keys()
+	var timeMod : Dictionary = UnitData.timeModData[SPEC_ID][time]
+	var statKeys := total_stats.keys()
 	var buffTotal := {}
 	var baseUpdated := false
 	var combatUpdated := false
 	var modifiedStats := active_stats
-	var baseValues := baseStats
+	var baseValues := total_stats
 	var subKeys := Enums.SUB_TYPE.keys()
 	
 	check_passives()
 	validate_active_effect_skills()
 	
-	if baseStats == null or active_stats == null or lifeBar == null:
+	if baseValues == null or active_stats == null or lifeBar == null:
 		return
-	lifeBar.max_value = baseStats.Life
+	
 	#lifeBar.value = active_stats.CurLife
 	#if active_stats["CurLife"] <= 0:
 		#run_death()
@@ -1644,7 +1646,7 @@ func update_stats(): #GO BACK AND FINISH ACTIVE DEBUFFS AFTER THIS
 			baseUpdated = true
 		else:
 			combatUpdated = true
-		
+		lifeBar.max_value = active_stats.Life
 	update_sprite()
 	
 	if status.Sleep:
@@ -1892,32 +1894,33 @@ func add_exp(action, _target = null): ##Adds exp if a unit is a place, as well a
 	if FACTION_ID != Enums.FACTION_ID.PLAYER:
 		return false
 
-	var xpVal = 0
+	var xpVal := 0
 	var results
-	var oldStats = unitData.Stats.duplicate()
-	var oldLevel = unitData.Profile.Level
+	var oldStats :Dictionary
+	var oldLevel := unit_level
 	#var targetLevel
-	var oldExp = unitData.Profile.EXP
-	var expSteps = []
-	var portrait = unitData.Profile.Prt
-	var lvlLoops = 0
-	var levelUpReport = {}
-
+	var oldExp := unit_exp
+	var expSteps := []
+	var portrait :String= artPaths.Prt
+	var lvlLoops := 0
+	var levelUpReport := {}
+	for stat in base_stats.keys():
+		oldStats[stat] = active_stats[stat]
 	#if target != null:
-		#targetLevel = target.unitData.Profile.Level
-#	print(unitData.Profile.EXP)
+		#targetLevel = target.unit_level
+#	print(unit_exp)
 	match action:
 		"Kill": xpVal = 150
 		"Support": xpVal = 60
 		"Generic": xpVal = 60
-	unitData.Profile.EXP += xpVal
+	unit_exp += xpVal
 	
-#	print(unitData.Profile.EXP)
-	if unitData.Profile.EXP <= 100:
-		expSteps.append(unitData.Profile.Exp) 
+#	print(unit_exp)
+	if unit_exp <= 100:
+		expSteps.append(unit_exp) 
 		
-	if unitData.Profile.EXP >= 100 and unitData.Profile.Level < 20:
-		var expBracket = unitData.Profile.EXP
+	if unit_exp >= 100 and unit_level < 20:
+		var expBracket = unit_exp
 		while expBracket > 100:
 			expSteps.append(100)
 			expBracket -= 100
@@ -1925,8 +1928,8 @@ func add_exp(action, _target = null): ##Adds exp if a unit is a place, as well a
 			if expBracket < 100:
 				expSteps.append(expBracket)
 		
-		while unitData.Profile.EXP > 100:	
-			unitData.Profile.EXP = unitData.Profile.EXP - 100
+		while unit_exp > 100:	
+			unit_exp = unit_exp - 100
 			lvlLoops += 1
 			
 		results = UnitData.level_up(self, lvlLoops).duplicate()
@@ -1935,7 +1938,7 @@ func add_exp(action, _target = null): ##Adds exp if a unit is a place, as well a
 		levelUpReport["OldStats"] = oldStats
 		levelUpReport.OldStats["LVL"] = oldLevel
 #		print(unitData)
-	emit_signal("exp_gained", oldExp, expSteps, levelUpReport, portrait, unitData.Profile.UnitName)
+	emit_signal("exp_gained", oldExp, expSteps, levelUpReport, portrait, unit_name)
 	return true
 
 func map_start_init():

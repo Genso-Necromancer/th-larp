@@ -50,11 +50,9 @@ func toggle_vis():
 
 func update_prof():
 	var focusUnit = Global.focusUnit
-	var unitData : Dictionary
 	
 	if !focusUnit: return
 	focusUnit.update_stats()
-	unitData = focusUnit.unitData
 	focusLabels.clear()
 	_clear_skills()
 	
@@ -71,8 +69,8 @@ func update_prof():
 	
 	if inventory: focusLabels += _update_inventory(focusUnit)
 	if fBox: focusLabels += _update_features(focusUnit)
-	if !isPreview: _update_portrait(unitData["Profile"]["FullPrt"])
-	elif isPreview and portrait: _update_portrait(unitData["Profile"]["Prt"])
+	if !isPreview: _update_portrait(focusUnit.artPaths.FullPrt)
+	elif isPreview and portrait: _update_portrait(focusUnit.artPaths.Prt)
 	get_tree().call_group("ProfileLabels", "you_need_to_update_yourself_NOW", focusUnit)
 
 
@@ -96,9 +94,9 @@ func _update_inventory(unit) -> Array:
 
 
 func _update_features(unit) -> Array:
-	var skills = unit.unitData.Skills
+	var skills = unit.skills
 	#var sData = UnitData.skillData
-	var passives = unit.unitData.Passives
+	var passives = unit.passives
 	#var pData = UnitData.passiveData
 	var sPath = load("res://scenes/GUI/skill_button.tscn")
 	var pPath = load("res://scenes/GUI/passive_button.tscn")

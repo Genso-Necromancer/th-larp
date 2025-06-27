@@ -95,7 +95,8 @@ func mash_test():
 	varArray.append(chance)
 	var s : String = mash_string(base, varArray)
 	print(s)
-		
+
+
 func get_combat_effect_string(effect:Effect) -> String: #Time to create the string XML and string getter, eh?
 	#var proc = cmbData.Effects[effect].proc
 	#var value = cmbData.Effects[effect].value

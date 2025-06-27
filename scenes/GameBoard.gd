@@ -1260,7 +1260,7 @@ func ai_attack(result): #HERE..... EVENTUALLY. So fuckin out of date.
 	var destination = Vector2i(result.BestMove["Launch"])
 	var weapon = result.BestMove.Weapon
 	var skill = result.BestMove.Skill
-	var wInd = actor.unitData.Inv.find(weapon)
+	var wInd = actor.inventory.find(weapon)
 	#var combatResults
 	var path = get_path_to_cell(actor.cell, destination, actor)
 	activeUnit = actor

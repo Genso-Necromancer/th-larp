@@ -1221,6 +1221,14 @@ static func get_auras():
 
 static func get_time_mods():
 	var timeMods = {
+		SPEC_ID.NONE:{
+			Enums.TIME.DAY:{
+				
+			},
+			Enums.TIME.NIGHT:{
+				
+			}
+		},
 		SPEC_ID.VAMPIRE:{
 						Enums.TIME.DAY:{
 							"Move": -1,
