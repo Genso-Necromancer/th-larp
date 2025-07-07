@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0" version="27.1.6" pages="2">
+  <diagram name="Story Timeline" id="vWFpPTab1r0fSYkTddCN">
+    <mxGraphModel dx="2526" dy="758" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" background="#000000" math="0" shadow="0" adaptiveColors="simple">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-7" value="&lt;div&gt;Sakuya begins the LARP; introduces Remilia to the game&lt;/div&gt;" style="ellipse;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fillColor=#182E3E;strokeColor=#FFFFFF;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="-810" y="112.5" width="170" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-8" value="&lt;div&gt;Remilia &amp;amp; Flandre face off against each other for the finale.&lt;/div&gt;&lt;div&gt;Resulting in understanding how Flandre felt, &amp;amp; why she hi-jacked the game&lt;/div&gt;" style="ellipse;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fillColor=#182E3E;strokeColor=#FFFFFF;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="600" y="102.5" width="240" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-9" value="Flandre becomes jealous of Remilia favortism, and feels sidelined" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#182E3E;strokeColor=#FFFFFF;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="-455" y="127.5" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-10" value="Seija weasels her way into Flandre&#39;s head, sympathizing with her. She feeds into Flandre&#39;s jealousy and gets her to ditch them for now." style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#182E3E;strokeColor=#FFFFFF;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="-225" y="110" width="170" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-11" value="Next chapter isn&#39;t how Sakuya planned the story to go; Flandre &amp;amp; Seija return as the source of the change." style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#182E3E;strokeColor=#FFFFFF;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="40" y="110" width="170" height="95" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-13" value="Flandre uses her charisma to sway most players on the &quot;villain&quot; side to follow her story instead" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#182E3E;strokeColor=#FFFFFF;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="290" y="116.25" width="160" height="82.5" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-16" value="Factions" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fillColor=#182E3E;strokeColor=#FFFFFF;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="-830" y="360" width="200" height="790" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-17" value="&lt;b&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(217, 150, 146));&quot;&gt;Scarlet Devil Manor:&lt;/span&gt;&lt;/b&gt;&amp;nbsp;The player faction lead by Remilia." style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-16" vertex="1">
+          <mxGeometry y="30" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-18" value="&lt;b&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(217, 150, 146));&quot;&gt;Taoists:&lt;/span&gt;&lt;/b&gt; Lead by Seiga, until Miko &quot;resurrects&quot;. Original Antagonists, goes off script with Flandre later" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-16" vertex="1">
+          <mxGeometry y="70" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-21" value="&lt;b&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(217, 150, 146));&quot;&gt;Myouren Temple:&lt;/span&gt;&lt;/b&gt;&amp;nbsp;Lead by Byakuren. Side Faction of Buddhists that would align with SDM on script, opposition to Taoists" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-16" vertex="1">
+          <mxGeometry y="130" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-19" value="&lt;b&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(217, 150, 146));&quot;&gt;Fairy Bandits:&lt;/span&gt;&lt;/b&gt; Bandits lead by Cirno. Never goes off script, even when everyone one else has" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-16" vertex="1">
+          <mxGeometry y="210" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-20" value="&lt;b&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(217, 150, 146));&quot;&gt;Flandre:&lt;/span&gt;&lt;/b&gt;&amp;nbsp;&quot;Flanpire&quot;. Eventual &quot;true&quot; antagonists. Never on script." style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-16" vertex="1">
+          <mxGeometry y="270" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-23" value="&lt;div&gt;&lt;b&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(217, 150, 146));&quot;&gt;Eientei:&lt;/span&gt;&lt;/b&gt; &quot;Neutral&quot; faction that meddles in the story on script. Mirrors their intended role when Flandre enters the picture, and continues to meddle&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-16" vertex="1">
+          <mxGeometry y="310" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-24" value="&lt;b&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(217, 150, 146));&quot;&gt;Human Village:&lt;/span&gt;&lt;/b&gt; Neutral Faction, not really an organized force, though different characters come from this faction." style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-16" vertex="1">
+          <mxGeometry y="390" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-27" value="&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(217, 150, 146));&quot;&gt;&lt;b&gt;Moriya Shrine:&lt;/b&gt; &lt;/span&gt;Small faction that sides with SDM on script" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-16" vertex="1">
+          <mxGeometry y="450" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-25" value="&lt;b&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(217, 150, 146));&quot;&gt;Old Hell:&lt;/span&gt;&amp;nbsp;&lt;/b&gt;Lead by Yuugi&lt;b&gt;,&amp;nbsp;&lt;/b&gt;in script they&#39;re a mercenary group of Oni hired by the antagonist. Off script, they join up with Flandre." style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-16" vertex="1">
+          <mxGeometry y="490" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-32" value="&lt;div&gt;&lt;b&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(217, 150, 146));&quot;&gt;Tengu:&lt;/span&gt;&lt;/b&gt; Aggressive Neutral faction, two from the group join the player. Wanting to report on the game out-of-character. Many join other factions as part of their own desire to gather information on them. Very disloyal, but can be found on all sides&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-16" vertex="1">
+          <mxGeometry y="560" width="200" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-33" value="&lt;b&gt;&lt;span style=&quot;color: light-dark(rgb(0, 0, 0), rgb(217, 150, 146));&quot;&gt;Kappa:&lt;/span&gt;&lt;/b&gt; Another Mercenary faction that can be found on all sides. Valued for their advanced weaponry." style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-16" vertex="1">
+          <mxGeometry y="680" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-34" value="n/a" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-16" vertex="1">
+          <mxGeometry y="750" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-28" value="Playable Characters" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fillColor=#182E3E;strokeColor=#FFFFFF;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="-590" y="360" width="160" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-46" value="&lt;b&gt;-Chapter 1-&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-28" vertex="1">
+          <mxGeometry y="30" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-29" value="&lt;b&gt;Remilia&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-28" vertex="1">
+          <mxGeometry y="60" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-30" value="&lt;b&gt;Sakuya&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-28" vertex="1">
+          <mxGeometry y="90" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-31" value="&lt;b&gt;Meiling&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-28" vertex="1">
+          <mxGeometry y="120" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-43" value="&lt;b&gt;Patchouli&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-28" vertex="1">
+          <mxGeometry y="150" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-44" value="&lt;b&gt;-Unsorted-&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-28" vertex="1">
+          <mxGeometry y="180" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-45" value="&lt;div&gt;&lt;b&gt;n/a&lt;/b&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-28" vertex="1">
+          <mxGeometry y="210" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-49" value="&lt;div&gt;&lt;b&gt;n/a&lt;/b&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-28" vertex="1">
+          <mxGeometry y="240" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-35" value="Enemy Characters" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fillColor=#182E3E;strokeColor=#FFFFFF;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="-190" y="360" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-36" value="&lt;b&gt;Flandre&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-35" vertex="1">
+          <mxGeometry y="30" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-37" value="&lt;b&gt;Seija&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-35" vertex="1">
+          <mxGeometry y="60" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-38" value="n/a" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-35" vertex="1">
+          <mxGeometry y="90" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-39" value="Recruitable Enemies" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fillColor=#182E3E;strokeColor=#FFFFFF;fontColor=#FFFFFF;" parent="1" vertex="1">
+          <mxGeometry x="-390" y="360" width="160" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-40" value="&lt;b&gt;-Chapter 2-&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-39" vertex="1">
+          <mxGeometry y="30" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-47" value="&lt;b&gt;Reimu&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-39" vertex="1">
+          <mxGeometry y="60" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-42" value="&lt;b&gt;-Unsorted-&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-39" vertex="1">
+          <mxGeometry y="90" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="hJkmPJ2T2UP-ICYkuYMx-48" value="n/a" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;rounded=0;labelBackgroundColor=none;fontColor=#FFFFFF;" parent="hJkmPJ2T2UP-ICYkuYMx-39" vertex="1">
+          <mxGeometry y="120" width="160" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="M2z98NtITwi6U2-mbCI7" name="Roles &amp; Species">
+    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Prgqk3VAPvqq0c66EVC5-1" value="Roles" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="160" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="Prgqk3VAPvqq0c66EVC5-2" value="&lt;b&gt;Troublemaker:&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="Prgqk3VAPvqq0c66EVC5-1">
+          <mxGeometry y="30" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Prgqk3VAPvqq0c66EVC5-3" value="&lt;b&gt;Cointaker:&lt;/b&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="Prgqk3VAPvqq0c66EVC5-1">
+          <mxGeometry y="60" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Prgqk3VAPvqq0c66EVC5-4" value="n/a" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="Prgqk3VAPvqq0c66EVC5-1">
+          <mxGeometry y="90" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="klgDxgl15snyhqNcgmtG-1" value="n/a" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="Prgqk3VAPvqq0c66EVC5-1">
+          <mxGeometry y="120" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Prgqk3VAPvqq0c66EVC5-5" value="Species" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=20;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="40" width="200" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="Prgqk3VAPvqq0c66EVC5-6" value="Item 1" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="Prgqk3VAPvqq0c66EVC5-5">
+          <mxGeometry y="20" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Prgqk3VAPvqq0c66EVC5-7" value="Item 2" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="Prgqk3VAPvqq0c66EVC5-5">
+          <mxGeometry y="50" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Prgqk3VAPvqq0c66EVC5-8" value="Item 3" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="Prgqk3VAPvqq0c66EVC5-5">
+          <mxGeometry y="80" width="200" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
