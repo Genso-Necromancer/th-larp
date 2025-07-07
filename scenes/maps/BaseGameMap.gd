@@ -10,7 +10,9 @@ enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
 @export_category("Map Values")
 ##Units required to participate in this chapter.[br]
 ##WARNING: Do not use units which can die and arrive prior to this map]
-@export var forcedUnits = ["Remilia"]
+##WARNING: unitId is case sensitive.
+@export var forcedUnits := ["remilia"]
+
 @export_file("*.tscn") var next_map : String
 @export var chapterNumber: int = 0
 @export var title: String = ""
@@ -56,7 +58,10 @@ enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
 @onready var ai : AiManager = $AiManager
 
 
-
+#region unit organization
+var generated_ids :Array = []
+var persistant_data:Dictionary
+#endregion
 var hours : int = 0
 var minutes : int = 0
 var mapSize
@@ -154,7 +159,9 @@ func get_active_danmaku() -> Dictionary:
 func _initialize_unit_cells():
 	var units : Dictionary = get_active_units()
 	for unit in units:
-		units[unit].initialize_cell()
+		if units[unit].isActive:
+			units[unit].add_map(self)
+			units[unit].initialize_cell()
 
 
 func _initialize_danmaku_cells():

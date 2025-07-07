@@ -1,0 +1,97 @@
+[gd_scene load_steps=13 format=3 uid="uid://x6dmleipd452"]
+
+[ext_resource type="Script" uid="uid://ctodvlhm5amph" path="res://scenes/units/Unit.gd" id="1_me1b5"]
+[ext_resource type="Texture2D" uid="uid://wnmi00k2g1y6" path="res://sprites/character/fairy/thief_sprite.png" id="2_3vwvo"]
+[ext_resource type="Script" uid="uid://ctblbjqcv65a5" path="res://scenes/unit_sprite.gd" id="2_me1b5"]
+[ext_resource type="AnimationLibrary" uid="uid://d4f2xcrr7c15q" path="res://scenes/unit_anim.tres" id="3_3vwvo"]
+[ext_resource type="Script" uid="uid://bv74dylssenec" path="res://scenes/UnitArea.gd" id="4_xr077"]
+[ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="5_4067k"]
+[ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="6_eo5f0"]
+[ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="7_66viq"]
+[ext_resource type="Script" uid="uid://3uafufnjrn24" path="res://scenes/HPbar.gd" id="8_5cxww"]
+[ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="9_1s8fa"]
+[ext_resource type="Script" uid="uid://dvccuyma23muf" path="res://scenes/unit_cell_label.gd" id="10_30vxy"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_51pth"]
+size = Vector2(84, 37.5)
+
+[node name="Unit" type="Path2D"]
+z_index = 2
+y_sort_enabled = true
+script = ExtResource("1_me1b5")
+
+[node name="PathFollow2D" type="PathFollow2D" parent="."]
+rotates = false
+loop = false
+
+[node name="Sprite" type="Sprite2D" parent="PathFollow2D"]
+self_modulate = Color(1, 1, 1, 0)
+position = Vector2(-1, -36)
+scale = Vector2(4, 4)
+texture = ExtResource("2_3vwvo")
+hframes = 12
+region_rect = Rect2(0.0799732, -0.0518999, 17.0268, 24.8617)
+script = ExtResource("2_me1b5")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="PathFollow2D/Sprite"]
+root_node = NodePath("../../..")
+libraries = {
+&"": ExtResource("3_3vwvo")
+}
+
+[node name="UnitArea" type="Area2D" parent="PathFollow2D/Sprite"]
+position = Vector2(0, 8)
+scale = Vector2(0.25, 0.25)
+collision_layer = 2
+script = ExtResource("4_xr077")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PathFollow2D/Sprite/UnitArea"]
+position = Vector2(0, 0.75)
+shape = SubResource("RectangleShape2D_51pth")
+
+[node name="HPbar" type="TextureProgressBar" parent="PathFollow2D/Sprite" groups=["HPBar"]]
+anchors_preset = -1
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -10.0
+offset_top = -11.75
+offset_right = -1.5
+offset_bottom = -29.75
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+max_value = 0.0
+nine_patch_stretch = true
+stretch_margin_left = 2
+stretch_margin_top = 2
+stretch_margin_right = 2
+stretch_margin_bottom = 2
+texture_under = ExtResource("5_4067k")
+texture_over = ExtResource("6_eo5f0")
+texture_progress = ExtResource("7_66viq")
+script = ExtResource("8_5cxww")
+
+[node name="Cell" type="Label" parent="PathFollow2D"]
+offset_left = -68.0
+offset_top = 15.0
+offset_right = 64.0
+offset_bottom = 41.0
+theme = ExtResource("9_1s8fa")
+theme_override_colors/font_color = Color(0.776471, 0, 0, 1)
+theme_override_font_sizes/font_size = 22
+text = "(0, 0)"
+script = ExtResource("10_30vxy")
+
+[node name="Cell2" type="Label" parent="PathFollow2D"]
+visible = false
+offset_left = -33.0
+offset_top = 40.0
+offset_right = 38.0
+offset_bottom = 66.0
+theme = ExtResource("9_1s8fa")
+theme_override_colors/font_color = Color(0.776471, 0, 0, 1)
+theme_override_font_sizes/font_size = 22
+text = "<null>"
+
+[connection signal="animation_finished" from="PathFollow2D/Sprite/AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

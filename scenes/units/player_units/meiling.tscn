@@ -1,0 +1,72 @@
+[gd_scene load_steps=11 format=3 uid="uid://dta0332r0wl83"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_ys274"]
+[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_042v0"]
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="2_grm3a"]
+[ext_resource type="Resource" uid="uid://dutu5gig40ko4" path="res://unit_resources/features/passives/martial.tres" id="3_ni6na"]
+[ext_resource type="Resource" uid="uid://bsclg2utruovi" path="res://unit_resources/features/skills/toss_enemy.tres" id="3_wxqng"]
+[ext_resource type="Resource" uid="uid://dhlpeampaptvh" path="res://unit_resources/features/skills/shove_enemy01.tres" id="4_grm3a"]
+[ext_resource type="Texture2D" uid="uid://c5g43x2xyqqmh" path="res://sprites/character/meiling/guard_sprite.png" id="5_ni6na"]
+[ext_resource type="Script" uid="uid://tkxohry12rc3" path="res://unit_resources/items/weapons/natural.gd" id="7_ni6na"]
+[ext_resource type="Resource" uid="uid://bxn1enbnerbpf" path="res://unit_resources/items/weapons/martial_fist.tres" id="8_qauq2"]
+
+[sub_resource type="Resource" id="Resource_rd4ga"]
+script = ExtResource("7_ni6na")
+stats = ExtResource("8_qauq2")
+equipped = true
+dropped = false
+is_broken = false
+
+[node name="Meiling" instance=ExtResource("1_ys274")]
+unitId = "meiling"
+recruited = true
+FACTION_ID = 2
+unique_art = true
+simulate_leveling = false
+SPEC_ID = 4
+ROLE_ID = 7
+total_stats = Dictionary[StringName, int]({
+&"Cele": 5,
+&"Cha": 5,
+&"Comp": 100,
+&"Def": 8,
+&"Eleg": 8,
+&"Life": 20,
+&"Mag": 0,
+&"Move": 4,
+&"Pwr": 8
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 20,
+&"Cha": 20,
+&"Comp": 20,
+&"Def": 20,
+&"Eleg": 20,
+&"Life": 20,
+&"Mag": 20,
+&"Move": 10,
+&"Pwr": 20
+})
+personal_passives = Array[ExtResource("2_grm3a")]([ExtResource("3_ni6na")])
+skills = Array[ExtResource("2_042v0")]([ExtResource("3_wxqng"), ExtResource("4_grm3a")])
+passives = Array[ExtResource("2_grm3a")]([ExtResource("3_ni6na")])
+weapon_prof = {
+"Blade": false,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": true,
+"Ofuda": false,
+"Stick": true
+}
+max_inv = 6
+natural = SubResource("Resource_rd4ga")
+
+[node name="Sprite" parent="PathFollow2D" index="0"]
+texture = ExtResource("5_ni6na")
+
+[node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
+max_value = 20.0

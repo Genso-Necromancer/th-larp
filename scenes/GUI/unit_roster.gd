@@ -1,7 +1,7 @@
 extends Control
 class_name UnitRoster
 
-signal trade_requested
+#signal trade_requested
 
 @onready var unitPreview := $PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/UnitPreviewPanel
 
@@ -40,7 +40,8 @@ func init_roster(forcedDep, depLimit):
 	close_unit_manager()
 	capLabel.set_text(str(depLimit))
 	capLabel.set_meta("Limit", depLimit)
-	for unit in units:
+	for slot in units:
+		var unit :String = slot.UnitId
 		var b = unitButton.instantiate()
 		
 		b.set_unit(unitObjs[unit])
@@ -100,7 +101,7 @@ func _font_state_change(node, state := ""):
 
 
 func open_unit_manager() -> Control: #need catch for which items to show
-	Global.focusUnit
+	#Global.focusUnit
 	unitManager.visible = true
 	return unitManager.buttonBox
 

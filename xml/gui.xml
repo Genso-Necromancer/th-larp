@@ -125,7 +125,8 @@
 			<entry id = "role_name_maid"><![CDATA[Maid]]></entry>
 			<entry id = "role_name_lady"><![CDATA[Lady]]></entry>
 			<entry id = "role_name_guard"><![CDATA[Gatekeeper]]></entry>
-			<entry id = "role_name_mage"><![CDATA[Magician]]></entry>
+			<entry id = "role_name_sorceress"><![CDATA[Sorceress]]></entry>
+			<entry id = "role_name_miko"><![CDATA[Miko]]></entry>
 			<!-- Weapon Types -->
 			<entry id = "type_blade"><![CDATA[Blade]]></entry>
 			<entry id = "type_blunt"><![CDATA[Blunt]]></entry>

@@ -65,7 +65,7 @@ func update_prof():
 	
 	
 	#var unitStats = focusUnit.active_stats
-	#var unitBuffs = focusUnit.activeBuffs
+	#var unitBuffs = focusUnit.active_buffs
 	
 	if inventory: focusLabels += _update_inventory(focusUnit)
 	if fBox: focusLabels += _update_features(focusUnit)

@@ -17,7 +17,6 @@ var timeModData := {}
 var terrainData := {}
 var rosterData := []
 var supply : Dictionary[String,Array] = {}
-var rosterOnce := false
 
 
 
@@ -159,6 +158,8 @@ func get_unit_stats(spec:int, role:int)->Dictionary:
 		for stat in sData.StatGroups[group]:
 			#print(stat)
 			stats[group][stat] = sData.StatGroups[group][stat] + jData.StatGroups[group][stat]
+			#if group == "Stats":
+				#print(stats.Stats[stat])
 	stats["Passives"] = sData.Passives + jData.Passives
 	#print(stats.Passives)
 	stats["Skills"] = sData.Skills + jData.Skills
@@ -183,26 +184,36 @@ func level_up(unit:Unit, levelups:int): #consider reach bands for stat normaliza
 	var rng = RandomNumberGenerator.new()
 	randomize()
 	var growth_check
-	var i = 0
 	var results = {}
 	var firstLoop = true
+	var leveled_features :Dictionary = {"Skills":unit.leveled_skills, "Passives":unit.leveled_passives}
 	
 	results["LVL"] = 0
+	results["NewSkills"] = []
+	results["NewPassives"] = []
 	while levelups > 0:
 		if unit.unit_level >= 20: break
 		unit.unit_level += 1
 		results["LVL"] += 1
+		
+		for level in leveled_features.Skills:
+			if unit.unit_level >= level and !unit.skills.has(leveled_features.Skills[level]):
+				results.NewSkills.append(leveled_features.Skills[level])
+		for level in leveled_features.Passives:
+			if unit.unit_level >= level and !unit.passives.has(leveled_features.Passives[level]):
+				results.NewPassives.append(leveled_features.Passives[level])
+				
+		
 		for stat in unit.base_stats:
 			growth_check = rng.randf_range(0.00, 1.0)
-			if growth_check <= unit.total_growth[stat] and unit.base_stats[stat] < unit.total_caps[stat]:
-				unit.base_stats[stat] += 1
+			if growth_check <= unit.total_growth[stat] and (unit.base_stats[stat] + unit.mod_stats[stat] + unit.level_stats[stat]) < unit.total_caps[stat]:
+				unit.level_stats[stat] += 1
 				if firstLoop: results[stat] = 1
 				else: results[stat] += 1
 			growth_check = rng.randf_range(0.00, 1.0)
-			if unit.total_growth[stat] >= 1.0 and growth_check <= (unit.total_growth[stat] - 1.0) and unit.base_stats[stat] < unit.total_caps[stat]:
-				unit.base_stats[stat] += 1
+			if unit.total_growth[stat] >= 1.0 and growth_check <= (unit.total_growth[stat] - 1.0) and (unit.base_stats[stat] + unit.mod_stats[stat] + unit.level_stats[stat]) < unit.total_caps[stat]:
+				unit.level_stats[stat] += 1
 				results[stat] += 1
-			i += 1
 		levelups -= 1
 		firstLoop = false
 	return results
@@ -233,7 +244,7 @@ func stat_gen(job :int, spec : int):
 	genData["Profile"] = {"UnitName" : genname}
 	genData["Profile"].merge({"Role" : jData["Role"]})
 	genData["Profile"].merge({"Species" : sData["Spec"]})
-	var art :Dictionary = _validate_art(pStats.get_art(genData.Profile.UnitName))
+	var art :Dictionary = _validate_art(pStats.get_art(genData.Profile.unit_name))
 	genData["Profile"].merge(art)
 	genData["Profile"].merge({"Level": 1})
 	genData["Profile"].merge({"Exp": 00})
@@ -250,22 +261,7 @@ func add_to_unitdata(data, id):
 	unitData[id] = data
 	print_rich("[color=green]Added to UnitData[/color]:", id)
 
-func generate_id():
-	var u := false
-	var c := 0
-	var unitId : String
-	if not Engine.is_editor_hint():
-		while !u:
-			unitId = "yk" + str(c)
-			if unitData.has(unitId):
-				c += 1
-				#print_rich("[color=red]IT'S HAPPENING[/color]:",c)
-			else:
-				u = true
-		#print("GENERATED ID:",unitId)
-		#if c > 5:
-			#print_rich("[color=red]UnitData[/color]:", UnitData.unitData.keys())
-		return unitId
+
 
 
 func _validate_art(art:Dictionary) -> Dictionary:
@@ -323,18 +319,26 @@ func _validate_art(art:Dictionary) -> Dictionary:
 		#loops -= 1
 		#firstLoop = false
 	#return results
-	
+#region Roster
 func init_roster():
-	if !rosterOnce:
-		rosterData.append("Remilia")
-		rosterData.append("Sakuya")
-		rosterData.append("Reimu")
-		rosterData.append("Patchouli")
-		rosterData.append("Meiling")
-		
-		rosterOnce = true
+	#var playerUnits : Array = ResourceLoader.list_directory("res://scenes/units/player_units/")
+	#var directory:String = "res://scenes/units/player_units/%s"
+#
+	#for unitRes in playerUnits:
+		#var rosterSlot : Dictionary = {"Unit": directory % [unitRes], "Alive":true}
+		#rosterData.append(rosterSlot)
+	rosterData.append({"Unit": "res://scenes/units/player_units/remilia.tscn","UnitId":"remilia", "Alive":true})
+	rosterData.append({"Unit": "res://scenes/units/player_units/sakuya.tscn","UnitId":"sakuya", "Alive":true})
+	rosterData.append({"Unit": "res://scenes/units/player_units/patchouli.tscn","UnitId":"patchouli", "Alive":true})
+	rosterData.append({"Unit": "res://scenes/units/player_units/meiling.tscn","UnitId":"meiling", "Alive":true})
+	rosterData.append({"Unit": "res://scenes/units/player_units/reimu.tscn","UnitId":"reimu", "Alive":true})
 	return
 
+
+func add_to_roster(unit_resource_path:String):
+	var rosterSlot : Dictionary = {"Unit": unit_resource_path, "Alive":true}
+	rosterData.append(rosterSlot)
+#endregion
 
 func init_supply():
 	supply = {

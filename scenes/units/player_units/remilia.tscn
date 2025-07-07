@@ -1,0 +1,75 @@
+[gd_scene load_steps=12 format=3 uid="uid://dwyxm5ognkbog"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_ku6ti"]
+[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_2l8tf"]
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="2_ou00g"]
+[ext_resource type="Texture2D" uid="uid://csm57ji64dv77" path="res://sprites/character/remilia/lady_sprite.png" id="2_tvseu"]
+[ext_resource type="Resource" uid="uid://bofq84qr3ykxf" path="res://unit_resources/features/passives/fated.tres" id="3_bmjv5"]
+[ext_resource type="Resource" uid="uid://p3wtlxq4fq1f" path="res://unit_resources/features/skills/life_steal_rem.tres" id="3_ushyw"]
+[ext_resource type="Resource" uid="uid://co546romn6pwr" path="res://unit_resources/features/passives/rem_aura.tres" id="4_302o8"]
+[ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="7_u1nol"]
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="8_vtdhj"]
+[ext_resource type="Resource" uid="uid://da080uvnxli85" path="res://unit_resources/items/weapons/gungnir.tres" id="9_1tx70"]
+
+[sub_resource type="Resource" id="Resource_5ej2j"]
+script = ExtResource("8_vtdhj")
+stats = ExtResource("9_1tx70")
+equipped = true
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[node name="Remilia" instance=ExtResource("1_ku6ti")]
+unitId = "remilia"
+recruited = true
+FACTION_ID = 2
+unique_art = true
+simulate_leveling = false
+SPEC_ID = 3
+ROLE_ID = 3
+move_type = 2
+total_stats = Dictionary[StringName, int]({
+&"Cele": 10,
+&"Cha": 8,
+&"Comp": 100,
+&"Def": 1,
+&"Eleg": 7,
+&"Life": 20,
+&"Mag": 4,
+&"Move": 5,
+&"Pwr": 5
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 20,
+&"Cha": 20,
+&"Comp": 20,
+&"Def": 20,
+&"Eleg": 20,
+&"Life": 20,
+&"Mag": 20,
+&"Move": 10,
+&"Pwr": 20
+})
+personal_passives = Array[ExtResource("2_ou00g")]([ExtResource("3_bmjv5"), ExtResource("4_302o8")])
+skills = Array[ExtResource("2_2l8tf")]([ExtResource("3_ushyw")])
+passives = Array[ExtResource("2_ou00g")]([ExtResource("3_bmjv5"), ExtResource("4_302o8")])
+weapon_prof = {
+"Blade": false,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": true
+}
+max_inv = 6
+inventory = Array[ExtResource("7_u1nol")]([SubResource("Resource_5ej2j")])
+
+[node name="Sprite" parent="PathFollow2D" index="0"]
+texture = ExtResource("2_tvseu")
+
+[node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
+max_value = 20.0

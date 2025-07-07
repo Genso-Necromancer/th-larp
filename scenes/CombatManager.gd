@@ -396,12 +396,12 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 	if action.Skill:
 		special = action.Skill
 		unitCompCost += _factor_combat_composure(unit, unit, triggers.SKILL, special.cost)
-		print("skill Cost comp loss added: ",unit.unitName, " ", unitCompCost)
+		print("skill Cost comp loss added: ",unit.unit_name, " ", unitCompCost)
 		multiSwing = _get_skill_swing_count(special)
 	elif action.Item:
 		special = action.Item
 		unitCompCost += _factor_combat_composure(unit, unit, triggers.SKILL, special.cost) # this isn't being used correctly
-		print("ofuda Cost comp loss added: ",unit.unitName, " ", unitCompCost)
+		print("ofuda Cost comp loss added: ",unit.unit_name, " ", unitCompCost)
 		#multiSwing = _get_skill_swing_count(special)
 	else:
 		multiSwing = unit.get_multi_swing()
@@ -412,7 +412,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 	for swing in swings:
 		if !special:
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.ATTACK)
-			print("Basic attack comp loss added: ",unit.unitName, " ", unitCompCost)
+			print("Basic attack comp loss added: ",unit.unit_name, " ", unitCompCost)
 		swingIndx = ("Swing" + str(swing))
 		print(str(swingIndx))
 		outcome[unit] = {swingIndx:{"ActionType": actionType, "Hit" : false, "CompLoss": 0, "Dmg" : 0, "Crit" : 0, "Skill" : special, "PassiveProc" : [], "Instant" : [], "Effects" : [], "Break" : false, "Slayer" : 0}}
@@ -458,9 +458,9 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 		else:
 			print("Missed")
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.MISS)
-			print("Attack Miss comp loss added: ",unit.unitName, " ", unitCompCost)
+			print("Attack Miss comp loss added: ",unit.unit_name, " ", unitCompCost)
 			targetCompCost += _factor_combat_composure(unit, target, triggers.DODGE)
-			print("Attack Dodge comp loss added: ",target.unitName, " ", targetCompCost)
+			print("Attack Dodge comp loss added: ",target.unit_name, " ", targetCompCost)
 			
 		
 		if !outcome[unit][swingIndx].Hit:
@@ -491,7 +491,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			critDmg = _get_crit_damage(unit)
 			print("Crit Success. Crit Dmg: ", critDmg)
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.CRIT)
-			print("Critically Hitting Comp Gain added: ", unit.unitName, " ", unitCompCost)
+			print("Critically Hitting Comp Gain added: ", unit.unit_name, " ", unitCompCost)
 		else: print("Crit Failed")
 			
 		#determine damage outcome
@@ -523,7 +523,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			
 			if actionType != ACTION_TYPE.FRIENDLY_SKILL:
 				targetCompCost += _factor_combat_composure(unit, target, triggers.WAS_HIT, finalDmg)
-				print("Was Hit Comp Loss added: ", target.unitName, " ", targetCompCost)
+				print("Was Hit Comp Loss added: ", target.unit_name, " ", targetCompCost)
 			for effect in unitEffects.OnHit:
 				print("Checking On Hit Effects....")
 				outcome[unit][swingIndx].Effects.append(_run_effect(unit, target, effect, actionType, finalDmg))
@@ -534,13 +534,13 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			if outcome[unit][swingIndx].Effects:
 				unitCompCost += _get_composure_total(unit, outcome[unit][swingIndx].Effects)
 				targetCompCost += _get_composure_total(target, outcome[unit][swingIndx].Effects)
-				print("Harvesting Effect Comp Loss.... ", unit.unitName, ": ", unitCompCost, " ", target.unitName, ": ", targetCompCost)
+				print("Harvesting Effect Comp Loss.... ", unit.unit_name, ": ", unitCompCost, " ", target.unit_name, ": ", targetCompCost)
 		
 		if target.active_stats.CurLife <= 0:
-			print("Shit dude, it says here ", target.unitName, " is dead.")
+			print("Shit dude, it says here ", target.unit_name, " is dead.")
 			outcome[target][swingIndx].Dead = true
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.KILL)
-			print("Kill Composure Gain added:", unit.unitName, " ", unitCompCost)
+			print("Kill Composure Gain added:", unit.unit_name, " ", unitCompCost)
 			
 		if action.Weapon:
 			unit.reduce_durability(weapon)
@@ -548,7 +548,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 		if action.Weapon and weapon.dur == 0:
 			outcome[unit][swingIndx].Break = true
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.BREAK)
-			print("Break Composure Loss added: ", unit.unitName, " ", unitCompCost)
+			print("Break Composure Loss added: ", unit.unit_name, " ", unitCompCost)
 			
 				
 		outcome[unit][swingIndx].CompLoss = unitCompCost
@@ -673,45 +673,45 @@ func _run_effect(actor:Unit, target:Unit, effect:Effect, actionType:Enums.ACTION
 				emit_signal("time_factor_changed", " EffectId: ", effect)
 			type.BUFF:
 				focus.set_buff(effect)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Buffed ", str(effect.sub_type), " by +", effect.value, " for ", effect.duration, " rounds.")
+				print("Actor: ", actor.unit_name, "Target: ", focus.unit_name, " EffectId: ",  str(effect), " Buffed ", str(effect.sub_type), " by +", effect.value, " for ", effect.duration, " rounds.")
 			type.DEBUFF: 
 				#"Debuffs" are resistable, possibly different general FXs, too. Remember this. need resist code.
 				focus.set_buff(effect)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				focus.apply_composure(result.Comp)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Buffed ", str(effect.sub_type), " by +", effect.value, " for ", effect.duration, " rounds.")
+				print("Actor: ", actor.unit_name, "Target: ", focus.unit_name, " EffectId: ",  str(effect), " Buffed ", str(effect.sub_type), " by +", effect.value, " for ", effect.duration, " rounds.")
 			type.STATUS: 
 				focus.set_status(effect)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				focus.apply_composure(result.Comp)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Applied Status: ", str(effect.sub_type), " for ", effect.duration, " rounds.")
+				print("Actor: ", actor.unit_name, "Target: ", focus.unit_name, " EffectId: ",  str(effect), " Applied Status: ", str(effect.sub_type), " for ", effect.duration, " rounds.")
 			type.DAMAGE:
 				result.Dmg += _factor_dmg(focus, effect)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				target.apply_dmg(result.Dmg, actor)
 				target.apply_composure(result.Comp)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Inflicted Damage: ", effect.value, " HP: ", target.active_stats.CurLife)
+				print("Actor: ", actor.unit_name, "Target: ", focus.unit_name, " EffectId: ",  str(effect), " Inflicted Damage: ", effect.value, " HP: ", target.active_stats.CurLife)
 			type.HEAL:
 				result.Heal = _factor_healing(actor, focus, effect)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				target.apply_heal(result.Heal)
 				target.apply_composure(result.Comp)
 				
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Healed For: ", result.Heal, " HP: ", target.active_stats.CurLife)
+				print("Actor: ", actor.unit_name, "Target: ", focus.unit_name, " EffectId: ",  str(effect), " Healed For: ", result.Heal, " HP: ", target.active_stats.CurLife)
 			type.CURE:
 				target.cure_status(effect.sub_type)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				target.apply_composure(result.Comp)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Cured Status: ", str(effect.sub_type))
+				print("Actor: ", actor.unit_name, "Target: ", focus.unit_name, " EffectId: ",  str(effect), " Cured Status: ", str(effect.sub_type))
 			type.RELOC:
 				#start_relocation(actor, focus, effect)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), "Relocation Requested")
+				print("Actor: ", actor.unit_name, "Target: ", focus.unit_name, " EffectId: ",  str(effect), "Relocation Requested")
 			type.LIFE_STEAL:
 				result.Heal = _factor_life_steal(focus, effect, dmg)
 				result.Comp = _factor_effect_composure(actor, focus, effect, result.Heal)
 				focus.apply_heal(result.Heal)
 				focus.apply_composure(result.Comp)
-				print("Actor: ", actor.unitName, "Target: ", focus.unitName, " EffectId: ",  str(effect), " Life Steal: ", result.Heal, " HP: ", target.active_stats.CurLife)
+				print("Actor: ", actor.unit_name, "Target: ", focus.unit_name, " EffectId: ",  str(effect), " Life Steal: ", result.Heal, " HP: ", target.active_stats.CurLife)
 			#type.ADD_SKILL: pass
 			#type.ADD_PASSIVE: pass
 			#type.MULTI_SWING: pass
@@ -723,7 +723,7 @@ func _run_effect(actor:Unit, target:Unit, effect:Effect, actionType:Enums.ACTION
 		gameBoard.add_post_queue(result.duplicate())
 	else:
 			result.Resisted = true
-			print("Actor: ", actor.unitName, "Target: ", focus.unitName, " Resisted: " + str(effect))
+			print("Actor: ", actor.unit_name, "Target: ", focus.unit_name, " Resisted: " + str(effect))
 	return result
 
 func _roll_proc(effect, chance) -> bool:
@@ -770,7 +770,7 @@ func shove_or_toss_unit(actor, target, reach, pivotHex, matchHex, mode = 0):
 		0: target.shove_unit(shoveResult.Hex)
 		1: target.toss_unit(shoveResult.Hex)
 	
-	print("Actor: ", actor.unitName, "Target: ", target.unitName, " Relocated to: ", str(shoveResult.Hex), "Slam? ", str(shoveResult.Slam), " Unit Collision? ", shoveResult.UniColl, " Slamage: ", slamDmg)
+	print("Actor: ", actor.unit_name, "Target: ", target.unit_name, " Relocated to: ", str(shoveResult.Hex), "Slam? ", str(shoveResult.Slam), " Unit Collision? ", shoveResult.UniColl, " Slamage: ", slamDmg)
 		
 func warp_to(target, cell):
 	target.relocate_unit(cell)
@@ -868,7 +868,7 @@ func use_item(unit:Unit, target:Unit, item:Item) -> Array: #not exactly finished
 	for effect in item.effects:
 		results.append(_run_effect(unit, target, effect, actionType))
 	compChange += _get_composure_total(unit, results)
-	print("Harvesting Effects Comp Loss.... ", unit.unitName, ": ", compChange)
+	print("Harvesting Effects Comp Loss.... ", unit.unit_name, ": ", compChange)
 	unit.apply_composure(compChange)
 	unit.reduce_durability(item)
 	return results

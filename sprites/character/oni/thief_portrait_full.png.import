@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://w7mbbljfdb0e"
-path="res://.godot/imported/magician_portrait.png-3130685e1c855e76f38f8db613cd8cf5.ctex"
+uid="uid://bh0g80m8lomxi"
+path="res://.godot/imported/thief_portrait_full.png-1b0fc2bc95f54dd17ad915bac97cce16.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/character/patchouli/magician_portrait.png"
-dest_files=["res://.godot/imported/magician_portrait.png-3130685e1c855e76f38f8db613cd8cf5.ctex"]
+source_file="res://sprites/character/oni/thief_portrait_full.png"
+dest_files=["res://.godot/imported/thief_portrait_full.png-1b0fc2bc95f54dd17ad915bac97cce16.ctex"]
 
 [params]
 

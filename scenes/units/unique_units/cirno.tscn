@@ -1,0 +1,77 @@
+[gd_scene load_steps=7 format=3 uid="uid://bokxjbvpfnkqp"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_86eo7"]
+[ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_x0q3j"]
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="3_yentv"]
+[ext_resource type="Resource" uid="uid://e7drxbfl83us" path="res://unit_resources/items/weapons/club.tres" id="4_dwoc8"]
+[ext_resource type="Texture2D" uid="uid://b0dblco6xcypq" path="res://sprites/character/cirno/trblr_sprite.png" id="5_v7mp4"]
+
+[sub_resource type="Resource" id="Resource_nxc8q"]
+script = ExtResource("3_yentv")
+stats = ExtResource("4_dwoc8")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[node name="Cirno" instance=ExtResource("1_86eo7")]
+unitId = "cirno"
+unique_art = true
+simulate_leveling = false
+unit_level = 3
+SPEC_ID = 1
+ROLE_ID = 1
+move_type = 2
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.1,
+&"Cha": 0.1,
+&"Comp": 0.3,
+&"Def": 0.2,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.3
+})
+total_stats = Dictionary[StringName, int]({
+&"Cele": 4,
+&"Cha": 2,
+&"Comp": 100,
+&"Def": 4,
+&"Eleg": 3,
+&"Life": 20,
+&"Mag": 1,
+&"Move": 4,
+&"Pwr": 6
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 20,
+&"Cha": 20,
+&"Comp": 20,
+&"Def": 20,
+&"Eleg": 20,
+&"Life": 20,
+&"Mag": 20,
+&"Move": 10,
+&"Pwr": 20
+})
+weapon_prof = {
+"Blade": false,
+"Blunt": true,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
+max_inv = 6
+inventory = Array[ExtResource("2_x0q3j")]([SubResource("Resource_nxc8q")])
+
+[node name="Sprite" parent="PathFollow2D" index="0"]
+texture = ExtResource("5_v7mp4")
+
+[node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
+max_value = 20.0

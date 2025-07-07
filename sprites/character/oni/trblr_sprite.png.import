@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bo6e5nujn022a"
-path="res://.godot/imported/magician_portrait_full.png-c0071424eeb64a40eae6f023102a15ad.ctex"
+uid="uid://cuqf75phsds5n"
+path="res://.godot/imported/trblr_sprite.png-a9e7b632755cd6042696a9a97bed5300.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/character/patchouli/magician_portrait_full.png"
-dest_files=["res://.godot/imported/magician_portrait_full.png-c0071424eeb64a40eae6f023102a15ad.ctex"]
+source_file="res://sprites/character/oni/trblr_sprite.png"
+dest_files=["res://.godot/imported/trblr_sprite.png-a9e7b632755cd6042696a9a97bed5300.ctex"]
 
 [params]
 
@@ -25,10 +25,10 @@ mipmaps/generate=false
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
-process/fix_alpha_border=true
+process/fix_alpha_border=false
 process/premult_alpha=false
 process/normal_map_invert_y=false
 process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
-detect_3d/compress_to=0
+detect_3d/compress_to=1

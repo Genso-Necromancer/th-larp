@@ -18,7 +18,7 @@ var ActorData: Dictionary = {
 	1: {
 		"name": "Patchouli Knowledge",
 		"title": "Librarian",
-		"portrait": preload("res://sprites/character/patchouli/magician_portrait.png")
+		"portrait": preload("res://sprites/character/patchouli/sorceress_portrait.png")
 	},
 	2: {
 		"name": "Remilia",

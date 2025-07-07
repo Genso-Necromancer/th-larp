@@ -58,9 +58,9 @@ func _set_unit_context(faction:Enums.FACTION_ID):
 		dazeTried = true
 	if unitContext.size() <= 0 and dazeTried: pass
 	#for unit in unitContext:
-		#print(unit.unitName,":", unitContext[unit].BaseValue)
+		#print(unit.unit_name,":", unitContext[unit].BaseValue)
 	#for unit in oppContext:
-		#print(unit.unitName,":", oppContext[unit].BaseValue)
+		#print(unit.unit_name,":", oppContext[unit].BaseValue)
 	#functions for adding context should go here
 	#adding them as I realize I need it
 

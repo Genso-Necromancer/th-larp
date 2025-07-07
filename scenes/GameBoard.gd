@@ -169,7 +169,7 @@ var cc : CameraController
 var ai : AiManager
 
 ##Unit Preload
-var unitScn := preload("res://scenes/Unit.tscn")
+var unitScn := preload("res://scenes/units/Unit.tscn")
 
 
 func _process(_delta):
@@ -207,7 +207,7 @@ func _wipe_region():
 
 #region debug funcs
 func _kill_lady():
-	var lady = unitObjs["Remilia"]
+	var lady = unitObjs["remilia"]
 	lady.apply_dmg(9999)
 
 
@@ -297,7 +297,7 @@ func _initialize_new_map():
 	units.clear()
 	_set_game_time()
 	_store_enemy_units()
-	_load_units()
+	_initialize_units()
 	_init_gamestate()
 	combatManager.init_manager()
 	ai = currMap.ai
@@ -312,56 +312,71 @@ func _store_enemy_units():
 		if not unit:
 			continue
 		
-		match unit.is_in_group("Player"): #turn order initializing
-			true: 
-				continue
-			false: 
-				units[unit.cell] = unit
+		match unit.FACTION_ID: #turn order initializing
+			Enums.FACTION_ID.ENEMY: units[unit.cell] = unit
+			_: continue
 		_connect_unit_signals(unit)
 		
-		unit.initialize_cell()
-		_update_unit_terrain(unit)
+		#unit.initialize_cell()
+		#_update_unit_terrain(unit)
 		 #update terrain data
 		
-func _load_units(): #merge with store enemy units
+func _initialize_units(): #merge with store enemy units
 	
-	var roster = UnitData.rosterData
+	var roster := UnitData.rosterData
+	var unitData:Dictionary = UnitData.unitData
 	#var spawnLoc
 	filledSlots = 0
 	deploymentCells = currMap.get_deployment_cells()
 	forcedDeploy = currMap.get_forced_deploy()
 	depCap = deploymentCells.size() + forcedDeploy.size()
 	
+	initialize_cell(currMap)
 	
-	for unit in roster:
-		var newUnit = unitScn.instantiate().init_unit(currMap, true, Enums.FACTION_ID.PLAYER, unit)
+	for rosterSlot in roster:
+		#var newUnit = unitScn.instantiate().init_unit(currMap, true, Enums.FACTION_ID.PLAYER, unit)
+		var newUnit :Unit= load(rosterSlot.Unit).instantiate()
+		var saveData :Dictionary
+		newUnit.initialize_unit(currMap, unitData.has(newUnit.unitId))
 		currMap.add_child(newUnit)
 		unitObjs[newUnit.unitId] = newUnit
+		if forcedDeploy.has(newUnit.unitId):
+			newUnit.forced = true
+			_deploy_unit(newUnit, true, forcedDeploy[newUnit.unitId])
+		elif filledSlots < depCap:
+			_deploy_unit(newUnit)
+		else:
+			_undeploy_unit(newUnit, true)
+			
+			
 	for child in currMap.get_children(): #grab unit children
 		var unit := child as Unit
-		if not unit:
-			continue
+		if not unit: continue
 		_connect_unit_signals(unit)
-		var isPlayable : bool
-		if unit.FACTION_ID == Enums.FACTION_ID.PLAYER:
-			isPlayable = true
-		else:
-			isPlayable = false
-		if isPlayable and forcedDeploy.has(unit.unitId):
-			unit.forced = true
-			_deploy_unit(unit, true, forcedDeploy[unit.unitId])
-		elif isPlayable and filledSlots < depCap:
-			_deploy_unit(unit)
-		elif isPlayable and filledSlots >= depCap:
-			_undeploy_unit(unit, true)
-	
-		if !isPlayable:
-			unit.init_unit(currMap,)
+		unit.set_process(true)
+		if unit.FACTION_ID != Enums.FACTION_ID.PLAYER:
 			units[unit.cell] = unit
 			unitObjs[unit.unitId] = unit
+		#var isPlayable : bool
+		#if unit.FACTION_ID == Enums.FACTION_ID.PLAYER:
+			#isPlayable = true
+		#else:
+			#isPlayable = false
+		#if isPlayable and forcedDeploy.has(unit.unitId):
+			#unit.forced = true
+			#_deploy_unit(unit, true, forcedDeploy[unit.unitId])
+		#elif isPlayable and filledSlots < deploymentCells.size():
+			#_deploy_unit(unit)
+		#elif isPlayable:
+			#_undeploy_unit(unit, true)
+	
+		#if !isPlayable:
+			##unit.init_unit(currMap,)
+			#units[unit.cell] = unit
+			#unitObjs[unit.unitId] = unit
 			
-		_update_unit_terrain(unit)
-		unit.set_process(true)
+		#_update_unit_terrain(unit)
+		#unit.set_process(true)
 	_update_roster_label()
 	
 

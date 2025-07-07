@@ -1,0 +1,83 @@
+[gd_scene load_steps=14 format=3 uid="uid://ehgcslevf08n"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_i0qm2"]
+[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_mx3tg"]
+[ext_resource type="Texture2D" uid="uid://c83g6bwvib3xh" path="res://sprites/character/reimu/miko_sprite.png" id="2_yned8"]
+[ext_resource type="Resource" uid="uid://cppnbtvkv1i0t" path="res://unit_resources/features/skills/slay_fairy.tres" id="3_rrfyl"]
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="4_634dn"]
+[ext_resource type="Resource" uid="uid://bj5u83dg0xeid" path="res://unit_resources/features/passives/plot_armor.tres" id="5_nnev5"]
+[ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="6_bmyf1"]
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="7_hh3fq"]
+[ext_resource type="Resource" uid="uid://crihx615imauw" path="res://unit_resources/items/weapons/gohei_simple.tres" id="8_fqquk"]
+[ext_resource type="Script" uid="uid://dtxt6i4bhoqpo" path="res://unit_resources/items/ofuda/ofuda.gd" id="9_634dn"]
+[ext_resource type="Resource" uid="uid://i6gxwkej1jxe" path="res://unit_resources/items/ofuda/ofuda_heal0.tres" id="10_nnev5"]
+
+[sub_resource type="Resource" id="Resource_tpcp1"]
+script = ExtResource("7_hh3fq")
+stats = ExtResource("8_fqquk")
+equipped = true
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[sub_resource type="Resource" id="Resource_bmyf1"]
+script = ExtResource("9_634dn")
+stats = ExtResource("10_nnev5")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://dtxt6i4bhoqpo"
+
+[node name="Reimu" instance=ExtResource("1_i0qm2")]
+unitId = "reimu"
+FACTION_ID = 2
+unique_art = true
+simulate_leveling = false
+SPEC_ID = 2
+ROLE_ID = 6
+total_stats = Dictionary[StringName, int]({
+&"Cele": 8,
+&"Cha": 8,
+&"Comp": 100,
+&"Def": 6,
+&"Eleg": 8,
+&"Life": 20,
+&"Mag": 5,
+&"Move": 4,
+&"Pwr": 7
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 20,
+&"Cha": 20,
+&"Comp": 20,
+&"Def": 20,
+&"Eleg": 20,
+&"Life": 20,
+&"Mag": 20,
+&"Move": 10,
+&"Pwr": 20
+})
+personal_skills = Array[ExtResource("2_mx3tg")]([ExtResource("3_rrfyl")])
+personal_passives = Array[ExtResource("4_634dn")]([ExtResource("5_nnev5")])
+skills = Array[ExtResource("2_mx3tg")]([ExtResource("3_rrfyl")])
+passives = Array[ExtResource("4_634dn")]([ExtResource("5_nnev5")])
+weapon_prof = {
+"Blade": false,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": true,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": true,
+"Stick": false
+}
+max_inv = 6
+inventory = Array[ExtResource("6_bmyf1")]([SubResource("Resource_tpcp1"), SubResource("Resource_bmyf1")])
+
+[node name="Sprite" parent="PathFollow2D" index="0"]
+texture = ExtResource("2_yned8")
+
+[node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
+max_value = 20.0

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cst1mk4jvlky"]
 
-[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/Unit.tscn" id="1_t3r1f"]
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_t3r1f"]
 
 [node name="SpawnGroup" type="Node2D"]
 

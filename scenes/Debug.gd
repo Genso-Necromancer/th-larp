@@ -35,7 +35,7 @@ func _process(_delta):
 	$PanelContainer/VBoxContainer/StateDebug.set_text("Slave: " + str(actSlave) + " | Prev.Slave:" + str(prevSlave) + " 
 	| State: " + cString + " | " + "Previous State: " + pString)
 	
-	if Global.focusUnit: $PanelContainer/VBoxContainer/UnitFocus.set_text("focusUnit : [" + str(Global.focusUnit.unitName)+"]")
+	if Global.focusUnit: $PanelContainer/VBoxContainer/UnitFocus.set_text("focusUnit : [" + str(Global.focusUnit.unit_name)+"]")
 	else: $PanelContainer/VBoxContainer/UnitFocus.set_text("focusUnit : [none]")
 	
 	if Global.focusDanmaku: $PanelContainer/VBoxContainer/DanmakuFocus.set_text("focusDanmaku : [" + str(Global.focusDanmaku)+"]")

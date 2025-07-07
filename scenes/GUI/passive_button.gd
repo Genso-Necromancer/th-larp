@@ -42,6 +42,6 @@ func set_passive_icon(data:Passive):
 	if ResourceLoader.exists(iconPath):
 		iconTx.set_texture(load(iconPath))
 	else:
-		print("item_button/set_item_icon: invalid icon path[", iconPath,"]")
+		#print("item_button/set_item_icon: invalid icon path[", iconPath,"]")
 		iconTx.set_texture(load("res://sprites/icons/items/missing_item.png"))
 	

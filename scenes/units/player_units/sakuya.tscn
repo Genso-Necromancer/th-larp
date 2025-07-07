@@ -1,0 +1,87 @@
+[gd_scene load_steps=15 format=3 uid="uid://diaw7xn4hvfd7"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_5xt48"]
+[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_mte8d"]
+[ext_resource type="Resource" uid="uid://6toly2qn15kk" path="res://unit_resources/features/skills/slow_time.tres" id="3_pg4wh"]
+[ext_resource type="Resource" uid="uid://cq6r1vkvimktr" path="res://unit_resources/features/skills/locked_corpse.tres" id="4_76ftn"]
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="5_xihvp"]
+[ext_resource type="Resource" uid="uid://m4j8pc7uii7k" path="res://unit_resources/features/passives/night_person.tres" id="6_ghyhf"]
+[ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="7_xjp6u"]
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="8_04v6q"]
+[ext_resource type="Resource" uid="uid://ck2mfsbmow1ok" path="res://unit_resources/items/weapons/knife_silver.tres" id="9_srosb"]
+[ext_resource type="Script" uid="uid://y8vspyvvdgjj" path="res://unit_resources/items/consumables/consumable.gd" id="10_80wpv"]
+[ext_resource type="Resource" uid="uid://cmoym4xuhijeg" path="res://unit_resources/items/consumables/pizza.tres" id="11_k4fqe"]
+[ext_resource type="Texture2D" uid="uid://dljh0liccgicy" path="res://sprites/character/sakuya/maid_sprite.png" id="12_pg4wh"]
+
+[sub_resource type="Resource" id="Resource_katwc"]
+script = ExtResource("8_04v6q")
+stats = ExtResource("9_srosb")
+equipped = true
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[sub_resource type="Resource" id="Resource_k04xu"]
+script = ExtResource("10_80wpv")
+stats = ExtResource("11_k4fqe")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://y8vspyvvdgjj"
+
+[node name="Sakuya" instance=ExtResource("1_5xt48")]
+unitId = "sakuya"
+recruited = true
+FACTION_ID = 2
+unique_art = true
+simulate_leveling = false
+unit_level = 5
+SPEC_ID = 2
+ROLE_ID = 4
+move_type = 1
+total_stats = Dictionary[StringName, int]({
+&"Cele": 7,
+&"Cha": 7,
+&"Comp": 100,
+&"Def": 2,
+&"Eleg": 11,
+&"Life": 20,
+&"Mag": 3,
+&"Move": 5,
+&"Pwr": 6
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 20,
+&"Cha": 20,
+&"Comp": 20,
+&"Def": 20,
+&"Eleg": 20,
+&"Life": 20,
+&"Mag": 20,
+&"Move": 10,
+&"Pwr": 20
+})
+personal_skills = Array[ExtResource("2_mte8d")]([ExtResource("3_pg4wh"), ExtResource("4_76ftn")])
+personal_passives = Array[ExtResource("5_xihvp")]([ExtResource("6_ghyhf")])
+skills = Array[ExtResource("2_mte8d")]([ExtResource("3_pg4wh"), ExtResource("4_76ftn")])
+passives = Array[ExtResource("5_xihvp")]([ExtResource("6_ghyhf")])
+weapon_prof = {
+"Blade": true,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": true,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
+max_inv = 6
+inventory = Array[ExtResource("7_xjp6u")]([SubResource("Resource_katwc"), SubResource("Resource_k04xu")])
+
+[node name="Sprite" parent="PathFollow2D" index="0"]
+texture = ExtResource("12_pg4wh")
+
+[node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
+max_value = 20.0

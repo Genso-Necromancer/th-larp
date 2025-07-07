@@ -21,7 +21,7 @@ func update_prof():
 		focusLabels.append_array(statusTray.get_icons())
 	
 	#var unitStats = focusDmk.active_stats
-	#var unitBuffs = focusDmk.activeBuffs
+	#var unitBuffs = focusDmk.active_buffs
 	
 	if inventory: focusLabels += _update_inventory(focusDmk)
 	if fBox: focusLabels += _update_features(focusDmk)

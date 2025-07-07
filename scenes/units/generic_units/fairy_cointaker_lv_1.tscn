@@ -1,0 +1,70 @@
+[gd_scene load_steps=6 format=3 uid="uid://dffu0k0v5tou1"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_qpxpp"]
+[ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_eo4lj"]
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="3_ls7l8"]
+[ext_resource type="Resource" uid="uid://b7s77y3xj1qtm" path="res://unit_resources/items/weapons/knife_dagger.tres" id="4_2tf2k"]
+
+[sub_resource type="Resource" id="Resource_akanq"]
+script = ExtResource("3_ls7l8")
+stats = ExtResource("4_2tf2k")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[node name="Fairy Cointaker lv1" instance=ExtResource("1_qpxpp")]
+SPEC_ID = 1
+ROLE_ID = 2
+move_type = 2
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.55,
+&"Cha": 0.1,
+&"Comp": 0.3,
+&"Def": 0.2,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.3
+})
+total_stats = Dictionary[StringName, int]({
+&"Cele": 7,
+&"Cha": 2,
+&"Comp": 100,
+&"Def": 0,
+&"Eleg": 3,
+&"Life": 14,
+&"Mag": 1,
+&"Move": 5,
+&"Pwr": 4
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 20,
+&"Cha": 20,
+&"Comp": 20,
+&"Def": 20,
+&"Eleg": 20,
+&"Life": 20,
+&"Mag": 20,
+&"Move": 10,
+&"Pwr": 20
+})
+weapon_prof = {
+"Blade": true,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": true,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
+max_inv = 6
+inventory = Array[ExtResource("2_eo4lj")]([SubResource("Resource_akanq")])
+
+[node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
+max_value = 14.0
+value = 0.0

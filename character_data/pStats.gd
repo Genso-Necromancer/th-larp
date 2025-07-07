@@ -387,17 +387,60 @@ static func get_named_unit_data():
 
 static func get_spec(specInd):
 	match specInd:
+		SPEC_ID.NONE:
+			return {
+			"StatGroups":{
+				"Stats": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+					},
+				"Growths": {
+					"Move": 0,
+					"Life": 0.0,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.0,
+					"Cele": 0.0,
+					"Def": 0.0,
+					"Cha": 0.0
+					},
+				"Caps": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MoveType": MOVE_TYPE.FOOT
+				}
 		SPEC_ID.FAIRY: 
 			return {
 			"Spec": SPEC_ID.FAIRY,
 			"StatGroups":{
 				"Stats": {
-					"Move": 4,
+					"Move": 0,
 					"Life": 0,
-					"Comp": 100,
+					"Comp": 0,
 					"Pwr": 0,
 					"Mag": 1,
-					"Eleg": 0,
+					"Eleg": -1,
 					"Cele": 2,
 					"Def": 0,
 					"Cha": 2
@@ -426,7 +469,9 @@ static func get_spec(specInd):
 					}
 					},
 			"Passives":[],
+			"LeveledPassives": {0:""},
 			"Skills":[],
+			"LeveledSkills": {0:""},
 			"MoveType": MOVE_TYPE.FLY
 				}
 		SPEC_ID.YOUKAI:
@@ -434,15 +479,15 @@ static func get_spec(specInd):
 			"Spec": SPEC_ID.YOUKAI,
 			"StatGroups":{
 				"Stats": {
-					"Move": 4,
+					"Move": 0,
 					"Life": 0,
-					"Comp": 100,
+					"Comp": 0,
 					"Pwr": 1,
 					"Mag": 0,
-					"Eleg": 1,
+					"Eleg": 0,
 					"Cele": 0,
 					"Def": 1,
-					"Cha": 1
+					"Cha": 0
 					},
 				"Growths": {
 					"Move": 0,
@@ -468,17 +513,18 @@ static func get_spec(specInd):
 					}
 					},
 			"Passives":[],
-			"Skills":[load("res://unit_resources/features/skills/toss_enemy.tres")],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
 			"MoveType": MOVE_TYPE.FOOT
 				}
 		SPEC_ID.HUMAN:
 			return {
-			"Spec": SPEC_ID.HUMAN,
 			"StatGroups":{
 				"Stats": {
-					"Move": 4,
+					"Move": 0,
 					"Life": 0,
-					"Comp": 100,
+					"Comp": 0,
 					"Pwr": 0,
 					"Mag": 0,
 					"Eleg": 0,
@@ -488,14 +534,14 @@ static func get_spec(specInd):
 					},
 				"Growths": {
 					"Move": 0,
-					"Life": 0.1,
+					"Life": 0.0,
 					"Comp": 0.0,
-					"Pwr": 0.1,
+					"Pwr": 0.0,
 					"Mag": 0.0,
-					"Eleg": 0.1,
-					"Cele": 0.1,
+					"Eleg": 0.0,
+					"Cele": 0.0,
 					"Def": 0.0,
-					"Cha": 0.3
+					"Cha": 0.0
 					},
 				"Caps": {
 					"Move": 0,
@@ -506,24 +552,533 @@ static func get_spec(specInd):
 					"Eleg": 0,
 					"Cele": 0,
 					"Def": 0,
-					"Cha": 2
+					"Cha": 0
 					}
 					},
 			"Passives":[],
+			"LeveledPassives": {0:""},
 			"Skills":[],
+			"LeveledSkills": {0:""},
 			"MoveType": MOVE_TYPE.FOOT
 				}
-	
+		SPEC_ID.VAMPIRE:
+			return {
+			"StatGroups":{
+				"Stats": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+					},
+				"Growths": {
+					"Move": 0,
+					"Life": 0.0,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.0,
+					"Cele": 0.0,
+					"Def": 0.0,
+					"Cha": 0.0
+					},
+				"Caps": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":["res://unit_resources/features/skills/life_steal_rem.tres"],
+			"LeveledSkills": {0:""},
+			"MoveType": MOVE_TYPE.FOOT
+				}
+		SPEC_ID.MAGICIAN:
+			return {
+			"StatGroups":{
+				"Stats": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 4,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+					},
+				"Growths": {
+					"Move": 0,
+					"Life": 0.0,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.0,
+					"Cele": 0.0,
+					"Def": 0.0,
+					"Cha": 0.0
+					},
+				"Caps": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MoveType": MOVE_TYPE.FOOT
+				}
+		SPEC_ID.DRAGON:
+			return {
+			"StatGroups":{
+				"Stats": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+					},
+				"Growths": {
+					"Move": 0,
+					"Life": 0.0,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.0,
+					"Cele": 0.0,
+					"Def": 0.0,
+					"Cha": 0.0
+					},
+				"Caps": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MoveType": MOVE_TYPE.FOOT
+				}
+		SPEC_ID.ONI:
+			return {
+			"StatGroups":{
+				"Stats": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+					},
+				"Growths": {
+					"Move": 0,
+					"Life": 0.0,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.0,
+					"Cele": 0.0,
+					"Def": 0.0,
+					"Cha": 0.0
+					},
+				"Caps": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MoveType": MOVE_TYPE.FOOT
+				}
+
+
 static func get_job(jobInd):
 	match jobInd:
+		ROLE_ID.NONE: return {
+			"Role": "n/a",
+			"StatGroups":{
+				"Stats": {
+					"Move": 5,
+					"Life": 20,
+					"Comp": 100,
+					"Pwr": 5,
+					"Mag": 4,
+					"Eleg": 7,
+					"Cele": 10,
+					"Def": 1,
+					"Cha": 8
+					},
+				"Growths": {
+					"Move": 0.0,
+					"Life": 0.0,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.0,
+					"Cele": 0.0,
+					"Def": 0.0,
+					"Cha": 0.0
+					},
+				"Caps": {
+					"Move": 10,
+					"Life": 20,
+					"Comp": 20,
+					"Pwr": 20,
+					"Mag": 20,
+					"Eleg": 20,
+					"Cele": 20,
+					"Def": 20,
+					"Cha": 20
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MaxInv": 6,
+			"Weapons": {
+				"Blade": false,
+				"Blunt": false,
+				"Stick": true,
+				"Book": false,
+				"Gohei": false,
+				"Ofuda": false,
+				"Bow": false,
+				"Gun": false,
+				"Knife": false,
+				"Natural":false,
+				},
+			"MoveType": MOVE_TYPE.FLY
+				}
+		ROLE_ID.LADY: return {
+			"Role": "Lady",
+			"StatGroups":{
+				"Stats": {
+					"Move": 5,
+					"Life": 20,
+					"Comp": 100,
+					"Pwr": 5,
+					"Mag": 4,
+					"Eleg": 7,
+					"Cele": 10,
+					"Def": 1,
+					"Cha": 8
+					},
+				"Growths": {
+					"Move": 0.0,
+					"Life": 0.0,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.0,
+					"Cele": 0.0,
+					"Def": 0.0,
+					"Cha": 0.0
+					},
+				"Caps": {
+					"Move": 10,
+					"Life": 20,
+					"Comp": 20,
+					"Pwr": 20,
+					"Mag": 20,
+					"Eleg": 20,
+					"Cele": 20,
+					"Def": 20,
+					"Cha": 20
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MaxInv": 6,
+			"Weapons": {
+				"Blade": false,
+				"Blunt": false,
+				"Stick": true,
+				"Book": false,
+				"Gohei": false,
+				"Ofuda": false,
+				"Bow": false,
+				"Gun": false,
+				"Knife": false,
+				"Natural":false,
+				},
+			"MoveType": MOVE_TYPE.FLY
+				}
+		ROLE_ID.MAID: return {
+			"Role": "Maid",
+			"StatGroups":{
+				"Stats": {
+					"Move": 5,
+					"Life": 20,
+					"Comp": 100,
+					"Pwr": 6,
+					"Mag": 3,
+					"Eleg": 11,
+					"Cele": 7,
+					"Def": 2,
+					"Cha": 7
+					},
+				"Growths": {
+					"Move": 0.0,
+					"Life": 0.0,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.0,
+					"Cele": 0.0,
+					"Def": 0.0,
+					"Cha": 0.0
+					},
+				"Caps": {
+					"Move": 10,
+					"Life": 20,
+					"Comp": 20,
+					"Pwr": 20,
+					"Mag": 20,
+					"Eleg": 20,
+					"Cele": 20,
+					"Def": 20,
+					"Cha": 20
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MaxInv": 6,
+			"Weapons": {
+				"Blade": true,
+				"Blunt": false,
+				"Stick": false,
+				"Book": false,
+				"Gohei": false,
+				"Ofuda": false,
+				"Bow": false,
+				"Gun": false,
+				"Knife": true,
+				"Natural":false,
+				},
+			"MoveType": MOVE_TYPE.RANGER
+				}
+		ROLE_ID.SORCERESS: return {
+			"Role": "Sorceress",
+			"StatGroups":{
+				"Stats": {
+					"Move": 4,
+					"Life": 20,
+					"Comp": 100,
+					"Pwr": 0,
+					"Mag": 8,
+					"Eleg": 10,
+					"Cele": 4,
+					"Def": 0,
+					"Cha": 6
+					},
+				"Growths": {
+					"Move": 0.0,
+					"Life": 0.0,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.0,
+					"Cele": 0.0,
+					"Def": 0.0,
+					"Cha": 0.0
+					},
+				"Caps": {
+					"Move": 10,
+					"Life": 20,
+					"Comp": 20,
+					"Pwr": 20,
+					"Mag": 20,
+					"Eleg": 20,
+					"Cele": 20,
+					"Def": 20,
+					"Cha": 20
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MaxInv": 6,
+			"Weapons": {
+				"Blade": false,
+				"Blunt": false,
+				"Stick": false,
+				"Book": true,
+				"Gohei": false,
+				"Ofuda": false,
+				"Bow": false,
+				"Gun": false,
+				"Knife": false,
+				"Natural":false,
+				},
+			"MoveType": MOVE_TYPE.FOOT
+				}
+		ROLE_ID.GUARD: return {
+			"Role": "Guard",
+			"StatGroups":{
+				"Stats": {
+					"Move": 4,
+					"Life": 20,
+					"Comp": 100,
+					"Pwr": 8,
+					"Mag": 0,
+					"Eleg": 8,
+					"Cele": 5,
+					"Def": 8,
+					"Cha": 5
+					},
+				"Growths": {
+					"Move": 0.0,
+					"Life": 0.0,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.0,
+					"Cele": 0.0,
+					"Def": 0.0,
+					"Cha": 0.0
+					},
+				"Caps": {
+					"Move": 10,
+					"Life": 20,
+					"Comp": 20,
+					"Pwr": 20,
+					"Mag": 20,
+					"Eleg": 20,
+					"Cele": 20,
+					"Def": 20,
+					"Cha": 20
+					}
+					},
+			"Passives":[],
+			"Skills":["res://unit_resources/features/skills/toss_enemy.tres","res://unit_resources/features/skills/shove_enemy01.tres"],
+			"MaxInv": 6,
+			"Weapons": {
+				"Blade": false,
+				"Blunt": false,
+				"Stick": true,
+				"Book": false,
+				"Gohei": false,
+				"Ofuda": false,
+				"Bow": false,
+				"Gun": false,
+				"Knife": false,
+				"Natural":false,
+				},
+			"MoveType": MOVE_TYPE.FOOT
+				}
+		ROLE_ID.MIKO: return {
+			"Role": "Miko",
+			"StatGroups":{
+				"Stats": {
+					"Move": 4,
+					"Life": 20,
+					"Comp": 100,
+					"Pwr": 7,
+					"Mag": 5,
+					"Eleg": 8,
+					"Cele": 8,
+					"Def": 6,
+					"Cha": 8
+					},
+				"Growths": {
+					"Move": 0.0,
+					"Life": 0.0,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.0,
+					"Cele": 0.0,
+					"Def": 0.0,
+					"Cha": 0.0
+					},
+				"Caps": {
+					"Move": 10,
+					"Life": 20,
+					"Comp": 20,
+					"Pwr": 20,
+					"Mag": 20,
+					"Eleg": 20,
+					"Cele": 20,
+					"Def": 20,
+					"Cha": 20
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MaxInv": 6,
+			"Weapons": {
+				"Blade": false,
+				"Blunt": false,
+				"Stick": false,
+				"Book": false,
+				"Gohei": true,
+				"Ofuda": true,
+				"Bow": false,
+				"Gun": false,
+				"Knife": false,
+				"Natural":false,
+				},
+			"MoveType": MOVE_TYPE.FOOT
+				}
 		ROLE_ID.TRBLR: 
 			return {
 			"Role": "Troublemaker",
 			"StatGroups":{
 				"Stats": {
-					"Move": 0, #Unintuitive handling of move. Race should give bonus, not job
+					"Move": 4,
 					"Life": 20,
-					"Comp": 10,
+					"Comp": 100,
 					"Pwr": 6,
 					"Mag": 0,
 					"Eleg": 4,
@@ -555,7 +1110,9 @@ static func get_job(jobInd):
 					}
 					},
 			"Passives":[],
+			"LeveledPassives": {0:""},
 			"Skills":[],
+			"LeveledSkills": {0:""},
 			"MaxInv": 6,
 			"Weapons": {
 				"Blade": false,
@@ -575,9 +1132,9 @@ static func get_job(jobInd):
 			"Role": "Cointaker",
 			"StatGroups":{
 				"Stats": {
-					"Move": 1,
+					"Move": 5,
 					"Life": 14,
-					"Comp": 10,
+					"Comp": 100,
 					"Pwr": 4,
 					"Mag": 0,
 					"Eleg": 4,
@@ -609,7 +1166,9 @@ static func get_job(jobInd):
 					}
 					},
 			"Passives":[],
+			"LeveledPassives": {0:""},
 			"Skills":[],
+			"LeveledSkills": {0:""},
 			"MaxInv": 6,
 			"Weapons": {
 				"Blade": true,
@@ -1495,5 +2054,49 @@ static func get_time_mods():
 							"DRes": 0,
 						}
 		},
+		Enums.SPEC_ID.ONI:{
+						Enums.TIME.DAY:{
+							"Move": 0,
+							"Life": 0,
+							"Comp": 0,
+							"Pwr": 0,
+							"Mag": 0,
+							"Eleg": 0,
+							"Cele": 0,
+							"Def": 0,
+							"Cha": 0,
+							"Dmg": 0, 
+							"Hit": 0, 
+							"": 0, 
+							"Barrier": 0, 
+							"BarPrc": 0, 
+							"Crit": 0, 
+							"Luck": 0, 
+							"Resist": 0, 
+							"EffHit":0, 
+							"DRes": 0,
+						},
+						Enums.TIME.NIGHT:{
+							"Move": 0,
+							"Life": 0,
+							"Comp": 0,
+							"Pwr": 0,
+							"Mag": 0,
+							"Eleg": 0,
+							"Cele": 0,
+							"Def": 0,
+							"Cha": 0,
+							"Dmg": 0, 
+							"Hit": 0, 
+							"": 0, 
+							"Barrier": 0, 
+							"BarPrc": 0, 
+							"Crit": 0, 
+							"Luck": 0, 
+							"Resist": 0, 
+							"EffHit":0, 
+							"DRes": 0,
+						}
+		}
 	}
 	return timeMods

@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cb7freyrit3pr"]
 
-[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/Unit.tscn" id="1_74ym6"]
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_74ym6"]
 
 [node name="FairyBrigand" instance=ExtResource("1_74ym6")]
 archetype = 2

@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bg6gj0igt3tqu" path="res://scenes/Danmaku/cirno/cirno_pattern_01.tscn" id="2_5snag"]
 [ext_resource type="PackedScene" uid="uid://dytugmw615m15" path="res://scenes/Danmaku/cirno/cirno_pattern_02.tscn" id="3_bns5h"]
 [ext_resource type="Script" uid="uid://dshxl1mfpb0v0" path="res://scrpt/danmaku/danmaku_script.gd" id="4_pivsa"]
-[ext_resource type="Resource" uid="uid://do3acn7e6lrmv" path="res://scenes/cutscenes/scene_script/test_map_start.tres" id="5_y36re"]
+[ext_resource type="Resource" path="res://scenes/cutscenes/scene_script/test_map_start.tres" id="5_y36re"]
 [ext_resource type="PackedScene" uid="uid://b6vorq2w1b5oa" path="res://scenes/units/cirno.tscn" id="6_k3lsm"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="7_tygqd"]
 [ext_resource type="PackedScene" uid="uid://cb7freyrit3pr" path="res://scenes/units/fairy_brigand.tscn" id="8_k3lsm"]

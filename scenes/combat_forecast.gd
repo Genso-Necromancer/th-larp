@@ -88,7 +88,7 @@ func update_fc(foreCast:Dictionary) -> void: #HERE labels need updating to using
 		else: lifeText = lifeText % [hp]
 		
 		#sprites[i].set_texture(units[i].unitData.Profile.Prt)
-		groups[g][0].set_text(units[i].unitName)
+		groups[g][0].set_text(units[i].unit_name)
 		groups[g][1].set_text(lifeText)
 		groups[g][2].set_text(hit)
 		groups[g][3].set_text(dmg)

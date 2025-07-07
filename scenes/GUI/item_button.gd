@@ -76,7 +76,7 @@ func set_item_icon(icon_path : String):
 	if ResourceLoader.exists(icon_path):
 		i.set_texture(load(icon_path))
 	else:
-		print("item_button/set_item_icon: invalid icon path[", icon_path,"]")
+		#print("item_button/set_item_icon: invalid icon path[", icon_path,"]")
 		i.set_texture(load("res://sprites/icons/items/missing_item.png"))
 
 
