@@ -95,9 +95,9 @@ func _update_inventory(unit) -> Array:
 
 func _update_features(unit) -> Array:
 	var skills = unit.skills
-	#var sData = UnitData.skillData
+	#var sData = PlayerData.skillData
 	var passives = unit.passives
-	#var pData = UnitData.passiveData
+	#var pData = PlayerData.passiveData
 	var sPath = load("res://scenes/GUI/skill_button.tscn")
 	var pPath = load("res://scenes/GUI/passive_button.tscn")
 	var s : SkillButton

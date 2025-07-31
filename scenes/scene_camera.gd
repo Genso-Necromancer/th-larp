@@ -11,7 +11,7 @@ func tween_camera(hex:Vector2i, property: String, speed:float = 1.0, setTrans: T
 		if tween: 
 			_kill_tween() 
 		tween = create_tween()
-		var currMap = Global.flags.CurrentMap
+		var currMap = Global.map_ref
 		var newPosition
 		#var adjSpd : float = speed/path.size()
 		

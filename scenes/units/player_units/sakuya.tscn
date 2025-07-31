@@ -30,7 +30,7 @@ is_broken = false
 metadata/_custom_type_script = "uid://y8vspyvvdgjj"
 
 [node name="Sakuya" instance=ExtResource("1_5xt48")]
-unitId = "sakuya"
+unit_id = "sakuya"
 recruited = true
 FACTION_ID = 2
 unique_art = true
@@ -85,3 +85,4 @@ texture = ExtResource("12_pg4wh")
 
 [node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
 max_value = 20.0
+value = 20.0

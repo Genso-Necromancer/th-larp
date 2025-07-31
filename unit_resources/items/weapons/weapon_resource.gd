@@ -16,3 +16,8 @@ class_name WeaponResource
 	set(value):
 		max_reach = clampi(value, 0, 999)
 @export var damage_type : Enums.DAMAGE_TYPE = Enums.DAMAGE_TYPE.NONE
+
+func get_resource_path()->String:
+	var path:String = "res://unit_resources/items/weapons/%s.tres" % id
+	
+	return path

@@ -17,6 +17,7 @@ func _init(resource : UnitResource = load("res://unit_resources/items/weapons/un
 	id = properties.id
 	print(_format_to_id())
 
+
 func get_property_names() -> Array[String]:
 	var propList : Array[Dictionary] = get_property_list()
 	var propNames : Array[String] = []
@@ -25,8 +26,10 @@ func get_property_names() -> Array[String]:
 			propNames.append(prop.name)
 	return propNames
 
+
 func load_resource(resource:UnitResource):
 	_init(resource)
+
 
 func _format_to_id() -> String:
 	var path = get_path()
@@ -39,3 +42,20 @@ func _format_to_id() -> String:
 	#print(slice)
 	#print(new_id)
 	return new_id
+
+
+func convert_to_save_data()->Dictionary:
+	var converted:Dictionary
+	converted = _get_values()
+	converted["Properties"] = properties.get_resource_path()
+	return converted
+
+
+func _get_values()->Dictionary:
+	var values:Dictionary ={}
+	values["id"] = id
+	return values
+
+
+func load_save_data(save_data:Dictionary):
+	id = save_data.id

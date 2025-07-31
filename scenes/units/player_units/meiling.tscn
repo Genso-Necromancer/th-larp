@@ -18,7 +18,7 @@ dropped = false
 is_broken = false
 
 [node name="Meiling" instance=ExtResource("1_ys274")]
-unitId = "meiling"
+unit_id = "meiling"
 recruited = true
 FACTION_ID = 2
 unique_art = true
@@ -70,3 +70,4 @@ texture = ExtResource("5_ni6na")
 
 [node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
 max_value = 20.0
+value = 20.0

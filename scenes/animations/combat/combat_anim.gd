@@ -45,7 +45,7 @@ func set_unit(newUnit : Unit):
 	
 	
 func assign_action(hit, actionType, skillId = false):
-	var sData = UnitData.skillData
+	var sData = PlayerData.skillData
 	isHit = hit
 	match actionType:
 		ACTION_TYPE.WEAPON: _assign_attack_animation()

@@ -29,7 +29,7 @@ func _get_property_list():
 		"type" : TYPE_STRING,
 		"hint" : PROPERTY_HINT_ENUM,
 		"hint_string" : _array_to_string(_styles)
-		#"hint_string" : _array_to_string(UnitData.get_item_keys())
+		#"hint_string" : _array_to_string(PlayerData.get_item_keys())
 	})
 		
 		

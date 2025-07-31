@@ -1,6 +1,8 @@
 @tool
 extends Node
 
+###Managment Signals
+#signal game_paused(exempt_scene)
 
 signal prompt_accepted
 signal focus_unit_changed(unit:Unit)

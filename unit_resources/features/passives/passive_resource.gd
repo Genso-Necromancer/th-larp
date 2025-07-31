@@ -14,3 +14,8 @@ class_name Passive
 @export var aura : Aura
 @export var day : Aura
 @export var night : Aura
+
+
+func get_resource_path()->String:
+	var path:String = "res://unit_resources/features/passives/%s.gd" % id
+	return path

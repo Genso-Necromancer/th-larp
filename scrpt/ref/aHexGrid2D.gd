@@ -109,14 +109,14 @@ func _sort_hostiles(unit: Unit) -> void:
 	for cell in unitList:
 			if !_is_hostile(mainFaction, unitList[cell]):
 				passableList.append(cell)
-			elif unit.active_stats.MoveType == Enums.MOVE_TYPE.FLY or unit.search_passive_id(Enums.PASSIVE_TYPE.PASS): 
+			elif unit.move_type == Enums.MOVE_TYPE.FLY or unit.search_passive_id(Enums.PASSIVE_TYPE.PASS): 
 				passableList.append(cell)
 			else:
 				solidList.append(cell)
 
 
 func _sort_walls(unit : Unit = null, walls : Dictionary = tileMap.get_walls()): #With another function you can nest anywhere
-	if unit and unit.active_stats.MoveType == Enums.MOVE_TYPE.FLY:
+	if unit and unit.move_type == Enums.MOVE_TYPE.FLY:
 		passableList.append_array(walls.WallFly)
 	else: solidList.append_array(walls.WallFly)
 	solidList.append_array(walls.WallShoot)
@@ -285,7 +285,7 @@ func compute_cost(a: Vector2i, b: Vector2i, unit = false) -> float:
 	var distance = axial_distance(ac, bc)
 	var final = 0
 	if unit: 
-		moveType = unit.active_stats.MoveType
+		moveType = unit.move_type
 		tileWeight += tileMap.get_movement_cost(b, moveType)
 	
 	
@@ -729,20 +729,19 @@ func _find_closest_edge_x(cell):
 	return edge
 
 
-func find_goal(wakka, brother, sinsToxin, youSaySo):
-	var goal
-	var you = "Tidus"
-	var gotcha = 0
-	while goal != "Victory":
-		if !brother.pop_back():
-			match wakka[gotcha]:
-				"Alright": gotcha += 1
-				"Hustle": goal = "victory"
-	if youSaySo:
-		return goal
-	elif sinsToxin.has(you):
-		return
-	
+#func find_goal(wakka, brother, sinsToxin, youSaySo):
+	#var goal
+	#var you = "Tidus"
+	#var gotcha = 0
+	#while goal != "Victory":
+		#if !brother.pop_back():
+			#match wakka[gotcha]:
+				#"Alright": gotcha += 1
+				#"Hustle": goal = "victory"
+	#if youSaySo:
+		#return goal
+	#elif sinsToxin.has(you):
+		#return
 
 #danmaku pathing
 #func find_and_set_direction(cell, anchorCell):

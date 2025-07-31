@@ -36,7 +36,7 @@ func _set_item_text(data) -> void:
 	for effId in data.Effects:
 		string = "%s" % StringGetter.get_effect_string(effId)
 		
-		match UnitData.effectData[effId].type:
+		match PlayerData.effectData[effId].type:
 			Enums.EFFECT_TYPE.ADD_SKILL:
 				skillEff.append(string)
 				continue
@@ -45,7 +45,7 @@ func _set_item_text(data) -> void:
 				continue
 			_: pass
 			
-		match UnitData.effectData[effId].Target:
+		match PlayerData.effectData[effId].Target:
 			Enums.EFFECT_TARGET.SELF, Enums.EFFECT_TARGET.EQUIPPED: selfEff.append(string)
 			Enums.EFFECT_TARGET.TARGET: targEff.append(string)
 			Enums.EFFECT_TARGET.GLOBAL: globEff.append(string)

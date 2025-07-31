@@ -18,7 +18,7 @@ func set_passive_text(data:Passive):
 	
 	
 	if data.is_time_sens:
-		match Global.timeOfDay:
+		match Global.time_of_day:
 			Enums.TIME.DAY: string = data.day_id
 			Enums.TIME.NIGHT: string = data.night_id
 	else:
@@ -33,7 +33,7 @@ func set_passive_icon(data:Passive):
 	var icon : String
 	var iconPath := "res://sprites/icons/features/%s_.png"
 	if data.is_time_sens:
-		match Global.timeOfDay:
+		match Global.time_of_day:
 			Enums.TIME.DAY: icon = data.day_id
 			Enums.TIME.NIGHT: icon = data.night_id
 	else:

@@ -28,7 +28,7 @@ func _ready():
 
 func update_focus_viewer(cell:Vector2i) -> void:
 	terrainPanel.visible = true
-	terrainPanel.update_terrain_data(cell)
+	terrainPanel.update_terrain_data(cell, Global.map_ref)
 	#_update_unit_panel()
 	#_update_dmk_panel()
 

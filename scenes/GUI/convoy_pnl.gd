@@ -27,7 +27,7 @@ var openTab := tabTypes.BLADE:
 		
 
 #Supply Tracking
-var supplyStats = UnitData.supplyStats
+var supplyStats = PlayerData.supplyStats
 
 func _ready():
 	var container := $VBoxContainer/PanelContainer2/MarginContainer/tabContainer
@@ -37,7 +37,7 @@ func _ready():
 
 func _convert_string_to_item():
 	var tabKeys = tabTypes.keys()
-	var supply = UnitData.supply
+	var supply = PlayerData.supply
 	for tab in tabKeys:
 		for entry in supply[tab]:
 			if entry is String: entry = load(entry).duplicate()
@@ -45,7 +45,7 @@ func _convert_string_to_item():
 
 func fill_items(_isTrade := false, _reach = [0,0], useBorder = false) -> Array:
 	var tabKeys = tabTypes.keys()
-	var supply = UnitData.supply[tabKeys[openTab]]
+	var supply = PlayerData.supply[tabKeys[openTab]]
 	var i = 0
 	var bPath = load("res://scenes/GUI/item_button.tscn")
 	
@@ -73,7 +73,7 @@ func _change_tab():
 
 func sort_supply() -> Array:
 	var tabKeys = tabTypes.keys()
-	var supply = UnitData.supply[tabKeys[openTab]]
+	var supply = PlayerData.supply[tabKeys[openTab]]
 	supply.sort_custom(_sort_items)
 	clear_items()
 	return fill_items()

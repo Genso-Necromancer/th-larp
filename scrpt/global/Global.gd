@@ -1,7 +1,9 @@
 @tool
 extends Node
+const validation:= "9808110206"
+#region persistant variables
 
-##persistant variables
+
 var focusUnit : Unit:
 	set(value):
 		focusUnit = value
@@ -17,95 +19,112 @@ var focusDanmaku : Danmaku:
 var aiTarget : Unit
 var activeUnit : Unit
 var activeSkill : Skill
-var timeOfDay := Enums.TIME.DAY
-var gameTime :float = 12.00:
+var time_of_day := Enums.TIME.DAY
+var game_time :float = 12.00:
 	set(value):
-		gameTime = value
-		if gameTime >= 6.0 and gameTime <= 18.0:
-			timeOfDay = Enums.TIME.DAY
+		game_time = value
+		if game_time >= 6.0 and game_time <= 18.0:
+			time_of_day = Enums.TIME.DAY
 		else:
-			timeOfDay = Enums.TIME.NIGHT
-		SignalTower.emit_signal("time_changed", gameTime)
-var timeFactor : float = 1.0
-const trueTimeFactor : float = 1.0
-var hour : float = 1.0
-var minute : float = 0.01666666666666666666666666666667
+			time_of_day = Enums.TIME.NIGHT
+		SignalTower.emit_signal("time_changed", game_time)
+var time_factor : float = 1.0
+const true_time_factor : float = 1.0
+const hour : float = 1.0
+const minute : float = 0.01666666666666666666666666666667
 var play_time:= 0
-var currentMap:GameMap
-var currentMapPath:String
-var nextMap: String
-var chapterNumber:int
-var chapterTitle:String
-var chapters_complete:Array = []
-
-
-var rng
-var unitObjs : Dictionary
+## RngTool stores the RandomNumberGenerator here to keep a reference loaded.
+## use RngTool to actually use the RandomNumberGenerator.
+var rng:RandomNumberGenerator
+#endregion
+var map_ref:GameMap
 var flags : Dictionary
+
 var timePassed := 0
 var language
 
-var slamage := 5
-var spdGap := 4
-var critRange := [10, 20] 
-var knifeCrit := [15, 25]
-var slayerMulti := 3
-var compCosts := {"Attack": 1, "WasHit":1, "Miss":1, "Dodge": 1, "NegEff": 1, "Healed":-1, "Move":0, "Crit": -1, "Kill": -1, "Break": 1}
+const slamage := 5
+const spdGap := 4
+const critRange := [10, 20]
+const knifeCrit := [15, 25]
+const slayerMulti := 3
+const compCosts := {"Attack": 1, "WasHit":1, "Miss":1, "Dodge": 1, "NegEff": 1, "Healed":-1, "Move":0, "Crit": -1, "Kill": -1, "Break": 1}
 
 
 func _init():
 	language = Enums.LANGUAGE.AMERICAN
-	rng = RandomNumberGenerator.new()
-	randomize()
 	_init_flags()
 
 #region saving/loading
 func save()->Dictionary:
+	var RNG := RandomNumberGenerator.new()
 	var pers : Dictionary = {
-		"NodeType": "Globals",
-		"TimeOfDay":timeOfDay,
-		"GameTime":gameTime,
-		"TimeFactor":timeFactor,
-		"RNG":rng,
-		"UnitObjs":unitObjs,
-		"Flags":flags,
-		"TimePassed":timePassed,
-		"Language":language,
-		"CurrentMap":currentMapPath,
-		"ChapterNumber":chapterNumber,
-		"NextMap":nextMap,
-		"ChaptersComplete":chapters_complete
+		"DataType": "Global",
+		"game_time":game_time,
+		"time_factor":time_factor,
+		"RngState":RNG.save_state(),
+		"flags":flags,
+		"time_of_day":time_of_day,
+		#"TimePassed":timePassed, #Move to MapManager?
+		#"Language":language, #Move to Config eventually
+		#"CurrentMap":currentMapPath, #Move to MapManager
+		#"ChapterNumber":chapterNumber, #Move to MapManager
+		#"NextMap":nextMap, #Move to MapManager
+		#"ChaptersComplete":chapters_complete #Move to Player Data
 	}
+	#var pers : Dictionary = {
+		#"DataType": "Globals",
+		#"time_of_day":time_of_day,
+		#"GameTime":game_time,
+		#"time_factor":time_factor,
+		#"RNG":rng,
+		#"UnitObjs":unitObjs,
+		#"Flags":flags,
+		#"TimePassed":timePassed,
+		#"Language":language,
+		#"CurrentMap":currentMapPath,
+		#"ChapterNumber":chapterNumber,
+		#"NextMap":nextMap,
+		#"ChaptersComplete":chapters_complete
+	#}
 	return pers
 
 
 func load_persistant(Data:Dictionary):
-	if Data.NodeType != "Globals": 
-		print("ERROR: ATTEMPTED TO LOAD NON-GLOBAL DATA IN GLOBALS")
+	var RNG := RngTool.new()
+	if Data.DataType != "Global": 
+		print("ERROR: ATTEMPTED TO LOAD NON-GLOBAL DATA IN GLOBAL")
 		return
-	timeOfDay = Data.TimeOfDay
-	gameTime = Data.GameTime
-	timeFactor = Data.TimeFactor
-	rng = Data.RNG
-	unitObjs = Data.UnitObjs
-	flags = Data.Flags
-	timePassed = Data.TimePassed
-	language = Data.Language
-	currentMap = Data.CurrentMapPath
-	chapterNumber = Data.ChapterNumber
-	nextMap = Data.NextMap
-	chapters_complete = Data.ChaptersComplete
-	
+	#time_of_day = Data.time_of_day
+	game_time = Data.game_time
+	time_factor = Data.time_factor
+	RNG.load_state(Data.RngState)
+	#unitObjs = Data.UnitObjs
+	flags = Data.flags
+	#timePassed = Data.TimePassed
+	#language = Data.Language
+	#currentMap = Data.CurrentMapPath
+	#chapterNumber = Data.ChapterNumber
+	#nextMap = Data.NextMap
+	#chapters_complete = Data.ChaptersComplete
+
+func reset_values():
+	time_of_day = Enums.TIME.DAY
+	game_time = 12.00
+	time_factor = 1.0
+	_init_flags()
+	timePassed = 0
+	#language = Data.Language
 #endregion
 
 func _init_flags():
 	flags = {
 		"DebugMode": true,
-		"gameOver": false,
-		"victory": false,
-		"ObjectiveComplete": false,
-		"traded": false,
-		"itemUsed" : false,
+		"gameOver": false, #Move to MapManager?
+		"victory": false, #Move to MapManager?
+		"ObjectiveComplete": false, #Move to Map?
+		"traded": false, #Move to Unit?
+		"itemUsed" : false, #Move to Unit?
 	}
 
 
@@ -117,42 +136,35 @@ func set_rich_text_params(label):
 	label.set_autowrap_mode(TextServer.AUTOWRAP_OFF)
 
 
-func update_map_header(map:GameMap):
-	var newTime = time_to_float(map.hours, map.minutes)
-	Global.gameTime = newTime
-	Global.currentMap = map
-	Global.currentMapPath = map.get_scene_file_path()
-	Global.chapterNumber = map.chapterNumber
-	Global.nextMap = map.next_map
-	Global.chapterTitle = map.title
+
 
 #region Time bullshitery
-##Passively progresses time, factoring any timeFactor
+##Passively progresses time, factoring any time_factor
 func progress_time():
-	var timeProgress = hour * timeFactor
-	if gameTime + timeProgress > 23:
-		gameTime = 0.0 + timeProgress
+	var timeProgress = hour * time_factor
+	if game_time + timeProgress > 23:
+		game_time = 0.0 + timeProgress
 	else:
-		gameTime += timeProgress
+		game_time += timeProgress
 
 
 func reset_time_factor():
-	timeFactor = trueTimeFactor
+	time_factor = true_time_factor
 
 
-##multiplies timeFactor by value given, clamps value between 0.25 and 2
+##multiplies time_factor by value given, clamps value between 0.25 and 2
 func apply_time_factor(effectValue:float):
-	var newFactor :float = timeFactor * effectValue
-	timeFactor = clampf(newFactor, 0.25, 2)
+	var newFactor :float = time_factor * effectValue
+	time_factor = clampf(newFactor, 0.25, 2)
 
-##converts number of hours and minutes into a float value usable for Global.gameTime to track time
+##converts number of hours and minutes into a float value usable for Global.game_time to track time
 func time_to_float(hours:int,minutes:int) -> float:
 	var h :float= hours * hour
 	var m :float= minutes * minute
 	return (h+m)
 
 
-##converts a float value usable for Global.gameTime to time values, and returns a dictionary[string, int] {Hours:number of, Minutes:number of}
+##converts a float value usable for Global.game_time to time values, and returns a dictionary[string, int] {Hours:number of, Minutes:number of}
 func float_to_time(game_time:float) -> Dictionary[String, int]:
 	var splitTime:Dictionary[String, int]= {"Hours": 0, "Minutes": 0}
 	splitTime.Hours = floori(game_time)
@@ -181,9 +193,4 @@ func time_to_string(hours:int, minutes:int) -> String:
 func reset_map_flags():
 	Global.flags.gameOver = false
 	Global.flags.victory = false
-	Global.flags.traded = false
-	Global.flags.itemUsed = false
-	Global.flags.gameOver = false
-	Global.flags.victory = false
-	Global.flags.ObjectiveComplete = false
 #endregion

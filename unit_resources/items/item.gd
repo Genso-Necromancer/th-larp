@@ -9,6 +9,7 @@ signal durability_reduced(item)
 @export var dropped := false
 @export var is_broken := false
 var temp_remove : bool = false
+#Property holders
 var max_dur : int = 1
 var trade := true
 var dur : int = 1:
@@ -45,3 +46,39 @@ func _init(resource : ItemResource = load("res://unit_resources/items/weapons/un
 	trade = properties.trade
 	rule_type = properties.rule_type
 	sub_rule = properties.sub_rule
+
+
+func _get_values()->Dictionary:
+	var values:Dictionary= super._get_values()
+	values["class"] = "Item"
+	values["equipped"] = equipped
+	values["dropped"] = dropped
+	values["is_broken"] = is_broken
+	values["temp_remove"] = temp_remove
+	#values["max_dur"] = max_dur
+	#values["trade"] = trade
+	#values["dur"] = dur
+	#values["level"] = level
+	#values["personal"] = personal
+	#values["breakable"] = breakable
+	#values["expendable"] = expendable
+	#values["equippable"] = equippable
+	#values["use"] = use
+	#values["category"] = category
+	#values["sub_group"] = sub_group
+	#values["effects"] = {}
+	#if effects:
+		#var order:int=0
+		#for effect in effects:
+			#values.effects[order] = effect.get_resource_path()
+			#order+=1
+	#values["rule_type"] = rule_type
+	#values["sub_rule"] = sub_rule
+	return values
+
+func load_save_data(save_data:Dictionary):
+	super.load_save_data(save_data)
+	equipped = save_data.equipped
+	dropped = save_data.dropped
+	is_broken = save_data.is_broken
+	temp_remove = save_data.temp_remove

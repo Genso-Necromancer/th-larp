@@ -23,3 +23,7 @@ class_name Skill
 @export var dmg_type : Enums.DAMAGE_TYPE = Enums.DAMAGE_TYPE.NONE
 @export_category("Effects")
 @export var effects : Array[Effect] = []
+
+func get_resource_path()->String:
+	var path:String = "res://unit_resources/features/skills/%s.gd" % id
+	return path

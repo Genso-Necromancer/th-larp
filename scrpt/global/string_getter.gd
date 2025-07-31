@@ -202,7 +202,7 @@ func get_effect_string(effect:Effect) -> String: #Needs reworking, see tooltip p
 			Enums.RULE_TYPE.TIME: value = ("time_" + Enums.TIME.keys()[effect.sub_rule].to_snake_case())
 			Enums.RULE_TYPE.TARGET_SPEC: value = ("species_name_" + Enums.SPEC_ID.keys()[effect.sub_rule].to_snake_case())
 			Enums.RULE_TYPE.SELF_SPEC: value = ("species_name_" + Enums.SPEC_ID.keys()[effect.sub_rule].to_snake_case())
-			Enums.RULE_TYPE.MORPH: value = ("time_" + Enums.TIME.keys()[Global.timeOfDay].to_snake_case())
+			Enums.RULE_TYPE.MORPH: value = ("time_" + Enums.TIME.keys()[Global.time_of_day].to_snake_case())
 		s += " " + StringGetter.get_string("effect_" + ruleKey)
 		s = s.format({"rule":StringGetter.get_string(str(value))})
 	

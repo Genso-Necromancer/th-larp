@@ -48,7 +48,10 @@
 			<entry id = "saving_file"><![CDATA[Saving...]]></entry>
 			<entry id = "save_complete"><![CDATA[Save Complete!]]></entry>
 			<entry id = "without_saving"><![CDATA[Continue Without Saving?]]></entry>
-			<entry id = "overwrite_save"><![CDATA[Overwrite Existing Save?]]></entry>
+			<entry id = "overwrite_save"><![CDATA[Overwrite %s?]]></entry>
+			<entry id = "load_file_normal"><![CDATA[Load %s?]]></entry>
+			<entry id = "return_title"><![CDATA[Return to Title Screen?]]></entry>
+			<entry id = "return_setup"><![CDATA[Exit and Return to Chapter?]]></entry>
 			
 			<!-- Durations -->
 			<entry id = "duration_round"><![CDATA[Rounds]]></entry>
@@ -119,9 +122,10 @@
 			<entry id = "species_name_magician"><![CDATA[Magician]]></entry>
 			<entry id = "species_name_dragon"><![CDATA[Dragon]]></entry>
 			<entry id = "species_name_youkai"><![CDATA[Youkai]]></entry>
+			<entry id = "species_name_oni"><![CDATA[Oni]]></entry>
 			<!-- character roles -->
-			<entry id = "role_name_troublemaker"><![CDATA[Troublemaker]]></entry>
-			<entry id = "role_name_cointaker"><![CDATA[Cointaker]]></entry>
+			<entry id = "role_name_trblr"><![CDATA[Troublemaker]]></entry>
+			<entry id = "role_name_thief"><![CDATA[Cointaker]]></entry>
 			<entry id = "role_name_maid"><![CDATA[Maid]]></entry>
 			<entry id = "role_name_lady"><![CDATA[Lady]]></entry>
 			<entry id = "role_name_guard"><![CDATA[Gatekeeper]]></entry>
@@ -264,6 +268,7 @@
 			<entry id = "weapon_gungnir"><![CDATA[Gungnir]]></entry>
 			<entry id = "weapon_club"><![CDATA[Club]]></entry>
 			<entry id = "weapon_knife_silver"><![CDATA[Silver Knife]]></entry>
+			<entry id = "weapon_knife_dagger"><![CDATA[Dagger]]></entry>
 			<entry id = "weapon_book_fire"><![CDATA[Fire Book]]></entry>
 			<entry id = "weapon_gohei_simple"><![CDATA[Simple Gohei]]></entry>
 			<!-- Accessories -->

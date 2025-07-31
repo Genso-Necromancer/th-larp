@@ -629,7 +629,7 @@ func _assign_terrain_value(map:GameMap) -> Dictionary:
 	var groundTiles : Array[Vector2i] = map.ground.get_used_cells()
 	var modTiles : Array[Vector2i] = map.modifier.get_used_cells()
 	var walls : Dictionary = map.get_walls()
-	var tData : Dictionary = UnitData.terrainData
+	var tData : Dictionary = PlayerData.terrainData
 	for tile in groundTiles:
 		if !walls.Wall.has(tile) and !walls.WallShoot.has(tile) and !walls.WallFly.has(tile):
 			var bonuses : Dictionary = map.get_bonus(tile)

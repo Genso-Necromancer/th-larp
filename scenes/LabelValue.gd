@@ -10,14 +10,12 @@ class_name LabelValue
 
 var specKeys := Enums.SPEC_ID.keys()
 var default : String = get_text()
-var errorThrown := false
+#var errorThrown := false
 
 
 func you_need_to_update_yourself_NOW(unit) -> void:
 	var newValue
-	if unit.get(key1) == null and !errorThrown:
-		#print("LabelValue: you_need_to_update_yourself_NOW: Invalid key1")
-		errorThrown = true
+	if unit.get(key1) == null:
 		return
 	elif unit.get(key1) == null: return
 	elif key3: newValue = unit[key1][key2].get(key3, 0)
@@ -30,7 +28,7 @@ func you_need_to_update_yourself_NOW(unit) -> void:
 		newValue = StringGetter.get_string("species_name_%s" % [specKeys[newValue].to_snake_case()])
 	elif key2 == "Move":
 		var typeKeys : Array = Enums.MOVE_TYPE.keys()
-		var moveType : String = typeKeys[unit[key1]["MoveType"]]
+		var moveType : String = typeKeys[unit.active_stats.move_type]
 		var path = (iconDir + "/" + moveType + ".png").to_snake_case()
 		_set_icon(moveType, path)
 	elif key1 == "dmkName":
@@ -48,7 +46,7 @@ func you_need_to_update_yourself_NOW(unit) -> void:
 
 
 func _set_icon(moveType: StringName, iconPath : String):
-	pairedIcon.set_meta("MoveType", moveType)
+	pairedIcon.set_meta("move_type", moveType)
 	pairedIcon.set_texture(load(iconPath))
 
 

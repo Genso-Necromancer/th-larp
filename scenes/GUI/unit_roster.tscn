@@ -65,6 +65,7 @@ layout_mode = 2
 text = "/"
 
 [node name="CapLabel" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer/PanelContainer/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "00"
 metadata/Limit = 0
@@ -78,6 +79,7 @@ follow_focus = true
 horizontal_scroll_mode = 0
 
 [node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/ScrollContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 columns = 3
 

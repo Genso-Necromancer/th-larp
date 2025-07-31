@@ -39,14 +39,14 @@ func move_camera_map(hex:Vector2i, speed:float = 1.0, setTrans: Tween.Transition
 	camera.tween_camera(hex, "offset", speed, setTrans, setEase)
 	
 	
-##same as move_camera_map, but uses UnitID for coordinates
-func move_camera_unit(unitID:String, speed:float = 1.0, setTrans: Tween.TransitionType = Tween.TransitionType.TRANS_LINEAR, setEase:Tween.EaseType = Tween.EaseType.EASE_OUT_IN) -> void:
+##same as move_camera_map, but uses unit_id for coordinates
+func move_camera_unit(unit_id:String, speed:float = 1.0, setTrans: Tween.TransitionType = Tween.TransitionType.TRANS_LINEAR, setEase:Tween.EaseType = Tween.EaseType.EASE_OUT_IN) -> void:
 	var hex : Vector2i
-	var map : GameMap = Global.flags.CurrentMap
+	var map : GameMap = Global.map_ref
 	var units = map.get_active_units()
 	
 	for cell in units:
-		if units[cell].unitId == unitID: hex = cell
+		if units[cell].unit_id == unit_id: hex = cell
 		
 	if !_check_valid(hex): 
 		print("Camer Controller: move_camera_unit: invalid coordinates")
@@ -57,7 +57,7 @@ func move_camera_unit(unitID:String, speed:float = 1.0, setTrans: Tween.Transiti
 
 ##same as move_camera_map, but retrieves location from sceneTile with id matching given int value.
 func move_camera_cameratile(cameraTileId:int, speed:float = 1.0, setTrans: Tween.TransitionType = Tween.TransitionType.TRANS_LINEAR, setEase:Tween.EaseType = Tween.EaseType.EASE_OUT_IN) -> void:
-	var map : GameMap = Global.flags.CurrentMap
+	var map : GameMap = Global.map_ref
 	var hex : Vector2i = map.get_narrative_tile(cameraTileId)
 
 	if !_check_valid(hex): 
@@ -113,7 +113,7 @@ func _on_tween_complete():
 
 
 func _check_valid(point:Vector2i) -> bool:
-	var mapSize = Global.flags.CurrentMap.get_used_rect().size
+	var mapSize = Global.map_ref.get_used_rect().size
 	if point.x < 0 or point.x >= (mapSize.x) or point.y < 0 or point.y >= (mapSize.y):
 		print("Cursor: path_camer: point in cameraPath out of bounds")
 		return false

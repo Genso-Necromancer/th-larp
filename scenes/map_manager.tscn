@@ -4,18 +4,16 @@
 [ext_resource type="Script" uid="uid://ci7bvot3e5ktr" path="res://scenes/map_manager.gd" id="1_o0i0e"]
 [ext_resource type="PackedScene" uid="uid://r6wtvva5qput" path="res://scenes/GUIManager.tscn" id="2_3ng14"]
 
-[node name="mapManager" type="Node"]
+[node name="mapManager" type="Node" groups=["Persist"]]
 script = ExtResource("1_o0i0e")
 
 [node name="Gameboard" parent="." instance=ExtResource("1_1o3kx")]
-mouseSens = 0.4
-smoothing = 0.2
-uiCooldown = 0.2
 
 [node name="Cursor" parent="Gameboard" index="1"]
 position = Vector2(0, 0)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
 follow_viewport_scale = 0.001
 
 [node name="GUIManager" parent="CanvasLayer" instance=ExtResource("2_3ng14")]

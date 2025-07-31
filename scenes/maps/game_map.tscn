@@ -10,10 +10,10 @@
 [ext_resource type="Script" uid="uid://bdpbd4lp3x08s" path="res://scrpt/ai/ai_manager.gd" id="7_77vj4"]
 [ext_resource type="Resource" uid="uid://befkt7mur7ux" path="res://scrpt/ai/personality_test.tres" id="8_gm7ke"]
 
-[node name="GameMap" type="Node2D"]
+[node name="GameMap" type="Node2D" groups=["Persist"]]
 z_index = -2
 script = ExtResource("1_ak6bi")
-forcedUnits = ["Remilia", "Sakuya"]
+forcedUnits = ["remilia", "sakuya"]
 title = "Testing My Fucking Patience"
 start_script = null
 end_script = null

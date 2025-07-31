@@ -28,16 +28,23 @@ enum PASSIVE_TYPE {NONE, VANTAGE, STAT_CHANGE, AURA, RESPONSE, FATED, SUB_WEAPON
 #Unit Enums
 enum UNIT_ID {NONE, Remilia, Sakuya, Patchy, China,}
 enum FACTION_ID {NONE, ENEMY, PLAYER, NPC,}
+enum DEPLOYMENT {NONE,FORCED,DEPLOYED,UNDEPLOYED,GRAVEYARD}
 enum MOVE_TYPE {FOOT, RANGER, FLY, MOUNT, ARMOR} #Note to self, when combining role+spec compare move_type and pick which ever is higher
 enum SPEC_ID {NONE,FAIRY,HUMAN,VAMPIRE,DRAGON,MAGICIAN,YOUKAI,ONI}
 #, Human, Kappa, Lunarian, Oni, Doll, Devil, Yukionna, Zombie, Hermit, Magician, Spirit
 enum ROLE_ID {NONE, TRBLR, THIEF,LADY, MAID, SORCERESS, MIKO, GUARD, WITCH,}
 enum ACTION_TYPE {WEAPON, FRIENDLY_SKILL, HOSTILE_SKILL}
-
-
 enum CORE_STAT {NONE, MOVE, LIFE, COMP, PWR, MAG, ELEG, CELE, DEF, CHA,}
 enum ACTION_FAIL {NONE, DEAD, SLEEP, REACH, STRUCK}
 enum WEAPON_CATEGORY {NONE, ANY, UNARMED, BLADE, BLUNT, STICK, BOW, GUN, GOHEI, BOOK, OFUDA, ACC, ITEM}
 enum WEAPON_SUB {NONE, KNIFE, NATURAL}
 #Combat Enums
 enum COMP_TRIGGERS {NONE, ATTACK, WAS_HIT, MISS, DODGE, NEG_EFF, HEALED, MOVE, SKILL, CRIT, KILL, BREAK}
+#Save Enums
+enum SAVE_TYPE {
+	NONE, ##Used for loading saves
+	TRANSITION, ##Between chapters
+	SET_UP, ##during chapter set up
+	SUSPENDED, ##Temporary save during gameplay
+	IRON ##Autosaving for iron man mode
+	}

@@ -18,7 +18,7 @@ var cell := Vector2i.ZERO:
 			return
 		newCell = _region_clamp(value)
 
-		position = Global.flags.CurrentMap.map_to_local(newCell)
+		position = Global.map_ref.map_to_local(newCell)
 		cell = newCell
 		cursor_moved.emit(newCell)
 		
@@ -72,7 +72,7 @@ func cell_path_camera(cameraPath:Array[Vector2i], speed:float = 1.0, ease:Tween.
 	if cameraPath.size() < 1:
 		print("Cursor: path_camera: no points found in cameraPath.")
 		return
-	var mapSize = Global.flags.CurrentMap.get_used_rect().size
+	var mapSize = Global.map_ref.get_used_rect().size
 	for point in cameraPath:
 		if point.x < 0 or point.x >= (mapSize.x) or point.y < 0 or point.y >= (mapSize.y):
 			print("Cursor: path_camer: point in cameraPath out of bounds")
@@ -101,7 +101,7 @@ func kill_tween() -> void:
 
 
 func _create_camera_path(path:Array[Vector2i]) -> Array[Vector2i]:
-	var pathFinder := AHexGrid2D.new(Global.flags.CurrentMap)
+	var pathFinder := AHexGrid2D.new(Global.map_ref)
 	var cameraPath := []
 	cameraPath.append(pathFinder.find_path(cell, path.pop_front()))
 	for point in path:
@@ -113,7 +113,7 @@ func _create_camera_path(path:Array[Vector2i]) -> Array[Vector2i]:
 func _tween_camera(path:Array[Vector2i], speed:float = 1.0, ease:Tween.EaseType = Tween.EaseType.EASE_OUT_IN):
 		if tween: tween.kill()
 		tween = get_tree().create_tween()
-		var currMap = Global.flags.CurrentMap
+		var currMap = Global.map_ref
 		var newPosition
 		#var adjSpd : float = speed/path.size()
 		for point in path:
@@ -134,8 +134,8 @@ func _toggle_drag():
 func _region_clamp(gridPosition: Vector2i) -> Vector2i:
 	#Keeps cursor inside temporary boundaries without messing with it's map boundaries
 	var out := gridPosition
-	#var mapRect :Rect2i= Global.flags.CurrentMap.get_used_rect()
-	var usedCells : Array[Vector2i] = Global.flags.CurrentMap.ground.get_used_cells()
+	#var mapRect :Rect2i= Global.map_ref.get_used_rect()
+	var usedCells : Array[Vector2i] = Global.map_ref.ground.get_used_cells()
 	#mapRect = mapRect.grow_side(SIDE_RIGHT,1)
 	#mapRect = mapRect.grow_side(SIDE_BOTTOM,1)
 	if snapPath:
@@ -156,7 +156,7 @@ func bump_cursor():
 	var bumpTo
 	var shortest = INF
 	var bumpFound = false
-	var hexStar = AHexGrid2D.new(Global.flags.CurrentMap)
+	var hexStar = AHexGrid2D.new(Global.map_ref)
 	if !snapPath.has(cell):
 		seek = true
 	if seek:

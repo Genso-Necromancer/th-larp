@@ -51,8 +51,6 @@ var shouldChangeState = false
 func change_state(newSlave : Node = previousSlave.pop_back(), newState: gState = previousState.pop_back()):
 	previousState.append(state)
 	state = newState
-	
-	
 	previousSlave.append(activeSlave)
 	activeSlave = newSlave
 		

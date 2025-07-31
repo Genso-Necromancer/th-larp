@@ -32,4 +32,14 @@ func _init(resource:WeaponResource = stats) ->void:
 		min_reach = properties.min_reach
 		max_reach = properties.max_reach
 		damage_type = properties.damage_type
-		
+
+
+func _get_values()->Dictionary:
+	var values:Dictionary = super._get_values()
+	values["class"] = "Weapon"
+	return values
+
+
+func load_save_data(save_data:Dictionary):
+	super.load_save_data(save_data)
+	#stats = load(save_data.properties)

@@ -26,5 +26,5 @@ func parse_json(event_json:String) -> Array[Dictionary]:
 		#else:
 			#print("Unexpected data")
 	else:
-		print("JSON Parse Error: ", parser.get_error_message(), " in ", json, " at line ", parser.get_error_line())
+		print("[jason_parser]JSON Parse Error: ", parser.get_error_message(), " in ", json, " at line ", parser.get_error_line())
 	return data_received

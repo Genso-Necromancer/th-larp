@@ -3,8 +3,7 @@ extends PanelContainer
 class_name TerrainPanel
 
 
-func update_terrain_data(cell:Vector2i) -> void:
-	var map : GameMap = Global.flags.CurrentMap
+func update_terrain_data(cell:Vector2i, map:GameMap) -> void:
 	var tags := map.get_terrain_tags(cell)
 	var lock : TextureRect = $TerrainMargin/TerrainHBox/TexturePanel/TextureMargin/LockIcon
 	

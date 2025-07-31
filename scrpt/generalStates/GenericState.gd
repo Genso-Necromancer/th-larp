@@ -2,7 +2,7 @@ extends Node
 class_name GenericState
 
 var slave : Node 
-var keyBinds = ["ui_accept", "ui_info", "ui_return", "debugKillLady", "debugHealTest", "debug_camera_test", "debug_kill_test"]
+var keyBinds = ["ui_accept", "ui_info", "ui_return", "debugKillLady", "debugHealTest", "debug_camera_test", "debug_kill_test","debug_level_up",]
 var heldBinds = ["ui_scroll_left", "ui_scroll_right", "ui_right", "ui_up", "ui_left", "ui_down"]
 var uiCooldown = 0.2
 var timer

@@ -9,3 +9,8 @@ class_name ConsumableResource
 @export var max_reach: int = 0:
 	set(value):
 		max_reach = clampi(value, 0, 999)
+
+func get_resource_path()->String:
+	var path:String = "res://unit_resources/items/consumables/%s.tres" % id
+	
+	return path

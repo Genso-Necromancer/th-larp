@@ -7,7 +7,7 @@ func play_action():
 func set_passive_style(passiveId):
 	var stringPath = "passive_name_%s" % [passiveId.to_snake_case()]
 	var string = StringGetter.get_string(stringPath)
-	var passiveIcon = UnitData.passiveData[passiveId].Icon
+	var passiveIcon = PlayerData.passiveData[passiveId].Icon
 	var lbl = $PanelContainer/TextBox/Label
 	var icon = $PanelContainer/TextBox/TextureRect
 	lbl.set_text(string)

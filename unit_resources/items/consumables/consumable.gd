@@ -23,3 +23,13 @@ func _init(resource : ItemResource = stats) -> void:
 	target = properties.target
 	min_reach = properties.min_reach
 	max_reach = properties.max_reach
+
+
+func _get_values()->Dictionary:
+	var values:Dictionary = super._get_values()
+	values["class"] = "Consumable"
+	return values
+	
+func load_save_data(save_data:Dictionary):
+	super.load_save_data(save_data)
+	#stats = load(save_data.properties)

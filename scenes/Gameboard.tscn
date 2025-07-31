@@ -7,11 +7,8 @@
 [ext_resource type="PackedScene" uid="uid://dxoxyyj8wpdgu" path="res://scenes/combat_manager.tscn" id="8_06m4j"]
 [ext_resource type="Script" uid="uid://q1022o5v4v8d" path="res://scenes/TurnSort.gd" id="9_gu2p2"]
 
-[node name="Gameboard" type="Node2D"]
+[node name="Gameboard" type="Node2D" groups=["Persist"]]
 script = ExtResource("1_kkv4d")
-mouseSens = null
-smoothing = null
-uiCooldown = null
 
 [node name="UnitPath" parent="." instance=ExtResource("6_sxhsu")]
 visibility_layer = 2

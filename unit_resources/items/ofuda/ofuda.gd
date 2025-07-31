@@ -9,7 +9,7 @@ var can_dmg : bool
 var can_crit : bool
 var dmg : int = 0
 var crit : int = 0
-var dmg_type : Enums.DAMAGE_TYPE = Enums.DAMAGE_TYPE.NONE
+var damage_type : Enums.DAMAGE_TYPE = Enums.DAMAGE_TYPE.NONE
 
 func _init(resource : ItemResource = stats) -> void:
 	if resource == null: return
@@ -23,4 +23,10 @@ func _init(resource : ItemResource = stats) -> void:
 	can_crit = properties.can_crit
 	dmg = properties.dmg
 	crit = properties.crit
-	dmg_type = properties.dmg_type
+	damage_type = properties.damage_type
+
+func _get_values()->Dictionary:
+	var values:Dictionary = super._get_values()
+	values["class"] = "Ofuda"
+	return values
+	

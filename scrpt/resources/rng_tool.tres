@@ -1,0 +1,6 @@
+[gd_resource type="Resource" load_steps=2 format=3 uid="uid://lvpoxqb1fjn4"]
+
+[ext_resource type="Script" uid="uid://dkauw1118pkb5" path="res://scrpt/resources/rng_tool.gd" id="1_1xe5t"]
+
+[resource]
+script = ExtResource("1_1xe5t")

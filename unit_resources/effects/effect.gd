@@ -81,3 +81,8 @@ func _get_property_list():
 	properties.append(sub_type_entry)
 	
 	return properties
+
+
+func get_resource_path()->String:
+	var path:String = "res://unit_resources/effects/%s.tres" % id
+	return path

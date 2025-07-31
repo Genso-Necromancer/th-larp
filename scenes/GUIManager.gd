@@ -3,11 +3,12 @@ class_name GUIManager
 
 signal gui_splash_finished
 signal start_the_justice
-signal deploy_toggled(unitID, depStatus)
+signal deploy_toggled(unit_id, depStatus)
 signal formation_toggled
 signal item_used
 signal map_started
 signal gui_action_menu_canceled
+
 
 @onready var blocker : Panel = $PanelBlocker #used to block the map easily
 @onready var HUD : Control = $HUD
@@ -74,12 +75,11 @@ var chClock : ChapterClock
 
 
 ##roster variables
-var rosterData = UnitData.rosterData
+var rosterData = PlayerData.rosterData
 var depCount = 0
 var depLimit = 0
 var forcedDep : Array = []
 var rosterInit : bool = false
-var unitObjs = Global.unitObjs
 var activeBtn : Node
 
 ##focusTracking
@@ -290,19 +290,19 @@ func _on_gameboard_exp_display(oldExp, expSteps, results, unitPrt, unitName):
 	expContainer.init_exp_display(oldExp, expSteps, results, unitPrt, unitName)
 	expContainer.toggle_visibility()
 
-func call_setup(dLimit, forced, map):
+func call_setup(dep_cap:int, forced:Array, map:GameMap, unit_refs:Dictionary):
 	var btns = mapSetUp.btnContainer
 	inSetup = true
 	mapSetUp.connect_buttons(self)
 	mapSetUp.free_previous_obj()
 	mapSetUp.call_deferred("set_chapter",map.chapterNumber, map.title, map.get_objectives(), map.get_loss_conditions())
-	mapSetUp.set_mon(UnitData.playerMon)
+	mapSetUp.set_mon(PlayerData.playerMon)
 	mapSetUp.toggle_visible()
 	menuCursor.resignal_cursor(btns.get_children())
 	sState = sStates.HOME
 	forcedDep = forced
-	depLimit = dLimit
-	rosterGrid.init_roster(forcedDep, depLimit)
+	depLimit = dep_cap
+	rosterGrid.init_roster(forcedDep, depLimit, unit_refs)
 	GameState.change_state(self, GameState.gState.GB_SETUP)
 
 func _load_assets():
@@ -341,7 +341,7 @@ func _connect_asset_signals():
 	actMenu.action_menu_trade_pressed.connect(self._on_action_trade_pressed)
 	#actMenu.action_menu_ofuda_open.connect(self._on_action_ofuda_open)
 	
-#SetUp Buttons
+#region SetUp Buttons
 func _on_btn_deploy_pressed():
 	#var sCountPnl = $SetUpMain/SetUpGrid/SetUpPnl2
 	mapSetUp.toggle_visible()
@@ -378,6 +378,19 @@ func _on_status_btn_pressed():
 	pass
 
 
+func _on_save_btn_pressed():
+	var saveScreen = load("res://scenes/chapter_save_screen.tscn").instantiate()
+	menuCursor.visible = false
+	saveScreen.save_type = Enums.SAVE_TYPE.SET_UP
+	saveScreen.save_scene_finished.connect(self._on_save_scene_finished_saving)
+	add_child(saveScreen)
+#endregion
+
+func _on_save_scene_finished_saving(save_screen:SaveScreen):
+	save_screen.queue_free()
+	GameState.change_state()
+	menuCursor.visible = true
+	
 func _open_unit_menu():
 	match sState:
 		sStates.DEPLOY: rosterGrid.open_menu(0)
@@ -389,10 +402,10 @@ func _open_unit_menu():
 
 func _assign_cursor_to_roster():
 	var btns : Array = []
-	for bar in rosterGrid.unitBars:
+	for bar in rosterGrid.unit_bars:
 		btns.append(bar.button)
 		_connect_unit_btn(bar)
-	#if !activeBtn: Global.focusUnit = rosterGrid.unitBars[0].get_unit()
+	#if !activeBtn: Global.focusUnit = rosterGrid.unit_bars[0].get_unit()
 	#else: Global.focusUnit = activeBtn.get_unit()
 	_resignal_menuCursor_array(btns, 1)
 

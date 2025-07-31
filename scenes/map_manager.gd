@@ -3,15 +3,46 @@ class_name MapManager
 
 @onready var gameBoard :GameBoard = $Gameboard
 @onready var guiManager :GUIManager = $CanvasLayer/GUIManager
-var dialogie_overlay := preload("res://scenes/cutscenes/dialog_overlay.tscn")
+var dialogue_overlay := preload("res://scenes/cutscenes/dialog_overlay.tscn")
 var dOverlay : DialogueOverlay
+var current_map:String
+var next_map:String
+
 
 func _ready():
 	_connect_signals()
+
+
+#region save/load
+func save()->Dictionary:
+	var saveData:Dictionary
+	saveData["DataType"] = "MapManager"
+	saveData["current_map"] = current_map
+	saveData["next_map"] = next_map
+	return saveData
+
+
+func load_data(save_data:Dictionary):
+	var data :Dictionary= save_data.MapManager
+	current_map = data.current_map
+	next_map = data.next_map
+
+#endregion
+
+	
+func load_map(map:String):
+	if !map: print("[MapManager]load_map: empty map string")
+	gameBoard.load_map(map)
+
+
+func load_map_from_file(map:String, save_data:Dictionary):
+	if !map: print("[MapManager]load_map_from_file: empty map string")
+	gameBoard.load_map_from_file(map, save_data)
 	
 
-func load_map(map):
-	gameBoard.load_map(map)
+func shift_to_next_map():
+	current_map = next_map
+	next_map = ""
 
 
 func _connect_signals()-> void:
@@ -26,6 +57,7 @@ func _connect_signals()-> void:
 	gameBoard.new_round.connect(guiManager._on_new_round)
 	gameBoard.turn_added.connect(guiManager._on_turn_added)
 	gameBoard.turn_removed.connect(guiManager._on_turn_removed)
+	gameBoard.map_added.connect(self._on_map_added)
 	guiManager.gui_splash_finished.connect(self._on_gui_splash_finished)
 	guiManager.gui_action_menu_canceled.connect(gameBoard._on_gui_action_menu_canceled)
 	
@@ -44,11 +76,20 @@ func _on_win_screen_win_finished() -> void:
 		#start_load_screen()
 		#await SignalTower.fade_out_complete
 	dOverlay.queue_free()
-	Global.flags.NextMap = gameBoard.currMap.next_map
 	gameBoard.free_map()
 	#start_load_screen()
 	#await SignalTower.fade_out_complete
 	#
+
+
+func _on_map_added(map:GameMap):
+	var newTime = Global.time_to_float(map.hours, map.minutes)
+	#Global.game_time = newTime
+	#Global.currentMap = map
+	current_map = map.get_scene_file_path()
+	PlayerData.chapter_title = map.title
+	next_map = map.next_map
+	
 
 
 func _on_map_loaded(map:GameMap):
@@ -65,30 +106,22 @@ func _on_map_loaded(map:GameMap):
 
 func _on_map_freed()->void:
 	var saveScreen :SaveScreen= load("res://scenes/chapter_save_screen.tscn").instantiate()
-	$CanvasLayer.add_child(saveScreen)
-	
-	saveScreen.save_scene_finished.connect(self._on_save_scene_finished.bind(saveScreen))
+	shift_to_next_map()
+	saveScreen.save_type = Enums.SAVE_TYPE.TRANSITION
+	$%CanvasLayer.add_child(saveScreen)
+	saveScreen.save_scene_finished.connect(self._on_save_scene_finished)
 	#end_load_screen()
 
 
 func load_cutscene():
-	dOverlay = dialogie_overlay.instantiate()
-	$CanvasLayer.add_child(dOverlay)
-
-
-#func _load_save_screen(mode:int)-> void:
-	#var saveScreen
-	#match mode:
-		#0:pass
-		#1:pass
-		#2:pass
+	dOverlay = dialogue_overlay.instantiate()
+	$%CanvasLayer.add_child(dOverlay)
 
 
 func _on_save_scene_finished(save_screen:SaveScreen) -> void:
-	#start_load_screen()
+	#Establish the need for the loading screen
 	GameState.change_state(self, GameState.gState.LOADING)
-	save_screen.queue_free()
-	gameBoard.load_map(Global.flags.NextMap)
+	gameBoard.load_map(current_map)
 
 
 func start_load_screen(speed: float = 0.5):
@@ -107,7 +140,7 @@ func _on_gui_splash_finished():
 		await dOverlay.dialog_finished
 	dOverlay.queue_free()
 	GameState.change_state(self, GameState.gState.LOADING)
-	guiManager.call_setup(gameBoard.depCap, gameBoard.forcedDeploy.keys(), gameBoard.currMap)
+	guiManager.call_setup(gameBoard.depCap, gameBoard.forcedDeploy.keys(), gameBoard.currMap, gameBoard.unitObjs)
 #endregion
 
 

@@ -29,7 +29,7 @@ func display_unit_actions(unit : Unit):
 	var hasSkills := false
 	var noFocus := true
 	
-	if unit.active_stats.Skills:
+	if unit.skills:
 		hasSkills = true
 	
 	for b in buttons:
@@ -39,7 +39,7 @@ func display_unit_actions(unit : Unit):
 			"VisitBtn": pass
 			"ShopBtn": pass
 			"SeizeBtn":
-				b.visible = Global.flags.CurrentMap.is_seize(unit.cell)
+				b.visible = Global.map_ref.is_seize(unit.cell)
 				b.disabled = !b.visible
 					
 			"AtkBtn": 
@@ -125,7 +125,7 @@ func _check_inv(unit:Unit) -> Dictionary:
 
 func _check_reach(unit:Unit) -> Dictionary:
 	var inReach := {"Hostiles":false, "Trades": false}
-	var aHex = AHexGrid2D.new(Global.flags.CurrentMap)
+	var aHex = AHexGrid2D.new(Global.map_ref)
 	var reach = unit.get_weapon_reach()
 	if aHex.find_units_in_reach(unit, reach, Enums.FACTION_ID.ENEMY):
 		inReach.Hostiles = true

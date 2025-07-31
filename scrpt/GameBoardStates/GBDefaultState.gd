@@ -29,3 +29,4 @@ func _handle_bind(bind):
 		"debug_camera_test": 
 			slave._camera_test()
 		"debug_kill_test": slave._kill_camera_test()
+		"debug_level_up":slave.level_test()

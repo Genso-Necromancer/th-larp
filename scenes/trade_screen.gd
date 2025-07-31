@@ -65,7 +65,7 @@ enum tabTypes {
 		
 
 #Supply Tracking
-var supplyStats = UnitData.supplyStats
+var supplyStats = PlayerData.supplyStats
 
 #func _init():
 	#toggle_visible()
@@ -125,7 +125,7 @@ func _reparent_info(mode:int) -> void:
 func _refresh_count():
 	var countLabel = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel/MarginContainer/HBoxContainer/SupplyCount
 	var capLabel = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel/MarginContainer/HBoxContainer/SupplyCap
-	var supply : Dictionary = UnitData.supply
+	var supply : Dictionary = PlayerData.supply
 	supplyStats.Count = 0
 	
 	for key in supply.keys():
@@ -429,7 +429,7 @@ func _assign_horizontal_neighbors(empty):
 
 func _assign_tab_neighbor():
 	#var tabKeys = tabTypes.keys()
-	#var supply = UnitData.supply[tabKeys[openTab]]
+	#var supply = PlayerData.supply[tabKeys[openTab]]
 	var tabs = supplyPanel.tabs
 	var supplyHasItems = supplyPanel.itemList.get_children()
 	var unitHasItems = list1.itemList.get_children()
@@ -505,8 +505,8 @@ func _check_full_unit_inv(unit):
 
 
 func _check_empty_supply():
-	var supply = UnitData.supply
-	var allTabs = UnitData.supply.keys()
+	var supply = PlayerData.supply
+	var allTabs = PlayerData.supply.keys()
 	var noItems = true
 	for tab in allTabs:
 		var count = supply[tab].size()
@@ -586,7 +586,7 @@ func _close_item_options():
 	#tState = tStates.DEFAULT
 
 func _on_selection_made(selection:String, item:Item):
-	Global.flags.itemUsed = true
+	PlayerData.item_used = true
 	_close_item_options()
 	match selection:
 		"Use": _play_item_anim(item)
@@ -637,7 +637,7 @@ func _give_select(b) -> void:
 	var iType = Enums.WEAPON_CATEGORY.keys()[item.category]
 	var iInd = b.get_meta("Index")
 	var inv = unit.inventory
-	var supplyInv = UnitData.supply[iType]
+	var supplyInv = PlayerData.supply[iType]
 	var wasEquipped := false
 	
 	
@@ -675,7 +675,7 @@ func _take_select(b):
 	var iType = Enums.WEAPON_CATEGORY.keys()[item.category]
 	var iInd = b.get_meta("Index")
 	var inv = unit.inventory
-	var supply = UnitData.supply
+	var supply = PlayerData.supply
 	var supplyInv = supply[iType]
 	
 	firstBtn = b
@@ -821,12 +821,12 @@ func _swap_items(b1, b2):
 
 
 func _flag_trade():
-	if !Global.flags.traded:
-		Global.flags.traded = true
+	if !PlayerData.traded:
+		PlayerData.traded = true
 
 func _get_first_valid_category() -> int:
 	var valid := tabTypes.BLADE
-	var supply = UnitData.supply
+	var supply = PlayerData.supply
 	var keys = tabTypes.keys()
 	for key in keys:
 		var count = supply[key].size()

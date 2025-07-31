@@ -2,7 +2,7 @@
 extends SlotWrapper
 class_name Feature
 
-@export var feature_id : String: ##this overwrited parent var 'id'. just call that for consistency
+@export var feature_id : String: ##this overwrites parent var 'id'. just call that for consistency
 	set(value):
 		feature_id = value
 		id = value
@@ -44,3 +44,8 @@ func _enum_to_string(e, seperator = ",") -> String:
 	for i in arr:
 		string += str(i)+seperator
 	return string
+
+func _get_values()->Dictionary:
+	var values:Dictionary = super._get_values()
+	values["Class"] = "Feature"
+	return values

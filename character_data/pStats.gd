@@ -695,24 +695,24 @@ static func get_spec(specInd):
 			"StatGroups":{
 				"Stats": {
 					"Move": 0,
-					"Life": 0,
-					"Comp": 0,
-					"Pwr": 0,
+					"Life": 4,
+					"Comp": -10,
+					"Pwr": 2,
 					"Mag": 0,
-					"Eleg": 0,
+					"Eleg": -2,
 					"Cele": 0,
-					"Def": 0,
+					"Def": 1,
 					"Cha": 0
 					},
 				"Growths": {
 					"Move": 0,
-					"Life": 0.0,
+					"Life": 0.1,
 					"Comp": 0.0,
-					"Pwr": 0.0,
+					"Pwr": 0.1,
 					"Mag": 0.0,
-					"Eleg": 0.0,
+					"Eleg": -0.1,
 					"Cele": 0.0,
-					"Def": 0.0,
+					"Def": 0.1,
 					"Cha": 0.0
 					},
 				"Caps": {
@@ -1088,10 +1088,10 @@ static func get_job(jobInd):
 					},
 				"Growths": {
 					"Move": 0,
-					"Life": 0.4,
+					"Life": 0.5,
 					"Comp": 0.3,
-					"Pwr": 0.3,
-					"Mag": -0.1,
+					"Pwr": 0.45,
+					"Mag": 0.0,
 					"Eleg": 0.2,
 					"Cele": 0.0,
 					"Def": 0.2,

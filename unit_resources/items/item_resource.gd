@@ -16,3 +16,7 @@ class_name ItemResource
 @export var sub_group : Enums.WEAPON_SUB = Enums.WEAPON_SUB.NONE
 @export_category("Effects")
 @export var effects : Array[Effect] = []
+
+func get_resource_path()->String:
+	var path:String = "" % id
+	return path

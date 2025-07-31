@@ -24,7 +24,7 @@ func get_passive(passive:Passive) -> String:
 			var restrict : String
 			var auraData := {}
 			
-			match Global.timeOfDay:
+			match Global.time_of_day:
 					Enums.TIME.NIGHT:
 						aura = passive.night
 						morph = passive.day
@@ -109,7 +109,7 @@ func get_skill(data:SlotWrapper) -> String:
 				Enums.RULE_TYPE.TIME: value = "time_" + Enums.TIME.keys()[data.sub_rule].to_snake_case()
 				Enums.RULE_TYPE.TARGET_SPEC: value = "species_name_" + Enums.SPEC_ID.keys()[data.sub_rule].to_snake_case()
 				Enums.RULE_TYPE.SELF_SPEC: value = "species_name_" + Enums.SPEC_ID.keys()[data.sub_rule].to_snake_case()
-				Enums.RULE_TYPE.MORPH: value = "time_" + Enums.TIME.keys()[Global.timeOfDay].to_snake_case()
+				Enums.RULE_TYPE.MORPH: value = "time_" + Enums.TIME.keys()[Global.time_of_day].to_snake_case()
 			converted["sub_rule"] = StringGetter.get_string(str(value))
 			#converted["Rule"] = StringGetter.get_string("lore_" + ruleKey + "_" + str(value))
 			ruleString = "{rule_type}"
@@ -161,8 +161,8 @@ func get_skill(data:SlotWrapper) -> String:
 	
 	finished = _mash_together(working, converted)
 	return finished
-	
-	
+
+
 func get_lore(unit:Unit, key:String) -> String:
 	var string : String
 	var finished : String
@@ -177,9 +177,9 @@ func get_lore(unit:Unit, key:String) -> String:
 			var titleString : String
 			var uName : String = unit.unit_name
 			if unit.unique_art: 
-				title= StringGetter.get_string("lore_title_" + unit.unitId.to_snake_case())
+				title= StringGetter.get_string("lore_title_" + unit.unit_id.to_snake_case())
 				titleString = "%s - %s" % [uName, title]
-				stringPath = str(stringPath,unit.unitId)
+				stringPath = str(stringPath,unit.unit_id)
 			else:
 				var spec :String= Enums.SPEC_ID.keys()[unit.SPEC_ID].to_snake_case()
 				var role :String= Enums.ROLE_ID.keys()[unit.ROLE_ID].to_snake_case()
@@ -198,19 +198,17 @@ func get_lore(unit:Unit, key:String) -> String:
 			stringPath = str(stringPath,key).to_snake_case()
 			string = StringGetter.get_string(stringPath)
 			
-	
 	finished = string
-	
 	return finished
 
 
 func get_active(unit:Unit, keyStat:String) -> String:
-	var keyBase : String = "baseStats"
+	var keyBase : String = "total_stats"
 	var keyTotal : String = "active_stats"
 	var string = _generate_stat_tt(unit, keyBase, keyTotal,keyStat,)
 	return string
-	
-	
+
+
 func get_combat(unit:Unit, keyStat:String) -> String:
 	var keyBase : String = "baseCombat"
 	var keyTotal : String = "combatData"
@@ -224,8 +222,12 @@ func _generate_stat_tt(unit:Unit, keyBase:String, keyTotal:String, keyStat: Stri
 	var finished : String
 	var stringPath:= "lore_"
 	
-	if keyStat != "MoveType": 
-		fString = str(keyStat,": ",unit[keyBase][keyStat]," %s") % _generate_formula([(unit[keyTotal][keyStat] - unit[keyBase][keyStat])])
+	if keyStat != "move_type":
+		var difference: int = (unit[keyTotal][keyStat] - unit[keyBase][keyStat])
+		var formula : String = _generate_formula([difference])
+		#if difference == 0: fString = str(keyStat)
+		#else: fString = str(keyStat,": ",unit[keyBase][keyStat]," %s") % formula
+		fString = str(keyStat,": ",unit[keyBase][keyStat]," %s") % formula
 		string = StringGetter.get_string((stringPath+keyStat.to_snake_case()))
 	
 	
@@ -244,7 +246,7 @@ func _generate_stat_tt(unit:Unit, keyBase:String, keyTotal:String, keyStat: Stri
 		"EffHit": pass
 		"DRes": pass
 		"MoveType":
-			var tData : Dictionary = UnitData.terrainData
+			var tData : Dictionary = PlayerData.terrainData
 			var moveCosts :Dictionary
 			var count := 0
 			for t in tData:
@@ -261,14 +263,11 @@ func _generate_stat_tt(unit:Unit, keyBase:String, keyTotal:String, keyStat: Stri
 				if count < moveCosts.size():
 					fString += "\n"
 			string = StringGetter.get_string((stringPath+keyStat.to_snake_case()+"_"+Enums.MOVE_TYPE.keys()[unit[keyTotal][keyStat]].to_snake_case()))
-		
-		
 	finished = string + "\n" + fString
-	
 	return finished
 
 
-func _generate_formula(params:Array):
+func _generate_formula(params:Array)->String:
 	var string: String = "(%s)"
 	var formula: String = ""
 	for p in params:
@@ -282,12 +281,10 @@ func _generate_formula(params:Array):
 			color = color % debuffColor.to_html(true)
 		value = color+value+"[/color]"
 		formula += value
-	if formula != "": 
+	if formula != "":
 		string = string % formula
-		
 	else: 
 		string = string % "+0"
-	
 	return string
 
 
@@ -303,7 +300,6 @@ func get_status(unit:Unit, status:String) -> String:
 		parts["Duration"] = str(sParams[status].get("Duration", ""))
 		var durationType = Enums.DURATION_TYPE.keys()[sParams[status].DurationType]
 		parts["DurationType"] = StringGetter.get_string("duration_"+durationType.to_snake_case())
-	
 	finished = _mash_together(working, parts)
 	return finished
 

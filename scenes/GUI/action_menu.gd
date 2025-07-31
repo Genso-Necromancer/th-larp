@@ -76,7 +76,6 @@ var state := MENU_STATES.NONE:
 var prevState : Array[MENU_STATES] = []
 var activeItem = null
 
-
 func _ready():
 	self.visible = false
 	aBox.connect_signals(self)
@@ -283,8 +282,8 @@ func return_previous_state() -> void:
 	#var curState : MENU_STATES = state
 	
 	
-	if state == MENU_STATES.ACTION and Global.flags.traded: return
-	elif state == MENU_STATES.ACTION and Global.flags.itemUsed: return
+	if state == MENU_STATES.ACTION and PlayerData.traded: return
+	elif state == MENU_STATES.ACTION and PlayerData.item_used: return
 	
 	if prevState.size() > 0:
 		newState = prevState.pop_back()

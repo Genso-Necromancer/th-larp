@@ -390,9 +390,7 @@ theme_override_font_sizes/font_size = 15
 text = "%s"
 vertical_alignment = 1
 script = ExtResource("6_f5i04")
-key1 = &"unitData"
-key2 = &"Profile"
-key3 = &"Level"
+key1 = &"unit_level"
 
 [node name="Name" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/LvNameHBox" groups=["ProfileLabels"]]
 custom_minimum_size = Vector2(200, 0)
@@ -401,7 +399,7 @@ theme_override_font_sizes/font_size = 20
 text = "%s"
 vertical_alignment = 1
 script = ExtResource("6_f5i04")
-key1 = &"unitName"
+key1 = &"unit_name"
 
 [node name="StatHBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox"]
 layout_mode = 2
@@ -459,7 +457,7 @@ theme_override_constants/outline_size = 2
 text = "%s"
 horizontal_alignment = 2
 script = ExtResource("6_f5i04")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"CurLife"
 
 [node name="Split" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1/HpVBox"]
@@ -479,7 +477,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 2
 text = "%s"
 script = ExtResource("6_f5i04")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"Life"
 
 [node name="CmpVBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1"]
@@ -499,7 +497,7 @@ text = "%s"
 horizontal_alignment = 2
 vertical_alignment = 1
 script = ExtResource("6_f5i04")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"CurComp"
 
 [node name="Split" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1/CmpVBox"]
@@ -519,7 +517,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 2
 text = "%s"
 script = ExtResource("6_f5i04")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"Comp"
 
 [node name="Graze" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1" groups=["ProfileLabels"]]
@@ -623,7 +621,7 @@ mouse_filter = 1
 text = "%s"
 vertical_alignment = 1
 script = ExtResource("6_f5i04")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"Move"
 pairedIcon = NodePath("../MoveType")
 iconDir = "res://sprites/icons/move_types"
@@ -645,7 +643,7 @@ focus_mode = 2
 texture = ExtResource("5_k63fk")
 expand_mode = 1
 metadata/MoveType = &""
-metadata/ToolTip = &"MoveType"
+metadata/ToolTip = &"move_type"
 
 [node name="OffenseBox" type="HBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox"]
 layout_mode = 2

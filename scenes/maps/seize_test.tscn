@@ -13,7 +13,6 @@ seize_count = 1
 metadata/_custom_type_script = "uid://b7a6ss8luhslm"
 
 [node name="SeizeTest" instance=ExtResource("1_qpt4y")]
-forcedUnits = ["remilia", "sakuya"]
 next_map = "uid://dy7o507urgp83"
 chapterNumber = 1
 title = "Seize Test"
@@ -35,12 +34,45 @@ tile_map_data = PackedByteArray("AAADAAkAAQAAAAAAAAAEAAoAAQAAAAAAAAACAAoAAAAAAAA
 tile_map_data = PackedByteArray("AAAFAAcAAQAAAAAAAAA=")
 
 [node name="Cirno" parent="." index="10" instance=ExtResource("4_cpkxf")]
-position = Vector2(704, 560)
+position = Vector2(714, 560)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.1,
+&"Cha": 0.1,
+&"Comp": 0.3,
+&"Def": 0.2,
+&"Eleg": 0.2,
+&"Life": 0.5,
+&"Mag": 0.1,
+&"Move": 0.0,
+&"Pwr": 0.45
+})
 
 [node name="Oni Troublemaker lv1" parent="." index="11" instance=ExtResource("5_5odpd")]
-position = Vector2(584, 368)
-unitId = "UnitId"
+position = Vector2(588, 364)
+simulate_leveling = false
+unit_level = 7
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.0,
+&"Cha": 0.0,
+&"Comp": 0.3,
+&"Def": 0.3,
+&"Eleg": 0.1,
+&"Life": 0.6,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.55
+})
+total_stats = Dictionary[StringName, int]({
+&"Cele": 2,
+&"Cha": 0,
+&"Comp": 90,
+&"Def": 8,
+&"Eleg": 2,
+&"Life": 24,
+&"Mag": 0,
+&"Move": 4,
+&"Pwr": 12
+})
 
 [node name="Fairy Cointaker lv1" parent="." index="12" instance=ExtResource("6_ub6hv")]
 position = Vector2(462, 448)
-unitId = "UnitId"

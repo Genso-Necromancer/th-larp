@@ -15,3 +15,16 @@ func _ready():
 func _unload_scene():
 	var main :MainNode= get_parent()
 	main.unload_me(self)
+
+
+
+func _on_new_game_button_pressed(_button):
+	var main :MainNode= get_parent()
+	main.new_game_start()
+	main.unload_me(self)
+
+
+func _on_load_game_button_pressed(_button):
+	var main :MainNode= get_parent()
+	main.begin_file_select()
+	main.unload_me(self)

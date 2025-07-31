@@ -9,17 +9,20 @@ func _init():
 
 
 func connect_buttons(parent):
-	var d := $PanelContainer/MarginContainer/SetUpVbox/OptionsVBox/BTNDeploy
-	var f := $PanelContainer/MarginContainer/SetUpVbox/OptionsVBox/FrmBtn
-	var m := $PanelContainer/MarginContainer/SetUpVbox/OptionsVBox/MngBtn
-	var b := $PanelContainer/MarginContainer/SetUpVbox/OptionsVBox/BeginBtn
-	var s := $PanelContainer/MarginContainer/SetUpVbox/OptionsVBox/StatusBtn
+	var d := %BTNDeploy
+	var f := %FrmBtn
+	var m := %MngBtn
+	var b := %BeginBtn
+	var s := %StatusBtn
+	var sv := %SaveBtn
 	
 	d.pressed.connect(parent._on_btn_deploy_pressed)
 	f.pressed.connect(parent._on_frm_btn_pressed)
 	m.pressed.connect(parent._on_mng_btn_pressed)
 	b.pressed.connect(parent._on_begin_btn_pressed)
 	s.pressed.connect(parent._on_status_btn_pressed)
+	sv.pressed.connect(parent._on_save_btn_pressed)
+	
 	
 
 func toggle_visible():
@@ -98,6 +101,10 @@ func _on_mng_btn_pressed():
 
 
 func _on_begin_btn_pressed():
+	_button_confirm_sfx()
+
+
+func _on_save_btn_pressed():
 	_button_confirm_sfx()
 #endregion
 

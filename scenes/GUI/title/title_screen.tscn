@@ -48,19 +48,19 @@ theme_override_constants/margin_top = 100
 [node name="Vbox" type="VBoxContainer" parent="Margin/VBox/ButtonMargin"]
 layout_mode = 2
 
-[node name="TexturedLabelButton" parent="Margin/VBox/ButtonMargin/Vbox" instance=ExtResource("4_jymba")]
+[node name="NewGame" parent="Margin/VBox/ButtonMargin/Vbox" instance=ExtResource("4_jymba")]
 layout_mode = 2
 label_text = "New Game"
 
-[node name="TexturedLabelButton2" parent="Margin/VBox/ButtonMargin/Vbox" instance=ExtResource("4_jymba")]
+[node name="LoadGame" parent="Margin/VBox/ButtonMargin/Vbox" instance=ExtResource("4_jymba")]
 layout_mode = 2
 label_text = "Load Game"
 
-[node name="TexturedLabelButton3" parent="Margin/VBox/ButtonMargin/Vbox" instance=ExtResource("4_jymba")]
+[node name="Options" parent="Margin/VBox/ButtonMargin/Vbox" instance=ExtResource("4_jymba")]
 layout_mode = 2
 label_text = "Options"
 
-[node name="TexturedLabelButton4" parent="Margin/VBox/ButtonMargin/Vbox" instance=ExtResource("4_jymba")]
+[node name="Exit" parent="Margin/VBox/ButtonMargin/Vbox" instance=ExtResource("4_jymba")]
 layout_mode = 2
 label_text = "Exit"
 
@@ -68,3 +68,6 @@ label_text = "Exit"
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
+
+[connection signal="button_pressed" from="Margin/VBox/ButtonMargin/Vbox/NewGame" to="." method="_on_new_game_button_pressed"]
+[connection signal="button_pressed" from="Margin/VBox/ButtonMargin/Vbox/LoadGame" to="." method="_on_load_game_button_pressed"]

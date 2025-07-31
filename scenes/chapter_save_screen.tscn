@@ -95,17 +95,22 @@ layout_mode = 2
 label_text = "No"
 
 [node name="FileSelectScreenEdge" type="MarginContainer" parent="MainContainer"]
+visible = false
 layout_mode = 2
+theme_override_constants/margin_top = 80
 theme_override_constants/margin_bottom = 45
 
-[node name="FilesVBox" type="VBoxContainer" parent="MainContainer/FileSelectScreenEdge"]
+[node name="ScrollContainer" type="ScrollContainer" parent="MainContainer/FileSelectScreenEdge"]
+layout_mode = 2
+size_flags_horizontal = 4
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="FilesVBox" type="VBoxContainer" parent="MainContainer/FileSelectScreenEdge/ScrollContainer"]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 alignment = 1
-
-[node name="VScrollBar" type="VScrollBar" parent="MainContainer/FileSelectScreenEdge/FilesVBox"]
-layout_mode = 2
 
 [node name="PromptContainer" type="PanelContainer" parent="MainContainer"]
 layout_mode = 2

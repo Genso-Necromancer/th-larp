@@ -169,7 +169,7 @@ vertical_alignment = 2
 clip_text = true
 text_overrun_behavior = 3
 script = ExtResource("7_2r62x")
-key1 = &"unitName"
+key1 = &"unit_name"
 
 [node name="HSeparator" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/NameMargin/NameVBox"]
 layout_mode = 2
@@ -208,9 +208,7 @@ theme_override_font_sizes/font_size = 25
 text = "%s"
 horizontal_alignment = 1
 script = ExtResource("7_2r62x")
-key1 = &"unitData"
-key2 = &"Profile"
-key3 = &"Role"
+key1 = &"ROLE_ID"
 
 [node name="HSeparator" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/ClassVBox"]
 layout_mode = 2
@@ -247,9 +245,7 @@ theme_override_font_sizes/font_size = 25
 text = "%s"
 horizontal_alignment = 1
 script = ExtResource("7_2r62x")
-key1 = &"unitData"
-key2 = &"Profile"
-key3 = &"Species"
+key1 = &"SPEC_ID"
 
 [node name="HSeparator" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/SpeciesVBox"]
 layout_mode = 2
@@ -287,9 +283,7 @@ theme_override_font_sizes/font_size = 25
 text = "%s"
 horizontal_alignment = 1
 script = ExtResource("7_2r62x")
-key1 = &"unitData"
-key2 = &"Profile"
-key3 = &"Level"
+key1 = &"unit_level"
 
 [node name="HSeparator" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MetaDataMargin/PanelContainer/MetaStatsMargin/MetaStatsVBox/LvVBox"]
 layout_mode = 2
@@ -371,9 +365,7 @@ theme_override_font_sizes/font_size = 20
 text = "%s"
 horizontal_alignment = 1
 script = ExtResource("7_2r62x")
-key1 = &"unitData"
-key2 = &"Profile"
-key3 = &"EXP"
+key1 = &"unit_exp"
 
 [node name="HSeparator" type="HSeparator" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/MidMargin/MidHBox/XPMargin/XPVBox"]
 layout_mode = 2
@@ -645,8 +637,7 @@ mouse_filter = 1
 text = "%s"
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
-key1 = &"activeStats"
-key2 = &"Move"
+key1 = &"move_type"
 pairedIcon = NodePath("../MoveType")
 iconDir = "res://sprites/icons/move_types"
 
@@ -667,7 +658,7 @@ focus_mode = 2
 texture = ExtResource("3_x6e7x")
 expand_mode = 1
 metadata/MoveType = &""
-metadata/ToolTip = &"MoveType"
+metadata/ToolTip = &"move_type"
 
 [node name="StatMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -730,7 +721,7 @@ theme_override_font_sizes/font_size = 24
 text = "%s"
 horizontal_alignment = 2
 script = ExtResource("7_2r62x")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"CurLife"
 
 [node name="Split" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox"]
@@ -753,7 +744,7 @@ theme_override_fonts/font = ExtResource("9_ce1yi")
 theme_override_font_sizes/font_size = 24
 text = "%s"
 script = ExtResource("7_2r62x")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"Life"
 
 [node name="CompMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox"]
@@ -793,7 +784,7 @@ text = "%s"
 horizontal_alignment = 2
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"CurComp"
 
 [node name="Split" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/CompMargin/VBoxContainer2"]
@@ -815,7 +806,7 @@ theme_override_fonts/font = ExtResource("9_ce1yi")
 theme_override_font_sizes/font_size = 24
 text = "%s"
 script = ExtResource("7_2r62x")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"Comp"
 
 [node name="StatBlockMargin" type="MarginContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox"]
@@ -915,7 +906,7 @@ mouse_filter = 1
 text = "%s"
 vertical_alignment = 2
 script = ExtResource("7_2r62x")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"Pwr"
 
 [node name="Mag" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VStats" groups=["ProfileLabels"]]
@@ -925,7 +916,7 @@ mouse_filter = 1
 text = "%s"
 vertical_alignment = 2
 script = ExtResource("7_2r62x")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"Mag"
 
 [node name="Ele" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VStats" groups=["ProfileLabels"]]
@@ -935,7 +926,7 @@ mouse_filter = 1
 text = "%s"
 vertical_alignment = 2
 script = ExtResource("7_2r62x")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"Eleg"
 
 [node name="Cele" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VStats" groups=["ProfileLabels"]]
@@ -945,7 +936,7 @@ mouse_filter = 1
 text = "%s"
 vertical_alignment = 2
 script = ExtResource("7_2r62x")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"Cele"
 
 [node name="Def" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VStats" groups=["ProfileLabels"]]
@@ -955,7 +946,7 @@ mouse_filter = 1
 text = "%s"
 vertical_alignment = 2
 script = ExtResource("7_2r62x")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"Def"
 
 [node name="Cha" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox/VStats" groups=["ProfileLabels"]]
@@ -965,7 +956,7 @@ mouse_filter = 1
 text = "%s"
 vertical_alignment = 2
 script = ExtResource("7_2r62x")
-key1 = &"activeStats"
+key1 = &"active_stats"
 key2 = &"Cha"
 
 [node name="VBonus" type="VBoxContainer" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/StatBlockMargin/StatBlockHBox/StatBox"]

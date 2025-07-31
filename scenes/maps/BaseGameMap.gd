@@ -2,17 +2,22 @@
 extends Node2D
 class_name GameMap
 signal map_ready
+signal units_reloaded
 signal events_checked
 signal danmaku_progressed
+
 
 enum MAP_EVENT{NONE, TIME, DEATH, SEIZE}
 enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
 @export_category("Map Values")
 ##Units required to participate in this chapter.[br]
 ##WARNING: Do not use units which can die and arrive prior to this map]
-##WARNING: unitId is case sensitive.
-@export var forcedUnits := ["remilia"]
-
+##WARNING: unit_id is case sensitive.
+@export var forcedUnits := ["remilia"]:
+	set(value):
+		forcedUnits.clear()
+		for id in value:
+			forcedUnits.append(id.to_snake_case())
 @export_file("*.tscn") var next_map : String
 @export var chapterNumber: int = 0
 @export var title: String = ""
@@ -59,8 +64,8 @@ enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
 
 
 #region unit organization
-var generated_ids :Array = []
-var persistant_data:Dictionary
+var units_loading:int =0
+var graveyard:Array[StringName] = []
 #endregion
 var hours : int = 0
 var minutes : int = 0
@@ -74,13 +79,10 @@ var wasSeized : Array[Vector2i] = []
 var sequenceStep := 0:
 	set(value):
 		sequenceStep = clampi(value,0,win_conditions.size()-1)
-		Global.flags.ObjectiveComplete = true
+
 
 func _ready():
 	if not Engine.is_editor_hint():
-		var p = get_parent()
-		
-		self.map_ready.connect(p._on_map_ready)
 		_load_danmaku_scripts()
 		dev.visible = false
 		narrative.visible = false
@@ -88,19 +90,84 @@ func _ready():
 		for obj in win_conditions:
 			if obj is KillUnit:
 				for path in obj.hit_list_paths:
-					obj.hit_list.append(get_node(path).unitId)
+					obj.hit_list.append(get_node(path).unit_id)
 
 	mapSize = ground.get_used_rect().size
 	SignalTower.action_seize.connect(self._on_seize)
-	#print(mapSize)
+	_initialize_map_units()
 	emit_signal("map_ready")
-	_initialize_unit_cells()
+
+#region save/load
+func save()->Dictionary:
+	var saveData :Dictionary
+	#generated_ids
+	saveData["DataType"] = "GameMap"
+	saveData["graveyard"] = graveyard
+	#saveData["eventQue"] = eventQue
+	#saveData["actingDanmaku"] = actingDanmaku
+	#saveData["victoryKills"] = victoryKills
+	#saveData["wasSeized"] = wasSeized
+	#saveData["sequenceStep"] = sequenceStep
+	return saveData
+
+
+func load_data(save_data:Dictionary):
+	graveyard.assign(save_data.graveyard)
+	#eventQue = save_data.eventQue
+	#actingDanmaku = save_data.actingDanmaku
+	#victoryKills = save_data.victoryKills
+	#wasSeized = save_data.wasSeized
+	#sequenceStep = save_data.sequenceStep
+
+
+func load_map_units():
+	var npc:Dictionary = PlayerData.unitData.NPC
+	var enemy:Dictionary = PlayerData.unitData.ENEMY
+	_unload_map_units()
+	units_loading = npc.size() + enemy.size()
+	_load_unit_group(npc)
+	_load_unit_group(enemy)
+
+
+func _load_unit_group(unit_data:Dictionary):
+	var unitPath := load("res://scenes/units/Unit.tscn")
+	for unitId in unit_data:
+		var newUnit:Unit = unitPath.instantiate()
+		var unitData: Dictionary = unit_data[unitId]
+		if !unitData.alive:
+			graveyard.append(unitId)
+			units_loading -= 1
+			continue
+		newUnit.unit_ready.connect(self._on_new_unit_ready)
+		newUnit.pre_load(unitData)
+		add_child(newUnit)
+
+
+func _on_new_unit_ready(unit:Unit):
+	var faction: String = Enums.FACTION_ID.keys()[unit.FACTION_ID]
+	unit.map = self
+	unit.post_load(PlayerData.unitData[faction][unit.unit_id], true)
+	units_loading -= 1
+	if units_loading < 1:
+		call_deferred("_signal_units_reloaded")
+
+
+func _signal_units_reloaded():
+	units_reloaded.emit()
+
+
+func _unload_map_units():
+	var units : Array[Unit] = get_map_units()
+	for unit in units:
+		unit.queue_free()
+#endregion
+
 
 #region warnings
 func _get_configuration_warnings():
 	if win_conditions.is_empty(): return ["Objective missing in win_condition, map is unbeatable."]
 	else: return []
-
+#endregion
 
 #region property list functions
 func _get_property_list():
@@ -140,8 +207,17 @@ func get_active_units() -> Dictionary:
 		var unit := child as Unit
 		if not unit:
 			continue
-		elif unit.isActive:
+		elif unit.is_active:
 			unitList[unit.cell] = unit
+	return unitList
+
+
+func get_map_units() -> Array[Unit]:
+	var unitList :Array[Unit]= []
+	for child in get_children():
+		var unit := child as Unit
+		if not unit: continue
+		unitList.append(unit)
 	return unitList
 
 
@@ -151,23 +227,26 @@ func get_active_danmaku() -> Dictionary:
 		var bullet := child as Danmaku
 		if not bullet:
 			continue
-		elif bullet.isActive:
+		elif bullet.is_active:
 			bulletList[bullet.cell] = bullet
 	return bulletList
 
 
-func _initialize_unit_cells():
-	var units : Dictionary = get_active_units()
-	for unit in units:
-		if units[unit].isActive:
-			units[unit].add_map(self)
-			units[unit].initialize_cell()
+func _initialize_map_units():
+	var units : Array[Unit] = get_map_units()
+	for unit :Unit in units:
+		unit.set_unit_id()
+		unit.map = self
+		if unit.is_active: unit.initialize_cell()
+		
+
 
 
 func _initialize_danmaku_cells():
 	var danmaku : Dictionary = get_active_danmaku()
 	for bullet in danmaku:
 		danmaku[bullet].initialize_cell()
+
 
 func get_objectives() -> Array:
 	var objectives: Array = ["This is a Test", "Of The Emergency Broadcast", "System."]
@@ -177,6 +256,7 @@ func get_objectives() -> Array:
 func get_loss_conditions() -> Array:
 	var loss: Array = ["Do NOT Be Alarmed."]
 	return loss
+
 
 func cell_clamp(grid_position: Vector2i) -> Vector2i:
 	var out := grid_position
@@ -193,7 +273,7 @@ func get_movement_cost(cell, moveType):
 	var mod :TileData = modifier.get_cell_tile_data(cell)
 	var baseTile : StringName
 	var modTile : StringName
-	var costData :Dictionary = UnitData.terrainData
+	var costData :Dictionary = PlayerData.terrainData
 	var cost := 0.0
 	
 	if base: baseTile = base.get_custom_data("TerrainType")
@@ -223,7 +303,7 @@ func get_terrain_tags(cell:Vector2i) -> Dictionary:
 func get_bonus(cell:Vector2i) -> Dictionary:
 	var tags : Dictionary =  get_terrain_tags(cell)
 	var cellParams : Dictionary
-	var tData : Dictionary = UnitData.terrainData
+	var tData : Dictionary = PlayerData.terrainData
 	cellParams = tData[tags.BaseType].duplicate()
 	if tags.ModType == "Bridge": cellParams = tData[tags.ModType]
 	elif tags.ModType:
@@ -309,7 +389,8 @@ func get_used_rect() -> Rect2i:
 #endregion
 
 #region Event Functions
-func _on_unit_death(unit):
+func _on_unit_death(unit:Unit):
+	graveyard.append(unit.unit_id)
 	check_event(MAP_EVENT.DEATH, unit)
 
 
@@ -330,14 +411,14 @@ func _get_win_objective(event:MAP_EVENT) -> Objective:
 	var toCheck : Array[Objective] = []
 	var obj : Objective
 	match win_style:
-		OBJECTIVE_STYLE.SEQUENTIAL: return win_conditions[sequenceStep]
+		OBJECTIVE_STYLE.SEQUENTIAL: obj = win_conditions[sequenceStep]
 		OBJECTIVE_STYLE.SIMULTANEOUS: toCheck = win_conditions
 	
 	for con in toCheck:
 		match event:
 			MAP_EVENT.TIME: pass
-			MAP_EVENT.SEIZE: if con is Seize: return con
-			MAP_EVENT.DEATH:  if con is KillUnit: return con
+			MAP_EVENT.SEIZE: if con is Seize: obj = con
+			MAP_EVENT.DEATH:  if con is KillUnit: obj = con
 	return obj
 
 
@@ -364,7 +445,7 @@ func _check_death_conditionals(parameter) -> bool:
 	var triggered := false
 	var winObj :KillUnit= _get_win_objective(MAP_EVENT.DEATH)
 	if parameter.FACTION_ID == Enums.FACTION_ID.PLAYER:
-		unitId = parameter.unitId
+		unitId = parameter.unit_id
 		condition = "Player Death"
 	else:
 		condition = "NPC Death"
@@ -378,7 +459,7 @@ func _check_death_conditionals(parameter) -> bool:
 			if lossKill.has(parameter):
 				Global.flags.gameOver = true
 				triggered = true
-			if winObj.hit_list.has(parameter.unitId):
+			if winObj.hit_list.has(parameter.unit_id):
 				_add_kill(parameter, true)
 	if triggered:
 		_check_off_event.call_deferred()
@@ -388,7 +469,7 @@ func _check_death_conditionals(parameter) -> bool:
 func _add_kill(unit, victory):
 	var winObj :KillUnit = _get_win_objective(MAP_EVENT.DEATH)
 	if victory:
-		victoryKills.append(unit.unitId)
+		victoryKills.append(unit.unit_id)
 	if !winObj: return
 	for kill in winObj.hit_list:
 		if !victoryKills.has(kill):
@@ -410,7 +491,7 @@ func _check_time_conditional(_time) -> bool:
 		if spawner and spawner.timeMethod == "Time Passed" and spawner.timeHours <= Global.timePassed:
 			_spawn_premade_units(spawner)
 			triggered = true
-		elif spawner and spawner.timeMethod == "Time of Day" and spawner.timeHours == Global.gameTime:
+		elif spawner and spawner.timeMethod == "Time of Day" and spawner.timeHours == Global.game_time:
 			_spawn_premade_units(spawner)
 			triggered = true
 	return triggered
@@ -418,7 +499,7 @@ func _check_time_conditional(_time) -> bool:
 
 func check_events():
 	var triggered : bool
-	triggered = check_event(MAP_EVENT.TIME, Global.gameTime)
+	triggered = check_event(MAP_EVENT.TIME, Global.game_time)
 	if triggered:
 		eventQue.append(triggered)
 	if eventQue.size() == 0:
@@ -433,7 +514,7 @@ func _check_off_event():
 
 
 func _check_victory() -> void:
-	var flag : bool
+	#var flag : bool
 	for obj in win_conditions:
 		if !obj.complete: return
 	Global.flags.victory = true
@@ -522,33 +603,8 @@ func _process_bullets(spawn_scene:PackedScene):
 	get_parent().camera_to_anchor(anchor.cell)
 	await get_parent().camera_on_anchor
 	_call_danmaku_entrance()
-	
-	#"Type": "DmkuKunai",
-	#"SpawnStyle": "Left",
-	#"Amount": 2,
-	#"Offset": 1,
-	#var dmkData = dmkScript.danmakuData
-	#for bullet in bullets:
-		#var a : int = bullet.Amount
-		#var dmk : Dictionary = dmkData[bullet.Type]
-		#var grouping := []
-		#
-		#for i in a:
-			#var b = dmkScene.instantiate()
-			#b.init_bullet(dmk, bullet.Type, dmkMaster)
-			#grouping.append(b)
-			#
-		#var results : Array = get_parent().spawn_danmaku(grouping, bullet.Offset, dmkMaster.cell, bullet.AnchorType)
-		#
-		#for b in results:
-			#if b.SpawnPoint:
-				#add_child(b.Bullet)
-				#b.Bullet.relocate(b.SpawnPoint)
-				#b.Bullet.animation_completed.connect(self._on_danmaku_animation_completed)
-				#actingDanmaku.Spawning.append(b.Bullet)
-			#else: b.Bullet.queue_free()
-	#if actingDanmaku.Spawning.size() > 0:
-		#_call_danmaku_entrance()
+
+
 ##Not functioning yet
 func get_danmaku_target() -> Unit:
 	var target : Unit

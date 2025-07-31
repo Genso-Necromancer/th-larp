@@ -15,3 +15,8 @@ func _init(resource :NaturalResource = stats) -> void:
 		trade = false
 		use = false
 		sub_group = Enums.WEAPON_SUB.NATURAL
+
+func _get_values()->Dictionary:
+	var values:Dictionary = super._get_values()
+	values["class"] = "Natural"
+	return values

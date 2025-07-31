@@ -1,4 +1,5 @@
 extends HBoxContainer
+class_name XpContainer
 
 signal exp_finished
 #Nodes

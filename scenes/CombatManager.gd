@@ -233,7 +233,7 @@ func _reach_check(unit, target) -> bool:
 	var tWep = target.get_equipped_weapon()
 	var minR = tWep.min_reach
 	var maxR = tWep.max_reach
-	var hexStar = AHexGrid2D.new(Global.flags.CurrentMap)
+	var hexStar = AHexGrid2D.new(Global.map_ref)
 	var distance = hexStar.find_distance(unit.cell, target.cell)
 	if distance >= minR and distance <= maxR:
 		return true

@@ -10,4 +10,9 @@ class_name OfudaResource
 @export var hit : int = 0
 @export var dmg : int = 0
 @export var crit : int = 0
-@export var dmg_type : Enums.DAMAGE_TYPE = Enums.DAMAGE_TYPE.NONE
+@export var damage_type : Enums.DAMAGE_TYPE = Enums.DAMAGE_TYPE.NONE
+
+func get_resource_path()->String:
+	var path:String = "res://unit_resources/items/ofuda/%s.tres" % id
+	
+	return path

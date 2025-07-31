@@ -18,7 +18,7 @@ func play_splash(chNum :int, chTitle:String, timeString:String):
 	var title := $TitleNode/TitlePanel/ChTitle
 	var time := $TitleNode/TimePanel/ChTime
 	var dayHalf : String = ""
-	match Global.timeOfDay:
+	match Global.time_of_day:
 		Enums.TIME.DAY: dayHalf = "AM"
 		Enums.TIME.NIGHT: dayHalf = "PM"
 	num.set_text(str(chNum))

@@ -8,7 +8,7 @@ var defaultText : String = get_text()
 
 ##Name of node must match it's desired keyword
 func update_yourself_now(type1: StringName, type2: StringName) -> void:
-	var tData : Dictionary = UnitData.terrainData
+	var tData : Dictionary = PlayerData.terrainData
 	var value : int = 0
 	var key : StringName = name
 	

@@ -1,8 +1,7 @@
-[gd_scene load_steps=14 format=3 uid="uid://ehgcslevf08n"]
+[gd_scene load_steps=13 format=3 uid="uid://ehgcslevf08n"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_i0qm2"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_mx3tg"]
-[ext_resource type="Texture2D" uid="uid://c83g6bwvib3xh" path="res://sprites/character/reimu/miko_sprite.png" id="2_yned8"]
 [ext_resource type="Resource" uid="uid://cppnbtvkv1i0t" path="res://unit_resources/features/skills/slay_fairy.tres" id="3_rrfyl"]
 [ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="4_634dn"]
 [ext_resource type="Resource" uid="uid://bj5u83dg0xeid" path="res://unit_resources/features/passives/plot_armor.tres" id="5_nnev5"]
@@ -29,7 +28,7 @@ is_broken = false
 metadata/_custom_type_script = "uid://dtxt6i4bhoqpo"
 
 [node name="Reimu" instance=ExtResource("1_i0qm2")]
-unitId = "reimu"
+unit_id = "reimu"
 FACTION_ID = 2
 unique_art = true
 simulate_leveling = false
@@ -77,7 +76,8 @@ max_inv = 6
 inventory = Array[ExtResource("6_bmyf1")]([SubResource("Resource_tpcp1"), SubResource("Resource_bmyf1")])
 
 [node name="Sprite" parent="PathFollow2D" index="0"]
-texture = ExtResource("2_yned8")
+texture = null
 
 [node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
 max_value = 20.0
+value = 20.0

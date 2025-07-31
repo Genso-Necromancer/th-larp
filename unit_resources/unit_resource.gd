@@ -26,7 +26,7 @@ func _get_property_list():
 				"type" : TYPE_INT,
 				"hint" : PROPERTY_HINT_ENUM,
 				"hint_string" : _enum_to_string(Enums.TIME)
-				#"hint_string" : _array_to_string(UnitData.get_item_keys())
+				#"hint_string" : _array_to_string(PlayerData.get_item_keys())
 			})
 		Enums.RULE_TYPE.SELF_SPEC, Enums.RULE_TYPE.TARGET_SPEC:
 			properties.append({
@@ -34,7 +34,7 @@ func _get_property_list():
 				"type" : TYPE_INT,
 				"hint" : PROPERTY_HINT_ENUM,
 				"hint_string" : _enum_to_string(Enums.SPEC_ID)
-				#"hint_string" : _array_to_string(UnitData.get_item_keys())
+				#"hint_string" : _array_to_string(PlayerData.get_item_keys())
 			})
 		
 	return properties
@@ -57,3 +57,9 @@ func get_property_names() -> Array[String]:
 		if prop.name in self:
 			propNames.append(prop.name)
 	return propNames
+
+
+func get_resource_path()->String:
+	var path:String = ""
+	
+	return path

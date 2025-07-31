@@ -31,7 +31,7 @@ func load_animations(units):
 	animations.clear()
 	
 	for unit in units:
-		var animPath = "res://scenes/animations/combat/combat_%s.tscn" % [unit.unitId.to_snake_case()]
+		var animPath = "res://scenes/animations/combat/combat_%s.tscn" % [unit.unit_id.to_snake_case()]
 		var animScene = load(animPath)
 		if !animScene:
 			animPath = "res://scenes/animations/combat/combat_sakuya.tscn"

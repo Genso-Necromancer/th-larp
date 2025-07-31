@@ -20,7 +20,7 @@ is_broken = false
 metadata/_custom_type_script = "uid://bas4mbl00uet6"
 
 [node name="Remilia" instance=ExtResource("1_ku6ti")]
-unitId = "remilia"
+unit_id = "remilia"
 recruited = true
 FACTION_ID = 2
 unique_art = true
@@ -28,6 +28,28 @@ simulate_leveling = false
 SPEC_ID = 3
 ROLE_ID = 3
 move_type = 2
+mod_growth = Dictionary[StringName, float]({
+&"Cele": 1.0,
+&"Cha": 0.6,
+&"Comp": 1.0,
+&"Def": 0.2,
+&"Eleg": 0.7,
+&"Life": 1.0,
+&"Mag": 0.5,
+&"Move": 0.0,
+&"Pwr": 0.5
+})
+total_growth = Dictionary[StringName, float]({
+&"Cele": 1.0,
+&"Cha": 0.6,
+&"Comp": 1.0,
+&"Def": 0.2,
+&"Eleg": 0.7,
+&"Life": 1.0,
+&"Mag": 0.5,
+&"Move": 0.0,
+&"Pwr": 0.5
+})
 total_stats = Dictionary[StringName, int]({
 &"Cele": 10,
 &"Cha": 8,
@@ -73,3 +95,4 @@ texture = ExtResource("2_tvseu")
 
 [node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
 max_value = 20.0
+value = 20.0

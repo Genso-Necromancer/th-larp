@@ -24,6 +24,8 @@ signal turn_added(team:StringName)
 signal turn_removed(team:StringName)
 signal turn_changed
 signal new_round(turn_order:Array[StringName])
+signal map_added(map:GameMap)
+signal units_loaded
 
 #signal skill_target_canceled
 #signal item_target_canceled
@@ -42,43 +44,34 @@ signal deploy_toggled
 signal formation_closed
 
 enum ACTION_TYPE {ATTACK, SKILL, WAIT, END}
-
+var save_enum:Enums.SAVE_TYPE
 var map_end := false
+var chapter_started := false
 # Mapping locations of units and danmaku {cell:node}
 var units :Dictionary[Vector2i, Unit]= {} 
 var danmaku := {}
 var danmakuMotion := []
 var collisionQue := []
 var dmkScriptProgressing:bool = false
-
-
 #these are used to store references to actual units that are passed around this class and those it controls
 var focusUnit : Unit :
 	set(value):
 		focusUnit = value
 		Global.focusUnit = focusUnit
-
-
 var focusDanmaku : Danmaku :
 	set(value):
 		focusDanmaku = value
 		Global.focusDanmaku = focusDanmaku
-
-
 var aiTarget : Unit :
 	set(value):
 		aiTarget = value
 		Global.aiTarget = aiTarget
-		
 var activeUnit: Unit :
 	set(value):
 		activeUnit = value
 		Global.activeUnit = activeUnit
-		
 var targetUnit : Unit
 var sequencingUnits = {}
-
-
 #set up variables
 var forcedDeploy : Dictionary
 var deploymentCells : Array
@@ -86,28 +79,17 @@ var depCap : int = 0
 var filledSlots : int = 0
 var storedUnit : Unit
 var storedCell : Vector2i = Vector2i(-1,-1)
-
 #variables related to the active map in use
 var currMap: GameMap:
 	set(value):
 		currMap = value
-		Global.flags.CurrentMap = value
+		Global.map_ref = value
 var warpTarget
 var deathList = []
 var turnLoss = []
-
-#Units by UnitID
-var unitObjs : Dictionary = Global.unitObjs
-
+#Units by unit_id
+var unitObjs : Dictionary
 @onready var parent = get_parent()
-
-
-
-
-
-#ready() is the gayest fucking shit ever
-var defineUnits = false
-
 #related to pathfinding
 #var hexStar: AHexGrid2D #HEX REF
 var walkableCells = []
@@ -118,43 +100,29 @@ var snapPath := []:
 		cursor.snapPath = value
 		snapPath = value
 var pathingArray := []
-
 #game turns
 var turnOrder :Array[StringName]= []
-var roundCounter = 0
-var turnCounter = 0
-var maxTurns = 0
+var roundCounter := 0
+var turnCounter := 0
 var earlyEnd = false
-
 #Turn/Round variables
 var turnComplete := false
 var endOfRound := false
 var startNextTurn := false
-
-
 #Global effects
-var globalEffects = {}
-
-
-
-
+var globalEffects := {}
 #unit variables
 var activeAction : Dictionary = {"Weapon":false,"Skill":null,"Item":null}
-var postQueue = []
-
+var postQueue := []
 #controls pseudo UI elements, like HP bars
-var HpBarVis = true
-
+var HpBarVis := true
 #AI Variables
-var aiTurn = false
-var aiNeedAct = false
-
+var aiTurn := false
+var aiNeedAct := false
+var ai_turn_result:Dictionary = {}
 #Mouse related
 @export var mouseSens: float = 0.4
 @export var smoothing: float = 0.2
-
-
-
 #Nodes
 @onready var unitPath: UnitPath = $UnitPath
 @onready var cursor: Cursor = $Cursor
@@ -163,17 +131,18 @@ var aiNeedAct = false
 #@onready var turnTest = $Control/TurnLight
 @onready var boardState: BoardState = BoardState.new()
 @export var uiCooldown := 0.2
-
 ## Global node variables
 var cc : CameraController
 var ai : AiManager
-
 ##Unit Preload
 var unitScn := preload("res://scenes/units/Unit.tscn")
 
 
+func _init()->void:
+	set_process(false)
+
+
 func _process(_delta):
-	
 	_check_flags()
 	if deathList.size() > 0 and turnComplete:
 		_wipe_dead()
@@ -188,6 +157,7 @@ func _process(_delta):
 	elif GameState.state == GameState.gState.ACCEPT_PROMPT or GameState.state == GameState.gState.FAIL_STATE or GameState.state == GameState.gState.WIN_STATE or GameState.state == GameState.gState.GB_END_OF_ROUND:
 		pass
 	elif turnComplete:
+		
 		turnComplete = false
 		_post_turn_events()
 	elif startNextTurn:
@@ -199,10 +169,70 @@ func _process(_delta):
 #region utility funcs
 func _wipe_region():
 	snapPath.clear()
-
-
 #endregion
 
+#region save/load
+func save() -> Dictionary:
+	var saveData : Dictionary = {}
+	saveData["DataType"] = "GameBoard"
+	saveData["map_end"] = map_end
+	saveData["chapter_started"] = chapter_started
+	#Global effects
+	saveData["globalEffects"] = globalEffects
+	if !chapter_started and currMap: saveData["deployment"] = _get_deployment()
+	#Turn/Round variables
+	saveData["turnOrder"] = turnOrder
+	saveData["roundCounter"] = roundCounter
+	saveData["turnCounter"] = turnCounter
+	saveData["earlyEnd"] = earlyEnd
+	saveData["turnComplete"] = turnComplete
+	saveData["endOfRound"] = endOfRound
+	saveData["startNextTurn"] = startNextTurn
+	
+	#unit variables
+	saveData["activeAction"] = activeAction
+	saveData["postQueue"] = postQueue
+	saveData["HpBarVis"] = HpBarVis # Needs special loading function
+
+	saveData["aiTurn"] = aiTurn
+	saveData["aiNeedAct"] = aiNeedAct
+	saveData["ai_turn_result"] = ai_turn_result
+	# Mapping locations of units and danmaku {cell:node}
+	#saveData["units"] = units
+	#saveData["focusUnit"] = focusUnit
+	#saveData["focusDanmaku"] = focusDanmaku
+	#saveData["aiTarget"] = aiTarget
+			#
+	#saveData["activeUnit"] = activeUnit
+			
+	#saveData["targetUnit"] = targetUnit
+	#saveData["sequencingUnits"] = sequencingUnits
+
+
+	#saveData["forcedDeploy"] = forcedDeploy
+	#saveData["deploymentCells"] = deploymentCells
+	#saveData["depCap"] = depCap
+	#saveData["filledSlots"] = filledSlots
+	#saveData["storedUnits"] = storedUnit
+	#saveData["storedCell"] = storedCell
+
+	#variables related to the active map in use
+	#saveData["currMap"] = currMap
+	#saveData["deathList"] = deathList
+	#saveData["turnLoss"] = turnLoss
+
+	#Units by unit_id
+	#saveData["unitObjs"] = unitObjs
+
+	return saveData
+
+func _get_deployment()->Dictionary[StringName,Vector2i]:
+	var deployments : Dictionary[StringName,Vector2i]
+	for cell : Vector2i in units:
+		var unit: Unit = units[cell]
+		if unit.deployment == Enums.DEPLOYMENT.DEPLOYED and unit.FACTION_ID == Enums.FACTION_ID.PLAYER: deployments[unit.unit_id] = cell
+	return deployments
+#endregion
 
 
 #region debug funcs
@@ -210,6 +240,9 @@ func _kill_lady():
 	var lady = unitObjs["remilia"]
 	lady.apply_dmg(9999)
 
+func level_test():
+	var unit : Unit = unitObjs["remilia"]
+	unit.add_exp("Kill")
 
 func _camera_test():
 	if !cc: 
@@ -246,30 +279,26 @@ func _kill_camera() -> void:
 	cursor.visible = true
 	cc.call_deferred("free")
 	#cursor.return_origin()
-
 #endregion
+
 
 func _toggle_pause():
 	get_tree().paused = !get_tree().paused
-	
-#func _on_jobs_done(id, node):
-	#match id:
-		#"Cursor": 
-			#cursor = node
-			
-#Map Functions
+
+
+#region map functions?
 func _get_current_map():
 	for mapChild in get_children(): #mapchild
 		var map := mapChild as GameMap
 		if not map:
 			continue
 		return map
-		
-	
-	
+
+
 func free_map()->void:
 	reset_flags()
 	turnComplete = false # find a better place to reinitialize this and above value HERE
+	PlayerData.purge_npc_data()
 	if currMap:
 		currMap.queue_free()
 		await currMap.tree_exited
@@ -279,106 +308,126 @@ func free_map()->void:
 
 
 func load_map(map:String):
-	var newMap = load(map).instantiate()
+	if !map: print("[GameBoard]load_map: empty map string")
+	var newMap:GameMap = load(map).instantiate()
 	Global.timePassed = 0
+	currMap = newMap
+	newMap.map_ready.connect(self._on_map_ready)
 	add_child(newMap)
-	Global.update_map_header(newMap)
+	emit_signal("map_added",newMap)
+
+
+func load_map_from_file(map:String,save_data:Dictionary):
+	if !map: print("[GameBoard]load_map_from_file: empty map string")
+	var newMap:GameMap = load(map).instantiate()
+	Global.timePassed = 0
+	currMap = newMap
+	newMap.map_ready.connect(self._on_map_ready_from_file)
+	newMap.load_data(save_data.GameMap)
+	add_child(newMap)
+	emit_signal("map_added",newMap)
 
 
 func _on_map_ready():
 	call_deferred("_initialize_new_map")
 
+func _on_map_ready_from_file():
+	currMap.units_reloaded.connect(self._on_units_reloaded)
+	currMap.load_map_units()
+
+
+func _on_units_reloaded():
+	_initialize_new_map()
+
 
 func _initialize_new_map():
 	_connect_general_signals()
-	currMap = _get_current_map()
-	#_initialize_terrain_data()
-	#_initialize_hexstar() #HEX REF
 	units.clear()
 	_set_game_time()
 	_store_enemy_units()
-	_initialize_units()
+	##_initialize_units() #This wasn't finishing in time
+	await _initialize_units() #no, don't read this one yet		--		So I had to tell Wokedot to chill the fuck out for a sec
 	_init_gamestate()
 	combatManager.init_manager()
 	ai = currMap.ai
 	ai.init_ai(self)
-	_cursor_toggle(true)
+	_cursor_toggle(true) ##before this one, which relies on Remilia being loaded in
+	#You can go back and read the second one now
+	call_deferred("set_process", true)
 	emit_signal("map_loaded", currMap)
+#endregion
 
 
 func _store_enemy_units():
-	for child in currMap.get_children(): #grab enemy unit locations
+	for child in currMap.get_children():
 		var unit := child as Unit
-		if not unit:
-			continue
-		
-		match unit.FACTION_ID: #turn order initializing
-			Enums.FACTION_ID.ENEMY: units[unit.cell] = unit
-			_: continue
+		if not unit or unit.FACTION_ID == Enums.FACTION_ID.PLAYER: continue
+		units[unit.cell] = unit
 		_connect_unit_signals(unit)
-		
-		#unit.initialize_cell()
-		#_update_unit_terrain(unit)
-		 #update terrain data
-		
-func _initialize_units(): #merge with store enemy units
+
+
+func _initialize_units():
+	var roster := PlayerData.rosterData
+	var order := PlayerData.roster_order
+	var unitData:Dictionary = PlayerData.unitData
+	var deploymentHistory := {"Deployed":[],"Undeployed":[]}
 	
-	var roster := UnitData.rosterData
-	var unitData:Dictionary = UnitData.unitData
 	#var spawnLoc
 	filledSlots = 0
 	deploymentCells = currMap.get_deployment_cells()
 	forcedDeploy = currMap.get_forced_deploy()
 	depCap = deploymentCells.size() + forcedDeploy.size()
 	
-	initialize_cell(currMap)
-	
-	for rosterSlot in roster:
-		#var newUnit = unitScn.instantiate().init_unit(currMap, true, Enums.FACTION_ID.PLAYER, unit)
-		var newUnit :Unit= load(rosterSlot.Unit).instantiate()
-		var saveData :Dictionary
-		newUnit.initialize_unit(currMap, unitData.has(newUnit.unitId))
-		currMap.add_child(newUnit)
-		unitObjs[newUnit.unitId] = newUnit
-		if forcedDeploy.has(newUnit.unitId):
-			newUnit.forced = true
-			_deploy_unit(newUnit, true, forcedDeploy[newUnit.unitId])
-		elif filledSlots < depCap:
-			_deploy_unit(newUnit)
-		else:
-			_undeploy_unit(newUnit, true)
-			
-			
-	for child in currMap.get_children(): #grab unit children
-		var unit := child as Unit
-		if not unit: continue
-		_connect_unit_signals(unit)
-		unit.set_process(true)
-		if unit.FACTION_ID != Enums.FACTION_ID.PLAYER:
-			units[unit.cell] = unit
-			unitObjs[unit.unitId] = unit
-		#var isPlayable : bool
-		#if unit.FACTION_ID == Enums.FACTION_ID.PLAYER:
-			#isPlayable = true
-		#else:
-			#isPlayable = false
-		#if isPlayable and forcedDeploy.has(unit.unitId):
-			#unit.forced = true
-			#_deploy_unit(unit, true, forcedDeploy[unit.unitId])
-		#elif isPlayable and filledSlots < deploymentCells.size():
-			#_deploy_unit(unit)
-		#elif isPlayable:
-			#_undeploy_unit(unit, true)
-	
-		#if !isPlayable:
-			##unit.init_unit(currMap,)
-			#units[unit.cell] = unit
-			#unitObjs[unit.unitId] = unit
-			
-		#_update_unit_terrain(unit)
-		#unit.set_process(true)
+	_deploy_forced(forcedDeploy)
+	_deploy_group(order[Enums.DEPLOYMENT.DEPLOYED])
+	_deploy_group(order[Enums.DEPLOYMENT.UNDEPLOYED])
 	_update_roster_label()
-	
+
+
+func _deploy_forced(forced_dictionary:Dictionary):
+	var roster := PlayerData.rosterData
+	var unitData:Dictionary = PlayerData.unitData
+	var group:Array = forced_dictionary.keys()
+	var filledSlots: int = 0
+	for id in group:
+		if roster[id].deployment == Enums.DEPLOYMENT.GRAVEYARD: continue
+		var playerUnit:Unit = _load_player_unit(roster[id].Path)
+		_deploy_unit(playerUnit, true, forced_dictionary[id])
+
+
+func _deploy_group(group:Array):
+	var roster := PlayerData.rosterData
+	var unitData:Dictionary = PlayerData.unitData
+	var groupCopy:= group.duplicate()
+	for id in groupCopy:
+		if roster[id].deployment == Enums.DEPLOYMENT.GRAVEYARD: continue
+		var playerUnit:Unit = _load_player_unit(roster[id].Path)
+		if filledSlots < depCap:
+			_deploy_unit(playerUnit)
+		elif filledSlots >= depCap:
+			_undeploy_unit(playerUnit, true)
+
+
+func _load_player_unit(path:String) -> Unit:
+	var playerUnit :Unit= load(path).instantiate()
+	var unitData:Dictionary = PlayerData.unitData
+	playerUnit.map = currMap
+	if unitData and unitData.PLAYER.get(playerUnit.unit_id,false): 
+		playerUnit.pre_load(unitData.PLAYER[playerUnit.unit_id])
+	unitObjs[playerUnit.unit_id] = playerUnit
+	_connect_unit_signals(playerUnit)
+	currMap.add_child(playerUnit)
+	return playerUnit
+
+
+##Intended for player units, maps will handle Enemy and NPC units
+func _on_unit_ready(unit:Unit)->void:
+	var faction:String = Enums.FACTION_ID.keys()[unit.FACTION_ID]
+	var ID: String = unit.unit_id
+	var unitData:Dictionary = PlayerData.unitData[faction]
+	var setCell:bool = false
+	if save_enum == Enums.SAVE_TYPE.SUSPENDED: setCell = true
+	if unitData and unitData.get(ID,false): unit.post_load(unitData[ID],setCell)
 
 
 func _connect_unit_signals(unit:Unit):
@@ -406,6 +455,8 @@ func _connect_unit_signals(unit:Unit):
 		unit.item_targeting.connect(self._on_unit_item_targeting)
 	if !unit.item_activated.is_connected(self._on_unit_item_activated):
 		unit.item_activated.connect(self._on_unit_item_activated)
+	if !unit.unit_ready.is_connected(self._on_unit_ready):
+		unit.unit_ready.connect(self._on_unit_ready)
 
 func _connect_danmaku_signals(bullet):
 	if !bullet.danmaku_relocated.is_connected(self.on_danmaku_relocated):
@@ -415,7 +466,7 @@ func _connect_danmaku_signals(bullet):
 	if !bullet.animation_completed.is_connected(self._on_danmaku_animation):
 		bullet.animation_completed.connect(self._on_danmaku_animation)
 
-	
+
 func _connect_general_signals():
 	#self.gb_ready.connect(GameState.set_new_state)
 	cursor.cursor_moved.connect(self._on_cursor_moved)
@@ -439,7 +490,8 @@ func _update_unit_terrain(unit): #HERE BROKEN
 func gb_mouse_motion(_event):
 	var mousePos: Vector2i = currMap.get_local_mouse_position()
 	var toMap = currMap.ground.local_to_map(mousePos)
-#	print(toMap)
+	
+	#print(mousePos)
 	cursor.cell = Vector2i(toMap)
 
 
@@ -1020,6 +1072,7 @@ func _clear_post_queue():
 
 func on_turn_complete(unit):
 	#and mainCon.state != GameState.GB_END_OF_ROUND
+	PlayerData.save_unit_data()
 	if sequencingUnits.has(unit):
 		sequencingUnits[unit] = false
 	else: return
@@ -1117,8 +1170,8 @@ func turn_change():
 	boardState.update_remaining_turns(turnOrder)
 	print(turnOrder)
 	GameState.clear_state_lists()
-	Global.flags.traded = false
-	Global.flags.itemUsed = false
+	PlayerData.traded = false
+	PlayerData.item_used = false
 	emit_signal("turn_changed")
 
 
@@ -1212,23 +1265,17 @@ func _on_danmaku_progressed():
 	_start_next_turn()
 	
 func _initialize_turns(ignoreActed = false): #not quite right Groups might be the problem, just use faction ID
-	var groups = ["Player", "Enemy", "NPC"]
 	turnOrder.clear()
 	for cell in units: #grab unit locations
 		var unit = units[cell]
 		if ignoreActed and unit.status.Acted:
 			continue
 		else: unit.set_acted(false)
-		var uGroups = unit.get_groups()
-		var gIndex = -1
-		var i = 0
-		while gIndex == -1:
-			gIndex = uGroups.find(groups[i])
-			i += 1
-		match uGroups[gIndex]: #turn order initializing
-			"Player": turnOrder.append("Player")
-			"Enemy": turnOrder.append("Enemy")
-			"NPC": turnOrder.append("NPC")
+		
+		match unit.FACTION_ID: #turn order initializing
+			Enums.FACTION_ID.PLAYER: turnOrder.append("Player")
+			Enums.FACTION_ID.ENEMY: turnOrder.append("Enemy")
+			Enums.FACTION_ID.NPC: turnOrder.append("NPC")
 		_update_unit_terrain(unit) #update terrain data
 	turnOrder = turnSort.sort_turns(turnOrder)
 	aiTurn = false
@@ -1252,10 +1299,10 @@ func start_ai_turn(aiFaction):
 	aiNeedAct = false
 	GameState.change_state(self, GameState.gState.GB_AI_TURN)
 	if team.size() > 0:
-		var result = ai.get_move(factionId)
+		ai_turn_result = ai.get_move(factionId)
 		
-		print_rich("[color=green]AI MOVE[/color]: ",result)
-		turnComplete = true
+		print_rich("[color=green]AI MOVE[/color]: ",ai_turn_result)
+		turnComplete = true #not normally here
 		#match result.BestMove["Action"]:
 			#"Attack": ai_attack(result)
 			#"Skill": pass
@@ -1338,7 +1385,7 @@ func _on_combat_manager_combat_resolved():
 
 #region Time bullshitery
 ##tracks duration of round based effects, removing them when duration is up
-##Lacks a check for stacked global effects, and only really works for timeFactor changes
+##Lacks a check for stacked global effects, and only really works for time_factor changes
 func round_duration_tick():
 	var keys = globalEffects.keys()
 	for effId in keys:
@@ -1365,7 +1412,7 @@ func _on_combat_manager_time_factor_changed(effect:Effect):
 
 func _set_game_time():
 	var newTime = Global.time_to_float(currMap.hours, currMap.minutes)
-	Global.gameTime = newTime
+	Global.game_time = newTime
 	check_passives()
 
 
@@ -1383,8 +1430,6 @@ func _on_combat_manager_warp_selected(actor, target, reach):
 func on_exp_gained(oldExp, expSteps, results, portrait, unitName):
 	emit_signal("exp_display", oldExp, expSteps, results, portrait, unitName)
 
-	
-	
 
 func _first_available_dep_cell():
 	var firstCell = null
@@ -1393,40 +1438,47 @@ func _first_available_dep_cell():
 		if !filled.has(cell):
 			firstCell = cell
 			break
-		
 	return firstCell
 
-func _deploy_unit(unit:Unit, forced = false, spawnLoc = Vector2i(0,0)): 
-	if !forced:
+
+func _deploy_unit(unit:Unit, forced = false, spawnLoc = Vector2i(0,0)):
+	var roster := PlayerData.rosterData
+	if forced:
+		unit.deployment = Enums.DEPLOYMENT.FORCED
+	else:
 		spawnLoc = _first_available_dep_cell()
+		unit.deployment = Enums.DEPLOYMENT.DEPLOYED
 	if filledSlots < depCap:
 		unit.visible = true
-		unit.isActive = true
+		unit.is_active = true
 		unit.relocate_unit(spawnLoc)
 		filledSlots += 1
+		roster
 		_update_roster_label()
 	else:
 		print("Roster Full")
-	
-func _undeploy_unit(unit, ini = false):
+
+
+func _undeploy_unit(unit:Unit, ini = false):
 	var spawnLoc = Vector2i(0,0)
-	if !unit.forced:
+	if unit.deployment != Enums.DEPLOYMENT.FORCED:
 		unit.visible = false
-		unit.isActive = false
+		unit.is_active = false
+		unit.deployment = Enums.DEPLOYMENT.UNDEPLOYED
 		_remove_from_grid(unit)
 		unit.relocate_unit(spawnLoc, false)
 	else:
-		print("Must deploy: " + unit.unitId)
-	if !unit.forced and !ini:
+		print("Must deploy: " + unit.unit_id)
+	if unit.deployment != Enums.DEPLOYMENT.FORCED and !ini:
 		filledSlots -= 1
 		_update_roster_label()
+
 
 func _update_roster_label():
 	#print(filledSlots)
 	emit_signal("deploy_toggled", filledSlots)
 
-			
-			
+
 func _cursor_toggle(enable, snapLeader = true):
 	if enable:
 		cursor.visible = true
@@ -1457,7 +1509,8 @@ func unit_wait():
 
 
 func _on_exp_gain_exp_finished():
-	GameState.change_state(self, GameState.gState.LOADING)
+	#GameState.change_state(self, GameState.gState.LOADING)
+	GameState.change_state()
 	emit_signal("continue_turn")
 
 
@@ -1484,16 +1537,18 @@ func _on_action_weapon_selected(button = false):
 
 
 func _on_win_screen_win_finished():
-	Global.chapters_complete.append(currMap.get_name())
+	PlayerData.completed_chapters.append(currMap.get_name())
 	#currMap.progress_next_map()
 	#self.call_deferred("_load_next_map")
-	
+
+
 func _on_gui_manager_deploy_toggled(unit, deployed):
-#	var unit = unitObjs[unitId]
+#	var unit = unitObjs[unit_id]
 	if deployed:
 		_undeploy_unit(unit)
 	else:
 		_deploy_unit(unit)
+
 
 func _on_gui_manager_formation_toggled():
 	match GameState.state:
@@ -1509,6 +1564,7 @@ func _on_gui_manager_formation_toggled():
 func _on_gui_manager_map_started():
 	for unit in units:
 		units[unit].map_start_init()
+	chapter_started = true
 	_cursor_toggle(true)
 	currMap.hide_deployment()
 	GameState.clear_state_lists()
@@ -1519,7 +1575,6 @@ func _on_gui_manager_map_started():
 		
 func _on_inventory_weapon_changed(button) -> void:
 	var i = button.get_meta("Item")
-	
 	if button.disabled:
 		return
 	activeUnit._equip_weapon(i) #See if it can find it's own index based on ID?
@@ -1537,11 +1592,14 @@ func _check_flags():
 		emit_signal("player_lost")
 	elif flags.victory:
 		map_end = true
+		PlayerData.save_unit_data(true)
 		emit_signal("player_win")
 		
 func reset_flags():
 	Global.reset_map_flags()
+	units.clear()
 	map_end = false
+	chapter_started = false
 	aiTurn = false
 	aiNeedAct = false
 	turnComplete = false
@@ -1663,7 +1721,7 @@ func spawn_unit(unit: Unit, cell): #Uses solidsArray, which is deprecated FIX
 	#cell = adjustedCell
 	unit.init_unit(currMap)
 	_add_turn(unit.FACTION_ID)
-	unitObjs[unit.unitId] = unit
+	unitObjs[unit.unit_id] = unit
 	units[path[0]] = unit
 	_connect_unit_signals(unit)
 	_update_unit_terrain(unit)
@@ -1704,7 +1762,7 @@ func spawn_raw_unit(unitPackage : Dictionary):
 	cell = adjustedCell
 	
 	var newUnit = unitScn.instantiate().init_unit(currMap, false, faction, id, elite, lv, spec, job)
-	unitObjs[newUnit.unitId] = newUnit
+	unitObjs[newUnit.unit_id] = newUnit
 	_connect_unit_signals(newUnit)
 	_update_unit_terrain(newUnit)
 	newUnit.relocate_unit(cell)

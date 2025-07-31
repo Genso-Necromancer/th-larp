@@ -15,7 +15,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_51pth"]
 size = Vector2(84, 37.5)
 
-[node name="Unit" type="Path2D"]
+[node name="Unit" type="Path2D" groups=["Unit"]]
 z_index = 2
 y_sort_enabled = true
 script = ExtResource("1_me1b5")
@@ -84,6 +84,7 @@ text = "(0, 0)"
 script = ExtResource("10_30vxy")
 
 [node name="Cell2" type="Label" parent="PathFollow2D"]
+unique_name_in_owner = true
 visible = false
 offset_left = -33.0
 offset_top = 40.0
