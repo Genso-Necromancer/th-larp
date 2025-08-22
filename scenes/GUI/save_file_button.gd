@@ -27,15 +27,20 @@ func get_save_file() -> String:
 
 
 func _format(file_name:String) -> void:
-	var headStone = SaveHub.get_header(file_name)
+	var headStone := SaveHub.get_header(file_name)
 	var saveData:Dictionary
 	if !headStone: state = SCENE_STATE.EMPTY
+	elif headStone.SaveType == Enums.SAVE_TYPE.SUSPENDED: _enable_suspended_format()
 	match state:
 		SCENE_STATE.EMPTY: save_name = file_name
 		SCENE_STATE.FILE:
 			save_name = file_name
 			_format_save_slot(headStone)
 
+
+func _enable_suspended_format():
+	## put code here to change visuals of the save file to indicate it's typing
+	pass
 
 func _format_save_slot(header: Dictionary):
 	var date:= "%d/%d/%d - %d:%d:%d" % [header.Date.month,header.Date.day,header.Date.year,header.Date.hour,header.Date.minute,header.Date.second]

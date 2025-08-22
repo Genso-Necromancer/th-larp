@@ -20,6 +20,7 @@ signal gui_action_menu_canceled
 
 @onready var parent = get_parent()
 @onready var GRANDDAD = parent.get_parent()
+var is_auto_saving := true
 
 #states
 enum sStates {
@@ -104,6 +105,7 @@ func _init():
 func _ready():
 	SignalTower.prompt_accepted.connect(_on_prompt_accepted)
 	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
+	SaveHub.suspend_save_complete.connect(self._on_suspend_save_complete)
 	#menuCursor.visible = false
 	#_add_hud_children()
 	_connect_asset_signals()
@@ -122,6 +124,10 @@ func update_labels(): #Use this to cascade assigning strings from XML to all har
 
 func _on_prompt_accepted():
 	_initiate_ai_sequence()
+
+
+func _on_suspend_save_complete():
+	if !is_auto_saving: SignalTower.returning_to_title.emit()
 
 
 func _on_jobs_done(id, node):
@@ -339,6 +345,7 @@ func _connect_asset_signals():
 	actMenu.action_menu_selected.connect(GRANDDAD._on_action_menu_selected)
 	actMenu.action_menu_item_pressed.connect(self._on_action_item_pressed)
 	actMenu.action_menu_trade_pressed.connect(self._on_action_trade_pressed)
+	actMenu.action_menu_suspending_game.connect(self._on_action_suspending)
 	#actMenu.action_menu_ofuda_open.connect(self._on_action_ofuda_open)
 	
 #region SetUp Buttons
@@ -365,9 +372,13 @@ func _on_mng_btn_pressed():
 
 
 func _on_begin_btn_pressed():
+	begin_mode()
+
+
+func begin_mode():
 	inSetup = false
 	menuCursor.visible = false
-	mapSetUp.toggle_visible()
+	mapSetUp.visible = false
 	sState = sStates.BEGIN
 	#turnTracker.unhide_self()
 	chClock.visible = true
@@ -443,9 +454,11 @@ func _on_gameboard_deploy_toggled(deployed):
 	depCount = deployed
 	rosterGrid.update_deploy_count(deployed)
 
+
 func _roster_focus_entered(unit):
 	Global.focusUnit = unit
 	update_prof()
+
 
 func _connect_unit_btn(bar):
 	var unit = bar.get_unit()
@@ -543,7 +556,8 @@ func _trade_unit_select_roster(b) -> void:
 		_set_roster_trade_partners(b)
 		rosterGrid.toggle_visible()
 		_open_trade_menu()
-	
+
+
 func _on_gameboard_formation_closed():
 	var btns :Array = mapSetUp.btnContainer.get_children()
 	mapSetUp.toggle_visible()
@@ -555,7 +569,7 @@ func _on_gameboard_formation_closed():
 	#_resignal_menuCursor(btns)
 	GameState.change_state(self, GameState.gState.GB_SETUP)
 
-	
+
 func _open_unit_options(b):
 	sState = sStates.UNITOP
 	_set_active_btn(b)
@@ -718,6 +732,13 @@ func _on_gameboard_forecast_confirmed():
 func _on_action_menu_menu_opened(container):
 	#_resignal_menuCursor(container)
 	call_deferred("_resignal_menuCursor",container)
+
+
+func _on_action_suspending():
+	var fileName:String = SaveHub.suspended_format
+	GameState.change_state(self,GameState.gState.LOADING)
+	is_auto_saving = false
+	SaveHub.save_to_file(fileName,Enums.SAVE_TYPE.SUSPENDED)
 
 
 func _on_weapon_selected(button): #weapon can change after selection if mouse moves at wrong time. HERE Fix this, you absolute fucking retard

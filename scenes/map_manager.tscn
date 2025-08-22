@@ -8,6 +8,7 @@
 script = ExtResource("1_o0i0e")
 
 [node name="Gameboard" parent="." instance=ExtResource("1_1o3kx")]
+unique_name_in_owner = true
 
 [node name="Cursor" parent="Gameboard" index="1"]
 position = Vector2(0, 0)
@@ -17,6 +18,7 @@ unique_name_in_owner = true
 follow_viewport_scale = 0.001
 
 [node name="GUIManager" parent="CanvasLayer" instance=ExtResource("2_3ng14")]
+unique_name_in_owner = true
 mapCursorPath = NodePath("../../Gameboard/Cursor")
 
 [node name="AudioHub" parent="CanvasLayer/GUIManager" index="7" node_paths=PackedStringArray("audio_players")]

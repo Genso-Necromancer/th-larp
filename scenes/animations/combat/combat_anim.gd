@@ -44,17 +44,16 @@ func set_unit(newUnit : Unit):
 	unit = newUnit
 	
 	
-func assign_action(hit, actionType, skillId = false):
-	var sData = PlayerData.skillData
+func assign_action(hit, actionType, skill:Skill=null):
 	isHit = hit
 	match actionType:
 		ACTION_TYPE.WEAPON: _assign_attack_animation()
-		ACTION_TYPE.FRIENDLY_SKILL: _assign_skill_animation(skillId)
+		ACTION_TYPE.FRIENDLY_SKILL: _assign_skill_animation(skill)
 		ACTION_TYPE.HOSTILE_SKILL: 
-			if sData[skillId].Augment:
+			if skill.augment:
 				_assign_attack_animation()
 			else:
-				_assign_skill_animation(skillId)
+				_assign_skill_animation(skill)
 
 
 func assign_defend(hit, dmg, crit, graze):

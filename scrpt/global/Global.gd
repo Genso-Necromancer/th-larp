@@ -57,7 +57,7 @@ func _init():
 
 #region saving/loading
 func save()->Dictionary:
-	var RNG := RandomNumberGenerator.new()
+	var RNG := RngTool.new()
 	var pers : Dictionary = {
 		"DataType": "Global",
 		"game_time":game_time,
@@ -108,6 +108,7 @@ func load_persistant(Data:Dictionary):
 	#nextMap = Data.NextMap
 	#chapters_complete = Data.ChaptersComplete
 
+
 func reset_values():
 	time_of_day = Enums.TIME.DAY
 	game_time = 12.00
@@ -116,6 +117,7 @@ func reset_values():
 	timePassed = 0
 	#language = Data.Language
 #endregion
+
 
 func _init_flags():
 	flags = {

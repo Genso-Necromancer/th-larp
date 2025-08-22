@@ -55,8 +55,8 @@ func _increase_exp(expStep):
 	expText.text = str(expStep)
 	
 func _display_levelup(report, unitName): #requires actual level up display
-	var stats = report.Results.keys()
-	var increases = {}
+	var stats :Array= report.Results.keys()
+	var increases := {}
 	tween.tween_method(_toggle_lv_panel, true, false, 0.3).set_trans(Tween.TRANS_LINEAR) #Toggle off
 	tween.tween_method(_toggle_exp_margin, true, false, 0.1).set_trans(Tween.TRANS_LINEAR)#Toggle off
 	tween.tween_method(_toggle_lv_margin.bind(report, unitName), false, true, 0.1).set_trans(Tween.TRANS_LINEAR)#Toggle off
@@ -65,8 +65,9 @@ func _display_levelup(report, unitName): #requires actual level up display
 	for stat in stats:
 		if report.Results[stat] > 0:
 			increases[stat] = report.Results[stat]
-	
-	tween.tween_method(_increase_stat.bind(report, increases), 0, (increases.size() - 1), 2).set_trans(Tween.TRANS_LINEAR)
+		#else: increases[stat] = 0
+	if !increases: _dead_level()
+	else: tween.tween_method(_increase_stat.bind(report, increases), 0, (increases.size() - 1), 2).set_trans(Tween.TRANS_LINEAR)
 	
 func _toggle_lv_panel(status):
 	$PanelContainer.visible = status
@@ -99,9 +100,9 @@ func _toggle_lv_margin(status, results, unitName):
 	
 	
 func _increase_stat(index, report, increases):
-	var stats = increases.keys()
-	var stat = stats[index]
-	var statUp = report.OldStats[stat] + increases[stat]
+	var stats :Array= report.Results.keys()
+	var stat :String= stats[index]
+	var statUp :int= report.OldStats[stat] + increases[stat]
 	
 	match stat:
 		"LVL":
@@ -131,6 +132,11 @@ func _increase_stat(index, report, increases):
 		"Cha":
 			$PanelContainer/LvUpMargin/Vbox/Stats/UnitCha.text = str(statUp)
 			$PanelContainer/LvUpMargin/Vbox/Stats/Increase6.text = ("+" + str(increases[stat]))
+
+
+func _dead_level():
+	print("Dead Level")
+
 
 func _kill_tween():
 	growExp = false

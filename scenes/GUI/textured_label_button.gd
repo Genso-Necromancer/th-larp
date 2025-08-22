@@ -5,7 +5,7 @@ signal button_focus_entered(button:TextureButton)
 signal button_mouse_entered(button:TextureButton)
 signal button_pressed(button:TextureLabelButton)
 signal key_input(event:InputEvent)
-@onready var label : RichTextLabel = $ContentsHBox/LabelMargin/ButtonText
+@onready var label : RichTextLabel = %ButtonText
 @onready var icon : TextureRect = $ContentsHBox/Icon
 @onready var background : TextureRect = $ButtonBackground
 @onready var button : TextureButton = $TextureButton
@@ -26,6 +26,11 @@ signal key_input(event:InputEvent)
 	set(value):
 		highlight_border = value
 		if is_node_ready(): _set_highlight(value)
+@export var font_override:= 0:
+	set(value):
+		if value > 0: %ButtonText.add_theme_font_size_override("normal_font_size", value)
+		elif %ButtonText.has_theme_font_size_override("normal_font_size"): %ButtonText.remove_theme_font_size_override("normal_font_size")
+		font_override = value
 
 
 func _ready():

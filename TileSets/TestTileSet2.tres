@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=18 format=3 uid="uid://dae0fl1fnuwvk"]
+[gd_resource type="TileSet" load_steps=20 format=3 uid="uid://dae0fl1fnuwvk"]
 
 [ext_resource type="Texture2D" uid="uid://cwrqpj7en2cof" path="res://sprites/tiles/deployment.png" id="1_ggcxa"]
 [ext_resource type="Texture2D" uid="uid://b3kybcmn08s6d" path="res://sprites/tiles/forcedDeployment.png" id="2_e3vs3"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dwlnwcdgwc6de" path="res://sprites/tiles/PlaceHolderModTiles.png" id="4_j2mhh"]
 [ext_resource type="Texture2D" uid="uid://cjkkbrsts6nqc" path="res://sprites/tiles/walls.png" id="5_ycrxn"]
 [ext_resource type="Texture2D" uid="uid://cvwlg1ibgcatk" path="res://sprites/tiles/event_spawner.png" id="6_6ymmv"]
+[ext_resource type="Texture2D" uid="uid://bc4tnv65u3qkk" path="res://sprites/tiles/newhex168x56.png" id="7_e3vs3"]
 [ext_resource type="Texture2D" uid="uid://bksmyj30srka5" path="res://sprites/tiles/TileSetPlaceHolder.png" id="7_s3su6"]
 [ext_resource type="Texture2D" uid="uid://dl5k64jih1qno" path="res://sprites/tiles/attack_target.png" id="8_rk7vv"]
 
@@ -80,6 +81,11 @@ texture_region_size = Vector2i(168, 104)
 4:0/0/texture_origin = Vector2i(0, 25)
 4:0/0/custom_data_0 = &"Wall"
 4:0/0/custom_data_1 = &"Wall"
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_v76xb"]
+texture = ExtResource("7_e3vs3")
+texture_region_size = Vector2i(168, 56)
+0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_njr1x"]
 texture = ExtResource("6_6ymmv")
@@ -164,3 +170,4 @@ sources/4 = SubResource("TileSetAtlasSource_fntpe")
 sources/1 = SubResource("TileSetAtlasSource_bkpol")
 sources/0 = SubResource("TileSetAtlasSource_qmxju")
 sources/2 = SubResource("TileSetAtlasSource_ggcxa")
+sources/5 = SubResource("TileSetAtlasSource_v76xb")

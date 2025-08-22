@@ -268,7 +268,7 @@ var base_prof:Dictionary={
 #var inventory : Array[Item] = []
 var unarmed : Weapon = load("res://unit_resources/items/weapons/unarmed.tres").duplicate() ##Default value for any unarmed unit, overwritten by Natural if Natural assigned
 ##Overrides unarmed as default when nothing is equipped if given a Weapon
-@export var natural : Weapon
+@export var natural : Natural
 
 @export_category("Conditions")
 ##Afflicted status conditions, do not change unless you have a good reason for a unit to begin play with specified condition.
@@ -592,7 +592,7 @@ func save_parameters() -> Dictionary:
 	var RC:= ResourceConverter.new()
 	var inventoryConvert := RC.resources_to_save_data(inventory)
 	var naturalConvert :Dictionary = {}
-	if natural: naturalConvert = natural.to_save_data()
+	if natural: naturalConvert = natural.convert_to_save_data()
 	var bonusSkills := RC.resources_to_save_data(bonus_skills)
 	var personalSkills := RC.resources_to_save_data(personal_skills)
 	var bonusPassives := RC.resources_to_save_data(bonus_passives)
@@ -680,7 +680,7 @@ func pre_load(unit_data:Dictionary) -> bool:
 func post_load(unit_data:Dictionary, set_cell:bool=false)->void:
 	var convCell: Vector2i
 	active_stats.CurLife = int(unit_data.current_life)
-	active_stats.CurComp = int(unit_data.current_life)
+	active_stats.CurComp = int(unit_data.current_comp)
 	status = unit_data.status
 	#active_item_effects = unit_data.active_item_effects
 	_load_buff_effects(unit_data.active_buffs,active_buffs)
@@ -1392,8 +1392,8 @@ func get_weapon_reach() -> Dictionary:
 			reach.Min = mini(weapon.min_reach, reach.Min)
 			reach.Max = maxi(weapon.max_reach, reach.Max)
 	if natural:
-		reach.Min = mini(natural.MinRange, reach.Min)
-		reach.Max = maxi(natural.MaxRange, reach.Max)
+		reach.Min = mini(natural.min_reach, reach.Min)
+		reach.Max = maxi(natural.max_reach, reach.Max)
 	return reach
 
 
@@ -1813,17 +1813,18 @@ func update_composure_bar():
 
 
 
-func apply_dmg(dmg : int, source : Unit):
+func apply_dmg(dmg : int, source : Unit = null):
 	active_stats.CurLife -= dmg
 	active_stats.CurLife = clampi(active_stats.CurLife, 0, active_stats.Life)
 	if active_stats.CurLife == 0:
-		killer = source
+		if source: killer = source
 		deathFlag = true
 	
 	if dmg > 0 and status.Sleep:
 		cure_status("Sleep")
 	if dmg > 0:
 		isHurt = true
+	update_life_bar()
 	#return active_stats.CurLife
 	
 func apply_heal(heal := 0):

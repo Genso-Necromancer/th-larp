@@ -22,7 +22,7 @@ var cached_button:SaveFileButton #Stores save slot when prompting user
 @onready var cursor : MenuCursor = $MainContainer/menu_cursor
 @onready var save_prompt : MarginContainer = $MainContainer/PromptScreenEdge
 @onready var file_container : MarginContainer = $MainContainer/FileSelectScreenEdge
-@onready var file_list : VBoxContainer = $MainContainer/FileSelectScreenEdge/ScrollContainer/FilesVBox
+@onready var file_list : VBoxContainer = %FilesVBox
 @onready var main_container : PanelContainer = $MainContainer
 @onready var prompt_container : PanelContainer = $MainContainer/PromptContainer
 @onready var blocker : Panel = $Blocker
@@ -168,12 +168,18 @@ func _new_state_chain() -> void:
 
 func _load_save_files() -> void:
 	var saveFiles : Array = SaveHub.get_save_files()
-	var remainder := 10 - saveFiles.size()
+	var remainder := 8 - saveFiles.size()
 	var first : SaveFileButton = null
 	var previous : SaveFileButton
 	#var plusOne := false
 	var fileCount := 0
 	#call for existing save files
+	
+	var suspended:= _get_suspended_save(saveFiles)
+	if suspended:
+		var b : SaveFileButton = _instantiate_save_button(suspended)
+		first = b
+		previous = b
 	
 	for save in saveFiles:
 		var b : SaveFileButton = _instantiate_save_button(save)
@@ -206,6 +212,15 @@ func _load_save_files() -> void:
 	await file_container.draw
 	call_deferred("_move_cursor", first)
 	#_move_cursor(first)
+
+
+func _get_suspended_save(files:Array) -> String:
+	var i := files.find(SaveHub.suspended_format)
+	var fileName : String
+	if i > -1: 
+		fileName = files.pop_at(i)
+		return fileName
+	else: return ""
 
 
 func _instantiate_save_button(save_name:String) -> SaveFileButton:
@@ -333,7 +348,7 @@ func _on_save_pressed(button:SaveFileButton) -> void:
 				button.SCENE_STATE.FILE:
 					cached_button = button
 					_verify_overwrite()
-
+			
 
 func _format_save(save_name:String, button:SaveFileButton) -> void:
 	button.set_file(save_name)

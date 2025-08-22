@@ -4,7 +4,9 @@ const root := "user://"
 const save_dir := "user://saves"
 var validation := Global.validation.sha256_text()
 signal save_complete(file_name:String)
+signal suspend_save_complete
 var save_format:= "save_%d.tomb"
+var suspended_format:= "save_suspended.tomb"
 
 func _ready():
 	#SignalTower.save_called.connect(self._on_save_called)
@@ -18,13 +20,13 @@ func _verify_save_dir(dir:String)->void:
 func save_to_file(file_name:String,save_type:Enums.SAVE_TYPE):
 	match save_type:
 		Enums.SAVE_TYPE.TRANSITION,Enums.SAVE_TYPE.SET_UP:_write_to_file(file_name,save_type)
-		Enums.SAVE_TYPE.SUSPENDED:pass
+		Enums.SAVE_TYPE.SUSPENDED:
+			await _write_to_file(file_name,save_type)
+			suspend_save_complete.emit()
 		Enums.SAVE_TYPE.IRON:pass
-	
-	
-	
+
+
 func _write_to_file(file_name:String,save_type:Enums.SAVE_TYPE)->void:
-	
 	var saveNodes := get_tree().get_nodes_in_group("Persist")
 	var storage: Dictionary = {}
 	var global : Dictionary = Global.save()
@@ -98,7 +100,7 @@ func get_save_files() -> Array:
 
 
 ##Returns the headStone data exclusively
-func get_header(file_name:String):
+func get_header(file_name:String)->Dictionary:
 	#var savePath := save_dir+"/"+file_name
 	var headStone:Dictionary = {}
 	#var save_file = FileAccess.open_encrypted_with_pass(savePath, FileAccess.READ,validation)
@@ -122,6 +124,14 @@ func get_file_name(file_name:String)->int:
 	file_name = file_name.get_slice("_",0)
 	number = int(file_name)
 	return number
+
+func delete_temp(file_name:String = suspended_format)->void:
+	var savePath := save_dir+"/"+file_name
+	var dir := DirAccess.open(save_dir)
+	var saveData:Dictionary = {}
+	if !FileAccess.file_exists(savePath): return
+	dir.remove(savePath)
+
 
 #region globals
 func load_globals(data:Dictionary):

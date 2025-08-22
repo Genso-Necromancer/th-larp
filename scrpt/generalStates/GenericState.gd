@@ -31,7 +31,10 @@ func mouse_pressed(event: InputEvent) -> void:
 	var bind
 	#print("[",Time.get_ticks_msec(),"]",event)
 	bind = _find_key_bind(event)
+	if _handle_held_key(event, bind) == false:
+		return
 	_handle_bind(bind)
+	timer.start()
 	
 	
 func event_key(event: InputEventKey) -> void: #Figure out how, if it's even possible, to use InputEventAction instead

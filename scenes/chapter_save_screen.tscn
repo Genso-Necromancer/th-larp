@@ -107,6 +107,7 @@ follow_focus = true
 horizontal_scroll_mode = 0
 
 [node name="FilesVBox" type="VBoxContainer" parent="MainContainer/FileSelectScreenEdge/ScrollContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4

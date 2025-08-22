@@ -7,14 +7,16 @@ static var screen_shot_folder := "screen_shots"
 #enum SAVE_TYPE {TRANSITION, SET_UP, SUSPENDED,}
 
 var gameBoard: GameBoard
+var map_manager: MapManager
 var first_map:String = "res://scenes/maps/seize_test.tscn"
 var manager_preload:= preload("res://scenes/map_manager.tscn")
 var file_selected:bool = false
 
 
 func _ready():
-	var startScene = load("res://scenes/GUI/title/title_screen.tscn").instantiate()
-	load_scene(startScene)
+	SignalTower.exiting_game.connect(self.game_exit)
+	SignalTower.returning_to_title.connect(self.return_to_title)
+	_load_title_screen()
 	_check_directory()
 
 
@@ -25,7 +27,7 @@ func _process(_delta):
 func load_scene(scene):
 	add_child(scene)
 
-
+##Debugging function, won't be necessary eventually
 func load_map(map:String):
 	gameBoard.load_map(map)
 
@@ -54,10 +56,11 @@ func _input(event: InputEvent) -> void:
 
 
 #Picks up the inputs, then directs them to the currently active state for processing.
-func _unhandled_input(event: InputEvent) -> void: 
+func _unhandled_input(event: InputEvent) -> void:
+	get_viewport().set_input_as_handled()
 	if GameState.activeState == null:
 		return
-	if event is InputEventMouseMotion:
+	elif event is InputEventMouseMotion:
 		GameState.activeState.mouse_motion(event)
 	elif event is InputEventMouseButton:
 		GameState.activeState.mouse_pressed(event)
@@ -69,19 +72,15 @@ func _check_directory():
 	if not DirAccess.dir_exists_absolute(root):
 		var dir = DirAccess.open(root)
 		dir.make_dir(root)
-	
 
 
 func _create_director(newDir : String) -> String:
 	var filePath : String = root + "/" + newDir
 	var newPath : String
-	
 	if not DirAccess.dir_exists_absolute(filePath):
 		var dir = DirAccess.open(root)
 		dir.make_dir(newDir)
-		
 	newPath = filePath + "/"
-	
 	return newPath
 
 
@@ -119,6 +118,7 @@ func is_file_duplicate(directory:String, fileName: String) -> bool:
 
 func on_load_map_manager(map:String):
 	var manager = load("res://scenes/map_manager.tscn").instantiate()
+	map_manager = manager
 	load_scene(manager)
 	manager.load_map(map)
 
@@ -126,10 +126,28 @@ func on_load_map_manager(map:String):
 func unload_me(scene):
 	scene.queue_free()
 
+
+func return_to_title():
+	## Function for loading screen
+	SaveHub.reset_globals()
+	_load_title_screen()
+	## checks for when loading is finished necessary for ending loading screen
+
+
+func _load_title_screen():
+	var startScene = load("res://scenes/GUI/title/title_screen.tscn").instantiate()
+	
+	load_scene(startScene)
+
+
+func game_exit():
+	get_tree().quit()
+
+
 #region title screen buttons
 func new_game_start():
 	var rng = RngTool.new()
-	rng.new_seed()
+	rng.random()
 	SaveHub.reset_globals()
 	#_load_opening_scene()
 	_load_first() #Temporary until opening scene is set-up
@@ -147,6 +165,7 @@ func begin_file_select():
 func _on_file_selected(save_file:String):
 	_start_file_load(save_file)
 	file_selected = true
+
 
 func _on_save_scene_finished(_save_screen:SaveScreen):
 	if file_selected:
@@ -190,7 +209,13 @@ func _load_from_set_up(data:Dictionary):
 
 
 func _load_from_suspended(data:Dictionary):
-	pass
+	var manager := _load_map_manager()
+	manager.load_data(data)
+	manager.load_map_from_file(manager.current_map, data, true)
+
+
+func _on_suspend_save_complete():
+	return_to_title()
 #endregion
 
 

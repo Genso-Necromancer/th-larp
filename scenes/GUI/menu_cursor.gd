@@ -15,18 +15,18 @@ func _process(_delta):
 		call_deferred("set_cursor")
 
 
-		
 func set_cursor(button = get_viewport().gui_get_focus_owner()):
 	var cPosition = button.get_global_position()
 	var cSize = button.size
 	var newPos
 	newPos = Vector2(cPosition.x, cPosition.y + cSize.y / 2.0) - (size / 2.0) - cursor_offset
 	set_global_position(newPos)
-	
+
+
 func toggle_visible():
 	var isVisible = visible
 	visible = !isVisible
-	
+
 
 func resignal_cursor(buttons: Array):
 	var focus = false
@@ -39,7 +39,7 @@ func resignal_cursor(buttons: Array):
 			firstVis = b
 	if !focus and firstVis: 
 		focus = firstVis
-	focus.call_deferred("grab_focus")
+	if focus: focus.call_deferred("grab_focus")
 
 
 func _connect_btn_to_cursor(b):

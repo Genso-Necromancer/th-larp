@@ -39,6 +39,17 @@ unit_level = 5
 SPEC_ID = 2
 ROLE_ID = 4
 move_type = 1
+mod_stats = Dictionary[StringName, int]({
+&"Cele": 0,
+&"Cha": 0,
+&"Comp": 0,
+&"Def": 0,
+&"Eleg": 0,
+&"Life": 0,
+&"Mag": 0,
+&"Move": 0,
+&"Pwr": 13
+})
 total_stats = Dictionary[StringName, int]({
 &"Cele": 7,
 &"Cha": 7,

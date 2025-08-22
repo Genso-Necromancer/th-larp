@@ -59,7 +59,7 @@ func update_fc(foreCast:Dictionary) -> void: #HERE labels need updating to using
 		var lifeTemplate : String = StringGetter.get_template("combat_hp")
 		var remainTemplate : String = StringGetter.get_template("combat_hp_remain")
 		var lifeText : String = "[center]%s[/center]"
-		var hp = lifeTemplate % [active.CurLife, units[i].baseStats.Life]
+		var hp = lifeTemplate % [active.CurLife, active.Life]
 		#var iconPath : String = "res://sprites/icons/items/%s/%s.png"
 		var actionPath : String
 		var actionString : String = "--"

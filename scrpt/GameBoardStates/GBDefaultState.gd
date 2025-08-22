@@ -25,7 +25,7 @@ func _handle_bind(bind):
 		"ui_down": 
 			direction = Vector2.DOWN
 			slave.on_directional_press(direction)
-		"debugKillLady": slave._kill_lady()
+		"debugKillLady": slave._dmg_lady()
 		"debug_camera_test": 
 			slave._camera_test()
 		"debug_kill_test": slave._kill_camera_test()

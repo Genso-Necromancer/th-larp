@@ -7,9 +7,10 @@ signal action_menu_selected(bName)
 signal action_menu_item_pressed(unit)
 #signal action_menu_item_canceled
 signal action_menu_trade_pressed(unit)
+signal action_menu_suspending_game
 
 
-enum MENU_STATES {NONE, OPTIONS, ACTION, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE, OFUDA_OPEN, OFUDA_TARGETING}
+enum MENU_STATES {NONE, OPTIONS, ACTION, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE, OFUDA_OPEN, OFUDA_TARGETING, SUSPEND_PROMPT, SUSPENDING}
 @onready var aContainer : MarginContainer = $ScreenMargin/ActionBackgroundMargin
 @onready var oContainer : MarginContainer = $ScreenMargin/OfudaBackgroundMargin
 @onready var sContainer : MarginContainer = $ScreenMargin/SkillBackgroundMargin
@@ -72,6 +73,16 @@ var state := MENU_STATES.NONE:
 				MENU_STATES.OFUDA_TARGETING:
 					_hide_cursor()
 					_hide_action_container()
+				MENU_STATES.SUSPEND_PROMPT:
+					var choices:= %promptHBox
+					var buttons:Array=[]
+					for btn in choices.get_children():
+						buttons.append(btn.button)
+					_assign_cursor(buttons)
+					cursor.setCursor = true
+				MENU_STATES.SUSPENDING:
+					_switch_to_save_warning()
+
 
 var prevState : Array[MENU_STATES] = []
 var activeItem = null
@@ -165,6 +176,7 @@ func _hide_tertiary():
 	sContainer.visible = false
 	cContainer.visible = false
 	oContainer.visible = false
+	%SuspendPanel.visible = false
 	_free_skills()
 	_free_ofuda()
 
@@ -208,7 +220,21 @@ func _on_button_pressed(bName):
 		"EndBtn": pass
 		"StatBtn": pass
 		"OpBtn": pass
-		"SusBtn": pass
+		"SusBtn":
+			_prompt_suspension()
+
+
+func _prompt_suspension():
+	var sPan:= %SuspendPanel
+	aContainer.visible = false
+	sPan.visible = true
+	_change_state(MENU_STATES.SUSPEND_PROMPT)
+
+
+func _switch_to_save_warning():
+	%SuspendPromptText.visible = false
+	%promptHBox.visible = false
+	%SaveWarningText.visible = true
 
 
 func _on_skill_pressed(sButton : Control):
@@ -303,3 +329,12 @@ func _clear_states():
 func _on_skill_confirm_pressed():
 	_clear_states()
 	SignalTower.emit_signal("action_skill_confirmed")
+
+
+func _on_suspend_confirm_button_pressed(_button):
+	_change_state(MENU_STATES.SUSPENDING)
+	action_menu_suspending_game.emit()
+
+
+func _on_suspend_reject_button_pressed(_button):
+	return_previous_state()

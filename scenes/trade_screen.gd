@@ -125,11 +125,11 @@ func _reparent_info(mode:int) -> void:
 func _refresh_count():
 	var countLabel = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel/MarginContainer/HBoxContainer/SupplyCount
 	var capLabel = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/ConvoyPnl/VBoxContainer/SupplyCountPanel/MarginContainer/HBoxContainer/SupplyCap
-	var supply : Dictionary = PlayerData.supply
+	var supply : PlayerSupply = PlayerData.supply
 	supplyStats.Count = 0
 	
-	for key in supply.keys():
-		supplyStats.Count += supply[key].size()
+	for page in supply.pages:
+		supplyStats.Count += supply[page].size()
 	
 	capLabel.set_text(str(supplyStats.Max))
 	countLabel.set_text(str(supplyStats.Count))

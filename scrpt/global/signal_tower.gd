@@ -3,10 +3,11 @@ extends Node
 
 ###Managment Signals
 #signal game_paused(exempt_scene)
-
+signal exiting_game
 signal prompt_accepted
 signal focus_unit_changed(unit:Unit)
 signal focus_danmaku_changed(dmku:Danmaku)
+signal returning_to_title
 #signal cursor_tile_updated(unit:Unit, tile)
 
 ##Unit Action Signals

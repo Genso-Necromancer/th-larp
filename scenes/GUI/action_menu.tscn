@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://2ggl8hw7vq8n"]
+[gd_scene load_steps=10 format=3 uid="uid://2ggl8hw7vq8n"]
 
 [ext_resource type="Script" uid="uid://cpn1isih8n42y" path="res://scenes/GUI/action_menu.gd" id="1_ilauf"]
 [ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/inventory_panel.tscn" id="2_8r605"]
@@ -7,6 +7,10 @@
 [ext_resource type="Script" uid="uid://dqnbmfjx7exf0" path="res://scenes/GUI/action_box.gd" id="3_hhurs"]
 [ext_resource type="Script" uid="uid://bsj5frkjcqte4" path="res://scenes/GUI/skill_box.gd" id="6_v4nkc"]
 [ext_resource type="Script" uid="uid://ct0uvjp5nevg7" path="res://scenes/GUI/ofuda_box.gd" id="7_61ufj"]
+[ext_resource type="PackedScene" uid="uid://br3hwrv0dbjeb" path="res://scenes/GUI/textured_label_button.tscn" id="8_4h5ep"]
+
+[sub_resource type="StyleBoxLine" id="StyleBoxLine_61ufj"]
+color = Color(0.62, 0.62, 0.62, 1)
 
 [node name="ActionMenu" type="PanelContainer" node_paths=PackedStringArray("skillConfirm")]
 anchors_preset = 15
@@ -268,4 +272,70 @@ theme_override_constants/margin_bottom = 10
 layout_mode = 2
 text = "Initiate Action"
 
+[node name="SuspendPanel" type="PanelContainer" parent="ScreenMargin"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="BackgroundCenter" type="NinePatchRect" parent="ScreenMargin/SuspendPanel"]
+layout_mode = 2
+texture = ExtResource("2_38ob5")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="MarginContainer" type="MarginContainer" parent="ScreenMargin/SuspendPanel"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScreenMargin/SuspendPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="SuspendPromptText" type="RichTextLabel" parent="ScreenMargin/SuspendPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+clip_contents = false
+layout_mode = 2
+size_flags_horizontal = 4
+bbcode_enabled = true
+text = "Suspend & Exit Game?"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+
+[node name="SaveWarningText" type="RichTextLabel" parent="ScreenMargin/SuspendPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+visible = false
+clip_contents = false
+layout_mode = 2
+size_flags_horizontal = 4
+bbcode_enabled = true
+text = "Girls are saving, do not close game...."
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+
+[node name="HSeparator" type="HSeparator" parent="ScreenMargin/SuspendPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_styles/separator = SubResource("StyleBoxLine_61ufj")
+
+[node name="promptHBox" type="HBoxContainer" parent="ScreenMargin/SuspendPanel/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 190
+alignment = 1
+
+[node name="SuspendConfirm" parent="ScreenMargin/SuspendPanel/MarginContainer/VBoxContainer/promptHBox" instance=ExtResource("8_4h5ep")]
+layout_mode = 2
+label_text = "Yes"
+font_override = 20
+
+[node name="SuspendReject" parent="ScreenMargin/SuspendPanel/MarginContainer/VBoxContainer/promptHBox" instance=ExtResource("8_4h5ep")]
+layout_mode = 2
+label_text = "No"
+font_override = 20
+
 [connection signal="pressed" from="ScreenMargin/ConfirmBackgroundMargin/ConfirmMargin/SkillConfirm" to="." method="_on_skill_confirm_pressed"]
+[connection signal="button_pressed" from="ScreenMargin/SuspendPanel/MarginContainer/VBoxContainer/promptHBox/SuspendConfirm" to="." method="_on_suspend_confirm_button_pressed"]
+[connection signal="button_pressed" from="ScreenMargin/SuspendPanel/MarginContainer/VBoxContainer/promptHBox/SuspendReject" to="." method="_on_suspend_reject_button_pressed"]

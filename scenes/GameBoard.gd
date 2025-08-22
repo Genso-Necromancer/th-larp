@@ -6,7 +6,7 @@
 class_name GameBoard
 extends Node2D
 
-#signals sent from here
+#region signals sent from here
 signal player_lost
 signal player_win
 signal cell_selected
@@ -18,7 +18,7 @@ signal danmaku_pathing_complete
 signal sequence_concluded
 signal post_queue_cleared
 signal continue_queue
-signal map_loaded(map)
+signal map_loaded(map:GameMap)
 signal map_freed
 signal turn_added(team:StringName)
 signal turn_removed(team:StringName)
@@ -26,6 +26,7 @@ signal turn_changed
 signal new_round(turn_order:Array[StringName])
 signal map_added(map:GameMap)
 signal units_loaded
+#signal loading_complete
 
 #signal skill_target_canceled
 #signal item_target_canceled
@@ -42,7 +43,10 @@ signal exp_display
 signal continue_turn
 signal deploy_toggled
 signal formation_closed
+#endregion
 
+
+#region variables
 enum ACTION_TYPE {ATTACK, SKILL, WAIT, END}
 var save_enum:Enums.SAVE_TYPE
 var map_end := false
@@ -136,7 +140,7 @@ var cc : CameraController
 var ai : AiManager
 ##Unit Preload
 var unitScn := preload("res://scenes/units/Unit.tscn")
-
+#endregion
 
 func _init()->void:
 	set_process(false)
@@ -157,7 +161,6 @@ func _process(_delta):
 	elif GameState.state == GameState.gState.ACCEPT_PROMPT or GameState.state == GameState.gState.FAIL_STATE or GameState.state == GameState.gState.WIN_STATE or GameState.state == GameState.gState.GB_END_OF_ROUND:
 		pass
 	elif turnComplete:
-		
 		turnComplete = false
 		_post_turn_events()
 	elif startNextTurn:
@@ -166,10 +169,6 @@ func _process(_delta):
 	elif aiTurn and aiNeedAct:
 		start_ai_turn(turnOrder[0])
 
-#region utility funcs
-func _wipe_region():
-	snapPath.clear()
-#endregion
 
 #region save/load
 func save() -> Dictionary:
@@ -202,28 +201,21 @@ func save() -> Dictionary:
 	#saveData["focusUnit"] = focusUnit
 	#saveData["focusDanmaku"] = focusDanmaku
 	#saveData["aiTarget"] = aiTarget
-			#
 	#saveData["activeUnit"] = activeUnit
-			
 	#saveData["targetUnit"] = targetUnit
 	#saveData["sequencingUnits"] = sequencingUnits
-
-
 	#saveData["forcedDeploy"] = forcedDeploy
 	#saveData["deploymentCells"] = deploymentCells
 	#saveData["depCap"] = depCap
 	#saveData["filledSlots"] = filledSlots
 	#saveData["storedUnits"] = storedUnit
 	#saveData["storedCell"] = storedCell
-
 	#variables related to the active map in use
 	#saveData["currMap"] = currMap
 	#saveData["deathList"] = deathList
 	#saveData["turnLoss"] = turnLoss
-
 	#Units by unit_id
 	#saveData["unitObjs"] = unitObjs
-
 	return saveData
 
 func _get_deployment()->Dictionary[StringName,Vector2i]:
@@ -234,56 +226,18 @@ func _get_deployment()->Dictionary[StringName,Vector2i]:
 	return deployments
 #endregion
 
-
-#region debug funcs
-func _kill_lady():
-	var lady = unitObjs["remilia"]
-	lady.apply_dmg(9999)
-
-func level_test():
-	var unit : Unit = unitObjs["remilia"]
-	unit.add_exp("Kill")
-
-func _camera_test():
-	if !cc: 
-		cc = CameraController.new(get_viewport())
-	cursor.visible = false
-	GameState.change_state(self, GameState.gState.CAMERA_STATE)
-	#cc.move_camera_map(Vector2i(15,8))
-	
-	cc.move_camera_cameratile(0)
-	
-	await cc.camera_control_complete
-	
-	cc.move_camera_cameratile(1,0.5)
-	
-	await cc.camera_control_complete
-	
-	cc.fade_out()
-	cc.reset_camera(false)
-	
-	await cc.camera_control_complete
-	
-	cc.fade_in()
-	
-	await cc.camera_fade_in_complete
-	
-	
-	GameState.change_state()
-	cursor.visible = true
-	print("Camera tween test complete")
-
-func _kill_camera() -> void:
-	if !cc: return
-	cc.skip_tween()
-	cursor.visible = true
-	cc.call_deferred("free")
-	#cursor.return_origin()
+#region Chapter begin, no idea what grouping this is yet
+func begin_chapter():
+	for unit in units:
+		units[unit].map_start_init()
+	chapter_started = true
+	_cursor_toggle(true)
+	currMap.hide_deployment()
+	GameState.clear_state_lists()
+	GameState.change_state(self, GameState.gState.GB_DEFAULT)
+	_initialize_turns()
+	call_deferred("set_process", true)
 #endregion
-
-
-func _toggle_pause():
-	get_tree().paused = !get_tree().paused
 
 
 #region map functions?
@@ -307,29 +261,31 @@ func free_map()->void:
 	#call_deferred("_load_new_map", map)
 
 
-func load_map(map:String):
+func load_map(map:String, save_data:Dictionary={}):
 	if !map: print("[GameBoard]load_map: empty map string")
 	var newMap:GameMap = load(map).instantiate()
 	Global.timePassed = 0
 	currMap = newMap
-	newMap.map_ready.connect(self._on_map_ready)
+	if save_data: newMap.map_ready.connect(self._on_map_ready_from_file)
+	else: newMap.map_ready.connect(self._on_map_ready)
+	if save_data: newMap.load_data(save_data.GameMap)
 	add_child(newMap)
 	emit_signal("map_added",newMap)
+	
 
 
-func load_map_from_file(map:String,save_data:Dictionary):
-	if !map: print("[GameBoard]load_map_from_file: empty map string")
-	var newMap:GameMap = load(map).instantiate()
-	Global.timePassed = 0
-	currMap = newMap
-	newMap.map_ready.connect(self._on_map_ready_from_file)
-	newMap.load_data(save_data.GameMap)
-	add_child(newMap)
-	emit_signal("map_added",newMap)
+#func skip_setup_load(map:String,save_data:Dictionary):
+	#load_map(map, save_data)
+	##begin_chapter()
+
+
+#func continue_map():
+	#call_deferred("set_process", true)
 
 
 func _on_map_ready():
 	call_deferred("_initialize_new_map")
+
 
 func _on_map_ready_from_file():
 	currMap.units_reloaded.connect(self._on_units_reloaded)
@@ -353,15 +309,15 @@ func _initialize_new_map():
 	ai.init_ai(self)
 	_cursor_toggle(true) ##before this one, which relies on Remilia being loaded in
 	#You can go back and read the second one now
-	call_deferred("set_process", true)
 	emit_signal("map_loaded", currMap)
 #endregion
 
 
+#region unit loading
 func _store_enemy_units():
 	for child in currMap.get_children():
 		var unit := child as Unit
-		if not unit or unit.FACTION_ID == Enums.FACTION_ID.PLAYER: continue
+		if not unit or unit.FACTION_ID == Enums.FACTION_ID.PLAYER or unit.is_queued_for_deletion(): continue
 		units[unit.cell] = unit
 		_connect_unit_signals(unit)
 
@@ -428,73 +384,10 @@ func _on_unit_ready(unit:Unit)->void:
 	var setCell:bool = false
 	if save_enum == Enums.SAVE_TYPE.SUSPENDED: setCell = true
 	if unitData and unitData.get(ID,false): unit.post_load(unitData[ID],setCell)
+#endregion
 
 
-func _connect_unit_signals(unit:Unit):
-#	if !combatManager.combat_resolved.is_connected(unit.on_combat_resolved):
-#		combatManager.combat_resolved.connect(unit.on_combat_resolved)
-	if !unit.death_done.is_connected(self.on_death_done):
-		unit.death_done.connect(self.on_death_done)
-	if !self.turn_changed.is_connected(unit.on_turn_changed): 
-		self.turn_changed.connect(unit.on_turn_changed)
-	if !unit.unit_relocated.is_connected(self.on_unit_relocated): 
-		unit.unit_relocated.connect(self.on_unit_relocated)
-	if !unit.exp_gained.is_connected(self.on_exp_gained) and unit.FACTION_ID == Enums.FACTION_ID.PLAYER:
-		unit.exp_gained.connect(self.on_exp_gained)
-	if !self.new_round.is_connected(unit._on_new_round):
-		self.new_round.connect(unit._on_new_round)
-	if !self.turn_changed.is_connected(unit._on_turn_changed):
-		self.turn_changed.connect(unit._on_turn_changed)
-	if !self.sequence_concluded.is_connected(unit.on_sequence_concluded):
-		self.sequence_concluded.connect(unit.on_sequence_concluded)
-	if !unit.turn_complete.is_connected(self.on_turn_complete):
-			unit.turn_complete.connect(self.on_turn_complete)
-	if !unit.effect_complete.is_connected(self.on_effect_complete):
-		unit.effect_complete.connect(self.on_effect_complete)
-	if !unit.item_targeting.is_connected(self._on_unit_item_targeting):
-		unit.item_targeting.connect(self._on_unit_item_targeting)
-	if !unit.item_activated.is_connected(self._on_unit_item_activated):
-		unit.item_activated.connect(self._on_unit_item_activated)
-	if !unit.unit_ready.is_connected(self._on_unit_ready):
-		unit.unit_ready.connect(self._on_unit_ready)
-
-func _connect_danmaku_signals(bullet):
-	if !bullet.danmaku_relocated.is_connected(self.on_danmaku_relocated):
-		bullet.danmaku_relocated.connect(self.on_danmaku_relocated)
-	if !bullet.collision_detected.is_connected(self.on_danmaku_collision):
-		bullet.collision_detected.connect(self.on_danmaku_collision)
-	if !bullet.animation_completed.is_connected(self._on_danmaku_animation):
-		bullet.animation_completed.connect(self._on_danmaku_animation)
-
-
-func _connect_general_signals():
-	#self.gb_ready.connect(GameState.set_new_state)
-	cursor.cursor_moved.connect(self._on_cursor_moved)
-	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
-	#self.danmaku_pathing_complete.connect()
-	#self.round_changed.connect(currMap.on_round_changed)
-	#self.cell_selected.connect(mainCon.on_cell_selected)
-	
-
-		
-func _init_gamestate():
-	#boardState.update_map_data(terrainData)
-	boardState.update_unit_data(units)
-	
-	
-func _update_unit_terrain(unit): #HERE BROKEN
-	unit.update_terrain_data()
-	
-			
-			
-func gb_mouse_motion(_event):
-	var mousePos: Vector2i = currMap.get_local_mouse_position()
-	var toMap = currMap.ground.local_to_map(mousePos)
-	
-	#print(mousePos)
-	cursor.cell = Vector2i(toMap)
-
-
+#region cell/grid/pathfinding
 ## Returns `true` if the cell is occupied by a unit
 func is_occupied(cell: Vector2i) -> bool:
 		return units.has(cell)
@@ -538,7 +431,6 @@ func is_within_bounds(cell_coordinates: Vector2i) -> bool: #Pathing
 	return valid
 
 
-
 func select_cell(): #DEFAULT STATE: If a cell has a valid unit, selects it
 	var occupied = is_occupied(cursor.cell)
 	if !occupied:
@@ -547,146 +439,6 @@ func select_cell(): #DEFAULT STATE: If a cell has a valid unit, selects it
 		_select_unit(cursor.cell)
 	else:
 		pass #TO-DO: seperate selection that just toggles a unit's movement and reach
-		
-
-func _move_active_unit(new_cell: Vector2i, enemy: bool = false, enemyPath = null) -> void: #pathing related
-	# Updates the units dictionary with the target position for the unit and asks the activeUnit to walk to it.
-#	print("move_active: ", new_cell)
-	var path = null
-	if !new_cell == activeUnit.cell and !enemy:
-		if is_occupied(new_cell) or not new_cell in walkableCells:
-			return
-	
-	if !enemy:
-		GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
-	currMap.pathAttack.clear()
-	if !new_cell == activeUnit.cell:
-		#print("it's walkable")
-		# warning-ignore:return_value_discarded
-		units.erase(activeUnit.cell)
-		units[new_cell] = activeUnit
-		if !enemy:
-			path = unitPath.current_path
-		else:
-			path = enemyPath
-		activeUnit.walk_along(path)
-		unitMoving = true
-		await activeUnit.walk_finished
-		pathingArray.clear()
-		
-		unitMoving = false
-		
-		
-	if !enemy:
-		emit_signal("unit_move_ended", activeUnit)
-	else:
-		emit_signal("aimove_finished")
-
-
-
-func _select_unit(cell: Vector2i, isAi = false) -> void:
-	# Selects the unit in the `cell` if there's one there.
-	# Sets it as the `activeUnit` and draws its walkable cells and interactive move path. 
-#	#print(units, units.has(cell))
-#	print(cell)
-	if !units.has(cell) or units[cell].status.Acted: return
-	activeUnit = units[cell]
-	#activeUnit.save_equip()
-	activeUnit.isSelected = true
-	walkableCells = get_walkable_cells(activeUnit)
-	
-	currMap.draw(walkableCells)
-	if !isAi: GameState.change_state(self, GameState.gState.GB_SELECTED)
-	emit_signal("unit_selected", units[cell])
-#	set_region_border(walkableCells)
-
-
-func _deselect_active_unit(confirm) -> void:
-	# Deselects the active unit, clearing the cells overlay and interactive path drawing
-	#confirm is used to let the game know if this is a temporary movement(can be canceled by player) 
-	#or a confirmed move so it knows to retain previous position or update the units dictionary
-	
-
-	if activeUnit != null and units.has(activeUnit.cell):
-		if !confirm: 
-			units.erase(activeUnit.cell)
-			var new_cell = activeUnit.return_original()
-			units[new_cell] = activeUnit
-			activeUnit.restore_equip()
-			
-		else:
-			var new_cell = activeUnit.cell
-			activeUnit.originCell = activeUnit.cell
-			units[new_cell] = activeUnit
-			boardState.add_acted(activeUnit)
-			activeUnit.set_acted(true)
-		_snap_cursor(activeUnit.cell)
-		activeUnit.isSelected = false
-		
-	_clear_active_unit()
-	currMap.pathAttack.clear()
-	unitPath.stop()
-	pathingArray.clear()
-	
-	
-func on_unit_relocated(oldCell, newCell, unit): #updates unit locations with it's new location
-	if units.has(oldCell):
-		units.erase(oldCell)
-	units[newCell] = unit
-
-
-func on_danmaku_relocated(oldCell, newCell, bullet):
-	var hexStar = AHexGrid2D.new(currMap)
-	if danmaku.has(oldCell):
-		danmaku.erase(oldCell)
-	danmaku[newCell] = bullet
-	bullet.set_path(hexStar.get_danmaku_path(bullet)) #HEX REF
-	if danmakuMotion.has(bullet):
-		danmakuMotion.erase(bullet)
-
-
-func on_danmaku_collision(bullet):
-	collisionQue.append(bullet)
-	#if danmakuMotion.has(bullet):
-		#danmakuMotion.erase(bullet)
-
-
-func _on_danmaku_animation(anim, bullet):
-	match anim:
-		"Collision": 
-			_remove_danmaku(bullet)
-			_process_danmaku_collision()
-
-
-func _pause_danmaku_phase():
-	set_process(false)
-	for b in danmakuMotion:
-		if b.isMoving: b.pause_move()
-
-
-func _remove_danmaku(bullet):
-	var keys = danmaku.keys()
-	if keys.has(bullet.originCell):
-		danmaku.erase(bullet.originCell)
-	if danmakuMotion.has(bullet):
-		danmakuMotion.erase(bullet)
-	bullet.queue_free()
-
-
-func _process_danmaku_collision():
-	if collisionQue.size() == 0:
-		_resume_danmaku_phase()
-		return
-	var bullet = collisionQue.pop_front()
-	_snap_cursor(bullet.cell)
-	bullet.play_collide()
-
-
-func _resume_danmaku_phase():
-	set_process(true)
-	for b in danmakuMotion:
-		b.start_move()
-
 
 func grab_target(cell):
 	#Called to assign values based on unit at cursor's coordinate
@@ -710,23 +462,6 @@ func grab_target(cell):
 	emit_signal("target_focused", mode, reach)
 
 
-func confirm_forecast():
-	emit_signal("forecast_confirmed")
-
-
-func _start_trade(cell):
-	_wipe_region()
-	currMap.pathAttack.clear()
-	parent.call_trade(units[cell])
-
-
-func _clear_active_unit() -> void:
-	# Clears the reference to the activeUnit and the corresponding walkable cells
-	
-	activeUnit = null
-	walkableCells.clear()
-
-
 func select_destination() -> void: #SELECTED STATE Pathing Related
 	var isOccupied = is_occupied(cursor.cell)
 	var isWalkable = walkableCells.has(cursor.cell)
@@ -741,156 +476,7 @@ func select_destination() -> void: #SELECTED STATE Pathing Related
 	elif !isWalkable or isOccupied: return
 	elif pathingArray[-1] == cursor.cell:
 		_move_active_unit(cursor.cell)
-	
-
-func select_formation_cell():
-	if deploymentCells.has(cursor.cell) and is_occupied(cursor.cell) and storedUnit == null:
-		storedUnit = units[cursor.cell]
-		storedCell = cursor.cell
-		storedUnit.isSelected = true
-	elif deploymentCells.has(cursor.cell) and is_occupied(cursor.cell):
-		_deploy_swap(storedUnit, units[cursor.cell])
-		# swap function here
-	elif deploymentCells.has(cursor.cell) and storedCell != Vector2i(-1,-1):
-		storedCell = cursor.cell
-	elif deploymentCells.has(cursor.cell):
-		_deploy_swap(storedUnit, storedCell)
-		#swap function
-		
-func _deploy_swap(start, end):
-	#var defValue = Vector2i(-1,-1)
-	var swap = false
-	if end is Unit:
-		swap = true
-	if !swap:
-		start.relocate_unit(end)
-		deselect_formation_cell()
-	else:
-		var cell1 = start.cell
-		var cell2 = end.cell
-		var unit1 = start
-		var unit2 = end
-		start.relocate_unit(cell2, false)
-		end.relocate_unit(cell1, false)
-		units[cell1] = unit2
-		units[cell2] = unit1
-		deselect_formation_cell()
-
-func deselect_formation_cell():
-	var defValue = Vector2i(-1,-1)
-	if storedUnit == null and storedCell == defValue:
-		emit_signal("formation_closed")
-	if storedUnit != null:
-		storedUnit.isSelected = false
-		storedUnit = null
-	if storedCell != defValue:
-		storedCell = defValue
-
-func toggle_unit_profile(): 
-	if GameState.state == GameState.gState.GB_PROFILE:
-		emit_signal("toggle_prof")
-	elif focusUnit:
-		emit_signal("toggle_prof")
-	else: toggle_extra_info()
-
-
-func request_deselect():
-	_wipe_region()
-	currMap.pathAttack.clear()
-	GameState.change_state(self, GameState.gState.GB_DEFAULT)
-	_deselect_active_unit(false)
-
-
-func end_targeting():
-	_wipe_region()
-	currMap.pathAttack.clear()
-	cursor.cell = activeUnit.cell
-	emit_signal("gameboard_targeting_canceled")
-
-
-func menu_step_back():
-	match GameState.state:
-		GameState.gState.GB_COMBAT_FORECAST:
-			emit_signal("action_called", activeUnit)
-			GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-			_wipe_region()
-			cursor.cell = activeUnit.cell
-	
-	
-func attack_target_selected():
-	if is_occupied(cursor.cell) and !_check_friendly(activeUnit, focusUnit):
-#				$Cursor.visible = false
-		grab_target(cursor.cell)
-
-
-func trade_target_selected():
-	if is_occupied(cursor.cell) and _check_friendly(activeUnit, focusUnit, true):
-		_start_trade(cursor.cell)
-
-
-
-func item_target_selected()->void:
-	if activeAction.Item is Ofuda: _feature_target(activeAction.Item)
-	else: _activate_item(activeAction.Item,activeUnit,focusUnit)
-
-func skill_target_selected():
-	_feature_target(activeAction.Skill)
-
-
-func _feature_target(feature:SlotWrapper)-> void:
-	if !is_occupied(cursor.cell):
-		return
-	if !feature:
-		print("No Valid SkillID")
-		return
-	var friendly := false
-	var valid := false
-
-
-	if focusUnit.FACTION_ID == activeUnit.FACTION_ID or focusUnit.FACTION_ID == Enums.FACTION_ID.NPC:
-		friendly = true
-	match feature.target:
-		Enums.SKILL_TARGET.SELF:
-			if activeUnit == focusUnit:
-				valid = true
-		Enums.SKILL_TARGET.ENEMY:
-			if !friendly:
-				valid = true
-			#if skill.RuleType:
-				#match skill.RuleType:
-					#Enums.RULE_TYPE.TARGET_SPEC:
-						#if skill.Rule != focusUnit.SPEC_ID:
-							#valid = false
-		Enums.SKILL_TARGET.ALLY:
-			if friendly and activeUnit != focusUnit:
-				valid = true
-		Enums.SKILL_TARGET.SELF_ALLY:
-			if friendly:
-				valid = true
-		Enums.SKILL_TARGET.MAP:
-			if activeUnit != focusUnit:
-				valid = true
-	
-	if valid: grab_target(cursor.cell)
-
-
-func _check_friendly(unit1, unit2, sameOnly:=false) ->bool:
-	if unit1.FACTION_ID == unit2.FACTION_ID: return true
-	elif !sameOnly and unit1.FACTION_ID != Enums.FACTION_ID.ENEMY and unit2.FACTION_ID != Enums.FACTION_ID.ENEMY: return true
-	return false
-
-
-func return_targeting():
-	#var s
-	match GameState.previousState:
-		GameState.gState.GB_ATTACK_TARGETING:
-			#s = "Attack"
-			activeUnit.restore_equip()
-			start_attack_targeting()
-		GameState.gState.GB_SKILL_TARGETING:
-			start_skill_targeting()
-		GameState.gState.GB_SKILL_TARGETING:
-			start_item_targeting(activeAction.Item)
+#endregion
 
 
 func _on_cursor_moved(new_cell: Vector2i) -> void: #Pathing
@@ -1451,7 +1037,7 @@ func _deploy_unit(unit:Unit, forced = false, spawnLoc = Vector2i(0,0)):
 	if filledSlots < depCap:
 		unit.visible = true
 		unit.is_active = true
-		unit.relocate_unit(spawnLoc)
+		if save_enum != Enums.SAVE_TYPE.SUSPENDED: unit.relocate_unit(spawnLoc)
 		filledSlots += 1
 		roster
 		_update_roster_label()
@@ -1497,8 +1083,7 @@ func _snap_cursor(cell: Vector2i = unitObjs[forcedDeploy.keys()[0]].cell): #can 
 	cursor.align_camera()
 
 
-#GUI Signal Functions
-
+#region GUI Signal Functions
 func _on_gui_action_menu_canceled():
 	request_deselect()
 
@@ -1530,10 +1115,6 @@ func _on_action_weapon_selected(button = false):
 	combat_sequence(combatResults)
 	boardState.add_acted(activeUnit)
 	#activeUnit.set_acted(true)
-	
-
-
-
 
 
 func _on_win_screen_win_finished():
@@ -1562,25 +1143,18 @@ func _on_gui_manager_formation_toggled():
 	#combatManager.use_item(unit, unit, item)
 
 func _on_gui_manager_map_started():
-	for unit in units:
-		units[unit].map_start_init()
-	chapter_started = true
-	_cursor_toggle(true)
-	currMap.hide_deployment()
-	GameState.clear_state_lists()
-	GameState.change_state(self, GameState.gState.GB_DEFAULT)
-	_initialize_turns()
-	
-		
-		
+	begin_chapter()
+	_randomize_rolls()
+
+
 func _on_inventory_weapon_changed(button) -> void:
 	var i = button.get_meta("Item")
 	if button.disabled:
 		return
 	activeUnit._equip_weapon(i) #See if it can find it's own index based on ID?
 	combatManager.get_forecast(activeUnit, targetUnit, activeAction)
-	
-	
+#regionend
+
 
 #Objective related code
 func _check_flags():
@@ -1768,4 +1342,451 @@ func spawn_raw_unit(unitPackage : Dictionary):
 	newUnit.relocate_unit(cell)
 	newUnit.set_process(true)
 	
+
+#region outdated, possibly unneeded functions that can't be outright deleted yet
+func _init_gamestate():
+	#boardState.update_map_data(terrainData)
+	boardState.update_unit_data(units)
+#endregion
+
+
+#region menu response functions
+func confirm_forecast():
+	emit_signal("forecast_confirmed")
+
+
+func _start_trade(cell):
+	_wipe_region()
+	currMap.pathAttack.clear()
+	parent.call_trade(units[cell])
+
+
+func toggle_unit_profile(): 
+	if GameState.state == GameState.gState.GB_PROFILE:
+		emit_signal("toggle_prof")
+	elif focusUnit:
+		emit_signal("toggle_prof")
+	else: toggle_extra_info()
+
+
+func request_deselect():
+	_wipe_region()
+	currMap.pathAttack.clear()
+	GameState.change_state(self, GameState.gState.GB_DEFAULT)
+	_deselect_active_unit(false)
+
+
+func end_targeting():
+	_wipe_region()
+	currMap.pathAttack.clear()
+	cursor.cell = activeUnit.cell
+	emit_signal("gameboard_targeting_canceled")
+
+
+func menu_step_back():
+	match GameState.state:
+		GameState.gState.GB_COMBAT_FORECAST:
+			emit_signal("action_called", activeUnit)
+			GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
+			_wipe_region()
+			cursor.cell = activeUnit.cell
+
+
+func attack_target_selected():
+	if is_occupied(cursor.cell) and !_check_friendly(activeUnit, focusUnit):
+#				$Cursor.visible = false
+		grab_target(cursor.cell)
+
+
+func trade_target_selected():
+	if is_occupied(cursor.cell) and _check_friendly(activeUnit, focusUnit, true):
+		_start_trade(cursor.cell)
+
+
+func item_target_selected()->void:
+	if activeAction.Item is Ofuda: _feature_target(activeAction.Item)
+	else: _activate_item(activeAction.Item,activeUnit,focusUnit)
+
+
+func skill_target_selected():
+	_feature_target(activeAction.Skill)
+
+
+func _feature_target(feature:SlotWrapper)-> void:
+	if !is_occupied(cursor.cell):
+		return
+	if !feature:
+		print("No Valid SkillID")
+		return
+	var friendly := false
+	var valid := false
+
+
+	if focusUnit.FACTION_ID == activeUnit.FACTION_ID or focusUnit.FACTION_ID == Enums.FACTION_ID.NPC:
+		friendly = true
+	match feature.target:
+		Enums.SKILL_TARGET.SELF:
+			if activeUnit == focusUnit:
+				valid = true
+		Enums.SKILL_TARGET.ENEMY:
+			if !friendly:
+				valid = true
+			#if skill.RuleType:
+				#match skill.RuleType:
+					#Enums.RULE_TYPE.TARGET_SPEC:
+						#if skill.Rule != focusUnit.SPEC_ID:
+							#valid = false
+		Enums.SKILL_TARGET.ALLY:
+			if friendly and activeUnit != focusUnit:
+				valid = true
+		Enums.SKILL_TARGET.SELF_ALLY:
+			if friendly:
+				valid = true
+		Enums.SKILL_TARGET.MAP:
+			if activeUnit != focusUnit:
+				valid = true
 	
+	if valid: grab_target(cursor.cell)
+
+
+func _check_friendly(unit1, unit2, sameOnly:=false) ->bool:
+	if unit1.FACTION_ID == unit2.FACTION_ID: return true
+	elif !sameOnly and unit1.FACTION_ID != Enums.FACTION_ID.ENEMY and unit2.FACTION_ID != Enums.FACTION_ID.ENEMY: return true
+	return false
+
+
+func return_targeting():
+	#var s
+	match GameState.previousState:
+		GameState.gState.GB_ATTACK_TARGETING:
+			#s = "Attack"
+			activeUnit.restore_equip()
+			start_attack_targeting()
+		GameState.gState.GB_SKILL_TARGETING:
+			start_skill_targeting()
+		GameState.gState.GB_SKILL_TARGETING:
+			start_item_targeting(activeAction.Item)
+#endregion
+
+
+#region mouse/cursor functions
+func gb_mouse_motion(_event):
+	var mousePos: Vector2i = currMap.get_local_mouse_position()
+	var toMap = currMap.ground.local_to_map(mousePos)
+	
+	#print(mousePos)
+	cursor.cell = Vector2i(toMap)
+#endregion
+
+
+#region unit-related functions
+func _update_unit_terrain(unit:Unit): #HERE BROKEN
+	unit.update_terrain_data()
+
+
+func _move_active_unit(new_cell: Vector2i, enemy: bool = false, enemyPath = null) -> void: #pathing related
+	# Updates the units dictionary with the target position for the unit and asks the activeUnit to walk to it.
+#	print("move_active: ", new_cell)
+	var path = null
+	if !new_cell == activeUnit.cell and !enemy:
+		if is_occupied(new_cell) or not new_cell in walkableCells:
+			return
+	
+	if !enemy:
+		GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
+	currMap.pathAttack.clear()
+	if !new_cell == activeUnit.cell:
+		#print("it's walkable")
+		# warning-ignore:return_value_discarded
+		units.erase(activeUnit.cell)
+		units[new_cell] = activeUnit
+		if !enemy:
+			path = unitPath.current_path
+		else:
+			path = enemyPath
+		activeUnit.walk_along(path)
+		unitMoving = true
+		await activeUnit.walk_finished
+		pathingArray.clear()
+		
+		unitMoving = false
+		
+		
+	if !enemy:
+		emit_signal("unit_move_ended", activeUnit)
+	else:
+		emit_signal("aimove_finished")
+
+
+func _select_unit(cell: Vector2i, isAi = false) -> void:
+	# Selects the unit in the `cell` if there's one there.
+	# Sets it as the `activeUnit` and draws its walkable cells and interactive move path. 
+#	#print(units, units.has(cell))
+#	print(cell)
+	if !units.has(cell) or units[cell].status.Acted: return
+	activeUnit = units[cell]
+	#activeUnit.save_equip()
+	activeUnit.isSelected = true
+	walkableCells = get_walkable_cells(activeUnit)
+	
+	currMap.draw(walkableCells)
+	if !isAi: GameState.change_state(self, GameState.gState.GB_SELECTED)
+	emit_signal("unit_selected", units[cell])
+#	set_region_border(walkableCells)
+
+
+func _deselect_active_unit(confirm) -> void:
+	# Deselects the active unit, clearing the cells overlay and interactive path drawing
+	#confirm is used to let the game know if this is a temporary movement(can be canceled by player) 
+	#or a confirmed move so it knows to retain previous position or update the units dictionary
+	if activeUnit != null and units.has(activeUnit.cell):
+		if !confirm: 
+			units.erase(activeUnit.cell)
+			var new_cell = activeUnit.return_original()
+			units[new_cell] = activeUnit
+			activeUnit.restore_equip()
+			
+		else:
+			var new_cell = activeUnit.cell
+			activeUnit.originCell = activeUnit.cell
+			units[new_cell] = activeUnit
+			boardState.add_acted(activeUnit)
+			activeUnit.set_acted(true)
+		_snap_cursor(activeUnit.cell)
+		activeUnit.isSelected = false
+		
+	_clear_active_unit()
+	currMap.pathAttack.clear()
+	unitPath.stop()
+	pathingArray.clear()
+	
+	
+func on_unit_relocated(oldCell, newCell, unit): #updates unit locations with it's new location
+	if units.has(oldCell):
+		units.erase(oldCell)
+	units[newCell] = unit
+
+
+func _clear_active_unit() -> void:
+	# Clears the reference to the activeUnit and the corresponding walkable cells
+	
+	activeUnit = null
+	walkableCells.clear()
+#endregion
+
+
+#region Danmaku functions
+func on_danmaku_relocated(oldCell, newCell, bullet):
+	var hexStar = AHexGrid2D.new(currMap)
+	if danmaku.has(oldCell):
+		danmaku.erase(oldCell)
+	danmaku[newCell] = bullet
+	bullet.set_path(hexStar.get_danmaku_path(bullet)) #HEX REF
+	if danmakuMotion.has(bullet):
+		danmakuMotion.erase(bullet)
+
+
+func on_danmaku_collision(bullet):
+	collisionQue.append(bullet)
+	#if danmakuMotion.has(bullet):
+		#danmakuMotion.erase(bullet)
+
+
+func _on_danmaku_animation(anim, bullet):
+	match anim:
+		"Collision": 
+			_remove_danmaku(bullet)
+			_process_danmaku_collision()
+
+
+func _pause_danmaku_phase():
+	set_process(false)
+	for b in danmakuMotion:
+		if b.isMoving: b.pause_move()
+
+
+func _remove_danmaku(bullet):
+	var keys = danmaku.keys()
+	if keys.has(bullet.originCell):
+		danmaku.erase(bullet.originCell)
+	if danmakuMotion.has(bullet):
+		danmakuMotion.erase(bullet)
+	bullet.queue_free()
+
+
+func _process_danmaku_collision():
+	if collisionQue.size() == 0:
+		_resume_danmaku_phase()
+		return
+	var bullet = collisionQue.pop_front()
+	_snap_cursor(bullet.cell)
+	bullet.play_collide()
+
+
+func _resume_danmaku_phase():
+	set_process(true)
+	for b in danmakuMotion:
+		b.start_move()
+#endregion
+
+
+#region formation functions
+func select_formation_cell():
+	if deploymentCells.has(cursor.cell) and is_occupied(cursor.cell) and storedUnit == null:
+		storedUnit = units[cursor.cell]
+		storedCell = cursor.cell
+		storedUnit.isSelected = true
+	elif deploymentCells.has(cursor.cell) and is_occupied(cursor.cell):
+		_deploy_swap(storedUnit, units[cursor.cell])
+		# swap function here
+	elif deploymentCells.has(cursor.cell) and storedCell != Vector2i(-1,-1):
+		storedCell = cursor.cell
+	elif deploymentCells.has(cursor.cell):
+		_deploy_swap(storedUnit, storedCell)
+		#swap function
+
+
+func _deploy_swap(start, end):
+	#var defValue = Vector2i(-1,-1)
+	var swap = false
+	if end is Unit:
+		swap = true
+	if !swap:
+		start.relocate_unit(end)
+		deselect_formation_cell()
+	else:
+		var cell1 = start.cell
+		var cell2 = end.cell
+		var unit1 = start
+		var unit2 = end
+		start.relocate_unit(cell2, false)
+		end.relocate_unit(cell1, false)
+		units[cell1] = unit2
+		units[cell2] = unit1
+		deselect_formation_cell()
+
+func deselect_formation_cell():
+	var defValue = Vector2i(-1,-1)
+	if storedUnit == null and storedCell == defValue:
+		emit_signal("formation_closed")
+	if storedUnit != null:
+		storedUnit.isSelected = false
+		storedUnit = null
+	if storedCell != defValue:
+		storedCell = defValue
+#endregion
+
+
+#region utility funcs
+func _randomize_rolls():
+	var rng:=RngTool.new()
+	rng.random()
+
+
+func _wipe_region():
+	snapPath.clear()
+
+
+func _toggle_pause():
+	get_tree().paused = !get_tree().paused
+
+
+func _connect_unit_signals(unit:Unit):
+#	if !combatManager.combat_resolved.is_connected(unit.on_combat_resolved):
+#		combatManager.combat_resolved.connect(unit.on_combat_resolved)
+	if !unit.death_done.is_connected(self.on_death_done):
+		unit.death_done.connect(self.on_death_done)
+	if !self.turn_changed.is_connected(unit.on_turn_changed): 
+		self.turn_changed.connect(unit.on_turn_changed)
+	if !unit.unit_relocated.is_connected(self.on_unit_relocated): 
+		unit.unit_relocated.connect(self.on_unit_relocated)
+	if !unit.exp_gained.is_connected(self.on_exp_gained) and unit.FACTION_ID == Enums.FACTION_ID.PLAYER:
+		unit.exp_gained.connect(self.on_exp_gained)
+	if !self.new_round.is_connected(unit._on_new_round):
+		self.new_round.connect(unit._on_new_round)
+	if !self.turn_changed.is_connected(unit._on_turn_changed):
+		self.turn_changed.connect(unit._on_turn_changed)
+	if !self.sequence_concluded.is_connected(unit.on_sequence_concluded):
+		self.sequence_concluded.connect(unit.on_sequence_concluded)
+	if !unit.turn_complete.is_connected(self.on_turn_complete):
+			unit.turn_complete.connect(self.on_turn_complete)
+	if !unit.effect_complete.is_connected(self.on_effect_complete):
+		unit.effect_complete.connect(self.on_effect_complete)
+	if !unit.item_targeting.is_connected(self._on_unit_item_targeting):
+		unit.item_targeting.connect(self._on_unit_item_targeting)
+	if !unit.item_activated.is_connected(self._on_unit_item_activated):
+		unit.item_activated.connect(self._on_unit_item_activated)
+	if !unit.unit_ready.is_connected(self._on_unit_ready):
+		unit.unit_ready.connect(self._on_unit_ready)
+
+func _connect_danmaku_signals(bullet):
+	if !bullet.danmaku_relocated.is_connected(self.on_danmaku_relocated):
+		bullet.danmaku_relocated.connect(self.on_danmaku_relocated)
+	if !bullet.collision_detected.is_connected(self.on_danmaku_collision):
+		bullet.collision_detected.connect(self.on_danmaku_collision)
+	if !bullet.animation_completed.is_connected(self._on_danmaku_animation):
+		bullet.animation_completed.connect(self._on_danmaku_animation)
+
+
+func _connect_general_signals():
+	#self.gb_ready.connect(GameState.set_new_state)
+	cursor.cursor_moved.connect(self._on_cursor_moved)
+	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
+	#self.danmaku_pathing_complete.connect()
+	#self.round_changed.connect(currMap.on_round_changed)
+	#self.cell_selected.connect(mainCon.on_cell_selected)
+#endregion
+
+
+#region debug funcs
+func _kill_lady():
+	var lady = unitObjs["remilia"]
+	lady.apply_dmg(9999)
+
+
+func _dmg_lady():
+	var lady :Unit= unitObjs["remilia"]
+	lady.apply_dmg(9, lady)
+
+
+func level_test():
+	var unit : Unit = unitObjs["remilia"]
+	unit.add_exp("Kill")
+
+
+func _camera_test():
+	if !cc: 
+		cc = CameraController.new(get_viewport())
+	cursor.visible = false
+	GameState.change_state(self, GameState.gState.CAMERA_STATE)
+	#cc.move_camera_map(Vector2i(15,8))
+	
+	cc.move_camera_cameratile(0)
+	
+	await cc.camera_control_complete
+	
+	cc.move_camera_cameratile(1,0.5)
+	
+	await cc.camera_control_complete
+	
+	cc.fade_out()
+	cc.reset_camera(false)
+	
+	await cc.camera_control_complete
+	
+	cc.fade_in()
+	
+	await cc.camera_fade_in_complete
+	
+	
+	GameState.change_state()
+	cursor.visible = true
+	print("Camera tween test complete")
+
+func _kill_camera() -> void:
+	if !cc: return
+	cc.skip_tween()
+	cursor.visible = true
+	cc.call_deferred("free")
+	#cursor.return_origin()
+#endregion

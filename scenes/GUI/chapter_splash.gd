@@ -9,8 +9,13 @@ func _ready():
 	animPlayer.animation_finished.connect(self._on_animation_finished)
 	SignalTower.prompt_accepted.connect(self._on_prompt_accepted)
 
+#func _process(_delta):
+	#if input_accepted: input_accepted = false
+
 func _on_prompt_accepted():
 	skip_animation()
+	accept_event()
+
 
 
 func play_splash(chNum :int, chTitle:String, timeString:String):
@@ -26,7 +31,7 @@ func play_splash(chNum :int, chTitle:String, timeString:String):
 	time.set_text(timeString+dayHalf)
 	animPlayer.play("Splash")
 
-func skip_animation():
+func skip_animation()->void:
 	if animPlayer.is_playing():
 		animPlayer.advance(3.5)
 	else:

@@ -1,13 +1,14 @@
 extends Node
 class_name MapManager
 
-@onready var gameBoard :GameBoard = $Gameboard
-@onready var guiManager :GUIManager = $CanvasLayer/GUIManager
+@onready var gameBoard :GameBoard = %Gameboard
+@onready var guiManager :GUIManager = %GUIManager
 var dialogue_overlay := preload("res://scenes/cutscenes/dialog_overlay.tscn")
 var dOverlay : DialogueOverlay
 var current_map:String
 var next_map:String
-
+var is_suspended_load:=false
+var load_initiated:= false
 
 func _ready():
 	_connect_signals()
@@ -35,10 +36,18 @@ func load_map(map:String):
 	gameBoard.load_map(map)
 
 
-func load_map_from_file(map:String, save_data:Dictionary):
+func load_map_from_file(map:String, save_data:Dictionary, is_suspended:bool=false):
 	if !map: print("[MapManager]load_map_from_file: empty map string")
-	gameBoard.load_map_from_file(map, save_data)
-	
+	is_suspended_load = is_suspended
+	if is_suspended_load: gameBoard.save_enum = Enums.SAVE_TYPE.SUSPENDED
+	gameBoard.load_map(map, save_data)
+
+
+#func load_suspended_map_from_file(map:String, save_data:Dictionary):
+	#if !map: print("[MapManager]load_suspended_map_from_file: empty map string")
+	#is_suspended_load = true
+	#gameBoard.load_map(map, save_data)
+
 
 func shift_to_next_map():
 	current_map = next_map
@@ -49,6 +58,7 @@ func _connect_signals()-> void:
 	SignalTower.inventory_weapon_changed.connect(gameBoard._on_inventory_weapon_changed)
 	SignalTower.action_weapon_selected.connect(gameBoard._on_action_weapon_selected)
 	SignalTower.action_skill_confirmed.connect(gameBoard._on_action_weapon_selected)
+	SignalTower.returning_to_title.connect(self._on_returning_to_title)
 	gameBoard.map_loaded.connect(self._on_map_loaded)
 	gameBoard.gameboard_targeting_canceled.connect(guiManager._on_gameboard_targeting_canceled)
 	gameBoard.cursor.cursor_moved.connect(self._on_cursor_moved)
@@ -60,7 +70,7 @@ func _connect_signals()-> void:
 	gameBoard.map_added.connect(self._on_map_added)
 	guiManager.gui_splash_finished.connect(self._on_gui_splash_finished)
 	guiManager.gui_action_menu_canceled.connect(gameBoard._on_gui_action_menu_canceled)
-	
+
 
 
 #region scene loading
@@ -104,6 +114,15 @@ func _on_map_loaded(map:GameMap):
 	guiManager.play_splash(chNum, chTitle, timeString)
 
 
+#func _on_suspension_loaded(map:GameMap):
+	#var chNum = map.chapterNumber
+	#var chTitle = map.title
+	#var timeString : String = Global.time_to_string(map.hours,map.minutes)
+	##end_load_screen()
+	##await SignalTower.fade_in_complete
+	#guiManager.play_splash(chNum, chTitle, timeString)
+
+
 func _on_map_freed()->void:
 	var saveScreen :SaveScreen= load("res://scenes/chapter_save_screen.tscn").instantiate()
 	shift_to_next_map()
@@ -133,7 +152,27 @@ func end_load_screen(speed: float = 0.5):
 	SignalTower.fader_fade_in.emit(speed)
 
 
-func _on_gui_splash_finished():
+func _on_gui_splash_finished()->void:
+	if load_initiated: 
+		return
+	elif is_suspended_load:
+		is_suspended_load = false
+		load_initiated = true
+		_suspended_start()
+	else:
+		load_initiated = true
+		_set_up_start()
+
+
+func _suspended_start():
+	if !Global.flags.DebugMode:
+		SaveHub.delete_temp()
+	GameState.change_state(self, GameState.gState.LOADING)
+	guiManager.begin_mode()
+	#gameBoard.begin_chapter()				
+
+
+func _set_up_start():
 	GameState.change_state(self, GameState.gState.LOADING)
 	if gameBoard.currMap.start_script:
 		dOverlay.prepare_new_dialogue(gameBoard.currMap.start_script)
@@ -166,6 +205,10 @@ func _on_action_menu_selected(bName:StringName):
 		"StatBtn": pass
 		"OpBtn": pass
 		"SusBtn": pass
+
+
+func _on_returning_to_title():
+	self.queue_free()
 
 
 func trade_seeking(unit:Unit = Global.activeUnit):

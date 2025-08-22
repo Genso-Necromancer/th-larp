@@ -121,24 +121,25 @@ func load_data(save_data:Dictionary):
 
 
 func load_map_units():
+	await _unload_map_units()
+	_load_unit_groups.call_deferred()
+
+
+func _load_unit_groups():
 	var npc:Dictionary = PlayerData.unitData.NPC
 	var enemy:Dictionary = PlayerData.unitData.ENEMY
-	_unload_map_units()
-	units_loading = npc.size() + enemy.size()
 	_load_unit_group(npc)
 	_load_unit_group(enemy)
-
 
 func _load_unit_group(unit_data:Dictionary):
 	var unitPath := load("res://scenes/units/Unit.tscn")
 	for unitId in unit_data:
 		var newUnit:Unit = unitPath.instantiate()
 		var unitData: Dictionary = unit_data[unitId]
-		if !unitData.alive:
-			graveyard.append(unitId)
-			units_loading -= 1
+		if graveyard.has(unitId):
 			continue
 		newUnit.unit_ready.connect(self._on_new_unit_ready)
+		units_loading += 1
 		newUnit.pre_load(unitData)
 		add_child(newUnit)
 
@@ -216,7 +217,7 @@ func get_map_units() -> Array[Unit]:
 	var unitList :Array[Unit]= []
 	for child in get_children():
 		var unit := child as Unit
-		if not unit: continue
+		if not unit or unit.is_queued_for_deletion(): continue
 		unitList.append(unit)
 	return unitList
 
@@ -440,10 +441,12 @@ func _check_seize_conditionals(cell) -> bool:
 
 
 func _check_death_conditionals(parameter) -> bool:
+	# Doesn't work if unit dies in non-killUnit objective
+	# Need to seperate the checks of loss kills and win kills into two seperate functions that are ran here
 	var unitId
 	var condition
 	var triggered := false
-	var winObj :KillUnit= _get_win_objective(MAP_EVENT.DEATH)
+	var winObj :Objective= _get_win_objective(MAP_EVENT.DEATH)
 	if parameter.FACTION_ID == Enums.FACTION_ID.PLAYER:
 		unitId = parameter.unit_id
 		condition = "Player Death"
@@ -459,8 +462,9 @@ func _check_death_conditionals(parameter) -> bool:
 			if lossKill.has(parameter):
 				Global.flags.gameOver = true
 				triggered = true
-			if winObj.hit_list.has(parameter.unit_id):
+			if winObj is KillUnit and winObj.hit_list.has(parameter.unit_id):
 				_add_kill(parameter, true)
+			_on_unit_death(parameter.unit_id)
 	if triggered:
 		_check_off_event.call_deferred()
 	return triggered

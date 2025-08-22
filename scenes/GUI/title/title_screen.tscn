@@ -71,3 +71,4 @@ size_flags_vertical = 4
 
 [connection signal="button_pressed" from="Margin/VBox/ButtonMargin/Vbox/NewGame" to="." method="_on_new_game_button_pressed"]
 [connection signal="button_pressed" from="Margin/VBox/ButtonMargin/Vbox/LoadGame" to="." method="_on_load_game_button_pressed"]
+[connection signal="button_pressed" from="Margin/VBox/ButtonMargin/Vbox/Exit" to="." method="_on_exit_button_pressed"]

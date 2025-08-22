@@ -67,7 +67,10 @@ func save()->Dictionary:
 
 func load_persistant(data:Dictionary):
 	rosterData = data.RosterData
-	roster_order = Dictionary(data.roster_order,Variant.Type.TYPE_INT,"",null,Variant.Type.TYPE_ARRAY,"",null)
+	_restore_roster_order(data.roster_order)
+	
+	#roster_order = Dictionary(data.roster_order.duplicate(),roster_order.get_typed_key_builtin(),"",null,roster_order.get_typed_value_builtin(),"",null)
+	#roster_order.assign(data.roster_order)
 	supply.load_supply(data.Supply)
 	playerMon = data.PlayerMon
 	supplyStats = data.SupplyStats
@@ -75,6 +78,15 @@ func load_persistant(data:Dictionary):
 	_id_tag = data._id_tag
 	for chapter in data.completed_chapters:
 		completed_chapters.append(chapter)
+
+
+func _restore_roster_order(saved_order:Dictionary):
+	var depTypes:= Enums.DEPLOYMENT
+	for key in depTypes:
+		var type :int= depTypes[key]
+		var wokeDot:String = "%d" % [type]
+		if type == depTypes.NONE: continue
+		roster_order[type] = saved_order[wokeDot]
 
 
 func save_unit_data(heal_unit:bool = false)->Dictionary:
@@ -114,7 +126,6 @@ func generate_yk_id()->StringName:
 
 func _load_time_mods():
 	var rawData = pStats.get_time_mods()
-	
 	for key in rawData:
 			timeModData[key] = {
 						Enums.TIME.DAY:{
@@ -205,7 +216,6 @@ func get_unit_stats(spec:int, role:int)->Dictionary:
 	var stats:Dictionary = {"Stats":{},"Growths":{},"Caps":{}, "WeaponProf":{}}
 	var sData :Dictionary= pStats.get_spec(spec)
 	var jData :Dictionary= pStats.get_job(role)
-	
 	for group in sData.StatGroups.keys():
 		#print(group)
 		for stat in sData.StatGroups[group]:
@@ -229,9 +239,9 @@ func get_unit_stats(spec:int, role:int)->Dictionary:
 		elif sData.get("Weapons") and sData.Weapons[wep]: nextProf = sData.Weapons[wep]
 		stats.WeaponProf[wep] = nextProf
 	#print(stats.WeaponProf)
-	
 	return stats
 #endregion
+
 
 func level_up(unit:Unit, levelups:int): #consider reach bands for stat normalization. Growth rates are a spook tho.
 	var rng:= RngTool.new()
@@ -273,9 +283,9 @@ func _get_blank_results()->Dictionary:
 		results.StatGains[key.to_pascal_case()] = 0
 	return results
 
+
 func stat_gen(job :int, spec : int):
 	#Need overhaul1!!!!
-	
 	var groupedStats = {}
 	#var jData = jobData[job].duplicate(true)
 	var sData = pStats.get_spec(spec)
@@ -311,11 +321,10 @@ func stat_gen(job :int, spec : int):
 	genData["MoveType"] = sData["MoveType"]
 	return genData
 
+
 func add_to_unitdata(data, id):
 	unitData[id] = data
 	print_rich("[color=green]Added to PlayerData[/color]:", id)
-
-
 
 
 func _validate_art(art:Dictionary) -> Dictionary:

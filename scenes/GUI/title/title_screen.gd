@@ -28,3 +28,7 @@ func _on_load_game_button_pressed(_button):
 	var main :MainNode= get_parent()
 	main.begin_file_select()
 	main.unload_me(self)
+
+
+func _on_exit_button_pressed(_button):
+	SignalTower.exiting_game.emit()
