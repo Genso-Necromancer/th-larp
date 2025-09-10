@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://d1lptkdo512fn"]
+
+[ext_resource type="Script" uid="uid://kftehbts107" path="res://scrpt/map_scripts/door_tile.gd" id="1_1gv65"]
+[ext_resource type="Script" uid="uid://c4i2tlu7lhq1t" path="res://scrpt/map_scripts/tile_area.gd" id="2_e1fuc"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p3gqd"]
+size = Vector2(84, 37.5)
+
+[node name="door" type="Node2D"]
+script = ExtResource("1_1gv65")
+
+[node name="TileArea" type="Area2D" parent="." node_paths=PackedStringArray("master")]
+collision_layer = 32
+collision_mask = 2
+script = ExtResource("2_e1fuc")
+master = NodePath("..")
+metadata/_custom_type_script = "uid://c4i2tlu7lhq1t"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TileArea"]
+position = Vector2(0, 0.75)
+shape = SubResource("RectangleShape2D_p3gqd")

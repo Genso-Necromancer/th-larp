@@ -99,7 +99,11 @@ theme = ExtResource("3_e8ygl")
 action_mode = 0
 text = "Skill"
 
-[node name="OpenBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+[node name="OpenDoorBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+text = "Open"
+
+[node name="OpenChestBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
 layout_mode = 2
 text = "Open"
 

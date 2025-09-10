@@ -9,6 +9,7 @@ func _ready():
 
 
 func refresh_self():
+	#print("fuck")
 	sprite_path = $"../..".artPaths.Sprite
 	#print("Sprite: ",sprite_path)
 	if sprite_path:

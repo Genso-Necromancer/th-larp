@@ -1,13 +1,14 @@
 @tool
 extends Area2D
+class_name AreaUnit
 
-var master
+var master:Unit
 var aura = false
 
-func set_master(unit):
+func set_master(unit:Unit):
 	master = unit
 
-func get_master():
+func get_master()->Unit:
 	if !master:
 		print(self, "[No Master!]")
 		return

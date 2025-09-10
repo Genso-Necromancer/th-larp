@@ -34,6 +34,7 @@ region_rect = Rect2(0.0799732, -0.0518999, 17.0268, 24.8617)
 script = ExtResource("2_me1b5")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="PathFollow2D/Sprite"]
+unique_name_in_owner = true
 root_node = NodePath("../../..")
 libraries = {
 &"": ExtResource("3_3vwvo")
@@ -83,17 +84,5 @@ theme_override_colors/font_color = Color(0.776471, 0, 0, 1)
 theme_override_font_sizes/font_size = 22
 text = "(0, 0)"
 script = ExtResource("10_30vxy")
-
-[node name="Cell2" type="Label" parent="PathFollow2D"]
-unique_name_in_owner = true
-visible = false
-offset_left = -33.0
-offset_top = 40.0
-offset_right = 38.0
-offset_bottom = 66.0
-theme = ExtResource("9_1s8fa")
-theme_override_colors/font_color = Color(0.776471, 0, 0, 1)
-theme_override_font_sizes/font_size = 22
-text = "<null>"
 
 [connection signal="animation_finished" from="PathFollow2D/Sprite/AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

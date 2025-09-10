@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=20 format=3 uid="uid://dae0fl1fnuwvk"]
+[gd_resource type="TileSet" load_steps=22 format=3 uid="uid://dae0fl1fnuwvk"]
 
 [ext_resource type="Texture2D" uid="uid://cwrqpj7en2cof" path="res://sprites/tiles/deployment.png" id="1_ggcxa"]
 [ext_resource type="Texture2D" uid="uid://b3kybcmn08s6d" path="res://sprites/tiles/forcedDeployment.png" id="2_e3vs3"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://dwlnwcdgwc6de" path="res://sprites/tiles/PlaceHolderModTiles.png" id="4_j2mhh"]
 [ext_resource type="Texture2D" uid="uid://cjkkbrsts6nqc" path="res://sprites/tiles/walls.png" id="5_ycrxn"]
 [ext_resource type="Texture2D" uid="uid://cvwlg1ibgcatk" path="res://sprites/tiles/event_spawner.png" id="6_6ymmv"]
+[ext_resource type="Texture2D" uid="uid://cmq0aslbpegke" path="res://sprites/tiles/interactives200x112.png" id="6_v76xb"]
 [ext_resource type="Texture2D" uid="uid://bc4tnv65u3qkk" path="res://sprites/tiles/newhex168x56.png" id="7_e3vs3"]
 [ext_resource type="Texture2D" uid="uid://bksmyj30srka5" path="res://sprites/tiles/TileSetPlaceHolder.png" id="7_s3su6"]
 [ext_resource type="Texture2D" uid="uid://dl5k64jih1qno" path="res://sprites/tiles/attack_target.png" id="8_rk7vv"]
@@ -66,6 +67,39 @@ texture_region_size = Vector2i(160, 48)
 0:0/0 = 0
 0:0/0/modulate = Color(0.890196, 0.784314, 0, 1)
 
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_j2mhh"]
+texture = ExtResource("6_v76xb")
+texture_region_size = Vector2i(200, 112)
+0:0/0 = 0
+0:0/0/texture_origin = Vector2i(0, 27)
+0:0/0/custom_data_1 = &"Chest"
+1:0/0 = 0
+1:0/0/texture_origin = Vector2i(0, 27)
+1:0/0/custom_data_1 = &"OpenChest"
+0:1/0 = 0
+0:1/0/texture_origin = Vector2i(0, 28)
+0:1/0/custom_data_0 = &"Wall"
+0:1/0/custom_data_1 = &"Door"
+1:1/0 = 0
+1:1/0/texture_origin = Vector2i(0, 28)
+1:1/0/custom_data_1 = &"OpenDoor"
+0:2/0 = 0
+0:2/0/texture_origin = Vector2i(0, 28)
+0:2/0/custom_data_0 = &"Wall"
+0:2/0/custom_data_1 = &"BreakableWall"
+1:2/0 = 0
+1:2/0/texture_origin = Vector2i(0, 28)
+1:2/0/custom_data_0 = &"Wall"
+1:2/0/custom_data_1 = &"OpenWall???"
+2:2/0 = 0
+2:2/0/texture_origin = Vector2i(0, 28)
+2:2/0/custom_data_1 = &"BrokenWall"
+2:1/0 = 0
+2:1/0/texture_origin = Vector2i(0, 28)
+2:1/0/custom_data_1 = &"BrokenDoor"
+2:0/0 = 0
+2:0/0/texture_origin = Vector2i(0, 27)
+
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_fntpe"]
 texture = ExtResource("5_ycrxn")
 texture_region_size = Vector2i(168, 104)
@@ -112,6 +146,7 @@ texture_region_size = Vector2i(168, 54)
 0:2/0 = 0
 0:2/0/custom_data_0 = &"Sanzu"
 0:2/0/custom_data_1 = &"Sanzu"
+1:2/next_alternative_id = 4
 1:2/0 = 0
 1:2/0/custom_data_0 = &"HotSpring"
 1:2/0/custom_data_1 = &"HotSpring"
@@ -171,3 +206,4 @@ sources/1 = SubResource("TileSetAtlasSource_bkpol")
 sources/0 = SubResource("TileSetAtlasSource_qmxju")
 sources/2 = SubResource("TileSetAtlasSource_ggcxa")
 sources/5 = SubResource("TileSetAtlasSource_v76xb")
+sources/3 = SubResource("TileSetAtlasSource_j2mhh")

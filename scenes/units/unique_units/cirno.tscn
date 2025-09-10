@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://bokxjbvpfnkqp"]
+[gd_scene load_steps=8 format=3 uid="uid://bokxjbvpfnkqp"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_86eo7"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_x0q3j"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="3_yentv"]
 [ext_resource type="Resource" uid="uid://e7drxbfl83us" path="res://unit_resources/items/weapons/club.tres" id="4_dwoc8"]
+[ext_resource type="Texture2D" uid="uid://b0dblco6xcypq" path="res://sprites/character/cirno/trblr_sprite.png" id="5_x0q3j"]
 
 [sub_resource type="Curve2D" id="Curve2D_u43h5"]
 
@@ -30,10 +31,10 @@ total_growth = Dictionary[StringName, float]({
 &"Comp": 0.3,
 &"Def": 0.2,
 &"Eleg": 0.2,
-&"Life": 0.4,
-&"Mag": 0.0,
+&"Life": 0.5,
+&"Mag": 0.1,
 &"Move": 0.0,
-&"Pwr": 0.3
+&"Pwr": 0.45
 })
 total_stats = Dictionary[StringName, int]({
 &"Cele": 4,
@@ -49,7 +50,7 @@ total_stats = Dictionary[StringName, int]({
 total_caps = Dictionary[StringName, int]({
 &"Cele": 20,
 &"Cha": 20,
-&"Comp": 20,
+&"Comp": 100,
 &"Def": 20,
 &"Eleg": 20,
 &"Life": 20,
@@ -73,7 +74,7 @@ max_inv = 6
 inventory = Array[ExtResource("2_x0q3j")]([SubResource("Resource_nxc8q")])
 
 [node name="Sprite" parent="PathFollow2D" index="0"]
-texture = null
+texture = ExtResource("5_x0q3j")
 
 [node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
 max_value = 20.0

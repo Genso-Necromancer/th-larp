@@ -124,6 +124,7 @@ func generate_yk_id()->StringName:
 	print(ykId)
 	return ykId
 
+
 func _load_time_mods():
 	var rawData = pStats.get_time_mods()
 	for key in rawData:
@@ -206,9 +207,6 @@ func _load_terrain_data():
 			var innerKeys = rawData[key].keys()
 			for iKey in innerKeys:
 				terrainData[key][iKey] = rawData[key][iKey]
-
-
-
 
 
 #region unit stat generation
@@ -335,53 +333,7 @@ func _validate_art(art:Dictionary) -> Dictionary:
 		valid.FullPrt = art.FullPrt
 	return valid
 
-#func get_experience(action, totalExp, targLvl, unitStats, growths, caps):
-#	var gainExp = 0
-#	match action:
-#		"attack":  
-#				gainExp  = (21 + targLvl - unitStats[0]) / 2
-#				gainExp = clampi(gainExp, 1, 100)
-#
-#		"defeat": 
-#			gainExp = ((21 + targLvl - unitStats[0]) / 2) + (targLvl - unitStats[0])
-#			gainExp = clampi(gainExp, 1, 100)
-#		"pacifist": 
-#			gainExp = (21 + unitStats[0])
-#			gainExp = clampi(gainExp, 1, 100)
-#
-#	totalExp = totalExp + gainExp
-#	while totalExp >= 100:
-#		totalExp -= 100
-#		totalExp = clampi(totalExp, 0, 10000)
-#		unitStats = level_up(unitStats, growths, caps)
-#	return [totalExp, unitStats]
-	
-#func level_up(uData, loops): #consider reach bands for stat normalization. Growth rates are a spook tho.
-	#var rng = RandomNumberGenerator.new()
-	#randomize()
-	#var growth_check
-	#var i = 0
-	#var results = {}
-	#var firstLoop = true
-	#var stats = uData.Stats.keys()
-	#results["LVL"] = 0
-	#while loops > 0:
-		#uData.Profile.Level += 1
-		#results["LVL"] += 1
-		#while i < stats.size():
-			#growth_check = rng.randf_range(0.00, 1.0)
-			#if growth_check <= uData.Growths[stats[i]] and uData.Stats[stats[i]] < uData.Caps[stats[i]]:
-				#uData.Stats[stats[i]] += 1
-				#if firstLoop: results[stats[i]] = 1
-				#else: results[stats[i]] += 1
-			#growth_check = rng.randf_range(0.00, 1.0)
-			#if uData.Growths[stats[i]] >= 1.0 and growth_check <= (uData.Growths[stats[i]] - 1.0) and uData.Stats[stats[i]] < uData.Caps[stats[i]]:
-				#uData.Stats[stats[i]] += 1
-				#results[stats[i]] += 1
-			#i += 1
-		#loops -= 1
-		#firstLoop = false
-	#return results
+
 #region Roster
 func init_roster():
 	rosterData.clear()

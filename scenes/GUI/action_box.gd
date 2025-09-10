@@ -27,10 +27,13 @@ func display_unit_actions(unit : Unit):
 	var itemFlags : Dictionary = _check_inv(unit)
 	var inReach : Dictionary = _check_reach(unit)
 	var hasSkills := false
+	var canPick := unit.can_pick()
 	var noFocus := true
+	
 	
 	if unit.skills:
 		hasSkills = true
+	
 	
 	for b in buttons:
 		var bName = b.get_name()
@@ -56,7 +59,20 @@ func display_unit_actions(unit : Unit):
 				else:
 					b.visible = false
 					b.disabled = true
-			"OpenBtn": pass
+			"OpenDoorBtn": 
+				if canPick and inReach.Doors:
+					b.visible = true
+					b.disabled = false
+				else:
+					b.visible = false
+					b.disabled = true
+			"OpenChestBtn": 
+				if canPick and unit.on_chest:
+					b.visible = true
+					b.disabled = false
+				else:
+					b.visible = false
+					b.disabled = true
 			"StealBtn": pass
 			"OfudaBtn": 
 				if itemFlags.canOfuda:
@@ -124,7 +140,7 @@ func _check_inv(unit:Unit) -> Dictionary:
 
 
 func _check_reach(unit:Unit) -> Dictionary:
-	var inReach := {"Hostiles":false, "Trades": false}
+	var inReach := {"Hostiles":false, "Trades": false, "Doors":false, "Chests":false}
 	var aHex = AHexGrid2D.new(Global.map_ref)
 	var reach = unit.get_weapon_reach()
 	if aHex.find_units_in_reach(unit, reach, Enums.FACTION_ID.ENEMY):
@@ -133,5 +149,8 @@ func _check_reach(unit:Unit) -> Dictionary:
 	reach = {"Max":1,"Min":1}
 	if aHex.find_units_in_reach(unit, reach, Enums.FACTION_ID.PLAYER):
 		inReach.Trades = true
-	
+	if aHex.find_doors_in_reach(unit,reach,Enums.FACTION_ID.ENEMY):
+		inReach.Doors = true
+	if aHex.find_chests_in_reach(unit,reach,Enums.FACTION_ID.ENEMY):
+		inReach.Chests = true
 	return inReach

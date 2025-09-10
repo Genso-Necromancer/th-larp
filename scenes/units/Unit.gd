@@ -276,7 +276,10 @@ var unarmed : Weapon = load("res://unit_resources/items/weapons/unarmed.tres").d
 var sParam : Dictionary = {}
 
 @onready var _sprite: Sprite2D = $PathFollow2D/Sprite
-@onready var _animPlayer: AnimationPlayer = $PathFollow2D/Sprite/AnimationPlayer
+@onready var _animPlayer: AnimationPlayer = %AnimationPlayer:
+	set(value):
+		_animPlayer = value
+		_animPlayer.play("idle")
 @onready var _pathFollow: PathFollow2D = $PathFollow2D
 @onready var lifeBar = $PathFollow2D/Sprite/HPbar
 @onready var map :GameMap
@@ -292,6 +295,7 @@ var deployment :Enums.DEPLOYMENT= Enums.DEPLOYMENT.NONE:
 		deployment = value
 
 var alive:= true
+var on_chest:=false
 var current_life:int = 1
 var unitAuras := {}
 #de/buffs applied to unit
@@ -347,6 +351,7 @@ var masterOf : String
 ## Coordinates of the current cell the cursor moved to.
 var cell := Vector2i.ZERO:
 	set(value):
+		#print("fuck")
 		cell = map.cell_clamp(value)
 var lastGlbPosition := Vector2.ZERO
 var originCell
@@ -851,6 +856,7 @@ func toss_unit(location):
 func relocate_unit(location:Vector2i, gridUpdate := true):
 	var oldCell := Vector2i(cell)
 	cell = location
+	
 	position = map.map_to_local(cell)
 	
 	if gridUpdate:
@@ -896,7 +902,7 @@ func toggle_path_pause():
 func return_original():
 	position = map.map_to_local(originCell)
 	cell = originCell
-#	#print(originCell, cell)
+	#print(originCell, cell)
 	return cell
 
 
@@ -993,7 +999,7 @@ func _set_art_paths():
 func _load_sprites():
 	#print(artPaths.Sprite)
 	if _sprite: _sprite.refresh_self()
-	_animPlayer.play("idle")
+	#_animPlayer.play("idle")
 	#print("MODULATION:",get_self_modulate())
 	#print(unit_id,":", _animPlayer.current_animation,"Load Sprite")
 
@@ -1024,6 +1030,13 @@ func check_passives() ->void:
 				_add_sub_weap(p.sub_weapon)
 				_update_natural(p)
 	if auras: validate_auras(auras)
+
+
+func can_pick()->bool:
+	for p in passives:
+		if p == null:continue
+		if p.type == Enums.PASSIVE_TYPE.LOCKPICK: return true
+	return false
 
 
 ##Non-permanent Skills Function
@@ -1811,6 +1824,12 @@ func update_composure_bar():
 	if active_stats.CurComp <= 0:
 		pass #comp check!
 
+
+func pick_door(door:DoorTile):
+	#Play unlock animation, with door unlocking called during animation
+	door.unlock() #removed after animation implemented
+	_turn_complete() #done when animation completed
+	
 
 
 func apply_dmg(dmg : int, source : Unit = null):

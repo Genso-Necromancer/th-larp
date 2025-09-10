@@ -61,6 +61,9 @@ enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
 @onready var tileShape = tileSet.get_tile_shape()
 ##Ai Manager
 @onready var ai : AiManager = $AiManager
+##Object Storage
+var doors:Dictionary[Vector2i,DoorTile] = {}
+var chests:Dictionary[Vector2i,DoorTile] = {}
 
 
 #region unit organization
@@ -94,15 +97,42 @@ func _ready():
 
 	mapSize = ground.get_used_rect().size
 	SignalTower.action_seize.connect(self._on_seize)
+	SignalTower.chest_opened.connect(self.chest_activated)
+	SignalTower.chest_stolen.connect(self.chest_activated)
+	SignalTower.door_unlocked.connect(self.door_unlocked)
+	_gather_object_tiles()
 	_initialize_map_units()
 	emit_signal("map_ready")
 
+#region special tile handling
+func chest_activated(cell:Vector2i, _contents:Array[Item],_covered_by:Unit):
+	chests.erase(cell)
+	swap_tile_to(cell,"open")
+
+
+func door_unlocked(cell:Vector2i):
+	doors.erase(cell)
+	swap_tile_to(cell,"open")
+
+
+func swap_tile_to(cell:Vector2i, new_state:String):
+	var sourceId = modifier.get_cell_source_id(cell)
+	var atlasCoord = modifier.get_cell_atlas_coords(cell)
+	match new_state:
+		"open": atlasCoord += Vector2i(1,0)
+		"broken": atlasCoord += Vector2i(2,0)
+	
+	modifier.set_cell(cell,sourceId,atlasCoord)
+
+
+#endregion
 #region save/load
 func save()->Dictionary:
 	var saveData :Dictionary
 	#generated_ids
 	saveData["DataType"] = "GameMap"
 	saveData["graveyard"] = graveyard
+	saveData["interactives"] = _get_interactive_states()
 	#saveData["eventQue"] = eventQue
 	#saveData["actingDanmaku"] = actingDanmaku
 	#saveData["victoryKills"] = victoryKills
@@ -113,6 +143,7 @@ func save()->Dictionary:
 
 func load_data(save_data:Dictionary):
 	graveyard.assign(save_data.graveyard)
+	_load_interactive_states(save_data.interactives)
 	#eventQue = save_data.eventQue
 	#actingDanmaku = save_data.actingDanmaku
 	#victoryKills = save_data.victoryKills
@@ -130,6 +161,7 @@ func _load_unit_groups():
 	var enemy:Dictionary = PlayerData.unitData.ENEMY
 	_load_unit_group(npc)
 	_load_unit_group(enemy)
+
 
 func _load_unit_group(unit_data:Dictionary):
 	var unitPath := load("res://scenes/units/Unit.tscn")
@@ -161,6 +193,28 @@ func _unload_map_units():
 	var units : Array[Unit] = get_map_units()
 	for unit in units:
 		unit.queue_free()
+
+
+func _get_interactive_states()->Dictionary[Vector2i,Dictionary]:
+	var states:Dictionary[Vector2i,Dictionary]= {}
+	var chestsList:= get_chest_tiles()
+	for tile in chestsList:
+		states[tile] = chestsList[tile].get_save_data()
+	return states
+
+
+func _load_interactive_states(data:Dictionary):
+	var kids := get_children()
+	for kid:InteractableTile in kids:
+		var d:Dictionary
+		if kid is InteractableTile:
+			d = data[str(kid.cell)]
+			kid.load_save_data(d)
+		else: continue
+		if kid is ChestTile and !d.is_locked: swap_tile_to(kid.cell,"open")
+		elif kid is DoorTile and d.is_destroyed: swap_tile_to(kid.cell,"broken")
+		elif kid is DoorTile and !d.is_locked: swap_tile_to(kid.cell,"open")
+		elif kid is BreakableWall and d.is_destroyed: swap_tile_to(kid.cell, "broken")
 #endregion
 
 
@@ -233,14 +287,20 @@ func get_active_danmaku() -> Dictionary:
 	return bulletList
 
 
+func _gather_object_tiles():
+	for child in get_children():
+		if child is DoorTile:
+			doors[child.cell] = child
+		elif child is ChestTile:
+			chests[child.cell] = child
+
+
 func _initialize_map_units():
 	var units : Array[Unit] = get_map_units()
 	for unit :Unit in units:
 		unit.set_unit_id()
 		unit.map = self
 		if unit.is_active: unit.initialize_cell()
-		
-
 
 
 func _initialize_danmaku_cells():
@@ -252,8 +312,8 @@ func _initialize_danmaku_cells():
 func get_objectives() -> Array:
 	var objectives: Array = ["This is a Test", "Of The Emergency Broadcast", "System."]
 	return objectives
-	
-	
+
+
 func get_loss_conditions() -> Array:
 	var loss: Array = ["Do NOT Be Alarmed."]
 	return loss
@@ -264,10 +324,12 @@ func cell_clamp(grid_position: Vector2i) -> Vector2i:
 	out.x = clamp(out.x, 0, ground.get_used_rect().size.x - 1.0)
 	out.y = clamp(out.y, 0, ground.get_used_rect().size.y - 1.0)
 	return grid_position
-	
+
+
 func hex_centered(grid_position: Vector2i) -> Vector2i:
 	var tileCenter = grid_position * tileSize + tileSize / 2
 	return tileCenter
+
 
 func get_movement_cost(cell, moveType):
 	var base :TileData = ground.get_cell_tile_data(cell)
@@ -282,7 +344,6 @@ func get_movement_cost(cell, moveType):
 	cost += costData[baseTile][moveType]
 	if modTile == "Bridge": cost = 0
 	elif modTile: cost += costData[modTile][moveType]
-	
 	return cost
 
 
@@ -290,7 +351,6 @@ func get_terrain_tags(cell:Vector2i) -> Dictionary:
 	var terrainTags: Dictionary = {"BaseType": "", "ModType": "", "BaseId": "", "ModId": "", "Locked": false}
 	var base = ground.get_cell_tile_data(cell)
 	var mod = modifier.get_cell_tile_data(cell)
-	
 	if base: 
 		terrainTags.BaseType = base.get_custom_data("TerrainType")
 		terrainTags.BaseId = base.get_custom_data("TerrainId")
@@ -311,7 +371,6 @@ func get_bonus(cell:Vector2i) -> Dictionary:
 		for param in cellParams:
 			cellParams[param] += tData[tags.ModType][param]
 	return cellParams
-
 
 
 func get_deployment_cells():
@@ -365,6 +424,25 @@ func get_forced_deploy(): #make sure there is equal units assigned as forced as 
 func get_narrative_tile(id:int) -> Vector2i:
 	return narrative.get_narrative_tile(id)
 
+
+func get_chest_tiles()->Dictionary[Vector2i,ChestTile]:
+	var chestsList:Dictionary[Vector2i,ChestTile]={}
+	var kids:=get_children()
+	for kid:ChestTile in kids:
+		if kid is ChestTile and kid.is_locked: chestsList[kid.cell] = kid
+	return chestsList
+#
+#
+#func is_chest(cell:Vector2i)->bool:
+	#var chests := get_chest_tiles()
+	#var chest:ChestTile
+	#if chests.has(cell): 
+		#var i:= chests.find(cell)
+		#chest = chests[i]
+	#else: return false
+	#
+	#if chest.is_locked:return true
+	#else: return false
 
 func is_seize(cell:Vector2i) -> bool:
 	if dev.get_used_cells_by_id(1,Vector2i(0,0),0).has(cell) and !wasSeized.has(cell):
@@ -645,13 +723,15 @@ func draw(cells: Array) -> void:
 	for cell in cells:
 #		print("draw2:", cell)
 		pathAttack.set_cell(cell, 10, Vector2i(0,0))
-		
+
+
 func draw_attack(cells: Array) -> void:
 	pathAttack.clear()
 	for cell in cells:
 #		print("draw2:", cell)
 		pathAttack.set_cell(cell, 9, Vector2i(0,0))
-		
+
+
 func draw_threat(walk: Array, threat: Array) -> void:
 	pathAttack.clear()
 	for cell in threat:

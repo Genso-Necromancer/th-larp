@@ -84,6 +84,35 @@ func find_units_in_reach(unit:Unit, reach:Dictionary, targetFaction:int) -> Arra
 	return unitsNear
 
 
+func find_doors_in_reach(unit:Unit, reach:Dictionary, targetFaction:int) -> Array:
+	var objectsNear :=[]
+	var area : Array = []
+	var underMin : Array = []
+	#var mainFaction = unit.FACTION_ID
+	area = find_all_paths(unit.cell, reach.Max)
+	#underMin = find_all_paths(unit.cell, clampi(reach.Min-1, 0, INF))
+	for cell in tileMap.doors:
+			if !area.has(cell):
+				continue
+			elif tileMap.doors[cell].faction_id == targetFaction:
+				objectsNear.append({"Object":tileMap.doors[cell],"Cell":cell})
+	return objectsNear
+	
+
+func find_chests_in_reach(unit:Unit, reach:Dictionary, targetFaction:int) -> Array:
+	var objectsNear :=[]
+	var area : Array = []
+	var underMin : Array = []
+	#var mainFaction = unit.FACTION_ID
+	area = find_all_paths(unit.cell, reach.Max)
+	#underMin = find_all_paths(unit.cell, clampi(reach.Min-1, 0, INF))
+	for cell in tileMap.chests:
+			if !area.has(cell):
+				continue
+			elif tileMap.chests[cell].faction_id == targetFaction:
+				objectsNear.append({"Object":tileMap.chests[cell],"Cell":cell})
+	return objectsNear
+
 
 func _set_units(units:Dictionary = tileMap.get_active_units()) -> void:
 	if !units:
@@ -120,6 +149,19 @@ func _sort_walls(unit : Unit = null, walls : Dictionary = tileMap.get_walls()): 
 		passableList.append_array(walls.WallFly)
 	else: solidList.append_array(walls.WallFly)
 	solidList.append_array(walls.WallShoot)
+	solidList.append_array(_get_doors(unit))
+
+func _get_doors(unit:Unit)->Array:
+	var solidDoors:Array=[]
+	var unitFact:= unit.FACTION_ID
+	var team:Enums.FACTION_ID
+	if unitFact == Enums.FACTION_ID.ENEMY:
+		team = Enums.FACTION_ID.ENEMY
+	else:
+		team = Enums.FACTION_ID.PLAYER
+	for cell in tileMap.doors:
+		if tileMap.doors[cell].faction_id != team: solidDoors.append(cell)
+	return solidDoors
 
 
 func _is_hostile(compare, unit:Unit) -> bool:

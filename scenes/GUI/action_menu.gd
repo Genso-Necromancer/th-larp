@@ -10,7 +10,7 @@ signal action_menu_trade_pressed(unit)
 signal action_menu_suspending_game
 
 
-enum MENU_STATES {NONE, OPTIONS, ACTION, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE, OFUDA_OPEN, OFUDA_TARGETING, SUSPEND_PROMPT, SUSPENDING}
+enum MENU_STATES {NONE, OPTIONS, ACTION, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE, OFUDA_OPEN, OFUDA_TARGETING, SUSPEND_PROMPT, SUSPENDING, DOOR}
 @onready var aContainer : MarginContainer = $ScreenMargin/ActionBackgroundMargin
 @onready var oContainer : MarginContainer = $ScreenMargin/OfudaBackgroundMargin
 @onready var sContainer : MarginContainer = $ScreenMargin/SkillBackgroundMargin
@@ -82,6 +82,10 @@ var state := MENU_STATES.NONE:
 					cursor.setCursor = true
 				MENU_STATES.SUSPENDING:
 					_switch_to_save_warning()
+				MENU_STATES.DOOR:
+					_hide_cursor()
+					_hide_action_container()
+					emit_signal("action_menu_selected", "OpenDoorBtn")
 
 
 var prevState : Array[MENU_STATES] = []
@@ -203,7 +207,8 @@ func _on_button_pressed(bName):
 		"ShopBtn": pass
 		"AtkBtn": _change_state(MENU_STATES.WEAPONS_TARGETING)
 		"SklBtn": _change_state(MENU_STATES.SKILLS_OPEN)
-		"OpenBtn": pass
+		"OpenDoorBtn": _change_state(MENU_STATES.DOOR)
+		"OpenChestBtn": pass
 		"StealBtn": pass
 		"OfudaBtn": 
 			_change_state(MENU_STATES.OFUDA_OPEN)

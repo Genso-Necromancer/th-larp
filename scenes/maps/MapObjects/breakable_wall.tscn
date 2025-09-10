@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://chqu2dkt7ofqi"]
+
+[ext_resource type="Script" uid="uid://d1c18i3pccqcj" path="res://scrpt/map_scripts/breakable_wall.gd" id="1_l75bm"]
+[ext_resource type="Script" uid="uid://c4i2tlu7lhq1t" path="res://scrpt/map_scripts/tile_area.gd" id="2_w2ix0"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8d1mj"]
+size = Vector2(84, 37.5)
+
+[node name="BreakableWall" type="Node2D"]
+script = ExtResource("1_l75bm")
+
+[node name="TileArea" type="Area2D" parent="." node_paths=PackedStringArray("master")]
+script = ExtResource("2_w2ix0")
+master = NodePath("..")
+metadata/_custom_type_script = "uid://c4i2tlu7lhq1t"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TileArea"]
+position = Vector2(0, 0.75)
+shape = SubResource("RectangleShape2D_8d1mj")

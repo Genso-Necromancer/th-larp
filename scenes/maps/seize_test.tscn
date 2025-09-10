@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=4 uid="uid://dv2xsgcjyj8ub"]
+[gd_scene load_steps=10 format=4 uid="uid://dv2xsgcjyj8ub"]
 
 [ext_resource type="PackedScene" uid="uid://cl7ik2hxcwm08" path="res://scenes/maps/game_map.tscn" id="1_qpt4y"]
 [ext_resource type="Script" uid="uid://duoms4relhrfy" path="res://scenes/maps/objectives/objective.gd" id="3_jfjoi"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" uid="uid://b7a6ss8luhslm" path="res://scenes/maps/objectives/seize.gd" id="4_nunlw"]
 [ext_resource type="PackedScene" uid="uid://d0864tysvp4bv" path="res://scenes/units/generic_units/oni_troublemaker_lv_1.tscn" id="5_5odpd"]
 [ext_resource type="PackedScene" uid="uid://dffu0k0v5tou1" path="res://scenes/units/generic_units/fairy_cointaker_lv_1.tscn" id="6_ub6hv"]
+[ext_resource type="PackedScene" uid="uid://d1lptkdo512fn" path="res://scenes/maps/MapObjects/door.tscn" id="7_5odpd"]
+[ext_resource type="PackedScene" uid="uid://chqu2dkt7ofqi" path="res://scenes/maps/MapObjects/breakable_wall.tscn" id="8_ub6hv"]
 
 [sub_resource type="Resource" id="Resource_cpkxf"]
 script = ExtResource("4_nunlw")
@@ -25,39 +27,19 @@ hours = 7
 tile_map_data = PackedByteArray("AAADAAYABwABAAAAAAACAAcABwABAAAAAAACAAgABwABAAAAAAACAAkABwABAAAAAAADAAkABwABAAAAAAACAAoABwABAAAAAAADAAoABwABAAAAAAADAAsABwABAAAAAAAEAAsABwABAAAAAAAFAAoABwABAAAAAAAFAAkABwABAAAAAAAFAAgABwABAAAAAAAFAAcABwABAAAAAAAEAAcABwABAAAAAAADAAcABwABAAAAAAADAAgABwABAAAAAAAEAAkABwABAAAAAAAEAAgABwABAAAAAAAEAAoABwABAAAAAAAGAAgABwABAAAAAAAGAAkABwABAAAAAAAGAAoABwABAAAAAAAGAAcABwABAAAAAAAFAAYABwABAAAAAAAEAAYABwABAAAAAAACAAsABwABAAAAAAAGAAsABwABAAAAAAAFAAsABwABAAAAAAAEAAwABwABAAAAAAABAAgABwABAAAAAAABAAcABwABAAAAAAABAAYABwAAAAMAAAABAAUABwABAAAAAAACAAUABwAAAAMAAAADAAQABwAAAAMAAAAEAAUABwABAAAAAAAFAAQABwABAAAAAAAGAAUABwABAAAAAAAFAAUABwABAAAAAAADAAUABwAAAAMAAAACAAYABwAAAAMAAAAGAAYABwABAAAAAAAHAAYABwABAAAAAAAIAAcABwABAAAAAAAHAAcABwABAAAAAAAIAAgABwABAAAAAAAHAAgABwABAAAAAAAHAAkABwABAAAAAAAHAAUABwABAAAAAAAHAAQABwABAAAAAAAGAAQABwABAAAAAAAEAAQABwABAAAAAAACAAQABwABAAAAAAABAAQABwABAAAAAAADAAMABwABAAAAAAA=")
 
 [node name="Modifier" parent="." index="1"]
-tile_map_data = PackedByteArray("AAAFAAcAEwAAAAAAAAADAAUAEwAAAAEAAAACAAYAEwAAAAEAAAACAAUAEwAAAAEAAAADAAYAEwABAAAAAAACAAcAEwABAAAAAAABAAYAEwABAAAAAAADAAQAEwABAAAAAAA=")
+tile_map_data = PackedByteArray("AAAFAAcAEwAAAAAAAAADAAUAEwAAAAEAAAACAAYAEwAAAAEAAAACAAUAEwAAAAEAAAADAAYAEwABAAAAAAACAAcAEwABAAAAAAABAAYAEwABAAAAAAADAAQAEwABAAAAAAADAAgAAwAAAAEAAAAFAAgAAwAAAAIAAAAGAAYABAAAAAAAAAAGAAcABAAEAAAAAAAGAAUABAAEAAAAAAA=")
 
 [node name="Deployments" parent="." index="3"]
 tile_map_data = PackedByteArray("AAADAAkAAQAAAAAAAAAEAAoAAQAAAAAAAAACAAoAAAAAAAAAAAADAAoAAAAAAAAAAAA=")
 
 [node name="Dev" parent="." index="7"]
+self_modulate = Color(1, 1, 1, 0.568627)
 tile_map_data = PackedByteArray("AAAFAAcAAQAAAAAAAAA=")
 
 [node name="Cirno" parent="." index="10" instance=ExtResource("4_cpkxf")]
-position = Vector2(714, 560)
+position = Vector2(712.909, 330)
+isBoss = true
 leash = 1
-total_growth = Dictionary[StringName, float]({
-&"Cele": 0.1,
-&"Cha": 0.1,
-&"Comp": 0.3,
-&"Def": 0.2,
-&"Eleg": 0.2,
-&"Life": 0.5,
-&"Mag": 0.1,
-&"Move": 0.0,
-&"Pwr": 0.45
-})
-total_caps = Dictionary[StringName, int]({
-&"Cele": 20,
-&"Cha": 20,
-&"Comp": 100,
-&"Def": 20,
-&"Eleg": 20,
-&"Life": 20,
-&"Mag": 20,
-&"Move": 10,
-&"Pwr": 20
-})
 
 [node name="Oni Troublemaker lv1" parent="." index="11" instance=ExtResource("5_5odpd")]
 position = Vector2(588, 364)
@@ -99,7 +81,7 @@ total_caps = Dictionary[StringName, int]({
 })
 
 [node name="Fairy Cointaker lv1" parent="." index="12" instance=ExtResource("6_ub6hv")]
-position = Vector2(462, 448)
+position = Vector2(461, 280)
 leash = 1
 total_caps = Dictionary[StringName, int]({
 &"Cele": 20,
@@ -112,3 +94,12 @@ total_caps = Dictionary[StringName, int]({
 &"Move": 10,
 &"Pwr": 20
 })
+
+[node name="door" parent="." index="13" node_paths=PackedStringArray("map") instance=ExtResource("7_5odpd")]
+position = Vector2(461, 501)
+map = NodePath("..")
+
+[node name="BreakableWall" parent="." index="14" node_paths=PackedStringArray("map") instance=ExtResource("8_ub6hv")]
+position = Vector2(712, 492)
+_hp = 5
+map = NodePath("..")

@@ -1,5 +1,5 @@
 extends GenericState
-class_name GBSkillTargetState
+class_name GBObjectTargetState
 
 func mouse_motion(event: InputEvent) -> void:
 	slave.gb_mouse_motion(event)
@@ -7,7 +7,7 @@ func mouse_motion(event: InputEvent) -> void:
 func _handle_bind(bind):
 	match bind:
 		"invalid": return
-		"ui_accept": slave.skill_target_selected()
+		"ui_accept": slave.object_target_selected()
 		"ui_info": slave.toggle_unit_profile()
 		"ui_return": slave.end_targeting()
 		"ui_scroll_left": pass

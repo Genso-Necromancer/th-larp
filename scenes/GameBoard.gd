@@ -45,7 +45,8 @@ signal deploy_toggled
 signal formation_closed
 #endregion
 
-
+##region targeting modes
+#enum TARGET_MODE {ATTACK, SKILL, DOOR,}
 #region variables
 enum ACTION_TYPE {ATTACK, SKILL, WAIT, END}
 var save_enum:Enums.SAVE_TYPE
@@ -433,7 +434,7 @@ func is_within_bounds(cell_coordinates: Vector2i) -> bool: #Pathing
 
 func select_cell(): #DEFAULT STATE: If a cell has a valid unit, selects it
 	var occupied = is_occupied(cursor.cell)
-	if !occupied:
+	if !occupied and !currMap.doors.has(cursor.cell):
 		emit_signal("cell_selected", cursor.cell)
 	elif units[cursor.cell].FACTION_ID == Enums.FACTION_ID.PLAYER:
 		_select_unit(cursor.cell)
@@ -511,7 +512,7 @@ func on_directional_press(direction: Vector2i):
 	else: cursor.cell += direction
 
 
-#Targeting Code
+#region Targeting Code
 func start_attack_targeting():
 	var reach :Dictionary = activeUnit.get_weapon_reach()
 	activeAction = {"Weapon": true, "Skill": null, "Item": null}
@@ -526,7 +527,12 @@ func start_skill_targeting():
 	else: reach = activeUnit.get_skill_reach(activeAction.Skill)
 	_draw_range(activeUnit, reach.Max, reach.Min)
 	GameState.change_state(self, GameState.gState.GB_SKILL_TARGETING)
-	
+
+
+func door_targeting():
+	_draw_range(activeUnit, 1, 1)
+	GameState.change_state(self, GameState.gState.GB_OBJECT_TARGETING)
+
 
 func start_item_targeting(item:Item):
 	activeAction = {"Weapon": false, "Skill": null, "Item": item}
@@ -568,7 +574,7 @@ func initiate_warp():
 		combatManager.warp_to(warpTarget, cursor.cell)
 		combat_sequence("warp")
 		warpTarget = null
-
+#endregion
 
 #actions code
 func _on_unit_item_targeting(item, unit):
@@ -1412,6 +1418,12 @@ func skill_target_selected():
 	_feature_target(activeAction.Skill)
 
 
+func object_target_selected():
+	if currMap.doors.has(cursor.cell):
+		GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
+		activeUnit.pick_door(currMap.doors[cursor.cell])
+
+
 func _feature_target(feature:SlotWrapper)-> void:
 	if !is_occupied(cursor.cell):
 		return
@@ -1420,8 +1432,6 @@ func _feature_target(feature:SlotWrapper)-> void:
 		return
 	var friendly := false
 	var valid := false
-
-
 	if focusUnit.FACTION_ID == activeUnit.FACTION_ID or focusUnit.FACTION_ID == Enums.FACTION_ID.NPC:
 		friendly = true
 	match feature.target:
@@ -1445,7 +1455,6 @@ func _feature_target(feature:SlotWrapper)-> void:
 		Enums.SKILL_TARGET.MAP:
 			if activeUnit != focusUnit:
 				valid = true
-	
 	if valid: grab_target(cursor.cell)
 
 

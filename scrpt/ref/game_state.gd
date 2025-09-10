@@ -26,6 +26,7 @@ enum gState {
 	WIN_STATE,
 	SCENE_ACTIVE,
 	SAVE_SCENE,
+	GB_OBJECT_TARGETING,
 }
 
 
@@ -131,16 +132,12 @@ func _switch_state(value):
 			
 			activeState = GBFormationState.new()
 		gState.GB_AI_TURN:
-			
 			activeState = AcceptState.new()
 		gState.START:
-			
 			activeState = StartState.new()
 		gState.CAMERA_STATE:
-			
 			activeState = CameraState.new()
 		gState.ACCEPT_PROMPT:
-			
 			activeState = AcceptState.new()
 		gState.DIALOGUE_SCENE:
 			activeState = GUIConfirm.new()
@@ -154,5 +151,7 @@ func _switch_state(value):
 			activeState = LoadingState.new()
 		gState.SAVE_SCENE:
 			activeState = SaveMenuState.new()
+		gState.GB_OBJECT_TARGETING:
+			activeState = GBObjectTargetState.new()
 	add_child(activeState)
 	activeState.setup(activeSlave)

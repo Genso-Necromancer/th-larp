@@ -59,6 +59,8 @@ func _connect_signals()-> void:
 	SignalTower.action_weapon_selected.connect(gameBoard._on_action_weapon_selected)
 	SignalTower.action_skill_confirmed.connect(gameBoard._on_action_weapon_selected)
 	SignalTower.returning_to_title.connect(self._on_returning_to_title)
+	SignalTower.chest_opened.connect(self._on_chest_opened)
+	SignalTower.chest_stolen.connect(self._on_chest_stolen)
 	gameBoard.map_loaded.connect(self._on_map_loaded)
 	gameBoard.gameboard_targeting_canceled.connect(guiManager._on_gameboard_targeting_canceled)
 	gameBoard.cursor.cursor_moved.connect(self._on_cursor_moved)
@@ -194,7 +196,8 @@ func _on_action_menu_selected(bName:StringName):
 			gameBoard.start_attack_targeting()
 		"SklBtn": 
 			gameBoard.start_skill_targeting()
-		"OpenBtn": pass
+		"OpenDoorBtn": gameBoard.door_targeting()
+		"OpenChestBtn": pass
 		"StealBtn": pass
 		"ItmBtn": 
 			pass
@@ -222,3 +225,17 @@ func call_trade(unit:Unit):
 func _on_cursor_moved(cell):
 	guiManager.focusViewer.update_focus_viewer(cell)
 #endregion
+
+
+func _on_chest_opened(cell:Vector2i, contents:Array[Item], unit:Unit):
+	#Unlock animation + SFX
+	#Cycle Contents and add to unit inv
+	#If inv full, send to storage and inform player
+	pass
+
+func _on_chest_stolen(cell:Vector2i, contents:Array[Item], unit:Unit):
+	#Unlock animation + SFX
+	#Stolen Sfx + prompt player what was stolen
+	#add to unit inv
+	#if inv full, check the fucking AI, they shouldn't be stealing with full inventories
+	pass
