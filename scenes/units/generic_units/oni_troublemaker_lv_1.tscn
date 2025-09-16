@@ -9,7 +9,7 @@
 [sub_resource type="Resource" id="Resource_lkyfi"]
 script = ExtResource("3_frupt")
 stats = ExtResource("4_iskvw")
-equipped = false
+equipped = true
 dropped = false
 is_broken = false
 metadata/_custom_type_script = "uid://bas4mbl00uet6"
@@ -21,28 +21,28 @@ total_growth = Dictionary[StringName, float]({
 &"Cele": 0.0,
 &"Cha": 0.0,
 &"Comp": 0.3,
-&"Def": 0.2,
-&"Eleg": 0.2,
-&"Life": 0.4,
-&"Mag": -0.1,
+&"Def": 0.3,
+&"Eleg": 0.1,
+&"Life": 0.6,
+&"Mag": 0.0,
 &"Move": 0.0,
-&"Pwr": 0.3
+&"Pwr": 0.55
 })
 total_stats = Dictionary[StringName, int]({
 &"Cele": 2,
 &"Cha": 0,
-&"Comp": 100,
-&"Def": 4,
-&"Eleg": 4,
-&"Life": 20,
+&"Comp": 90,
+&"Def": 5,
+&"Eleg": 2,
+&"Life": 24,
 &"Mag": 0,
 &"Move": 4,
-&"Pwr": 6
+&"Pwr": 8
 })
 total_caps = Dictionary[StringName, int]({
 &"Cele": 20,
 &"Cha": 20,
-&"Comp": 20,
+&"Comp": 100,
 &"Def": 20,
 &"Eleg": 20,
 &"Life": 20,
@@ -69,4 +69,5 @@ inventory = Array[ExtResource("2_715yn")]([SubResource("Resource_lkyfi")])
 texture = ExtResource("5_tn8cg")
 
 [node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
-max_value = 20.0
+max_value = 24.0
+value = 24.0

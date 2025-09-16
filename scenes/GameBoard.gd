@@ -26,6 +26,7 @@ signal turn_changed
 signal new_round(turn_order:Array[StringName])
 signal map_added(map:GameMap)
 signal units_loaded
+signal action_confirmed #Bandaid signal to close the action menu after targeted things like opening a door
 #signal loading_complete
 
 #signal skill_target_canceled
@@ -671,6 +672,7 @@ func on_turn_complete(unit):
 	for u in sequencingUnits:
 		if sequencingUnits[u]:
 			return
+	GameState.change_state(self, GameState.gState.LOADING)
 	sequencingUnits.clear()
 	_deselect_active_unit(true)
 	turnComplete = true
@@ -1420,8 +1422,12 @@ func skill_target_selected():
 
 func object_target_selected():
 	if currMap.doors.has(cursor.cell):
+		var dCell :Vector2i = cursor.cell
+		end_targeting()
+		action_confirmed.emit()
 		GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
-		activeUnit.pick_door(currMap.doors[cursor.cell])
+		sequencingUnits[activeUnit] = true
+		activeUnit.pick_door(currMap.doors[dCell])
 
 
 func _feature_target(feature:SlotWrapper)-> void:

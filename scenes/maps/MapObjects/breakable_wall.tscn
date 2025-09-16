@@ -6,7 +6,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_8d1mj"]
 size = Vector2(84, 37.5)
 
-[node name="BreakableWall" type="Node2D"]
+[node name="BreakableWall" type="Node2D" groups=["ObjectTile"]]
 script = ExtResource("1_l75bm")
 
 [node name="TileArea" type="Area2D" parent="." node_paths=PackedStringArray("master")]

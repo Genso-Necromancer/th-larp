@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://diaw7xn4hvfd7"]
+[gd_scene load_steps=16 format=3 uid="uid://diaw7xn4hvfd7"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_5xt48"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_mte8d"]
@@ -6,6 +6,7 @@
 [ext_resource type="Resource" uid="uid://cq6r1vkvimktr" path="res://unit_resources/features/skills/locked_corpse.tres" id="4_76ftn"]
 [ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="5_xihvp"]
 [ext_resource type="Resource" uid="uid://m4j8pc7uii7k" path="res://unit_resources/features/passives/night_person.tres" id="6_ghyhf"]
+[ext_resource type="Resource" uid="uid://dq348uxmletm" path="res://unit_resources/features/passives/lockpick.tres" id="7_76ftn"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="7_xjp6u"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="8_04v6q"]
 [ext_resource type="Resource" uid="uid://ck2mfsbmow1ok" path="res://unit_resources/items/weapons/knife_silver.tres" id="9_srosb"]
@@ -73,9 +74,9 @@ total_caps = Dictionary[StringName, int]({
 &"Pwr": 20
 })
 personal_skills = Array[ExtResource("2_mte8d")]([ExtResource("3_pg4wh"), ExtResource("4_76ftn")])
-personal_passives = Array[ExtResource("5_xihvp")]([ExtResource("6_ghyhf")])
+personal_passives = Array[ExtResource("5_xihvp")]([ExtResource("6_ghyhf"), ExtResource("7_76ftn")])
 skills = Array[ExtResource("2_mte8d")]([ExtResource("3_pg4wh"), ExtResource("4_76ftn")])
-passives = Array[ExtResource("5_xihvp")]([ExtResource("6_ghyhf")])
+passives = Array[ExtResource("5_xihvp")]([ExtResource("6_ghyhf"), ExtResource("7_76ftn")])
 weapon_prof = {
 "Blade": true,
 "Blunt": false,

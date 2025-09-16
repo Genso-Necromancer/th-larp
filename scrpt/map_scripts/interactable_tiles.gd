@@ -15,7 +15,7 @@ func _process(_delta):
 		cell = map.local_to_map(position)
 
 
-func _ready():
+func init_cell():
 	if map: cell = map.local_to_map(position)
 	
 

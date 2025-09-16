@@ -6,7 +6,7 @@
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p3gqd"]
 size = Vector2(84, 37.5)
 
-[node name="door" type="Node2D"]
+[node name="door" type="Node2D" groups=["ObjectTile"]]
 script = ExtResource("1_1gv65")
 
 [node name="TileArea" type="Area2D" parent="." node_paths=PackedStringArray("master")]

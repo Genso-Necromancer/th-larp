@@ -974,7 +974,7 @@ func status_duration_tick(duration:Enums.DURATION_TYPE)->void:
 			if status[key] and sParam.has(key) and sParam[key].Duration <= 0:
 				status[key] = false
 				sParam.erase(key)
-	%Cell2.set_text(str(status.Sleep))
+	#%Cell2.set_text(str(status.Sleep))
 	update_stats()
 
 

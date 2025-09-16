@@ -100,6 +100,7 @@ func _ready():
 	SignalTower.chest_opened.connect(self.chest_activated)
 	SignalTower.chest_stolen.connect(self.chest_activated)
 	SignalTower.door_unlocked.connect(self.door_unlocked)
+	get_tree().call_group("ObjectTile","init_cell")
 	_gather_object_tiles()
 	_initialize_map_units()
 	emit_signal("map_ready")

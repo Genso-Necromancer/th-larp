@@ -37,7 +37,7 @@ self_modulate = Color(1, 1, 1, 0.568627)
 tile_map_data = PackedByteArray("AAAFAAcAAQAAAAAAAAA=")
 
 [node name="Cirno" parent="." index="10" instance=ExtResource("4_cpkxf")]
-position = Vector2(712.909, 330)
+position = Vector2(714, 336)
 isBoss = true
 leash = 1
 
@@ -46,42 +46,9 @@ position = Vector2(588, 364)
 leash = 1
 simulate_leveling = false
 unit_level = 7
-total_growth = Dictionary[StringName, float]({
-&"Cele": 0.0,
-&"Cha": 0.0,
-&"Comp": 0.3,
-&"Def": 0.3,
-&"Eleg": 0.1,
-&"Life": 0.6,
-&"Mag": 0.0,
-&"Move": 0.0,
-&"Pwr": 0.55
-})
-total_stats = Dictionary[StringName, int]({
-&"Cele": 2,
-&"Cha": 0,
-&"Comp": 90,
-&"Def": 5,
-&"Eleg": 2,
-&"Life": 24,
-&"Mag": 0,
-&"Move": 4,
-&"Pwr": 8
-})
-total_caps = Dictionary[StringName, int]({
-&"Cele": 20,
-&"Cha": 20,
-&"Comp": 100,
-&"Def": 20,
-&"Eleg": 20,
-&"Life": 20,
-&"Mag": 20,
-&"Move": 10,
-&"Pwr": 20
-})
 
 [node name="Fairy Cointaker lv1" parent="." index="12" instance=ExtResource("6_ub6hv")]
-position = Vector2(461, 280)
+position = Vector2(462, 280)
 leash = 1
 total_caps = Dictionary[StringName, int]({
 &"Cele": 20,

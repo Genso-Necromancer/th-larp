@@ -54,6 +54,7 @@ func find_all_unit_paths(unit : Unit, customCell:Vector2i = unit.cell, leash : i
 	path = _remove_passable(path) #removes passable tiles as valid selections without blocking
 	return path
 
+
 func find_remaining_unit_paths(unit : Unit, wayPoint:Vector2i, moveRemain: int) -> Array:
 	var path : Array
 	_set_units()
@@ -89,7 +90,7 @@ func find_doors_in_reach(unit:Unit, reach:Dictionary, targetFaction:int) -> Arra
 	var area : Array = []
 	var underMin : Array = []
 	#var mainFaction = unit.FACTION_ID
-	area = find_all_paths(unit.cell, reach.Max)
+	area = find_aura(unit.cell, reach.Max)
 	#underMin = find_all_paths(unit.cell, clampi(reach.Min-1, 0, INF))
 	for cell in tileMap.doors:
 			if !area.has(cell):
@@ -149,19 +150,19 @@ func _sort_walls(unit : Unit = null, walls : Dictionary = tileMap.get_walls()): 
 		passableList.append_array(walls.WallFly)
 	else: solidList.append_array(walls.WallFly)
 	solidList.append_array(walls.WallShoot)
-	solidList.append_array(_get_doors(unit))
 
-func _get_doors(unit:Unit)->Array:
-	var solidDoors:Array=[]
-	var unitFact:= unit.FACTION_ID
-	var team:Enums.FACTION_ID
-	if unitFact == Enums.FACTION_ID.ENEMY:
-		team = Enums.FACTION_ID.ENEMY
-	else:
-		team = Enums.FACTION_ID.PLAYER
-	for cell in tileMap.doors:
-		if tileMap.doors[cell].faction_id != team: solidDoors.append(cell)
-	return solidDoors
+
+#func _get_doors(unit:Unit)->Array:
+	#var solidDoors:Array=[]
+	#var unitFact:= unit.FACTION_ID
+	#var team:Enums.FACTION_ID
+	#if unitFact == Enums.FACTION_ID.ENEMY:
+		#team = Enums.FACTION_ID.ENEMY
+	#else:
+		#team = Enums.FACTION_ID.PLAYER
+	#for cell in tileMap.doors:
+		#if tileMap.doors[cell].faction_id != team: solidDoors.append(cell)
+	#return solidDoors
 
 
 func _is_hostile(compare, unit:Unit) -> bool:

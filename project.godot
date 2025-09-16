@@ -54,6 +54,7 @@ enabled=PackedStringArray("res://addons/CodeEditorBackground/plugin.cfg")
 
 Unit="All game Units"
 Persist=""
+ObjectTile=""
 
 [gui]
 

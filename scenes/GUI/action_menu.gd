@@ -104,6 +104,10 @@ func _ready():
 	#self.item_used.connect(parent._on_item_used)
 
 #New Code
+func end_self():
+	_clear_states()
+
+
 ##opens self as current unit's actions.
 func open_as_action(unit: Unit):
 	_load_cursor()

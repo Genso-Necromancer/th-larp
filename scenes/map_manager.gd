@@ -70,6 +70,7 @@ func _connect_signals()-> void:
 	gameBoard.turn_added.connect(guiManager._on_turn_added)
 	gameBoard.turn_removed.connect(guiManager._on_turn_removed)
 	gameBoard.map_added.connect(self._on_map_added)
+	gameBoard.action_confirmed.connect(guiManager._on_gameboard_action_confirmed)
 	guiManager.gui_splash_finished.connect(self._on_gui_splash_finished)
 	guiManager.gui_action_menu_canceled.connect(gameBoard._on_gui_action_menu_canceled)
 

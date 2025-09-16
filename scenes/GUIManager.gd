@@ -699,11 +699,20 @@ func _on_action_menu_canceled():
 	emit_signal("gui_action_menu_canceled")
 
 
+func end_action_menu():
+	actMenu.end_self()
+	
+
+
 func cancel_forecast():
 	#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
 	turnTracker.unhide_self()
 	foreCast.hide_fc()
 	regress_act_menu()
+
+
+func _on_gameboard_action_confirmed():
+	end_action_menu()
 
 
 func _on_gameboard_cell_selected(_cell): #cell is sent by signal for general use, but the specific cell selected is not currently needed
@@ -722,9 +731,9 @@ func _on_gameboard_targeting_canceled():
 
 
 func _on_gameboard_forecast_confirmed():
-	if actMenu.visible:
-		return
-	#foreCast.hide_fc()
+	#if actMenu.visible:
+		#return
+	end_action_menu()
 	_strip_menuCursor()
 	emit_signal("start_the_justice")
 
