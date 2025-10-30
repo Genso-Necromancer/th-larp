@@ -1,6 +1,6 @@
 [gd_scene load_steps=7 format=3 uid="uid://cmvmjk0jj7dam"]
 
-[ext_resource type="Script" uid="uid://bgji3712ctdko" path="res://scenes/GameBoard.gd" id="1_kkv4d"]
+[ext_resource type="Script" uid="uid://bcs427ssasy2q" path="res://scrpt/nodes/gameboard2.gd" id="1_te3qc"]
 [ext_resource type="PackedScene" uid="uid://dar8sp5uxx2aw" path="res://scrpt/unit_path.tscn" id="6_sxhsu"]
 [ext_resource type="PackedScene" uid="uid://de42f2dvbgkri" path="res://scenes/cursor.tscn" id="7_bctkf"]
 [ext_resource type="TileSet" uid="uid://dvug0j8mmfnwj" path="res://scenes/unit_path.tres" id="7_ynrmr"]
@@ -8,17 +8,19 @@
 [ext_resource type="Script" uid="uid://q1022o5v4v8d" path="res://scenes/TurnSort.gd" id="9_gu2p2"]
 
 [node name="Gameboard" type="Node2D" groups=["Persist"]]
-script = ExtResource("1_kkv4d")
+script = ExtResource("1_te3qc")
 
 [node name="UnitPath" parent="." instance=ExtResource("6_sxhsu")]
 visibility_layer = 2
 tile_set = ExtResource("7_ynrmr")
 
 [node name="Cursor" parent="." instance=ExtResource("7_bctkf")]
+unique_name_in_owner = true
 z_index = 1
 position = Vector2(288, 156)
 
 [node name="CombatManager" parent="." instance=ExtResource("8_06m4j")]
+unique_name_in_owner = true
 
 [node name="TurnSort" type="Node" parent="."]
 script = ExtResource("9_gu2p2")

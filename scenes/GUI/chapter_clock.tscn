@@ -1,11 +1,194 @@
-[gd_scene load_steps=7 format=3 uid="uid://jmdc2n1a1cmw"]
+[gd_scene load_steps=17 format=3 uid="uid://jmdc2n1a1cmw"]
 
-[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_xrg8s"]
 [ext_resource type="Script" uid="uid://d4l2iyyc8mdsi" path="res://scenes/GUI/chapter_clock.gd" id="2_o1dct"]
-[ext_resource type="Texture2D" uid="uid://ba5l4eya6bq83" path="res://sprites/UI/clock_wheel.png" id="2_o1fpl"]
-[ext_resource type="Texture2D" uid="uid://ojuy1dftwelb" path="res://sprites/UI/upper_clock.png" id="3_nqesu"]
-[ext_resource type="Script" uid="uid://cqsb1veemjw30" path="res://scenes/GUI/clock_dial.gd" id="3_o1dct"]
-[ext_resource type="Script" uid="uid://b3lx3c4pfks7o" path="res://scenes/GUI/digital_time.gd" id="6_u16ko"]
+[ext_resource type="Texture2D" uid="uid://wd4d8kshbmvi" path="res://sprites/UI/clock/sun_dial.png" id="4_oy2tn"]
+[ext_resource type="Texture2D" uid="uid://bft4icyickpx4" path="res://sprites/UI/clock/clockface.png" id="8_04pvf"]
+[ext_resource type="Texture2D" uid="uid://dywo15638g3vq" path="res://sprites/UI/clock/clockwingleft.png" id="9_oy2tn"]
+[ext_resource type="Texture2D" uid="uid://cb4nk73kangtq" path="res://sprites/UI/clock/clockwingright.png" id="10_5m31i"]
+[ext_resource type="Theme" uid="uid://crq87yjolg6r0" path="res://fonts/clock_theme.tres" id="10_5p7p7"]
+[ext_resource type="Script" uid="uid://cxibrswbg60fd" path="res://scenes/GUI/digital_display.gd" id="11_2pgwi"]
+[ext_resource type="Texture2D" uid="uid://ei64drwlnbo4" path="res://sprites/UI/clock/digitalclock.png" id="11_5p7p7"]
+[ext_resource type="Texture2D" uid="uid://pnlg68ya51am" path="res://sprites/UI/clock/clockcenter.png" id="12_2pgwi"]
+[ext_resource type="Texture2D" uid="uid://dbiio27awr3rr" path="res://sprites/UI/clock/clockmhand.png" id="13_vb1qc"]
+[ext_resource type="Texture2D" uid="uid://dys6yxa5cklvv" path="res://sprites/UI/clock/clockhhand.png" id="14_0bgo7"]
+
+[sub_resource type="Animation" id="Animation_04pvf"]
+resource_name = "RESET"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Skeleton2D/center/WingRight:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Skeleton2D/center/WingLeft:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Skeleton2D/center:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 128.571)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Skeleton2D/center/WingRight:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(138.571, 20.0004)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Skeleton2D/center/mHand:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_5m31i"]
+resource_name = "enter"
+length = 0.9
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Skeleton2D/center:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.47, 0.7, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, -191.429), Vector2(0, 154.286), Vector2(0, 124), Vector2(0, 128.571)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Skeleton2D/center/WingRight:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.47, 0.72, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [-0.733038, 0.174533, -0.0872665, 0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Skeleton2D/center/WingLeft:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.47, 0.72, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.733038, -0.174533, 0.0872665, 0.0]
+}
+
+[sub_resource type="Animation" id="Animation_oy2tn"]
+resource_name = "exit"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Skeleton2D/center/WingRight:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.166667, 0.366667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.267035, 0.20944]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Skeleton2D/center/WingLeft:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.166667, 0.366667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, -0.261799, -0.20944]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Skeleton2D/center:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 128.571), Vector2(0, -180)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Skeleton2D/center/WingRight:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(138.571, 20.0004)]
+}
+
+[sub_resource type="Animation" id="Animation_epmeb"]
+resource_name = "idle"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Skeleton2D/center:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -180)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_oy2tn"]
+_data = {
+&"RESET": SubResource("Animation_04pvf"),
+&"enter": SubResource("Animation_5m31i"),
+&"exit": SubResource("Animation_oy2tn"),
+&"idle": SubResource("Animation_epmeb")
+}
 
 [node name="ChapterClock" type="Control"]
 layout_mode = 3
@@ -14,66 +197,212 @@ anchor_left = 0.5
 anchor_right = 0.5
 grow_horizontal = 2
 scale = Vector2(0.7, 0.7)
-mouse_filter = 2
-theme = ExtResource("1_xrg8s")
+mouse_filter = 1
 script = ExtResource("2_o1dct")
 
-[node name="ClockMargin" type="MarginContainer" parent="."]
+[node name="Assets" type="Control" parent="."]
 layout_mode = 1
-anchors_preset = 5
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 127.143
+offset_bottom = 127.143
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.55, 0.55)
+mouse_filter = 1
+
+[node name="WingLeft" type="Polygon2D" parent="Assets"]
+position = Vector2(-958.441, -148.052)
+antialiased = true
+texture = ExtResource("9_oy2tn")
+skeleton = NodePath("../../Skeleton2D")
+polygon = PackedVector2Array(495.135, 352.224, 824, 352, 824, -24, -16, -24, -16, 184, 136, 272)
+uv = PackedVector2Array(495.135, 352.224, 824, 352, 824, -24, -16, -24, -16, 184, 136, 272)
+polygons = [PackedInt32Array(3, 4, 5, 0, 1, 2)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(1, 1, 1, 1, 1, 1)]
+
+[node name="WingRight" type="Polygon2D" parent="Assets"]
+position = Vector2(142, -146)
+antialiased = true
+texture = ExtResource("10_5m31i")
+skeleton = NodePath("../../Skeleton2D")
+polygon = PackedVector2Array(320, 352, -8.00002, 352, -8, -8, 840, -8, 840, 192, 704, 256)
+uv = PackedVector2Array(320, 352, -8.00002, 352, -8, -8, 840, -8, 840, 192, 704, 256)
+polygons = [PackedInt32Array(2, 1, 0, 5, 4, 3)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(1, 1, 1, 1, 1, 1), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0)]
+
+[node name="SunDial" type="Polygon2D" parent="Assets"]
+position = Vector2(-75.3245, -75.3249)
+antialiased = true
+texture = ExtResource("4_oy2tn")
+skeleton = NodePath("../../Skeleton2D")
+polygon = PackedVector2Array(156, 76, 156, 0, 0, 0, 0, 156, 156, 156)
+uv = PackedVector2Array(156, 76, 156, 0, 0, 0, 0, 156, 156, 156)
+polygons = [PackedInt32Array(0, 1, 2, 3, 4)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0), "center/digital", PackedFloat32Array(0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(1, 1, 1, 1, 1)]
+
+[node name="face" type="Polygon2D" parent="Assets"]
+position = Vector2(-196, -227)
+texture = ExtResource("8_04pvf")
+skeleton = NodePath("../../Skeleton2D")
+polygon = PackedVector2Array(0, 432, 0, -16, 400, -16, 400, 432)
+uv = PackedVector2Array(0, 432, 0, -16, 400, -16, 400, 432)
+polygons = [PackedInt32Array(1, 0, 3, 2)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0), "center/face", PackedFloat32Array(1, 1, 1, 1)]
+
+[node name="mhand" type="Polygon2D" parent="Assets"]
+position = Vector2(-48.9998, -153)
+antialiased = true
+texture = ExtResource("13_vb1qc")
+skeleton = NodePath("../../Skeleton2D")
+polygon = PackedVector2Array(48, -8, 0, 48, 16, 64, 40, 64, 40, 168, 56, 168, 56, 64, 80, 64, 96, 48)
+uv = PackedVector2Array(48, -8, 0, 48, 16, 64, 40, 64, 40, 168, 56, 168, 56, 64, 80, 64, 96, 48)
+polygons = [PackedInt32Array(3, 4, 5, 6, 7, 8, 0, 1, 2)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="hhand" type="Polygon2D" parent="Assets"]
+position = Vector2(-11.9998, -16)
+antialiased = true
+texture = ExtResource("14_0bgo7")
+skeleton = NodePath("../../Skeleton2D")
+polygon = PackedVector2Array(-8.75251, -72.0901, 3.24722, -72.1702, 3.86119, 19.8278, 19.8608, 19.721, 19.2469, -72.277, 31.2466, -72.357, 31.0063, -108.356, -8.99277, -108.089)
+uv = PackedVector2Array(92, -2, 92, 10, 0, 10, 0, 26, 92, 26, 92, 38, 128, 38, 128, -2)
+polygons = [PackedInt32Array(2, 1, 0, 7, 6, 5, 4, 3)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1)]
+
+[node name="Center" type="Polygon2D" parent="Assets"]
+position = Vector2(-16, -12)
+texture = ExtResource("12_2pgwi")
+skeleton = NodePath("../../Skeleton2D")
+polygon = PackedVector2Array(0, 0, 0, 32, 32, 32, 32, 0)
+uv = PackedVector2Array(0, 0, 0, 32, 32, 32, 32, 0)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
+bones = ["center", PackedFloat32Array(1, 1, 1, 1), "center/mHand", PackedFloat32Array(0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0)]
+
+[node name="Digital" type="Polygon2D" parent="Assets"]
+position = Vector2(-119, 150)
+texture = ExtResource("11_5p7p7")
+skeleton = NodePath("../../Skeleton2D")
+polygon = PackedVector2Array(72, 0, 72, 64, 176, 64, 176, 0, 224, 0, 224, 64, 256, 64, 256, 168, -8, 168, -8, 64, 16, 64, 16, 0)
+uv = PackedVector2Array(72, 0, 72, 64, 176, 64, 176, 0, 224, 0, 224, 64, 256, 64, 256, 168, -8, 168, -8, 64, 16, 64, 16, 0)
+polygons = [PackedInt32Array(11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/digital", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1)]
+
+[node name="Skeleton2D" type="Skeleton2D" parent="."]
+position = Vector2(0, -1.19209e-07)
+
+[node name="center" type="Bone2D" parent="Skeleton2D"]
+position = Vector2(0, 128.571)
+rest = Transform2D(1, 0, 0, 1, 0, 128.571)
+editor_settings/show_bone_gizmo = false
+
+[node name="mHand" type="Bone2D" parent="Skeleton2D/center"]
+rest = Transform2D(1, 0, 0, 1, 0, 0)
+auto_calculate_length_and_angle = false
+length = 74.457
+bone_angle = -90.0
+editor_settings/show_bone_gizmo = false
+
+[node name="hHand" type="Bone2D" parent="Skeleton2D/center"]
+rest = Transform2D(1, 0, 0, 1, 0, 0)
+auto_calculate_length_and_angle = false
+length = 51.074
+bone_angle = -90.0
+editor_settings/show_bone_gizmo = false
+
+[node name="WingRight" type="Bone2D" parent="Skeleton2D/center"]
+position = Vector2(138.571, 20.0004)
+rest = Transform2D(1, 0, 0, 1, 138.571, 20.0004)
+auto_calculate_length_and_angle = false
+length = 304.248
+bone_angle = 0.0
+editor_settings/show_bone_gizmo = false
+
+[node name="WingLeft" type="Bone2D" parent="Skeleton2D/center"]
+position = Vector2(-137.143, 20.0004)
+rest = Transform2D(1, 0, 0, 1, -137.143, 20.0004)
+auto_calculate_length_and_angle = false
+length = 304.248
+bone_angle = 180.0
+editor_settings/show_bone_gizmo = false
+
+[node name="face" type="Bone2D" parent="Skeleton2D/center"]
+rest = Transform2D(1, 0, 0, 1, 0, 0)
+editor_settings/show_bone_gizmo = false
+
+[node name="digital" type="Bone2D" parent="Skeleton2D/center"]
+position = Vector2(2.85714, 91.429)
+rest = Transform2D(1, 0, 0, 1, 2.85714, 91.429)
+auto_calculate_length_and_angle = false
+length = 61.215
+bone_angle = 90.0
+editor_settings/show_bone_gizmo = false
+
+[node name="TimeBox" type="HBoxContainer" parent="Skeleton2D/center/digital"]
+custom_minimum_size = Vector2(190, 96)
+anchors_preset = 8
 anchor_left = 0.5
+anchor_top = 0.5
 anchor_right = 0.5
-offset_left = -96.0
-offset_right = 96.0
-offset_bottom = 247.0
+anchor_bottom = 0.5
+offset_left = -54.2858
+offset_top = 27.1429
+offset_right = 135.714
+offset_bottom = 123.143
 grow_horizontal = 2
-mouse_filter = 2
-theme_override_constants/margin_top = 98
+grow_vertical = 2
+scale = Vector2(0.55, 0.55)
+theme = ExtResource("10_5p7p7")
+alignment = 1
+script = ExtResource("11_2pgwi")
 
-[node name="PivotPoint" type="Control" parent="ClockMargin"]
+[node name="Hour10s" type="Label" parent="Skeleton2D/center/digital/TimeBox"]
 layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 0
-mouse_filter = 2
-
-[node name="ClockDial" type="TextureRect" parent="ClockMargin/PivotPoint"]
-layout_mode = 1
-anchors_preset = -1
-offset_left = -80.0
-offset_top = -80.0
-offset_right = 82.0
-offset_bottom = 81.0
-grow_horizontal = 2
-pivot_offset = Vector2(80, 80)
-size_flags_horizontal = 4
-size_flags_vertical = 0
-mouse_filter = 2
-texture = ExtResource("2_o1fpl")
-script = ExtResource("3_o1dct")
-
-[node name="Border" type="TextureRect" parent="ClockMargin/PivotPoint"]
-layout_mode = 2
-offset_left = -608.0
-offset_top = -84.0
-offset_right = 606.0
-offset_bottom = 84.0
-size_flags_horizontal = 4
-size_flags_vertical = 0
-mouse_filter = 2
-texture = ExtResource("3_nqesu")
-
-[node name="CenterContainer" type="CenterContainer" parent="ClockMargin"]
-layout_mode = 2
-size_flags_vertical = 0
-mouse_filter = 2
-
-[node name="DigitalMargin" type="MarginContainer" parent="ClockMargin"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/margin_top = 91
-
-[node name="DigitalTime" type="Label" parent="ClockMargin/DigitalMargin"]
-layout_mode = 2
-text = "12:00"
+size_flags_horizontal = 3
+mouse_filter = 1
+text = "0"
 horizontal_alignment = 1
-script = ExtResource("6_u16ko")
+vertical_alignment = 1
+
+[node name="Hour1s" type="Label" parent="Skeleton2D/center/digital/TimeBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="center" type="Label" parent="Skeleton2D/center/digital/TimeBox"]
+layout_mode = 2
+mouse_filter = 1
+text = ":"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Minute10s" type="Label" parent="Skeleton2D/center/digital/TimeBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Minute1s" type="Label" parent="Skeleton2D/center/digital/TimeBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SunDial" type="Bone2D" parent="Skeleton2D/center"]
+rest = Transform2D(1, 0, 0, 1, 0, 0)
+auto_calculate_length_and_angle = false
+length = 16.0
+bone_angle = 0.0
+
+[node name="ClockPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_oy2tn")
+}

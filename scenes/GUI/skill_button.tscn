@@ -11,6 +11,7 @@ offset_right = 250.0
 offset_bottom = 30.0
 size_flags_horizontal = 0
 size_flags_vertical = 4
+mouse_filter = 1
 theme = ExtResource("1_li3j2")
 script = ExtResource("2_fcxm4")
 type = "Skill"
@@ -77,5 +78,6 @@ vertical_alignment = 1
 
 [node name="ButtonLayer" type="TextureButton" parent="."]
 layout_mode = 2
+mouse_filter = 1
 theme = ExtResource("4_n1iv6")
 action_mode = 0

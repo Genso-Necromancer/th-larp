@@ -36,6 +36,8 @@ var roster_order:Dictionary[Enums.DEPLOYMENT,Array]={Enums.DEPLOYMENT.FORCED:[],
 #region player action flags
 var traded:bool = false
 var item_used:bool = false
+var move_committed:bool = false
+var canto_triggered:bool = false
 #endregion
 
 func _ready():

@@ -143,7 +143,7 @@ func _start_combat():
 		if isSkipped: break
 	
 	_clear_sequence()
-	SignalTower.emit_signal("sequence_complete")
+	SignalTower.sequence_complete.emit()
 
 
 func _on_animation_start(player):
@@ -176,7 +176,7 @@ func _progress_sequence():
 			"Passives": animations[anim].call_deferred("play_passive_que")
 			"Actions": animations[anim].call_deferred("play_animation")
 			"Complete": 
-				emit_signal("animations_complete", false)
+				animations_complete.emit(false)
 				break
 			"Effects": animations[anim].call_deferred("play_effects_que")
 
@@ -202,4 +202,4 @@ func _clear_sequence():
 func _scene_skipped():
 	if isInitiated: 
 		activeAnims.clear()
-		emit_signal("animations_complete", true)
+		animations_complete.emit(true)

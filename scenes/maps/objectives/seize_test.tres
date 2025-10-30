@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Seize" load_steps=2 format=3 uid="uid://d2dx18fsw0jpm"]
+
+[ext_resource type="Script" uid="uid://b7a6ss8luhslm" path="res://scenes/maps/objectives/seize.gd" id="1_8odue"]
+
+[resource]
+script = ExtResource("1_8odue")
+seize_tile_layer = NodePath("SeizeLayer")
+completion_type = 0
+condition_type = 1
+metadata/_custom_type_script = "uid://b7a6ss8luhslm"

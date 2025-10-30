@@ -67,3 +67,13 @@ func _on_gui_focused_changed(f):
 			#
 		#for connected_position in connected_positions:
 			#draw_line(point_position+offset, connected_position+offset, Color.WHITE, 2)
+
+
+func _on_gb_state_changed(stateKeys:Array, stateInd):
+	var state :String = stateKeys[stateInd]
+	$PanelContainer/VBoxContainer/VBoxContainer/HBoxContainer/GBState.set_text(state)
+
+
+func _on_gb_step_changed(stepKeys:Array, stepInd):
+	var step:String = stepKeys[stepInd]
+	$PanelContainer/VBoxContainer/VBoxContainer/HBoxContainer2/GBStep.set_text(step)

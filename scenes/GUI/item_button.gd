@@ -71,6 +71,13 @@ func set_item_text(item : SlotWrapper):
 	d.set_text(durString)
 
 
+func set_blank_item():
+	var n = $ContentMargin/HBoxContainer/Name
+	var d = $ContentMargin/HBoxContainer/Durability
+	n.set_text("")
+	d.set_text("")
+
+
 func set_item_icon(icon_path : String):
 	var i = $ContentMargin/HBoxContainer/Icon
 	if ResourceLoader.exists(icon_path):

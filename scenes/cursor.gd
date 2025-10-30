@@ -22,16 +22,17 @@ var cell := Vector2i.ZERO:
 		cell = newCell
 		cursor_moved.emit(newCell)
 		
-var snapPath := []
+var snap_path := []
 var tick = 1
 var originPoint := Vector2i.ZERO
 var tween : Tween
 	
+#func _ready():
+	#visible = false
+
 
 func _process(_delta):
-	
 	if Engine.is_editor_hint(): return
-	
 	if $Cell.visible != Global.flags.DebugMode:
 		$Cell.visible = Global.flags.DebugMode
 		
@@ -138,8 +139,8 @@ func _region_clamp(gridPosition: Vector2i) -> Vector2i:
 	var usedCells : Array[Vector2i] = Global.map_ref.ground.get_used_cells()
 	#mapRect = mapRect.grow_side(SIDE_RIGHT,1)
 	#mapRect = mapRect.grow_side(SIDE_BOTTOM,1)
-	if snapPath:
-		if !snapPath.has(gridPosition):
+	if snap_path:
+		if !snap_path.has(gridPosition):
 			return cell
 	elif usedCells.has(cell) and !usedCells.has(out): return cell
 	elif !usedCells.has(out):
@@ -157,10 +158,10 @@ func bump_cursor():
 	var shortest = INF
 	var bumpFound = false
 	var hexStar = AHexGrid2D.new(Global.map_ref)
-	if !snapPath.has(cell):
+	if !snap_path.has(cell):
 		seek = true
 	if seek:
-		for cell in snapPath:
+		for cell in snap_path:
 			var distance = hexStar.find_distance(cell, cell)
 			if get_parent().units.has(cell) and distance < shortest:
 				bumpTo = cell
@@ -170,7 +171,7 @@ func bump_cursor():
 	if seek and bumpFound:
 		cell = bumpTo
 	elif seek:
-		cell = snapPath[0]
+		cell = snap_path[0]
 
 
 func align_camera():

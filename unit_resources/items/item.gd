@@ -82,3 +82,11 @@ func load_save_data(save_data:Dictionary):
 	dropped = save_data.dropped
 	is_broken = save_data.is_broken
 	temp_remove = save_data.temp_remove
+
+
+func get_main_effect_id()->String:
+	var id:String
+	var effect:Effect= effects[0]
+	var keys:Array=Enums.EFFECT_TYPE.keys()
+	id = keys[effect.type].to_snake_case()
+	return id

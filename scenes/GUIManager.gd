@@ -4,14 +4,15 @@ class_name GUIManager
 signal gui_splash_finished
 signal start_the_justice
 signal deploy_toggled(unit_id, depStatus)
-signal formation_toggled
-signal item_used
+signal formation_selected
 signal map_started
 signal gui_action_menu_canceled
+signal set_up_loaded
 
 
 @onready var blocker : Panel = $PanelBlocker #used to block the map easily
 @onready var HUD : Control = $HUD
+@onready var DEBUG:Control = $DEBUG
 #unvetted
 @export var mapCursorPath : NodePath
 @export var menuOffSet : int = 150
@@ -19,7 +20,7 @@ signal gui_action_menu_canceled
 
 
 @onready var parent = get_parent()
-@onready var GRANDDAD = parent.get_parent()
+@onready var GRANDDAD :MapManager= parent.get_parent()
 var is_auto_saving := true
 
 #states
@@ -44,7 +45,7 @@ var sState := sStates.HOME:
 			sStates.FORM: focusViewer.enableViewer = true
 			sStates.BEGIN: focusViewer.enableViewer = true
 			_: 
-				turnTracker.hide_self()
+				_hide_hud()
 				focusViewer.enableViewer = false
 			
 			
@@ -52,7 +53,7 @@ var sState := sStates.HOME:
 		#print("sState Changed: ", sStates.keys()[value])
 
 ##preloads (this is how I should have been doing shit from the start!)
-var turnTrackerRes = preload("res://scenes/turn_tracker.tscn")
+var turn_tracker_res = preload("res://scenes/turn_tracker.tscn")
 var mapSetUp : MapGui
 var rosterGrid : UnitRoster
 var tradeScreen : TradeScreen
@@ -61,7 +62,7 @@ var actMenu : ActionMenu
 var foreCast : CombatForecast
 
 ##scenes
-var turnTracker : TurnTracker
+var turn_tracker : TurnTracker
 
 ##prompts
 var isForecastPrompt = false
@@ -71,7 +72,7 @@ var timer : Timer
 var tween : Tween
 var menuCursor : MenuCursor
 var focusViewer : FocusViewer
-var chClock : ChapterClock
+var hud_clock : ChapterClock
 
 
 
@@ -112,8 +113,7 @@ func _ready():
 
 
 func _add_hud_children():
-	var hudElements := [chClock, turnTracker, focusViewer]
-	
+	var hudElements := [hud_clock, turn_tracker, focusViewer]
 	for node in hudElements:
 		_relocate_child(node, HUD)
 
@@ -201,9 +201,9 @@ func _snap_to_cursor(node): #bug gy save for later
 
 func _on_gameboard_toggle_prof():
 	toggle_profile()
-		
-			
-func toggle_profile() -> void: 
+
+
+func toggle_profile() -> void:
 	if sState < sStates.TRDSEEK: return #profile should not open in these states.
 	
 	if unitProf.visible and Global.focusUnit != profFocus:
@@ -279,22 +279,22 @@ func _prompt_delay():
 func _initiate_ai_sequence():
 	if isForecastPrompt:
 		isForecastPrompt = false
-		emit_signal("start_the_justice")
+		start_the_justice.emit()
 
 
 func _swap_to_forecast():
 	var fc = $CombatForecast
 	fc.show_fc()
-	turnTracker.hide_self()
+	_hide_hud()
 
 
 #HERE
-func _on_gameboard_exp_display(oldExp, expSteps, results, unitPrt, unitName):
-	var expContainer : Control = $ExpGain
-	
+func _on_gameboard_exp_display(oldExp:int, expSteps:Array, results:Dictionary, unitPrt:String, unitName:String):
+	var expContainer : XpContainer = $ExpGain
 	GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
 	expContainer.init_exp_display(oldExp, expSteps, results, unitPrt, unitName)
 	expContainer.toggle_visibility()
+
 
 func call_setup(dep_cap:int, forced:Array, map:GameMap, unit_refs:Dictionary):
 	var btns = mapSetUp.btnContainer
@@ -310,6 +310,8 @@ func call_setup(dep_cap:int, forced:Array, map:GameMap, unit_refs:Dictionary):
 	depLimit = dep_cap
 	rosterGrid.init_roster(forcedDep, depLimit, unit_refs)
 	GameState.change_state(self, GameState.gState.GB_SETUP)
+	set_up_loaded.emit()
+
 
 func _load_assets():
 	mapSetUp = load("res://scenes/GUI/MapSetup.tscn").instantiate()
@@ -320,11 +322,10 @@ func _load_assets():
 	foreCast = load("res://scenes/combat_forecast.tscn").instantiate()
 	menuCursor = load("res://scenes/GUI/menu_cursor.tscn").instantiate()
 	focusViewer = load("res://scenes/GUI/cursor_focus_viewer.tscn").instantiate()
-	chClock = load("res://scenes/GUI/chapter_clock.tscn").instantiate()
-	turnTracker = turnTrackerRes.instantiate()
-	
-	add_child(chClock)
-	add_child(turnTracker)
+	hud_clock = load("res://scenes/GUI/chapter_clock.tscn").instantiate()
+	turn_tracker = turn_tracker_res.instantiate()
+	add_child(hud_clock)
+	add_child(turn_tracker)
 	add_child(focusViewer)
 	add_child(mapSetUp)
 	add_child(foreCast)
@@ -333,8 +334,7 @@ func _load_assets():
 	add_child(tradeScreen)
 	add_child(unitProf)
 	add_child(menuCursor)
-	chClock.add_to_group("hud")
-	
+	hud_clock.add_to_group("hud")
 	menuCursor.visible = false
 
 
@@ -361,8 +361,7 @@ func _on_frm_btn_pressed():
 	menuCursor.toggle_visible()
 #	_relocate_child(unitProf, self)
 	sState = sStates.FORM
-	
-	emit_signal("formation_toggled")
+	formation_selected.emit()
 	
 	
 func _on_mng_btn_pressed():
@@ -380,9 +379,8 @@ func begin_mode():
 	menuCursor.visible = false
 	mapSetUp.visible = false
 	sState = sStates.BEGIN
-	#turnTracker.unhide_self()
-	chClock.visible = true
-	emit_signal("map_started")
+	_show_hud()
+	map_started.emit()
 
 
 func _on_status_btn_pressed():
@@ -406,7 +404,6 @@ func _open_unit_menu():
 	match sState:
 		sStates.DEPLOY: rosterGrid.open_menu(0)
 		sStates.ROSTER: rosterGrid.open_menu(1)
-	
 	_assign_cursor_to_roster()
 	update_prof()
 
@@ -450,7 +447,7 @@ func _toggle_unit(b):
 				print("Deploy Limit Reached")
 		
 	
-func _on_gameboard_deploy_toggled(deployed):
+func _on_gameboard_deploy_count_updated(deployed):
 	depCount = deployed
 	rosterGrid.update_deploy_count(deployed)
 
@@ -612,16 +609,20 @@ func _on_item_selected(b):
 	cursorDest.call_deferred("grab_focus")
 	
 
-func _on_trade_closed() -> void:
+func _on_trade_closed(is_action:=false) -> void:
 	if inSetup:
 		rosterGrid.toggle_visible()
 		_open_unit_options(activeBtn)
+	elif is_action:
+		menuCursor.visible = false
+		_show_hud()
 	elif trade1 and trade2:
 		menuCursor.visible = false
 		GameState.change_state()
 		GRANDDAD.trade_seeking()
 	else:
 		menuCursor.visible = false
+		_show_hud()
 		GameState.change_state()
 		actMenu.return_previous_state()
 	trade1 = null
@@ -650,8 +651,11 @@ func _on_manage_pressed():
 func _on_action_item_pressed(unit:Unit):
 	GameState.change_state(self,GameState.gState.GB_SETUP)
 	sState = sStates.MANAGE
-	tradeScreen.open_manage_menu(unit)
+	tradeScreen.open_manage_menu(unit,false)
 
+
+#func _on_item_equipped(item:Item,_equipped:bool):
+	#pass
 
 #func _on_action_ofuda_open(unit:Unit):
 	#GameState.change_state(self,GameState.gState.GB_SETUP)
@@ -686,17 +690,14 @@ func _on_profile_request(newParent):
 	_on_gameboard_toggle_prof()
 
 
-func _on_item_used(unit, item):
-	emit_signal("item_used", unit, item)
-
-
 #Action/Generic options menu functions
 func regress_act_menu():
 	actMenu.return_previous_state()
-	
+
+
 func _on_action_menu_canceled():
 	#_strip_menuCursor()
-	emit_signal("gui_action_menu_canceled")
+	gui_action_menu_canceled.emit()
 
 
 func end_action_menu():
@@ -706,7 +707,7 @@ func end_action_menu():
 
 func cancel_forecast():
 	#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-	turnTracker.unhide_self()
+	_show_hud()
 	foreCast.hide_fc()
 	regress_act_menu()
 
@@ -720,22 +721,35 @@ func _on_gameboard_cell_selected(_cell): #cell is sent by signal for general use
 	actMenu.open_as_options()
 
 
-func _on_gameboard_unit_move_ended(unit):
-	GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
+func _on_gameboard_unit_move_ended(unit:Unit):
+	#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
+	actMenu.open_as_action(unit, true)
+
+
+func _on_gameboard_unit_selected(unit:Unit):
+	#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
 	actMenu.open_as_action(unit)
 
 
 func _on_gameboard_targeting_canceled():
-	GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
+	#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
 	regress_act_menu()
 
+
+func _on_gameboard_ui_return(state:GameBoard.TURN_STEPS):
+	match state:
+		GameBoard.TURN_STEPS.FORECAST_ATTACK:
+			_show_hud()
+			foreCast.hide_fc()
+	regress_act_menu()
+	
 
 func _on_gameboard_forecast_confirmed():
 	#if actMenu.visible:
 		#return
 	end_action_menu()
 	_strip_menuCursor()
-	emit_signal("start_the_justice")
+	start_the_justice.emit()
 
 
 func _on_action_menu_menu_opened(container):
@@ -790,12 +804,12 @@ func _on_gameboard_player_win():
 
 
 func _on_win_screen_win_finished():
-	turnTracker.free_tokens()
+	turn_tracker.free_tokens()
 
 
 func _on_animation_handler_sequence_complete():
 	foreCast.hide_fc()
-	turnTracker.unhide_self()
+	_show_hud()
 
 
 func _on_gameboard_sequence_initiated(_sequence):
@@ -803,18 +817,29 @@ func _on_gameboard_sequence_initiated(_sequence):
 
 #region turn tracker signal routing
 func _on_turn_changed()->void:
-	turnTracker.change_turn()
+	turn_tracker.change_turn()
 	
 
 func _on_new_round(turn_order:Array[StringName])->void:
-	turnTracker.display_turns(turn_order)
+	turn_tracker.display_turns(turn_order)
 
 
 func _on_turn_added(team:StringName)->void:
-	turnTracker.add_turn(team)
+	turn_tracker.add_turn(team)
 
 
 func _on_turn_removed(team:StringName)->void:
-	turnTracker.remove_turn(team)
+	turn_tracker.remove_turn(team)
 
+#endregion
+
+#region hud group functions
+func _show_hud():
+	turn_tracker.unhide_self()
+	hud_clock.show_clock()
+
+
+func _hide_hud():
+	turn_tracker.hide_self()
+	hud_clock.hide_clock()
 #endregion

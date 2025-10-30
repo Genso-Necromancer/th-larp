@@ -69,6 +69,10 @@ theme = ExtResource("3_e8ygl")
 theme_override_constants/separation = 0
 script = ExtResource("3_hhurs")
 
+[node name="MoveBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+text = "Move"
+
 [node name="TalkBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
 layout_mode = 2
 text = "Talk"
@@ -137,6 +141,14 @@ focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../WaitBtn")
 mouse_filter = 1
 text = "Trade"
+
+[node name="MntBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+text = "Mount"
+
+[node name="DsMntBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
+layout_mode = 2
+text = "Dismount"
 
 [node name="WaitBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
 layout_mode = 2

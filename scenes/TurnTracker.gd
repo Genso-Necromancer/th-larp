@@ -1,6 +1,6 @@
 extends Control
 class_name TurnTracker
-signal turn_changed
+signal tracker_updated
 
 #@export var token_limit := 11
 @onready var turnBar := $MarginContainer/TurnBar
@@ -52,7 +52,7 @@ func display_turns(turnOrder:Array[StringName]):
 		nodes[count].add_child(token)
 		active_animations.append(token)
 		count +=1
-		
+	
 
 
 func _instantiate_token(team:StringName) -> TurnToken:
@@ -138,7 +138,7 @@ func _on_animation_finished(animation:StringName, token:TurnToken)->void:
 
 
 func _check_remaining()->void:
-	if active_animations.is_empty(): turn_changed.emit()
+	if active_animations.is_empty(): tracker_updated.emit()
 
 
 ##frees all current tokens

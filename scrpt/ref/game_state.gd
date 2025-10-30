@@ -28,9 +28,6 @@ enum gState {
 	SAVE_SCENE,
 	GB_OBJECT_TARGETING,
 }
-
-
-
 var state:= gState.LOADING #when this variable is changed to a valid state tag, it does all the work in properly changing the state to streamline coding. See set_new_state function for more.
 	#set(value):
 ##		if check_valid_state(value):

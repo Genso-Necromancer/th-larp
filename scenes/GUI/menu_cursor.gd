@@ -33,6 +33,7 @@ func resignal_cursor(buttons: Array):
 	var firstVis = false
 	visible = true
 	for b in buttons:
+		if b is ItemButton: b = b.get_button()
 		_connect_btn_to_cursor(b)
 		if !b.disabled and b.visible and !focus: focus = b
 		elif !firstVis and b.visible: 

@@ -3,7 +3,7 @@ class_name Unit
 extends Path2D
 signal walk_finished
 signal exp_handled
-signal death_done
+signal death_done(unit:Unit)
 signal unit_relocated
 signal exp_gained
 signal leveled_up
@@ -13,6 +13,8 @@ signal effect_complete
 signal unit_ready(unit:Unit)
 signal item_targeting(item, unit)
 signal item_activated(item, unit, target)
+signal animation_complete(unit:Unit)
+signal bars_updated(unit:Unit)
 
 
 
@@ -36,7 +38,10 @@ enum AI_TYPE {
 		set_process(!value)
 @export var recruited:= false
 var unit_name := "" #Presented strings will eventually be taken from a seperate file
-@export var FACTION_ID :Enums.FACTION_ID = Enums.FACTION_ID.ENEMY
+@export var FACTION_ID :Enums.FACTION_ID = Enums.FACTION_ID.ENEMY:
+	set(value):
+		FACTION_ID = value
+		_set_faction_group(value)
 @export_group("Spawn Parameters")
 #@export var isForced := false
 @export var is_active := true
@@ -280,24 +285,26 @@ var sParam : Dictionary = {}
 	set(value):
 		_animPlayer = value
 		_animPlayer.play("idle")
+@onready var _sprite_fx: SpriteFXHandler = %SpriteFxHandler
 @onready var _pathFollow: PathFollow2D = $PathFollow2D
 @onready var lifeBar = $PathFollow2D/Sprite/HPbar
 @onready var map :GameMap
 #endregion
 #non-exported unit Paramters
 #region vetted variables
-var roster_locked:= true
-var deployment :Enums.DEPLOYMENT= Enums.DEPLOYMENT.NONE:
+#var roster_locked:= true
+var deployment :Enums.DEPLOYMENT:
 	set(value):
-		if FACTION_ID == Enums.FACTION_ID.PLAYER and !roster_locked:
+		if FACTION_ID == Enums.FACTION_ID.PLAYER:
 			PlayerData.order_in_roster(unit_id,value,deployment)
 			PlayerData.rosterData[unit_id].deployment = value
-		deployment = value
+			deployment = value
 
 var alive:= true
 var on_chest:=false
 var current_life:int = 1
 var unitAuras := {}
+var remaining_move:int = 0
 #de/buffs applied to unit
 var active_buffs :Dictionary[String,Dictionary]= {}
 var active_debuffs :Dictionary[String,Dictionary]= {}
@@ -311,6 +318,8 @@ var combatData := {"Dmg": 0, "Hit": 0, "Graze": 0, "Barrier": 0, "BarPrc": 0, "C
 var artPaths:Dictionary = {"Sprite":"","Prt":"","FullPrt":""}
 var persistant_data : Dictionary
 var killer : Unit
+#queueing
+var life_updated:bool = false
 #endregion
 #unit base data
 
@@ -374,7 +383,8 @@ var isSelected := false:
 var isWalking := false
 var isShoved := false
 var isTossed := false
-var isHurt := false
+var hp_changed := 0
+var comp_changed := 0
 var cDir := ""
 var cAnim := ""
 var pathPaused := false
@@ -571,11 +581,17 @@ func _ready() -> void:
 	hitBox.area_exited.connect(self._on_aura_exited)
 	_animPlayer.play("idle")
 	#Create the curve resource here because creating it in the editor prevents moving the unit
+	_signals()
 	if not Engine.is_editor_hint():
 		curve = Curve2D.new()
 		_set_unit_name()
-	roster_locked = false
+	_set_faction_group(FACTION_ID)
 	unit_ready.emit(self)
+
+
+func _signals():
+	_sprite_fx.fx_ends.connect(self._on_fx_end)
+
 
 func _process(delta: float) -> void:
 	if !map: return
@@ -591,6 +607,18 @@ func _process(delta: float) -> void:
 	
 	if needDeath:
 		return
+
+
+#region animation handling
+func _on_fx_end(_fx_name:String):
+	#if life_updated: 
+		#update_life_bar()
+	#else: animation_complete.emit(self)
+	#Currently life bar updating just gets triggered and uses the sequence system, which is outdated.
+	#It also only has ending the turn in mind, outdated thinking
+	#For now healing items won't update the life bar, but will be added when reapproaching this 'sequence' system
+	animation_complete.emit(self)
+
 
 #region persistant data handling
 func save_parameters() -> Dictionary:
@@ -790,8 +818,9 @@ func _process_motion(delta):
 
 ## Starts walking along the `path`.
 ## `path` is an array of grid coordinates that the function converts to map coordinates.
-func walk_along(path: PackedVector2Array) -> void:
+func walk_along(path: PackedVector2Array, track_remaining:bool=false) -> void:
 #	#print("walk along")
+	if track_remaining: remaining_move = path.size()-total_stats.Move
 	lastAnim = _animPlayer.current_animation
 	if path.is_empty():
 		print("walk_along Path Empty")
@@ -810,7 +839,7 @@ func walk_along(path: PackedVector2Array) -> void:
 	isWalking = true
 #	print("unit cell: ", cell)
 #	print("unit position: ", position)
-	
+
 
 func shove_unit(location):
 	var oldCell = cell
@@ -896,8 +925,10 @@ func revert_animation():
 	_animPlayer.play(lastAnim)
 	#print(unit_id,":", _animPlayer.current_animation,"Revert")
 
+
 func toggle_path_pause():
 	pathPaused = !pathPaused
+
 
 func return_original():
 	position = map.map_to_local(originCell)
@@ -1017,7 +1048,7 @@ func can_act() -> bool:
 	return true
 
 
-#Passive Functions
+#region Passive Functions
 func check_passives() ->void:
 	var auras :Array[Aura]= []
 	if !passives: return
@@ -1032,12 +1063,23 @@ func check_passives() ->void:
 	if auras: validate_auras(auras)
 
 
+func can_canto()->bool:
+	if PlayerData.canto_triggered and has_passive(Enums.PASSIVE_TYPE.CANTO) and remaining_move>0: return true
+	return false
+
+
+func has_passive(passive_type:Enums.PASSIVE_TYPE)->bool:
+	for p in passives:
+		if p == null:continue
+		if p.type == passive_type: return true
+	return false
+
 func can_pick()->bool:
 	for p in passives:
 		if p == null:continue
 		if p.type == Enums.PASSIVE_TYPE.LOCKPICK: return true
 	return false
-
+#endregion
 
 ##Non-permanent Skills Function
 func validate_skills(): #The fuck am I trying to do here???
@@ -1462,15 +1504,20 @@ func has_valid_aug_weapon(skill : Skill) -> bool:
 	return isValid
 
 #region item use functions
-func use_item(item : Item) -> void:
-	if !item.use: return
-	if item.min_reach > 0 or item.max_reach > 0:
-		emit_signal("item_targeting", item, self)
-	else: activate_item(item, self)
+func use_item(_item : Item) -> void:
+	_animPlayer.play("use_item")
+	
+
+#func end_item_use():
+	#_animPlayer.play("idle")
 
 
-func activate_item(item: Item, target) -> void:
-	emit_signal("item_activated", item, self, target)
+
+func receive_item(item:Item)->void:
+	var id :String = item.get_main_effect_id()
+	_sprite_fx.play_item_fx(id)
+	update_life_bar()
+
 
 
 ##Item only considered broken at 0 durability!!! If reduc value would put an item below 0, it is clamped to 0 and will break.
@@ -1764,22 +1811,26 @@ func update_stats(): #GO BACK AND FINISH ACTIVE DEBUFFS AFTER THIS
 	if status.Sleep:
 		active_stats.Move = 0
 
-func on_sequence_concluded():
-	#check post-sequence event que?
-	update_life_bar()
-	check_death()
-	#finally allow turn completion?
+
+#func on_sequence_concluded():
+	##check post-sequence event que?
+	#update_life_bar()
+	#check_death()
+	##finally allow turn completion?
+
 
 func danmaku_collision():
 	update_life_bar()
 	check_death()
 
-func confirm_post_sequence_flags(flag):
+
+func confirm_post_sequence_flags(flag)->bool:
 	postSequenceFlags[flag] = true
 	for f in postSequenceFlags:
 		if !postSequenceFlags[f]:
-			return
-	_turn_complete()
+			return false
+	return true
+	#_turn_complete()
 
 
 func _turn_complete():
@@ -1803,33 +1854,53 @@ func update_sprite():
 func check_death():
 	if active_stats["CurLife"] <= 0:
 		run_death()
+		return true
 	else:
-		confirm_post_sequence_flags("Death")
+		return false
+		#confirm_post_sequence_flags("Death")
+
+
+func check_break():
+	bars_updated.emit(self)
+	#animation_complete.emit(self)
+
 
 func update_life_bar():
 	var tween = get_tree().create_tween()
-	if isHurt:
+	if hp_changed < 0:
 		play_animation("Hit")
-		isHurt = false
+		hp_changed = 0
+	elif hp_changed > 0:
+		hp_changed = 0
 	tween.finished.connect(self._life_tween_finished)
 	tween.tween_property($PathFollow2D/Sprite/HPbar, "value", active_stats.CurLife, 0.5)
-	
+
+
+func process_bars():
+	update_life_bar()
+
 
 func _life_tween_finished():
-	revert_animation()
-	confirm_post_sequence_flags("Bars")
+	if !check_death(): update_composure_bar()
+	#confirm_post_sequence_flags("Bars")
 
 
 func update_composure_bar():
 	if active_stats.CurComp <= 0:
 		pass #comp check!
+	_comp_tween_finished()
+
+
+func _comp_tween_finished():
+	revert_animation()
+	check_break()
 
 
 func pick_door(door:DoorTile):
-	#Play unlock animation, with door unlocking called during animation
-	door.unlock() #removed after animation implemented
-	_turn_complete() #done when animation completed
 	
+	_animPlayer.play("pick")
+	await animation_complete
+	door.unlock()
 
 
 func apply_dmg(dmg : int, source : Unit = null):
@@ -1838,23 +1909,26 @@ func apply_dmg(dmg : int, source : Unit = null):
 	if active_stats.CurLife == 0:
 		if source: killer = source
 		deathFlag = true
-	
 	if dmg > 0 and status.Sleep:
 		cure_status("Sleep")
 	if dmg > 0:
-		isHurt = true
-	update_life_bar()
+		hp_changed = 0 - dmg
 	#return active_stats.CurLife
-	
+
+
 func apply_heal(heal := 0):
-	active_stats.CurLife += heal
-	active_stats.CurLife = clampi(active_stats.CurLife, 0, active_stats.Life)
+	if heal > 0: 
+		hp_changed = heal
+		active_stats.CurLife += heal
+		active_stats.CurLife = clampi(active_stats.CurLife, 0, active_stats.Life)
 
 
 
 func apply_composure(comp := 0):
-	active_stats.CurComp -= comp
-	active_stats.CurComp = clampi(active_stats.CurComp, 0, active_stats.Comp)
+	if comp>0 or comp<0: 
+		comp_changed = comp
+		active_stats.CurComp -= comp
+		active_stats.CurComp = clampi(active_stats.CurComp, 0, active_stats.Comp)
 
 
 func has_enough_comp(cost:int) -> bool:
@@ -1931,10 +2005,11 @@ func set_acted(actState: bool):
 		true: 
 			if one_time_leash and leash > -1: leash = -1
 			_animPlayer.play("disabled")
+			status_duration_tick(Enums.DURATION_TYPE.TURN)
 			#print(unit_id,":", _animPlayer.current_animation,"Set Acted")
 
 #Turn Signals
-func on_turn_changed():
+func _on_turn_changed():
 	update_stats()
 	
 	
@@ -1942,33 +2017,35 @@ func _on_new_round(_to):
 	status_duration_tick(Enums.DURATION_TYPE.ROUND)
 
 
-func _on_turn_changed():
-	status_duration_tick(Enums.DURATION_TYPE.TURN)
+#func _on_turn_changed():
+	#status_duration_tick(Enums.DURATION_TYPE.TURN)
 	
 #DEATH
 func run_death():
 	#if FACTION_ID != FACTION_ID.PLAYER:
 		#unitData.erase(unit_id)
 #	emit_signal("imdead", self)
+	SignalTower.unit_death.emit(self)
 	fade_out(1.0)
-		
+
+
 func fade_out(duration: float):
 	needDeath = true
 	deployment = Enums.DEPLOYMENT.GRAVEYARD
 	_animPlayer.play("death")
 	await get_tree().create_timer(duration).timeout
 	$PathFollow2D/Sprite/HPbar.visible = false
-	confirm_post_sequence_flags("Death")
-	emit_signal("death_done", self)
-	
-	
+	#confirm_post_sequence_flags("Death")
+	death_done.emit(self)
+	bars_updated.emit(self)
+
+
 func update_terrain_data():
 	terrainTags = map.get_terrain_tags(cell)
-	
-	
+
+
 func update_terrain_bonus() -> Dictionary:
 #	print(combatData.Graze)
-	
 	var tVal := {"GrzBonus": 0, "DefBonus": 0, "PwrBonus": 0, "MagBonus": 0, "HitBonus": 0,}
 	var terrainData = PlayerData.terrainData
 	if !is_active or move_type == Enums.MOVE_TYPE.FLY: return tVal
@@ -2000,11 +2077,18 @@ func find_nested(array, value):
 		if array[i].find(value) != -1:
 			return i
 	return -1
-	
-func _on_animation_player_animation_finished(_animName):
-	pass
-	#HERE for what?!!!
-	
+
+
+func _on_animation_player_animation_finished(animName):
+	match animName:
+		"pick":
+			revert_animation()
+			animation_complete.emit(self)
+		"use_item":
+			revert_animation()
+			animation_complete.emit(self)
+
+
 func add_exp(action, _target = null): ##Adds exp if a unit is a place, as well as returning 'true', returns 'false' if not a player unit.
 	if FACTION_ID != Enums.FACTION_ID.PLAYER:
 		return false
@@ -2054,10 +2138,26 @@ func add_exp(action, _target = null): ##Adds exp if a unit is a place, as well a
 		levelUpReport["OldStats"] = oldStats
 		levelUpReport.OldStats["LVL"] = oldLevel
 #		print(unitData)
-	emit_signal("exp_gained", oldExp, expSteps, levelUpReport, portrait, unit_name)
+	exp_gained.emit(oldExp, expSteps, levelUpReport, portrait, unit_name)
 	return true
+
 
 func map_start_init():
 	originCell = map.local_to_map(position) #BUG GY
 	#print(originCell)
 	
+
+#region faction/group handling
+func _set_faction_group(faction:Enums.FACTION_ID)->void:
+	var fString:=""
+	remove_from_group("ENEMY")
+	remove_from_group("NPC")
+	remove_from_group("PLAYER")
+	match faction:
+		Enums.FACTION_ID.PLAYER: 
+			fString = "PLAYER"
+		Enums.FACTION_ID.ENEMY: 
+			fString = "ENEMY"
+		Enums.FACTION_ID.NPC: 
+			fString = "NPC"
+	add_to_group(fString)

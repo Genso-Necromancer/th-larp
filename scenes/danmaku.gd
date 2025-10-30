@@ -222,11 +222,13 @@ func _collided(unit):
 		unitHit = unit
 		set_path(newPath)
 		emit_signal("collision_detected", self)
-	
+
+
 func play_collide():
 	isMoving = true
 	apply_collision_effect()
 	_animPlayer.play("Collision")
+
 
 func apply_collision_effect():
 	if damage: unitHit.apply_dmg(damage, master)
@@ -235,10 +237,12 @@ func apply_collision_effect():
 	#effect processing needs to be a seperate script that can be loaded seperately.
 	#Currently too round-about to call effects for Danmaku
 
+
 func _update_cell():
 	emit_signal("danmaku_relocated", originCell, cell, self)
 	originCell = cell
-	
+
+
 func relocate(newCell):
 	var oldCell = cell
 	var map = get_parent()

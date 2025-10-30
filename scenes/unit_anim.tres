@@ -1,4 +1,4 @@
-[gd_resource type="AnimationLibrary" load_steps=15 format=3 uid="uid://d4f2xcrr7c15q"]
+[gd_resource type="AnimationLibrary" load_steps=17 format=3 uid="uid://d4f2xcrr7c15q"]
 
 [sub_resource type="Animation" id="Animation_4s25y"]
 resource_name = "Hit"
@@ -172,6 +172,21 @@ tracks/2/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 0,
 "values": [Vector2(-1, -36)]
+}
+
+[sub_resource type="Animation" id="Animation_si2k5"]
+resource_name = "pick"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PathFollow2D/Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.42),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [3, 4]
 }
 
 [sub_resource type="Animation" id="Animation_vw2je"]
@@ -435,6 +450,47 @@ tracks/5/keys = {
 }]
 }
 
+[sub_resource type="Animation" id="Animation_5a77k"]
+resource_name = "use_item"
+length = 1.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PathFollow2D/Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [2]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PathFollow2D/Sprite:flip_h")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("PathFollow2D/Sprite:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-1, -36)]
+}
+
 [sub_resource type="Animation" id="Animation_xwkmn"]
 resource_name = "walk_down"
 length = 0.8
@@ -558,11 +614,13 @@ _data = {
 &"death": SubResource("Animation_14iwe"),
 &"disabled": SubResource("Animation_n8or0"),
 &"idle": SubResource("Animation_qpckc"),
+&"pick": SubResource("Animation_si2k5"),
 &"selected": SubResource("Animation_vw2je"),
 &"shoved_left": SubResource("Animation_iyiwe"),
 &"shoved_right": SubResource("Animation_nwvif"),
 &"tossed_from_left": SubResource("Animation_uy3io"),
 &"tossed_from_right": SubResource("Animation_kwd0d"),
+&"use_item": SubResource("Animation_5a77k"),
 &"walk_down": SubResource("Animation_xwkmn"),
 &"walk_left": SubResource("Animation_ueevp"),
 &"walk_right": SubResource("Animation_liyna"),

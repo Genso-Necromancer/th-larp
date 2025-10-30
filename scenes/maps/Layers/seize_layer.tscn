@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://d2cjx6gleg5wq"]
+
+[ext_resource type="TileSet" uid="uid://byd2voh7n3m43" path="res://TileSets/seize.tres" id="1_jgv4p"]
+[ext_resource type="Script" uid="uid://ly6hi3cv5gy6" path="res://scenes/maps/Layers/seize_layer.gd" id="2_ip727"]
+
+[node name="SeizeLayer" type="TileMapLayer"]
+self_modulate = Color(1, 1, 1, 0.643137)
+tile_set = ExtResource("1_jgv4p")
+script = ExtResource("2_ip727")

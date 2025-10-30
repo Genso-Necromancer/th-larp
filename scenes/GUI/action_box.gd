@@ -22,13 +22,14 @@ func connect_signals(parent:ActionMenu): #HERE, coded this all wrong. Way too ea
 		b.pressed.connect(parent._on_button_pressed.bind(bName))
 
 ##Checks context of unit and actives that appropriate buttons. Buttons Not Implemented: Talk, Open, Steal
-func display_unit_actions(unit : Unit):
+func display_unit_actions(unit : Unit,moved:=false):
 	var buttons : Array = get_children()
 	var itemFlags : Dictionary = _check_inv(unit)
 	var inReach : Dictionary = _check_reach(unit)
 	var hasSkills := false
 	var canPick := unit.can_pick()
 	var noFocus := true
+	var moveCommitted := PlayerData.move_committed
 	
 	
 	if unit.skills:
@@ -38,6 +39,13 @@ func display_unit_actions(unit : Unit):
 	for b in buttons:
 		var bName = b.get_name()
 		match bName:
+			"MoveBtn":
+				if moveCommitted or moved:
+					b.visible = false
+					b.disabled = true
+				else:
+					b.visible = true
+					b.disabled = false
 			"TalkBtn": pass
 			"VisitBtn": pass
 			"ShopBtn": pass
@@ -94,6 +102,12 @@ func display_unit_actions(unit : Unit):
 					b.disabled = false
 				else:
 					b.visible = true
+					b.disabled = true
+			"MntBtn": #Not implemented
+					b.visible = false
+					b.disabled = true
+			"DsMntBtn": #Not implemented
+					b.visible = false
 					b.disabled = true
 			"WaitBtn": 
 				b.visible = true

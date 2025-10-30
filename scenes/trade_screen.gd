@@ -4,8 +4,9 @@ class_name TradeScreen
 signal item_list_filled(buttons)
 signal item_selected
 signal new_btn_added
-signal trade_closed
+signal trade_closed(is_action:bool)
 signal trd_focus_changed
+
 
 
 
@@ -48,9 +49,9 @@ enum tStates {
 var tState := tStates.DEFAULT:
 	set(value):
 		tState = value
-
+var is_setup:=false
 #tabs
-enum tabTypes {
+enum TAB_TYPES {
 	BLADE,
 	BLUNT,
 	STICK,
@@ -173,7 +174,7 @@ func open_trade_menu(unit1, unit2):
 	#_refresh_list()
 	
 	
-func _close_trade_menu():
+func _close_trade_menu(is_action:=false):
 	firstUnit = null
 	secondUnit = null
 	box1.visible = false
@@ -183,7 +184,7 @@ func _close_trade_menu():
 	_clear_item_list(list1)
 	_clear_item_list(list2)
 	tState = tStates.DEFAULT
-	emit_signal("trade_closed")
+	trade_closed.emit(is_action)
 	
 func open_supply_menu(unit): #HERE
 	var tab = _get_first_valid_category()
@@ -212,7 +213,7 @@ func _close_supply_menu():
 	emit_signal("trade_closed")
 	
 	
-func open_manage_menu(unit:Unit):
+func open_manage_menu(unit:Unit, is_setup_action:bool=true):
 	_load_names([unit])
 	_load_sprites([unit])
 	firstUnit = unit
@@ -220,18 +221,19 @@ func open_manage_menu(unit:Unit):
 	toggle_visible()
 	_reparent_info(1)
 	tState = tStates.MANAGE
+	is_setup = is_setup_action
 	list1.set_meta("Unit", unit)
 	#_refresh_list()
 	call_deferred("_refresh_list")
 
 
-func close_manage_menu():
+func close_manage_menu(emit:=true):
 	firstUnit = null
 	box1.visible = false
 	toggle_visible()
 	_clear_item_list(list1)
 	tState = tStates.DEFAULT
-	emit_signal("trade_closed")
+	if emit:trade_closed.emit()
 
 
 #Sprite Functions
@@ -428,7 +430,7 @@ func _assign_horizontal_neighbors(empty):
 
 
 func _assign_tab_neighbor():
-	#var tabKeys = tabTypes.keys()
+	#var tabKeys = TAB_TYPES.keys()
 	#var supply = PlayerData.supply[tabKeys[openTab]]
 	var tabs = supplyPanel.tabs
 	var supplyHasItems = supplyPanel.itemList.get_children()
@@ -450,7 +452,7 @@ func _assign_tab_neighbor():
 
 
 func increment_tabs(isIncrease, inc = 1): #Not yet used. tab incrementing hotkey
-	var tabSize = tabTypes.size()
+	var tabSize = TAB_TYPES.size()
 	var newTab = supplyPanel.openTab
 	if !isIncrease:
 		inc = inc - (inc * 2)
@@ -567,15 +569,15 @@ func _open_item_options(b) -> void:
 	emit_signal("trd_focus_changed", list)
 
 
-func _close_item_options():
+func _close_item_options(hard_close:=false):
 	var useLast := false
 	tState = tStates.MANAGE
 	optionsPop.hide_pop()
-	if list_snap == list1.items: useLast = true
+	if hard_close: useLast = false
+	elif list_snap == list1.items: useLast = true
 	list_snap.clear()
 	call_deferred("_refresh_list", useLast)
 	#_refresh_list(true)
-	
 	
 	#_item_deselected()
 	#var mngMenu = $SupplyOpPnl2
@@ -585,13 +587,18 @@ func _close_item_options():
 	#emit_signal("trd_focus_changed", list)
 	#tState = tStates.DEFAULT
 
+
 func _on_selection_made(selection:String, item:Item):
-	PlayerData.item_used = true
-	_close_item_options()
+	_close_item_options(!is_setup)
 	match selection:
-		"Use": _play_item_anim(item)
-		#"Equip": 
-		#"Unequip": 
+		"Use":
+			if is_setup: _play_item_anim(item)
+			else: _close_trade_menu(true)
+			SignalTower.item_used.emit(item)
+		"Equip":
+			SignalTower.item_equipped.emit(item,true)
+		"Unequip":
+			SignalTower.item_equipped.emit(item,false)
 
 
 func _play_item_anim(item) -> void:
@@ -648,8 +655,8 @@ func _give_select(b) -> void:
 	if item == unit.get_equipped_weapon():
 		wasEquipped = true
 	
-	if iType != tabTypes.find_key(supplyPanel.openTab):
-		_change_tab(tabTypes.get(iType))
+	if iType != TAB_TYPES.find_key(supplyPanel.openTab):
+		_change_tab(TAB_TYPES.get(iType))
 	supplyInv.append(item)
 	
 	inv.remove_at(iInd)
@@ -825,13 +832,13 @@ func _flag_trade():
 		PlayerData.traded = true
 
 func _get_first_valid_category() -> int:
-	var valid := tabTypes.BLADE
+	var valid := TAB_TYPES.BLADE
 	var supply = PlayerData.supply
-	var keys = tabTypes.keys()
+	var keys = TAB_TYPES.keys()
 	for key in keys:
 		var count = supply[key].size()
 		if count > 0:
-			valid = tabTypes[key]
+			valid = TAB_TYPES[key]
 			break
 	return valid
 
@@ -839,7 +846,7 @@ func _get_first_valid_category() -> int:
 func _on_tab_pressed(b):
 	var c = b.get_meta("Category")
 	lastClicked = b
-	_change_tab(tabTypes[c])
+	_change_tab(TAB_TYPES[c])
 
 #func _on_use_btn_pressed():
 	#var item = firstBtn.button.get_meta("Item")

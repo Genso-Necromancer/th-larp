@@ -3,7 +3,7 @@
 #UIManager, the map itself, all units, skills and combat are manipulated from this point and acts almost like a veritable hub
 #UIManager is not a true child of this class so that it can be used outside of simply maps and keep all UI elements in one place.
 #signals are uses for communication between them and many of the children of this class
-class_name GameBoard
+class_name GameBoardOld
 extends Node2D
 
 #region signals sent from here
@@ -131,7 +131,7 @@ var ai_turn_result:Dictionary = {}
 @export var smoothing: float = 0.2
 #Nodes
 @onready var unitPath: UnitPath = $UnitPath
-@onready var cursor: Cursor = $Cursor
+@onready var cursor: Cursor = %Cursor
 @onready var combatManager : CombatManager = $CombatManager
 @onready var turnSort : TurnSort = $TurnSort
 #@onready var turnTest = $Control/TurnLight
@@ -266,7 +266,7 @@ func free_map()->void:
 func load_map(map:String, save_data:Dictionary={}):
 	if !map: print("[GameBoard]load_map: empty map string")
 	var newMap:GameMap = load(map).instantiate()
-	Global.timePassed = 0
+	Global.time_passed = 0
 	currMap = newMap
 	if save_data: newMap.map_ready.connect(self._on_map_ready_from_file)
 	else: newMap.map_ready.connect(self._on_map_ready)
@@ -601,7 +601,6 @@ func combat_sequence(scenario):
 func _on_animation_handler_sequence_complete():
 	var hasPostEvents = _check_post_queue()
 	GameState.change_state(self, GameState.gState.LOADING)
-	
 	if hasPostEvents:
 		_run_post_queue()
 		await self.post_queue_cleared
@@ -626,7 +625,7 @@ func _run_post_queue():
 				_: isWait = false
 			if isWait:
 				await self.continue_queue
-	call_deferred("_clear_post_queue")
+	
 
 
 func on_effect_complete():
@@ -1095,6 +1094,7 @@ func _snap_cursor(cell: Vector2i = unitObjs[forcedDeploy.keys()[0]].cell): #can 
 func _on_gui_action_menu_canceled():
 	request_deselect()
 
+
 func unit_wait():
 	_deselect_active_unit(true)
 	GameState.change_state(self, GameState.gState.LOADING)
@@ -1488,7 +1488,6 @@ func return_targeting():
 func gb_mouse_motion(_event):
 	var mousePos: Vector2i = currMap.get_local_mouse_position()
 	var toMap = currMap.ground.local_to_map(mousePos)
-	
 	#print(mousePos)
 	cursor.cell = Vector2i(toMap)
 #endregion

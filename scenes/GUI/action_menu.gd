@@ -10,7 +10,7 @@ signal action_menu_trade_pressed(unit)
 signal action_menu_suspending_game
 
 
-enum MENU_STATES {NONE, OPTIONS, ACTION, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE, OFUDA_OPEN, OFUDA_TARGETING, SUSPEND_PROMPT, SUSPENDING, DOOR}
+enum MENU_STATES {NONE, OPTIONS, ACTION,ACTION2, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE, OFUDA_OPEN, OFUDA_TARGETING, SUSPEND_PROMPT, SUSPENDING, DOOR}
 @onready var aContainer : MarginContainer = $ScreenMargin/ActionBackgroundMargin
 @onready var oContainer : MarginContainer = $ScreenMargin/OfudaBackgroundMargin
 @onready var sContainer : MarginContainer = $ScreenMargin/SkillBackgroundMargin
@@ -38,12 +38,9 @@ var state := MENU_STATES.NONE:
 					_assign_cursor(aBox.get_children())
 					cursor.setCursor = true
 				MENU_STATES.ACTION:
-					_close_inv()
-					aBox.display_unit_actions(currentUnit)
-					_hide_tertiary()
-					_unhide_action_container()
-					_assign_cursor(aBox.get_children())
-					cursor.setCursor = true
+					_action_open()
+				MENU_STATES.ACTION2:
+					_action_open(true)
 				MENU_STATES.WEAPONS_TARGETING:
 					_hide_cursor()
 					_hide_action_container()
@@ -109,10 +106,11 @@ func end_self():
 
 
 ##opens self as current unit's actions.
-func open_as_action(unit: Unit):
+func open_as_action(unit: Unit, moved:bool = false):
 	_load_cursor()
 	currentUnit = unit
-	_change_state(MENU_STATES.ACTION)
+	if moved: _change_state(MENU_STATES.ACTION2)
+	else: _change_state(MENU_STATES.ACTION)
 	self.visible = true
 	cursor.setCursor = true
 
@@ -199,14 +197,28 @@ func _unhide_action_container():
 	blocker.visible = true
 	aContainer.visible = true
 
+
+func _action_open(moved:bool = false):
+	_close_inv()
+	aBox.display_unit_actions(currentUnit,moved)
+	_hide_tertiary()
+	_unhide_action_container()
+	_assign_cursor(aBox.get_children())
+	cursor.setCursor = true
+
+
 #Button functions
 func _on_button_pressed(bName):
 	match bName:
+		"MoveBtn": 
+			_clear_states()
+			state = MENU_STATES.NONE
+			action_menu_selected.emit(bName)
 		"TalkBtn": pass
 		"SeizeBtn": 
 			SignalTower.action_seize.emit(currentUnit.cell)
 			_clear_states()
-			emit_signal("action_menu_selected", bName)
+			action_menu_selected.emit(bName)
 		"VisitBtn": pass
 		"ShopBtn": pass
 		"AtkBtn": _change_state(MENU_STATES.WEAPONS_TARGETING)
@@ -219,13 +231,13 @@ func _on_button_pressed(bName):
 			
 		"ItmBtn": 
 			_change_state(MENU_STATES.ITEM_MANAGE)
-			emit_signal("action_menu_item_pressed", currentUnit)
+			action_menu_item_pressed.emit(currentUnit)
 		"TrdBtn": 
 			_change_state(MENU_STATES.ITEM_TRADE)
-			emit_signal("action_menu_trade_pressed", currentUnit)
+			action_menu_trade_pressed.emit(currentUnit)
 		"WaitBtn": 
 			_clear_states()
-			emit_signal("action_menu_selected", bName)
+			action_menu_selected.emit(bName)
 		"EndBtn": pass
 		"StatBtn": pass
 		"OpBtn": pass
@@ -294,6 +306,11 @@ func _load_cursor():
 	
 
 func _assign_cursor(buttons : Array):
+	#var bLayers:Array = []
+	#for b:Button in buttons:
+		#var bl :TextureButton= b.get_button()
+		#bLayers.append(bl)
+	#cursor.resignal_cursor(bLayers)
 	cursor.resignal_cursor(buttons)
 	#cursor.call_deferred("set_cursor")
 
@@ -310,29 +327,33 @@ func _hide_cursor():
 func _change_state(newState):
 	prevState.append(state)
 	state = newState
+	print(prevState)
 
 
 func return_previous_state() -> void:
 	var newState : MENU_STATES
 	#var curState : MENU_STATES = state
 	
-	
+	print(prevState)
 	if state == MENU_STATES.ACTION and PlayerData.traded: return
 	elif state == MENU_STATES.ACTION and PlayerData.item_used: return
+	elif state == MENU_STATES.ACTION and PlayerData.move_committed: return
 	
 	if prevState.size() > 0:
 		newState = prevState.pop_back()
 		state = newState
+		print(prevState)
 	else: 
 		print("action_menu, attempted invalid state return: No previous states.",)
 		return
 	
 	#if curState == MENU_STATES.ITEM_MANAGE: emit_signal("action_menu_item_canceled")
-	if newState == MENU_STATES.NONE: emit_signal("action_menu_canceled")
+	if newState == MENU_STATES.NONE: action_menu_canceled.emit()
 
 func _clear_states():
 	_change_state(MENU_STATES.NONE)
 	prevState.clear()
+	print(prevState)
 
 
 func _on_skill_confirm_pressed():

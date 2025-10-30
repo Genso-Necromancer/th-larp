@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://cl7ik2hxcwm08"]
+[gd_scene load_steps=11 format=3 uid="uid://cl7ik2hxcwm08"]
 
 [ext_resource type="Script" uid="uid://2hx5flk7mcr3" path="res://scenes/maps/BaseGameMap.gd" id="1_ak6bi"]
 [ext_resource type="TileSet" uid="uid://dae0fl1fnuwvk" path="res://TileSets/TestTileSet2.tres" id="2_1xy5d"]
@@ -9,6 +9,7 @@
 [ext_resource type="TileSet" uid="uid://bphorhxlrllt2" path="res://TileSets/dev_set.tres" id="7_1xy5d"]
 [ext_resource type="Script" uid="uid://bdpbd4lp3x08s" path="res://scrpt/ai/ai_manager.gd" id="7_77vj4"]
 [ext_resource type="Resource" uid="uid://befkt7mur7ux" path="res://scrpt/ai/personality_test.tres" id="8_gm7ke"]
+[ext_resource type="PackedScene" uid="uid://d2cjx6gleg5wq" path="res://scenes/maps/Layers/seize_layer.tscn" id="10_6ts4f"]
 
 [node name="GameMap" type="Node2D" groups=["Persist"]]
 z_index = -2
@@ -55,6 +56,8 @@ script = ExtResource("6_lbo8e")
 [node name="Dev" type="TileMapLayer" parent="."]
 use_parent_material = true
 tile_set = ExtResource("7_1xy5d")
+
+[node name="SeizeLayer" parent="." instance=ExtResource("10_6ts4f")]
 
 [node name="DanmakuManager" type="Node2D" parent="."]
 

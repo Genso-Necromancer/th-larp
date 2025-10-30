@@ -136,10 +136,9 @@ func _display_weapon(button : ItemButton):
 
 
 func add_empty(unit) -> ItemButton:
-	var b = load("res://scenes/GUI/item_button.tscn").instantiate()
-	
+	var b :ItemButton= load("res://scenes/GUI/item_button.tscn").instantiate()
 	var i = items.size()
-	b.set_item_text("", "")
+	b.set_blank_item()
 	b.toggle_icon()
 	b.set_meta_data(false, unit, i, true)
 	_add_item(b)

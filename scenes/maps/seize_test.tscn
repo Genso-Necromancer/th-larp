@@ -2,23 +2,19 @@
 
 [ext_resource type="PackedScene" uid="uid://cl7ik2hxcwm08" path="res://scenes/maps/game_map.tscn" id="1_qpt4y"]
 [ext_resource type="Script" uid="uid://duoms4relhrfy" path="res://scenes/maps/objectives/objective.gd" id="3_jfjoi"]
+[ext_resource type="Resource" uid="uid://d2dx18fsw0jpm" path="res://scenes/maps/objectives/seize_test.tres" id="3_ub6hv"]
 [ext_resource type="PackedScene" uid="uid://bokxjbvpfnkqp" path="res://scenes/units/unique_units/cirno.tscn" id="4_cpkxf"]
-[ext_resource type="Script" uid="uid://b7a6ss8luhslm" path="res://scenes/maps/objectives/seize.gd" id="4_nunlw"]
+[ext_resource type="Resource" uid="uid://7t8iqbg5bicy" path="res://scenes/maps/objectives/remi_saku_death_loss.tres" id="4_xc6ji"]
 [ext_resource type="PackedScene" uid="uid://d0864tysvp4bv" path="res://scenes/units/generic_units/oni_troublemaker_lv_1.tscn" id="5_5odpd"]
 [ext_resource type="PackedScene" uid="uid://dffu0k0v5tou1" path="res://scenes/units/generic_units/fairy_cointaker_lv_1.tscn" id="6_ub6hv"]
 [ext_resource type="PackedScene" uid="uid://d1lptkdo512fn" path="res://scenes/maps/MapObjects/door.tscn" id="7_5odpd"]
 [ext_resource type="PackedScene" uid="uid://chqu2dkt7ofqi" path="res://scenes/maps/MapObjects/breakable_wall.tscn" id="8_ub6hv"]
 
-[sub_resource type="Resource" id="Resource_cpkxf"]
-script = ExtResource("4_nunlw")
-seize_count = 1
-metadata/_custom_type_script = "uid://b7a6ss8luhslm"
-
 [node name="SeizeTest" instance=ExtResource("1_qpt4y")]
 next_map = "uid://dy7o507urgp83"
 chapterNumber = 1
 title = "Seize Test"
-win_conditions = Array[ExtResource("3_jfjoi")]([SubResource("Resource_cpkxf")])
+objectives = Array[ExtResource("3_jfjoi")]([ExtResource("3_ub6hv"), ExtResource("4_xc6ji")])
 start_script = "res://scenes/cutscenes/scene_events/seize_test_start_event.json"
 end_script = "res://scenes/cutscenes/scene_events/seize_test_end_event.json"
 hours = 7
@@ -32,8 +28,7 @@ tile_map_data = PackedByteArray("AAAFAAcAEwAAAAAAAAADAAUAEwAAAAEAAAACAAYAEwAAAAE
 [node name="Deployments" parent="." index="3"]
 tile_map_data = PackedByteArray("AAADAAkAAQAAAAAAAAAEAAoAAQAAAAAAAAACAAoAAAAAAAAAAAADAAoAAAAAAAAAAAA=")
 
-[node name="Dev" parent="." index="7"]
-self_modulate = Color(1, 1, 1, 0.568627)
+[node name="SeizeLayer" parent="." index="8"]
 tile_map_data = PackedByteArray("AAAFAAcAAQAAAAAAAAA=")
 
 [node name="Cirno" parent="." index="10" instance=ExtResource("4_cpkxf")]
@@ -67,6 +62,6 @@ position = Vector2(461, 501)
 map = NodePath("..")
 
 [node name="BreakableWall" parent="." index="14" node_paths=PackedStringArray("map") instance=ExtResource("8_ub6hv")]
-position = Vector2(712, 492)
+position = Vector2(712, 501)
 _hp = 5
 map = NodePath("..")

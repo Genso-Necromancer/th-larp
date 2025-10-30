@@ -118,3 +118,4 @@ vertical_alignment = 2
 [node name="TextureButton" type="TextureButton" parent="MarginContainer"]
 custom_minimum_size = Vector2(115, 112)
 layout_mode = 2
+mouse_filter = 1

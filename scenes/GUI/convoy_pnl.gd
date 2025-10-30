@@ -2,7 +2,7 @@
 extends InventoryPanel
 class_name ConvoyPanel
 
-enum tabTypes {
+enum TAB_TYPES {
 	BLADE,
 	BLUNT,
 	STICK,
@@ -17,9 +17,9 @@ enum tabTypes {
 
 var tabs : Array = []
 
-var openTab := tabTypes.BLADE:
+var openTab := TAB_TYPES.BLADE:
 	set(value):
-		if tabTypes.find_key(value) == null:
+		if TAB_TYPES.find_key(value) == null:
 			print("Invalid Tab Enum")
 			return
 		openTab = value
@@ -36,7 +36,7 @@ func _ready():
 
 
 func _convert_string_to_item():
-	var tabKeys = tabTypes.keys()
+	var tabKeys = TAB_TYPES.keys()
 	var supply = PlayerData.supply
 	for tab in tabKeys:
 		for entry in supply[tab]:
@@ -44,7 +44,7 @@ func _convert_string_to_item():
 
 
 func fill_items(_isTrade := false, _reach = [0,0], useBorder = false) -> Array:
-	var tabKeys = tabTypes.keys()
+	var tabKeys = TAB_TYPES.keys()
 	var supply = PlayerData.supply[tabKeys[openTab]]
 	var i = 0
 	var bPath = load("res://scenes/GUI/item_button.tscn")
@@ -72,7 +72,7 @@ func _change_tab():
 	clear_items()
 
 func sort_supply() -> Array:
-	var tabKeys = tabTypes.keys()
+	var tabKeys = TAB_TYPES.keys()
 	var supply = PlayerData.supply[tabKeys[openTab]]
 	supply.sort_custom(_sort_items)
 	clear_items()

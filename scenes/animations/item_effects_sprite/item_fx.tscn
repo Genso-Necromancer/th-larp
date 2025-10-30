@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://bsgmq8leqtiwa"]
+
+[ext_resource type="SpriteFrames" uid="uid://bfvlpdkp0kkoe" path="res://scenes/animations/item_effects/buff.tres" id="1_7b170"]
+[ext_resource type="Script" uid="uid://b6u3r4g0pflyy" path="res://scenes/animations/item_effects/item_fx.gd" id="2_pbhap"]
+
+[node name="ItemFxSprite" type="AnimatedSprite2D"]
+sprite_frames = ExtResource("1_7b170")
+animation = &"Buff"
+script = ExtResource("2_pbhap")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://x6dmleipd452"]
+[gd_scene load_steps=14 format=3 uid="uid://x6dmleipd452"]
 
 [ext_resource type="Script" uid="uid://ctodvlhm5amph" path="res://scenes/units/Unit.gd" id="1_me1b5"]
 [ext_resource type="Texture2D" uid="uid://wnmi00k2g1y6" path="res://sprites/character/fairy/thief_sprite.png" id="2_3vwvo"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" uid="uid://3uafufnjrn24" path="res://scenes/HPbar.gd" id="8_5cxww"]
 [ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="9_1s8fa"]
 [ext_resource type="Script" uid="uid://dvccuyma23muf" path="res://scenes/unit_cell_label.gd" id="10_30vxy"]
+[ext_resource type="Script" uid="uid://gv3mia0h3wmg" path="res://scenes/units/sprite_fx_handler.gd" id="12_3vwvo"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_51pth"]
 size = Vector2(84, 37.5)
@@ -73,6 +74,12 @@ texture_under = ExtResource("5_4067k")
 texture_over = ExtResource("6_eo5f0")
 texture_progress = ExtResource("7_66viq")
 script = ExtResource("8_5cxww")
+
+[node name="SpriteFxHandler" type="Node2D" parent="PathFollow2D/Sprite"]
+unique_name_in_owner = true
+position = Vector2(0.25, 9)
+scale = Vector2(0.25, 0.25)
+script = ExtResource("12_3vwvo")
 
 [node name="Cell" type="Label" parent="PathFollow2D"]
 offset_left = -68.0

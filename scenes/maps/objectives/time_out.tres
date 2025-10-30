@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="TimeOut" load_steps=2 format=3 uid="uid://cw2363y56cxry"]
+
+[ext_resource type="Script" uid="uid://rdy2nuvupjot" path="res://scenes/maps/objectives/time_out.gd" id="1_pki26"]
+
+[resource]
+script = ExtResource("1_pki26")
+time_limit = 0.0
+condition_type = 0

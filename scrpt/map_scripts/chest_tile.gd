@@ -12,13 +12,13 @@ var covered_by:Unit
 
 func unlock():
 	super()
-	SignalTower.chest_opened.emit(cell)
+	SignalTower.chest_opened.emit(cell, contents, covered_by)
 
 
 func stolen():
 	if !is_locked: return
 	is_locked = false
-	SignalTower.chest_stolen.emit(cell)
+	SignalTower.chest_stolen.emit(cell, contents, covered_by)
 
 
 func _on_tile_area_area_entered(area:AreaUnit):

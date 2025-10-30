@@ -1,0 +1,2 @@
+extends TileMapLayer
+class_name SeizeLayer

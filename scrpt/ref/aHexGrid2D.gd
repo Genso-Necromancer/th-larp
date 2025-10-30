@@ -351,7 +351,7 @@ func _get_passby_cost(unit:Unit, moveType) -> float:
 	return cost
 
 
-func find_path(start: Vector2i, end: Vector2i, unit = false,) -> Array: 
+func find_path(start: Vector2i, end: Vector2i, unit = false,) -> Array[Vector2i]: 
 	open_list.clear()
 	closed_list.clear()
 	var start_node = start #/ tileSize
@@ -456,18 +456,14 @@ func dict_strip(dict):
 		strip.append(page.node)
 	return strip
 
-func reconstruct_path(node: Dictionary) -> Array:
-	var path: Array = []
+func reconstruct_path(node: Dictionary) -> Array[Vector2i]:
+	var path: Array[Vector2i] = []
 	var currentNode = node
-	
 	while currentNode.parent != null:
 		path.insert(0, currentNode.node)
 		currentNode = currentNode.parent
-	
 	path.insert(0, currentNode.node)
 	currentNode = currentNode.parent
-	
-	
 	return path
 	
 func get_lowest_f_cost_node():

@@ -61,6 +61,9 @@ func _connect_signals()-> void:
 	SignalTower.returning_to_title.connect(self._on_returning_to_title)
 	SignalTower.chest_opened.connect(self._on_chest_opened)
 	SignalTower.chest_stolen.connect(self._on_chest_stolen)
+	SignalTower.item_used.connect(gameBoard._on_item_used)
+	SignalTower.item_equipped.connect(gameBoard._on_item_equipped)
+	#SignalTower.item_used.connect(guiManager._on_item_used)
 	gameBoard.map_loaded.connect(self._on_map_loaded)
 	gameBoard.gameboard_targeting_canceled.connect(guiManager._on_gameboard_targeting_canceled)
 	gameBoard.cursor.cursor_moved.connect(self._on_cursor_moved)
@@ -71,8 +74,20 @@ func _connect_signals()-> void:
 	gameBoard.turn_removed.connect(guiManager._on_turn_removed)
 	gameBoard.map_added.connect(self._on_map_added)
 	gameBoard.action_confirmed.connect(guiManager._on_gameboard_action_confirmed)
+	gameBoard.deployment_count_updated.connect(guiManager._on_gameboard_deploy_count_updated)
+	gameBoard.formation_closed.connect(guiManager._on_gameboard_formation_closed)
+	gameBoard.unit_selected.connect(guiManager._on_gameboard_unit_selected)
+	gameBoard.ui_returned.connect(guiManager._on_gameboard_ui_return)
+	gameBoard.state_changed.connect(guiManager.DEBUG._on_gb_state_changed)
+	gameBoard.step_changed.connect(guiManager.DEBUG._on_gb_step_changed)
+	gameBoard.unit_move_ended.connect(guiManager._on_gameboard_unit_move_ended)
+	gameBoard.target_focused.connect(guiManager._on_gameboard_target_focused)
+	gameBoard.exp_display.connect(guiManager._on_gameboard_exp_display)
+	gameBoard.toggle_prof.connect(guiManager._on_gameboard_toggle_prof)
 	guiManager.gui_splash_finished.connect(self._on_gui_splash_finished)
 	guiManager.gui_action_menu_canceled.connect(gameBoard._on_gui_action_menu_canceled)
+	guiManager.formation_selected.connect(gameBoard._on_gui_formation_selected)
+	guiManager.set_up_loaded.connect(gameBoard._on_gui_set_up_loaded)
 
 
 
@@ -82,9 +97,9 @@ func _on_win_screen_win_finished() -> void:
 	#await SignalTower.fade_out_complete
 	GameState.change_state(self, GameState.gState.LOADING)
 	load_cutscene()
-	if gameBoard.currMap.end_script != null:
+	if gameBoard.current_map.end_script != null:
 		#end_load_screen(0.1)
-		dOverlay.prepare_new_dialogue(gameBoard.currMap.end_script)
+		dOverlay.prepare_new_dialogue(gameBoard.current_map.end_script)
 		await dOverlay.dialog_finished
 		#start_load_screen()
 		#await SignalTower.fade_out_complete
@@ -96,9 +111,6 @@ func _on_win_screen_win_finished() -> void:
 
 
 func _on_map_added(map:GameMap):
-	var newTime = Global.time_to_float(map.hours, map.minutes)
-	#Global.game_time = newTime
-	#Global.currentMap = map
 	current_map = map.get_scene_file_path()
 	PlayerData.chapter_title = map.title
 	next_map = map.next_map
@@ -177,26 +189,25 @@ func _suspended_start():
 
 func _set_up_start():
 	GameState.change_state(self, GameState.gState.LOADING)
-	if gameBoard.currMap.start_script:
-		dOverlay.prepare_new_dialogue(gameBoard.currMap.start_script)
+	if gameBoard.current_map.start_script:
+		dOverlay.prepare_new_dialogue(gameBoard.current_map.start_script)
 		await dOverlay.dialog_finished
 	dOverlay.queue_free()
 	GameState.change_state(self, GameState.gState.LOADING)
-	guiManager.call_setup(gameBoard.depCap, gameBoard.forcedDeploy.keys(), gameBoard.currMap, gameBoard.unitObjs)
+	guiManager.call_setup(gameBoard.unit_loader.dep_cap, gameBoard.unit_loader.forced_deploy.keys(), gameBoard.current_map, gameBoard.unit_refs)
 #endregion
 
 
 #region GUI-Gameboard communication
 func _on_action_menu_selected(bName:StringName):
 	match bName:
+		"MoveBtn": gameBoard.move_selection()
 		"TalkBtn": pass
-		"SeizeBtn": gameBoard.unit_wait()
+		"SeizeBtn": gameBoard.unit_seize()
 		"VisitBtn": pass
 		"ShopBtn":pass
-		"AtkBtn": 
-			gameBoard.start_attack_targeting()
-		"SklBtn": 
-			gameBoard.start_skill_targeting()
+		"AtkBtn": gameBoard.start_attack_targeting()
+		"SklBtn": gameBoard.start_skill_targeting()
 		"OpenDoorBtn": gameBoard.door_targeting()
 		"OpenChestBtn": pass
 		"StealBtn": pass

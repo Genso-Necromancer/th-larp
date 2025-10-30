@@ -4,6 +4,8 @@ const validation:= "9808110206"
 #region persistant variables
 
 
+enum META_STATES {NONE,GAME_OVER,VICTORY}
+var meta_state:META_STATES = META_STATES.NONE
 var focusUnit : Unit:
 	set(value):
 		focusUnit = value
@@ -19,19 +21,38 @@ var focusDanmaku : Danmaku:
 var aiTarget : Unit
 var activeUnit : Unit
 var activeSkill : Skill
+
+#time
+const true_time_factor : float = 1.0
+#const hour : float = 1.0
+#const minute : float = 0.01
 var time_of_day := Enums.TIME.DAY
-var game_time :float = 12.00:
+#var game_time :float = 00.00:
+	#set(value):
+		#game_time = value
+		#value = _clamp_time(value)
+		#if value >= 6.0 and value <= 18.0:
+			#time_of_day = Enums.TIME.DAY
+		#else:
+			#time_of_day = Enums.TIME.NIGHT
+		#SignalTower.emit_signal("time_changed", value)
+##Never change this value directly, use Global.progess_time() or Global.set_time()
+var game_time :Dictionary[String,int]={"Minutes":0,"Hours":0,"Seconds":0}:
 	set(value):
-		game_time = value
-		if game_time >= 6.0 and game_time <= 18.0:
+		#if value.Minute >= 60: 
+			#value.Minute = value.Minute-60
+			#value.Hour + 1
+		#if value.Hour >=24: value.Hour = value.Hour - 24
+		if value.Hour >= 6 and value.Hour <= 18:
 			time_of_day = Enums.TIME.DAY
 		else:
 			time_of_day = Enums.TIME.NIGHT
+		game_time = value
+		print("time_changed %s" % [game_time])
 		SignalTower.emit_signal("time_changed", game_time)
 var time_factor : float = 1.0
-const true_time_factor : float = 1.0
-const hour : float = 1.0
-const minute : float = 0.01666666666666666666666666666667
+var time_passed := 0.0
+
 var play_time:= 0
 ## RngTool stores the RandomNumberGenerator here to keep a reference loaded.
 ## use RngTool to actually use the RandomNumberGenerator.
@@ -40,7 +61,7 @@ var rng:RandomNumberGenerator
 var map_ref:GameMap
 var flags : Dictionary
 
-var timePassed := 0
+
 var language
 
 const slamage := 5
@@ -64,8 +85,9 @@ func save()->Dictionary:
 		"time_factor":time_factor,
 		"RngState":RNG.save_state(),
 		"flags":flags,
+		"meta_state":meta_state,
 		"time_of_day":time_of_day,
-		#"TimePassed":timePassed, #Move to MapManager?
+		#"time_passed":time_passed, #Move to MapManager?
 		#"Language":language, #Move to Config eventually
 		#"CurrentMap":currentMapPath, #Move to MapManager
 		#"ChapterNumber":chapterNumber, #Move to MapManager
@@ -80,7 +102,7 @@ func save()->Dictionary:
 		#"RNG":rng,
 		#"UnitObjs":unitObjs,
 		#"Flags":flags,
-		#"TimePassed":timePassed,
+		#"time_passed":time_passed,
 		#"Language":language,
 		#"CurrentMap":currentMapPath,
 		#"ChapterNumber":chapterNumber,
@@ -92,6 +114,7 @@ func save()->Dictionary:
 
 func load_persistant(Data:Dictionary):
 	var RNG := RngTool.new()
+	var mStateKey :String = META_STATES.find_key(Data.meta_state)
 	if Data.DataType != "Global": 
 		print("ERROR: ATTEMPTED TO LOAD NON-GLOBAL DATA IN GLOBAL")
 		return
@@ -101,7 +124,8 @@ func load_persistant(Data:Dictionary):
 	RNG.load_state(Data.RngState)
 	#unitObjs = Data.UnitObjs
 	flags = Data.flags
-	#timePassed = Data.TimePassed
+	meta_state = META_STATES[mStateKey]
+	#time_passed = Data.time_passed
 	#language = Data.Language
 	#currentMap = Data.CurrentMapPath
 	#chapterNumber = Data.ChapterNumber
@@ -110,11 +134,12 @@ func load_persistant(Data:Dictionary):
 
 
 func reset_values():
-	time_of_day = Enums.TIME.DAY
-	game_time = 12.00
+	game_time.Hours = 12
+	game_time.Minutes = 0
+	#game_time = 0.0
 	time_factor = 1.0
 	_init_flags()
-	timePassed = 0
+	time_passed = 0
 	#language = Data.Language
 #endregion
 
@@ -122,12 +147,8 @@ func reset_values():
 func _init_flags():
 	flags = {
 		"DebugMode": true,
-		"gameOver": false, #Move to MapManager?
-		"victory": false, #Move to MapManager?
-		"ObjectiveComplete": false, #Move to Map?
-		"traded": false, #Move to Unit?
-		"itemUsed" : false, #Move to Unit?
 	}
+	meta_state = META_STATES.NONE
 
 
 func set_rich_text_params(label):
@@ -142,12 +163,48 @@ func set_rich_text_params(label):
 
 #region Time bullshitery
 ##Passively progresses time, factoring any time_factor
-func progress_time():
-	var timeProgress = hour * time_factor
-	if game_time + timeProgress > 23:
-		game_time = 0.0 + timeProgress
-	else:
-		game_time += timeProgress
+func progress_time(add_hours:int=0,add_minutes:int=0):
+	var seconds:float = (
+		float(add_minutes * 60)
+		+ (float(add_hours * 60)*60)
+	)
+	seconds = seconds * time_factor
+	var minutes := fmod(seconds/60.0,60.0)
+	var hours := floorf(fmod(seconds / 3600.0, 120.0))
+	var fract := minutes - floorf(minutes)
+	seconds =  60 * fract
+	
+	if seconds: print("seconds:%d, game_time:%d, combo:%d" % [minutes,game_time.Minutes,(game_time.Minutes + minutes)])
+	while (game_time.Seconds + seconds) >=60:
+		seconds = seconds - 60
+		minutes += 1
+		print("Loop: seconds:%d, game_time:%d, combo:%d" % [minutes,game_time.Minutes,(game_time.Minutes + minutes)])
+	
+	if add_minutes: print("add_minutes:%d, game_time:%d, combo:%d" % [minutes,game_time.Minutes,(game_time.Minutes + minutes)])
+	while (game_time.Minutes + minutes) >=60:
+		minutes = minutes - 60
+		hours += 1
+		print("Loop: add_minutes:%d, game_time:%d, combo:%d" % [minutes,game_time.Minutes,(game_time.Minutes + minutes)])
+	
+	if add_hours: print("add_hours:%d, game_time:%d, combo:%d" % [hours,game_time.Hours,(game_time.Hours + hours)])
+	while (game_time.Hours + hours) >= 24:
+		hours = hours - 24
+		print("Loop: add_hours:%d, game_time:%d, combo:%d" % [hours,game_time.Hours,(game_time.Hours + hours)])
+	
+	
+	game_time.Hours += int(hours)
+	game_time.Minutes += int(minutes)
+	game_time.Seconds += int(seconds)
+	print("Final Time: H:%d, M:%d, S:%d" % [game_time.Hours, game_time.Minutes, game_time.Seconds])
+
+
+func set_time(hours:int=0,minutes:int=0,seconds:int=0):
+	hours = clampi(hours,0,23)
+	minutes = clampi(minutes,0,59)
+	seconds = clampi(seconds,0,59)
+	game_time.Hours = hours
+	game_time.Minutes = minutes
+	game_time.Seconds = seconds
 
 
 func reset_time_factor():
@@ -160,19 +217,27 @@ func apply_time_factor(effectValue:float):
 	time_factor = clampf(newFactor, 0.25, 2)
 
 ##converts number of hours and minutes into a float value usable for Global.game_time to track time
-func time_to_float(hours:int,minutes:int) -> float:
-	var h :float= hours * hour
-	var m :float= minutes * minute
-	return (h+m)
+#func time_to_float(hours:int,minutes:int) -> float:
+	#var h :float= hours * hour
+	#var m :float= minutes * minute
+	#return (h+m)
 
 
 ##converts a float value usable for Global.game_time to time values, and returns a dictionary[string, int] {Hours:number of, Minutes:number of}
-func float_to_time(game_time:float) -> Dictionary[String, int]:
-	var splitTime:Dictionary[String, int]= {"Hours": 0, "Minutes": 0}
-	splitTime.Hours = floori(game_time)
-	splitTime.Minutes = floori((game_time - floori(game_time)) / minute)
-	return splitTime
+#func float_to_time(time:float) -> Dictionary[String, int]:
+	#var splitTime:Dictionary[String, int]= {"Hours": 0, "Minutes": 0}
+	#splitTime.Hours = floori(time)
+	#splitTime.Minutes = floori((time - floori(time)) / minute)
+	#return splitTime
 
+
+func find_time_difference(prev_time:float,new_time: float) -> float:
+	var d : float
+	var mod: float = 0.0
+	if prev_time > new_time: mod = 24.0
+	d = (new_time + mod) - prev_time
+	print("find_difference: ", d)
+	return d
 
 ##converts time units into a digital clock style string
 func time_to_string(hours:int, minutes:int) -> String:
@@ -193,6 +258,5 @@ func time_to_string(hours:int, minutes:int) -> String:
 
 #region flag shit
 func reset_map_flags():
-	Global.flags.gameOver = false
-	Global.flags.victory = false
+	meta_state = META_STATES.NONE
 #endregion

@@ -166,6 +166,29 @@ text = "FOCUS"
 layout_mode = 2
 text = "FOCUS"
 
+[node name="VBoxContainer" type="VBoxContainer" parent="DEBUG/PanelContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DEBUG/PanelContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="GBStateLbl" type="Label" parent="DEBUG/PanelContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "GBState: "
+
+[node name="GBState" type="Label" parent="DEBUG/PanelContainer/VBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="DEBUG/PanelContainer/VBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="GBStepLbl" type="Label" parent="DEBUG/PanelContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "GBStep: "
+
+[node name="GBStep" type="Label" parent="DEBUG/PanelContainer/VBoxContainer/VBoxContainer/HBoxContainer2"]
+layout_mode = 2
+
 [node name="ExpGain" type="HBoxContainer" parent="."]
 visible = false
 layout_mode = 1

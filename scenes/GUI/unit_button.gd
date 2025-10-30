@@ -6,6 +6,9 @@ class_name UnitButton
 var buttonState : StringName
 
 
+
+
+
 func set_state(state : StringName):
 	buttonState = state
 	_font_state_change(buttonState)

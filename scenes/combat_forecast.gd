@@ -22,7 +22,8 @@ func hide_fc() -> void:
 		p.visible = false
 	_close_effects()
 	if animationsLoaded: _free_animations()
-	
+
+
 func update_fc(foreCast:Dictionary) -> void: #HERE labels need updating to using StringGetter AND "unarmed" doesn't appear correct
 	var groups : Dictionary = {}
 	var units : Array = foreCast.keys()

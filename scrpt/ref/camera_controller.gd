@@ -13,6 +13,7 @@ var origCam : SceneCamera
 var originPoint := Vector2.ZERO
 var prevCamera : SceneCamera
 var viewPort : Viewport
+var orig_zoom:Vector2
 
 
 #func _init(newCamera : Camera2D):
@@ -34,40 +35,48 @@ func _init(view_port:Viewport):
 		
 #region Camera Movement Functions
 ##moves camera offset based on map co-ordinates
-func move_camera_map(hex:Vector2i, speed:float = 1.0, setTrans: Tween.TransitionType = Tween.TransitionType.TRANS_LINEAR, setEase:Tween.EaseType = Tween.EaseType.EASE_OUT_IN) -> void:
+func move_camera_map(hex:Vector2i, speed:float = 1.0,zoom_value:Vector2=camera.get_zoom(), setTrans: Tween.TransitionType = Tween.TransitionType.TRANS_LINEAR, setEase:Tween.EaseType = Tween.EaseType.EASE_OUT_IN) -> void:
 	if !_check_valid(hex): return
-	camera.tween_camera(hex, "offset", speed, setTrans, setEase)
+	var properties:Array[String] = ["offset"]
+	if zoom_value != camera.get_zoom():
+		orig_zoom = camera.get_zoom()
+		properties.append("zoom")
+	camera.tween_camera(hex, ["offset"],speed,zoom_value,setTrans,setEase)
 	
 	
 ##same as move_camera_map, but uses unit_id for coordinates
-func move_camera_unit(unit_id:String, speed:float = 1.0, setTrans: Tween.TransitionType = Tween.TransitionType.TRANS_LINEAR, setEase:Tween.EaseType = Tween.EaseType.EASE_OUT_IN) -> void:
+func move_camera_unit(unit_id:String,speed:float=1.0,zoom_value:Vector2=camera.get_zoom(), setTrans: Tween.TransitionType = Tween.TransitionType.TRANS_LINEAR, setEase:Tween.EaseType = Tween.EaseType.EASE_OUT_IN) -> void:
 	var hex : Vector2i
 	var map : GameMap = Global.map_ref
 	var units = map.get_active_units()
-	
+	var properties:Array[String] = ["offset"]
+	if zoom_value != camera.get_zoom(): 
+		orig_zoom = camera.get_zoom()
+		properties.append("zoom")
 	for cell in units:
 		if units[cell].unit_id == unit_id: hex = cell
 		
 	if !_check_valid(hex): 
 		print("Camer Controller: move_camera_unit: invalid coordinates")
 		return
-	
-	camera.tween_camera(hex, "offset", speed, setTrans, setEase)
+	camera.tween_camera(hex,properties,speed,zoom_value,setTrans,setEase)
 
 
 ##same as move_camera_map, but retrieves location from sceneTile with id matching given int value.
-func move_camera_cameratile(cameraTileId:int, speed:float = 1.0, setTrans: Tween.TransitionType = Tween.TransitionType.TRANS_LINEAR, setEase:Tween.EaseType = Tween.EaseType.EASE_OUT_IN) -> void:
+func move_camera_cameratile(cameraTileId:int, speed:float = 1.0,zoom_value:Vector2=camera.get_zoom(), setTrans: Tween.TransitionType = Tween.TransitionType.TRANS_LINEAR, setEase:Tween.EaseType = Tween.EaseType.EASE_OUT_IN) -> void:
 	var map : GameMap = Global.map_ref
 	var hex : Vector2i = map.get_narrative_tile(cameraTileId)
-
+	var properties:Array[String] = ["offset"]
+	if zoom_value != camera.get_zoom(): 
+		orig_zoom = camera.get_zoom()
+		properties.append("zoom")
 	if !_check_valid(hex): 
 		print("Camer Controller: move_camera_cameratile: invalid coordinates")
 		return
-	
-	camera.tween_camera(hex, "offset", speed, setTrans, setEase)
+	camera.tween_camera(hex, properties,speed,zoom_value,setTrans, setEase)
 
 
-#region camer effects
+#region camera effects
 ##Shake it baby
 func shake_camera(duration:int = 4.0):
 	camera.shake_camera(duration)
@@ -86,13 +95,12 @@ func fade_in(speedScale:=1.5):
 	SignalTower.emit_signal("fader_fade_in", speedScale)
 	await  SignalTower.fade_in_complete
 	emit_signal("camera_fade_in_complete")
-
-
 #endregion
 
+
 ##resets the target camera's offset, Pass true to tween the return.
-func reset_camera(isTweened := false, speed:float = 1.0) -> void:
-	camera.reset_camera(isTweened)
+func reset_camera(isTweened := false, speed:float = 1.0,set_trans: Tween.TransitionType = Tween.TransitionType.TRANS_LINEAR, set_ease:Tween.EaseType = Tween.EaseType.EASE_OUT_IN) -> void:
+	camera.reset_camera(isTweened,speed,orig_zoom,set_trans,set_ease)
 
 #endregion
 

@@ -1,0 +1,8 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://crq87yjolg6r0"]
+
+[ext_resource type="FontFile" uid="uid://dxy3wwjlv0480" path="res://fonts/Smythe/Smythe.otf" id="1_e4yhj"]
+
+[resource]
+default_font = ExtResource("1_e4yhj")
+Label/colors/font_color = Color(0.01, 0.01, 0.01, 1)
+Label/font_sizes/font_size = 70

@@ -85,5 +85,6 @@ vertical_alignment = 2
 
 [node name="ButtonLayer" type="TextureButton" parent="."]
 layout_mode = 2
+mouse_filter = 1
 theme = ExtResource("1_ofp1p")
 action_mode = 0

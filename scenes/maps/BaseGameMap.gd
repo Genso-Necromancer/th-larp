@@ -1,7 +1,7 @@
 @tool
 extends Node2D
 class_name GameMap
-signal map_ready
+signal map_ready(map:GameMap)
 signal units_reloaded
 signal events_checked
 signal danmaku_progressed
@@ -21,10 +21,16 @@ enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
 @export_file("*.tscn") var next_map : String
 @export var chapterNumber: int = 0
 @export var title: String = ""
+@export var objectives:Array[Objective] = []:
+	set(value):
+		objectives = value
+		update_configuration_warnings()
 @export_group("Conditions")
+
 @export_subgroup("Win Conditions")
 ##Sequential: each objective in win_conidtions occurs one after the other. [br]
 ##Simultaneous: Every objective in win_conditions is active at the same time.
+
 @export var win_style : OBJECTIVE_STYLE = OBJECTIVE_STYLE.SEQUENTIAL
 ##Objective of the map.[br]
 ##Make new of any desired style of objective, then input the desired requirements
@@ -50,6 +56,7 @@ enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
 @onready var modifier :TileMapLayer= $Modifier
 @onready var object :TileMapLayer= $Object
 @onready var deploy :TileMapLayer= $Deployments
+var seizeLayers :Array[SeizeLayer]=[]
 ##tiles with Even region numbers are treated as "Enemy Team" regions, while odd are considered "player" regions.
 @onready var regions :TileMapLayer= $Regions
 @onready var pathAttack :TileMapLayer= $PathAttack
@@ -82,6 +89,8 @@ var wasSeized : Array[Vector2i] = []
 var sequenceStep := 0:
 	set(value):
 		sequenceStep = clampi(value,0,win_conditions.size()-1)
+##Objective tracking
+var completed_conditions:Dictionary[String,Array] = {"Loss":[],"Victory":[]}
 
 
 func _ready():
@@ -90,20 +99,54 @@ func _ready():
 		dev.visible = false
 		narrative.visible = false
 		regions.visible = false
-		for obj in win_conditions:
-			if obj is KillUnit:
-				for path in obj.hit_list_paths:
-					obj.hit_list.append(get_node(path).unit_id)
-
+		_ready_objectives()
 	mapSize = ground.get_used_rect().size
 	SignalTower.action_seize.connect(self._on_seize)
 	SignalTower.chest_opened.connect(self.chest_activated)
 	SignalTower.chest_stolen.connect(self.chest_activated)
 	SignalTower.door_unlocked.connect(self.door_unlocked)
+	SignalTower.unit_death.connect(self._on_unit_death)
 	get_tree().call_group("ObjectTile","init_cell")
 	_gather_object_tiles()
 	_initialize_map_units()
-	emit_signal("map_ready")
+	emit_signal("map_ready", self)
+
+
+#region objective functions
+func _ready_objectives():
+	for objective in objectives:
+		objective.completed.connect(self._on_objective_completed)
+		if objective is Seize: _ready_seize(objective)
+		#elif objective is KillUnit: _ready_kills(objective)
+	
+	
+func _ready_seize(objective:Seize):
+	var layer:SeizeLayer=get_node(objective.seize_tile_layer)
+	seizeLayers.append(layer)
+	objective.ready_tracker(layer)
+
+
+func _on_objective_completed(objective:Objective):
+	match objective.condition_type:
+		Objective.CONDITION_TYPES.LOSING: completed_conditions.Loss.append(objective)
+		Objective.CONDITION_TYPES.WINNING: completed_conditions.Victory.append(objective)
+
+
+func _check_objective_triggers(): pass
+	#Eventually call this to cross reference completed objectives with events that have them as a trigger
+
+
+func check_map_completion()->bool:
+	var verdict:=true
+	if completed_conditions.Loss:Global.meta_state = Global.META_STATES.GAME_OVER
+	elif completed_conditions.Victory:Global.meta_state = Global.META_STATES.VICTORY
+	else:verdict = false
+	return verdict
+
+#func _ready_kills(objective:KillUnit):
+	#pass
+#endregion
+
 
 #region special tile handling
 func chest_activated(cell:Vector2i, _contents:Array[Item],_covered_by:Unit):
@@ -221,7 +264,7 @@ func _load_interactive_states(data:Dictionary):
 
 #region warnings
 func _get_configuration_warnings():
-	if win_conditions.is_empty(): return ["Objective missing in win_condition, map is unbeatable."]
+	if objectives.is_empty(): return ["Objective missing in objectives, map is uncompleteable."]
 	else: return []
 #endregion
 
@@ -243,7 +286,7 @@ func _get_property_list():
 		"name" : "minutes",
 		"type" : TYPE_INT,
 		"hint" : PROPERTY_HINT_RANGE,
-		"hint_string" : "0,60,1"
+		"hint_string" : "0,59,1"
 	})
 	
 	return properties
@@ -311,8 +354,8 @@ func _initialize_danmaku_cells():
 
 
 func get_objectives() -> Array:
-	var objectives: Array = ["This is a Test", "Of The Emergency Broadcast", "System."]
-	return objectives
+	var objectText: Array = ["This is a Test", "Of The Emergency Broadcast", "System."]
+	return objectText
 
 
 func get_loss_conditions() -> Array:
@@ -374,9 +417,9 @@ func get_bonus(cell:Vector2i) -> Dictionary:
 	return cellParams
 
 
-func get_deployment_cells():
+func get_deployment_cells()->Array[Vector2i]:
 	var triggerCells :Array[Vector2i] = deploy.get_used_cells()
-	var deploymentCells = []
+	var deploymentCells :Array[Vector2i]= []
 	for cell in triggerCells:
 		var tileData :TileData = deploy.get_cell_tile_data(cell)
 		if tileData.get_custom_data("Trigger") == "deployCell":
@@ -404,11 +447,11 @@ func get_walls() -> Dictionary:
 	return walls
 
 
-func get_forced_deploy(): #make sure there is equal units assigned as forced as there are forced cells!
+func get_forced_deploy()->Dictionary[String,Vector2i]: #make sure there is equal units assigned as forced as there are forced cells!
 	var i = 0
 	var triggerCells :Array[Vector2i] = deploy.get_used_cells()
-	var forcedCells = []
-	var forcedDeploy = {}
+	var forcedCells := []
+	var forcedDeploy :Dictionary[String,Vector2i]= {}
 	for cell in triggerCells:
 		var tileData :TileData = deploy.get_cell_tile_data(cell)
 		if tileData.get_custom_data("Trigger") == "forcedCell":
@@ -468,14 +511,21 @@ func get_used_rect() -> Rect2i:
 	return ground.get_used_rect()
 #endregion
 
+
 #region Event Functions
-func _on_unit_death(unit:Unit):
-	graveyard.append(unit.unit_id)
-	check_event(MAP_EVENT.DEATH, unit)
+func _on_unit_death(unit:Unit): graveyard.append(unit.unit_id)
+	#for objective in objectives:
+		#if objective is KillUnit: objective._on_unit_death(unit.unit_id)
+
+#endregion
+
+#old event functions could be repurposed if redesigned or non-objective events, kept for time being, but innert.
+#region old event code
+func _on_seize(cell:Vector2i): pass
 
 
-func _on_seize(cell:Vector2i):
-	check_event(MAP_EVENT.SEIZE,cell)
+#func _on_time_changed():
+	#check_event(MAP_EVENT.TIME,Global.time_passed)
 
 
 func check_event(trigger:MAP_EVENT, parameter): ##Triggers: death, time, seize
@@ -485,102 +535,102 @@ func check_event(trigger:MAP_EVENT, parameter): ##Triggers: death, time, seize
 		MAP_EVENT.DEATH: triggered = _check_death_conditionals(parameter)
 		MAP_EVENT.TIME: triggered = _check_time_conditional(parameter)
 	return triggered
+#
+#
+#func _get_win_objective(event:MAP_EVENT) -> Objective:
+	#var toCheck : Array[Objective] = []
+	#var obj : Objective
+	#match win_style:
+		#OBJECTIVE_STYLE.SEQUENTIAL: obj = win_conditions[sequenceStep]
+		#OBJECTIVE_STYLE.SIMULTANEOUS: toCheck = win_conditions
+	#
+	#for con in toCheck:
+		#match event:
+			#MAP_EVENT.TIME: pass
+			#MAP_EVENT.SEIZE: if con is Seize: obj = con
+			#MAP_EVENT.DEATH:  if con is KillUnit: obj = con
+	#return obj
 
 
-func _get_win_objective(event:MAP_EVENT) -> Objective:
-	var toCheck : Array[Objective] = []
-	var obj : Objective
-	match win_style:
-		OBJECTIVE_STYLE.SEQUENTIAL: obj = win_conditions[sequenceStep]
-		OBJECTIVE_STYLE.SIMULTANEOUS: toCheck = win_conditions
-	
-	for con in toCheck:
-		match event:
-			MAP_EVENT.TIME: pass
-			MAP_EVENT.SEIZE: if con is Seize: obj = con
-			MAP_EVENT.DEATH:  if con is KillUnit: obj = con
-	return obj
+func _check_seize_conditionals(cell): pass
+	#var c := 0
+	#var obj : Seize = _get_win_objective(MAP_EVENT.SEIZE)
+	#if !obj: return false
+	#elif is_seize(cell): wasSeized.append(cell)
+	#
+	#for event in dev.get_used_cells_by_id(1,Vector2i(0,0),0):
+		#if wasSeized.has(event): c += 1
+	#
+	#if c >= obj.seize_count:
+		#obj.complete = true
+		#sequenceStep += 1
+		#_check_victory()
+		#return true
+	#return false
 
 
-func _check_seize_conditionals(cell) -> bool:
-	var c := 0
-	var obj : Seize = _get_win_objective(MAP_EVENT.SEIZE)
-	if !obj: return false
-	elif is_seize(cell): wasSeized.append(cell)
-	
-	for event in dev.get_used_cells_by_id(1,Vector2i(0,0),0):
-		if wasSeized.has(event): c += 1
-	
-	if c >= obj.seize_count:
-		obj.complete = true
-		sequenceStep += 1
-		_check_victory()
-		return true
-	return false
-
-
-func _check_death_conditionals(parameter) -> bool:
+func _check_death_conditionals(parameter): pass
 	# Doesn't work if unit dies in non-killUnit objective
 	# Need to seperate the checks of loss kills and win kills into two seperate functions that are ran here
-	var unitId
-	var condition
-	var triggered := false
-	var winObj :Objective= _get_win_objective(MAP_EVENT.DEATH)
-	if parameter.FACTION_ID == Enums.FACTION_ID.PLAYER:
-		unitId = parameter.unit_id
-		condition = "Player Death"
-	else:
-		condition = "NPC Death"
-		
-	match condition:
-		"Player Death":
-			if playerDeath[unitId]:
-				Global.flags.gameOver = true
-				triggered = true
-		"NPC Death":
-			if lossKill.has(parameter):
-				Global.flags.gameOver = true
-				triggered = true
-			if winObj is KillUnit and winObj.hit_list.has(parameter.unit_id):
-				_add_kill(parameter, true)
-			_on_unit_death(parameter.unit_id)
-	if triggered:
-		_check_off_event.call_deferred()
-	return triggered
+	#var unitId
+	#var condition
+	#var triggered := false
+	#var winObj :Objective= _get_win_objective(MAP_EVENT.DEATH)
+	#if parameter.FACTION_ID == Enums.FACTION_ID.PLAYER:
+		#unitId = parameter.unit_id
+		#condition = "Player Death"
+	#else:
+		#condition = "NPC Death"
+		#
+	#match condition:
+		#"Player Death":
+			#if playerDeath[unitId]:
+				#Global.flags.gameOver = true
+				#triggered = true
+		#"NPC Death":
+			#if lossKill.has(parameter):
+				#Global.flags.gameOver = true
+				#triggered = true
+			#if winObj is KillUnit and winObj.hit_list.has(parameter.unit_id):
+				#_add_kill(parameter, true)
+			#_on_unit_death(parameter.unit_id)
+	#if triggered:
+		#_check_off_event.call_deferred()
+	#return triggered
 
 
-func _add_kill(unit, victory):
-	var winObj :KillUnit = _get_win_objective(MAP_EVENT.DEATH)
-	if victory:
-		victoryKills.append(unit.unit_id)
-	if !winObj: return
-	for kill in winObj.hit_list:
-		if !victoryKills.has(kill):
-			return
-	winObj.complete = true
-	sequenceStep += 1
-	_check_victory()
+#func _add_kill(unit, victory):
+	#var winObj :KillUnit = _get_win_objective(MAP_EVENT.DEATH)
+	#if victory:
+		#victoryKills.append(unit.unit_id)
+	#if !winObj: return
+	#for kill in winObj.hit_list:
+		#if !victoryKills.has(kill):
+			#return
+	#winObj.complete = true
+	#sequenceStep += 1
+	#_check_victory()
 
 
-func _check_time_conditional(_time) -> bool:
-	var triggered := false
-	if hoursPassed == 0: triggered = false
-	elif Global.timePassed == hoursPassed:
-		Global.flags.gameOver = true
-		return true
-	var childs = get_children()
-	for child in childs:
-		var spawner = child as UnitSpawner
-		if spawner and spawner.timeMethod == "Time Passed" and spawner.timeHours <= Global.timePassed:
-			_spawn_premade_units(spawner)
-			triggered = true
-		elif spawner and spawner.timeMethod == "Time of Day" and spawner.timeHours == Global.game_time:
-			_spawn_premade_units(spawner)
-			triggered = true
-	return triggered
+func _check_time_conditional(_time): pass
+	#var triggered := false
+	#if hoursPassed == 0: triggered = false
+	#elif Global.time_passed == hoursPassed:
+		#Global.flags.gameOver = true
+		#return true
+	#var childs = get_children()
+	#for child in childs:
+		#var spawner = child as UnitSpawner
+		#if spawner and spawner.timeMethod == "Time Passed" and spawner.timeHours <= Global.time_passed:
+			#_spawn_premade_units(spawner)
+			#triggered = true
+		#elif spawner and spawner.timeMethod == "Time of Day" and spawner.timeHours == Global.game_time:
+			#_spawn_premade_units(spawner)
+			#triggered = true
+	#return triggered
 
 
-func check_events():
+func check_event_queue():
 	var triggered : bool
 	triggered = check_event(MAP_EVENT.TIME, Global.game_time)
 	if triggered:
@@ -596,11 +646,11 @@ func _check_off_event():
 		emit_signal("events_checked")
 
 
-func _check_victory() -> void:
-	#var flag : bool
-	for obj in win_conditions:
-		if !obj.complete: return
-	Global.flags.victory = true
+#func _check_victory() -> void:
+	##var flag : bool
+	#for obj in win_conditions:
+		#if !obj.complete: return
+	#Global.flags.victory = true
 #endregion
 
 #region entity spawning

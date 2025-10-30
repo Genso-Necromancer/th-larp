@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://diaw7xn4hvfd7"]
+[gd_scene load_steps=23 format=3 uid="uid://diaw7xn4hvfd7"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_5xt48"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_mte8d"]
@@ -13,6 +13,10 @@
 [ext_resource type="Script" uid="uid://y8vspyvvdgjj" path="res://unit_resources/items/consumables/consumable.gd" id="10_80wpv"]
 [ext_resource type="Resource" uid="uid://cmoym4xuhijeg" path="res://unit_resources/items/consumables/pizza.tres" id="11_k4fqe"]
 [ext_resource type="Texture2D" uid="uid://dljh0liccgicy" path="res://sprites/character/sakuya/maid_sprite.png" id="12_pg4wh"]
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="13_xjp6u"]
+[ext_resource type="Resource" uid="uid://winsmapguce" path="res://unit_resources/effects/power_buff02.tres" id="14_04v6q"]
+[ext_resource type="Script" uid="uid://6xq3oabgheeu" path="res://unit_resources/items/consumables/consumable_resource.gd" id="15_srosb"]
+[ext_resource type="Resource" uid="uid://b7s77y3xj1qtm" path="res://unit_resources/items/weapons/knife_dagger.tres" id="16_04v6q"]
 
 [sub_resource type="Resource" id="Resource_katwc"]
 script = ExtResource("8_04v6q")
@@ -29,6 +33,42 @@ equipped = false
 dropped = false
 is_broken = false
 metadata/_custom_type_script = "uid://y8vspyvvdgjj"
+
+[sub_resource type="Resource" id="Resource_80wpv"]
+script = ExtResource("15_srosb")
+target = 1
+min_reach = 0
+max_reach = 0
+personal = false
+level = 0
+use = true
+equippable = false
+breakable = true
+expendable = true
+trade = true
+max_dur = 1
+category = 12
+sub_group = 0
+effects = Array[ExtResource("13_xjp6u")]([ExtResource("14_04v6q")])
+id = ""
+rule_type = 0
+metadata/_custom_type_script = "uid://6xq3oabgheeu"
+
+[sub_resource type="Resource" id="Resource_k4fqe"]
+script = ExtResource("10_80wpv")
+stats = SubResource("Resource_80wpv")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://y8vspyvvdgjj"
+
+[sub_resource type="Resource" id="Resource_srosb"]
+script = ExtResource("8_04v6q")
+stats = ExtResource("16_04v6q")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
 
 [node name="Sakuya" instance=ExtResource("1_5xt48")]
 unit_id = "sakuya"
@@ -90,7 +130,7 @@ weapon_prof = {
 "Stick": false
 }
 max_inv = 6
-inventory = Array[ExtResource("7_xjp6u")]([SubResource("Resource_katwc"), SubResource("Resource_k04xu")])
+inventory = Array[ExtResource("7_xjp6u")]([SubResource("Resource_katwc"), SubResource("Resource_k04xu"), SubResource("Resource_k4fqe"), SubResource("Resource_srosb")])
 
 [node name="Sprite" parent="PathFollow2D" index="0"]
 texture = ExtResource("12_pg4wh")
