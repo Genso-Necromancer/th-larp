@@ -1,0 +1,13 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://bkw5gyl1rlgs2"]
+
+[ext_resource type="FontFile" uid="uid://b1ahq708k5luc" path="res://fonts/Rotunda/Rotunda.otf" id="1_j36r7"]
+
+[resource]
+default_font = ExtResource("1_j36r7")
+default_font_size = 26
+Label/colors/font_color = Color(0, 0, 0, 1)
+MarginContainer/constants/margin_top = 45
+NameMargin/base_type = &"MarginContainer"
+NameMargin/constants/margin_left = 8
+NameMargin/constants/margin_right = 8
+NameMargin/constants/margin_top = 110

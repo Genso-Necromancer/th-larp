@@ -1210,6 +1210,8 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.FOOT: 3,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 2,
+				Enums.MOVE_TYPE.MOUNT: 10,
+				Enums.MOVE_TYPE.ARMOR: 10,
 				},
 			"Water":{
 				"GrzBonus": 20,

@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cmh8ono4w82cq"]
 
-[ext_resource type="Texture2D" uid="uid://4lca2aumdu2g" path="res://sprites/testCursor.png" id="1_pwpkv"]
+[ext_resource type="Texture2D" uid="uid://dvh7il8ju4ap5" path="res://scenes/GUI/cursors/cursor1.png" id="1_h682f"]
 [ext_resource type="Script" uid="uid://dybncle6hh6or" path="res://scenes/GUI/menu_cursor.gd" id="1_tms0j"]
 
 [node name="menu_cursor" type="TextureRect"]
@@ -8,11 +8,11 @@ top_level = true
 y_sort_enabled = true
 offset_right = 16.0
 offset_bottom = 16.0
-scale = Vector2(2, 2)
 pivot_offset = Vector2(8, 8)
 mouse_filter = 2
-texture = ExtResource("1_pwpkv")
+texture = ExtResource("1_h682f")
+flip_h = true
 script = ExtResource("1_tms0j")
-cursor_offset = Vector2(40, 10)
+cursor_offset = Vector2(40, 0)
 
 [node name="Timer" type="Timer" parent="."]

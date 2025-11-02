@@ -1,12 +1,11 @@
-[gd_scene load_steps=12 format=3 uid="uid://dsqet8mutarh6"]
+[gd_scene load_steps=11 format=3 uid="uid://dsqet8mutarh6"]
 
 [ext_resource type="Theme" uid="uid://ye48kx1r3u5" path="res://fonts/Izayoi_Theme_Profile_Core.tres" id="1_7goli"]
 [ext_resource type="Theme" uid="uid://errgec2364nv" path="res://fonts/Izayoi_Theme_Tooltip.tres" id="1_ajj6s"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_83r3n"]
 [ext_resource type="Script" uid="uid://drxuqtqtkggi1" path="res://scenes/trade_screen.gd" id="2_xrvbo"]
 [ext_resource type="Texture2D" uid="uid://dqqimoeongvyg" path="res://sprites/character/debug/portrait_full.png" id="4_g8gfs"]
-[ext_resource type="FontFile" uid="uid://di48a300uqd6d" path="res://fonts/VenomMincho-DOOyR.ttf" id="5_8syax"]
-[ext_resource type="Theme" uid="uid://dpfc6p7ruw7wo" path="res://fonts/Izayoi_Theme_Items.tres" id="6_k4p7w"]
+[ext_resource type="Theme" uid="uid://bkw5gyl1rlgs2" path="res://fonts/Theme_Trade_Panel_Extra.tres" id="6_dc2pd"]
 [ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/inventory_panel.tscn" id="8_hil8c"]
 [ext_resource type="PackedScene" uid="uid://dfr2jdyxd14oy" path="res://scenes/GUI/convoy_pnl.tscn" id="9_fjgok"]
 [ext_resource type="PackedScene" uid="uid://b2v4effpiibrw" path="res://scenes/GUI/options_pop_up.tscn" id="9_htpwm"]
@@ -136,17 +135,24 @@ size_flags_vertical = 4
 theme = ExtResource("1_ajj6s")
 theme_override_constants/separation = 150
 
-[node name="TradeBox1" type="VBoxContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer"]
+[node name="TradeBox1" type="MarginContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 0
-theme = ExtResource("6_k4p7w")
+theme = ExtResource("6_dc2pd")
+
+[node name="TradePnl1" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1" instance=ExtResource("8_hil8c")]
+unique_name_in_owner = true
+layout_mode = 2
+_style = "Trade"
 
 [node name="NamePnl1" type="PanelContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1"]
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 4
+size_flags_vertical = 0
 
 [node name="BackgroundCenter" type="NinePatchRect" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1/NamePnl1"]
+visible = false
 layout_mode = 2
 texture = ExtResource("2_83r3n")
 patch_margin_left = 16
@@ -156,30 +162,33 @@ patch_margin_bottom = 16
 
 [node name="MarginContainer" type="MarginContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1/NamePnl1"]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_right = 8
+theme = ExtResource("6_dc2pd")
+theme_type_variation = &"NameMargin"
 
 [node name="NameLb1" type="Label" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1/NamePnl1/MarginContainer"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_fonts/font = ExtResource("5_8syax")
 text = "Name"
 horizontal_alignment = 1
 
-[node name="TradePnl1" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1" instance=ExtResource("8_hil8c")]
-layout_mode = 2
-_style = "Trade"
-
-[node name="TradeBox2" type="VBoxContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer"]
+[node name="TradeBox2" type="MarginContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
-theme = ExtResource("6_k4p7w")
+theme = ExtResource("6_dc2pd")
+
+[node name="TradePnl2" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2" instance=ExtResource("8_hil8c")]
+unique_name_in_owner = true
+layout_mode = 2
+_style = "Trade"
 
 [node name="NamePnl2" type="PanelContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2"]
 layout_mode = 2
-size_flags_horizontal = 8
+size_flags_horizontal = 4
+size_flags_vertical = 0
 
 [node name="BackgroundCenter" type="NinePatchRect" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/NamePnl2"]
+visible = false
 layout_mode = 2
 texture = ExtResource("2_83r3n")
 patch_margin_left = 16
@@ -189,18 +198,18 @@ patch_margin_bottom = 16
 
 [node name="MarginContainer" type="MarginContainer" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/NamePnl2"]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_right = 8
+theme = ExtResource("6_dc2pd")
+theme_type_variation = &"NameMargin"
 
 [node name="NameLb2" type="Label" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/NamePnl2/MarginContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(142, 20)
 layout_mode = 2
-theme_override_fonts/font = ExtResource("5_8syax")
+theme = ExtResource("6_dc2pd")
 text = "Name"
 horizontal_alignment = 1
-
-[node name="TradePnl2" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2" instance=ExtResource("8_hil8c")]
-layout_mode = 2
-_style = "Trade"
+vertical_alignment = 1
+text_overrun_behavior = 1
 
 [node name="ConvoyPnl" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer" instance=ExtResource("9_fjgok")]
 layout_mode = 2

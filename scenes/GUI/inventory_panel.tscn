@@ -1,22 +1,23 @@
-[gd_scene load_steps=5 format=3 uid="uid://ws1f3jg0wotp"]
+[gd_scene load_steps=6 format=3 uid="uid://ws1f3jg0wotp"]
 
 [ext_resource type="Texture2D" uid="uid://de0fc4ialpktg" path="res://sprites/UI/bag.png" id="1_filpb"]
 [ext_resource type="Theme" uid="uid://dpfc6p7ruw7wo" path="res://fonts/Izayoi_Theme_Items.tres" id="1_hbvl4"]
 [ext_resource type="Script" uid="uid://mknl2seu7ecf" path="res://scenes/GUI/inventory_panel.gd" id="2_1levr"]
 [ext_resource type="Texture2D" uid="uid://c7u4h228kq0pr" path="res://sprites/UI/bag_trade.png" id="3_d5a4e"]
+[ext_resource type="Texture2D" uid="uid://dsfwyvrgqjfuv" path="res://scenes/GUI/inventory/itemborder.png" id="4_ro8xq"]
 
 [node name="TradePnl" type="PanelContainer" node_paths=PackedStringArray("itemList", "equipContainer", "styleNodes")]
-custom_minimum_size = Vector2(423, 506)
 size_flags_horizontal = 4
 size_flags_vertical = 0
 theme = ExtResource("1_hbvl4")
 script = ExtResource("2_1levr")
-itemList = NodePath("Control/InventoryMargin/VBoxContainer/ItemList1")
-equipContainer = NodePath("Control/InventoryMargin/VBoxContainer/EquipContainer")
+itemList = NodePath("InventoryMargin/VBoxContainer/ItemList1")
+equipContainer = NodePath("InventoryMargin/VBoxContainer/EquipContainer")
 styleNodes = [NodePath("TradeBackground"), NodePath("ProfileBackground")]
 _style = "NONE"
 
-[node name="TradeBackground" type="NinePatchRect" parent="."]
+[node name="TradeBackgroundOld" type="NinePatchRect" parent="."]
+visible = false
 layout_mode = 2
 texture = ExtResource("3_d5a4e")
 patch_margin_left = 16
@@ -24,7 +25,36 @@ patch_margin_top = 16
 patch_margin_right = 16
 patch_margin_bottom = 16
 
+[node name="RosterBackground" type="NinePatchRect" parent="."]
+layout_mode = 2
+texture = ExtResource("4_ro8xq")
+region_rect = Rect2(8, 6, 470, 844)
+patch_margin_left = 85
+patch_margin_top = 471
+patch_margin_right = 85
+patch_margin_bottom = 299
+
 [node name="ProfileBackground" type="NinePatchRect" parent="."]
+visible = false
+layout_mode = 2
+texture = ExtResource("4_ro8xq")
+region_rect = Rect2(8, 6, 470, 844)
+patch_margin_left = 85
+patch_margin_top = 471
+patch_margin_right = 85
+patch_margin_bottom = 299
+
+[node name="TradeBackground" type="NinePatchRect" parent="."]
+visible = false
+layout_mode = 2
+texture = ExtResource("4_ro8xq")
+region_rect = Rect2(8, 6, 470, 844)
+patch_margin_left = 85
+patch_margin_top = 471
+patch_margin_right = 85
+patch_margin_bottom = 299
+
+[node name="ProfileBackgroundOld" type="NinePatchRect" parent="."]
 visible = false
 layout_mode = 2
 texture = ExtResource("1_filpb")
@@ -34,27 +64,32 @@ patch_margin_right = 16
 patch_margin_bottom = 16
 
 [node name="Control" type="Control" parent="."]
+visible = false
 layout_mode = 2
 
-[node name="InventoryMargin" type="MarginContainer" parent="Control"]
+[node name="InventoryMargin" type="MarginContainer" parent="."]
 layout_mode = 2
-offset_right = 450.0
-offset_bottom = 500.0
-theme_override_constants/margin_left = 55
-theme_override_constants/margin_top = 48
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_constants/margin_left = 91
+theme_override_constants/margin_top = 250
 theme_override_constants/margin_right = 25
-theme_override_constants/margin_bottom = 125
+theme_override_constants/margin_bottom = 135
 
-[node name="VBoxContainer" type="VBoxContainer" parent="Control/InventoryMargin"]
+[node name="VBoxContainer" type="VBoxContainer" parent="InventoryMargin"]
 layout_mode = 2
+theme_override_constants/separation = 0
 
-[node name="EquipContainer" type="MarginContainer" parent="Control/InventoryMargin/VBoxContainer"]
+[node name="EquipContainer" type="MarginContainer" parent="InventoryMargin/VBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(370, 70)
 layout_mode = 2
-theme_override_constants/margin_left = 15
-theme_override_constants/margin_top = 6
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
 
-[node name="ItemList1" type="VBoxContainer" parent="Control/InventoryMargin/VBoxContainer"]
+[node name="ItemList1" type="VBoxContainer" parent="InventoryMargin/VBoxContainer"]
 custom_minimum_size = Vector2(370, 215)
 layout_mode = 2
 theme_override_constants/separation = 8

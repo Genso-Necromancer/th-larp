@@ -17,8 +17,8 @@ signal trd_focus_changed
 #Node references
 @onready var box1 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1
 @onready var box2 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2
-@onready var list1 :InventoryPanel= $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1/TradePnl1
-@onready var list2 :InventoryPanel= $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/TradePnl2
+@onready var list1 :InventoryPanel= %TradePnl1
+@onready var list2 :InventoryPanel= %TradePnl2
 @onready var sprite1 = $CharacterArtGroup/MarginContainer/PrtPnl1/MarginContainer/UnitPrt1
 @onready var sprite2 = $CharacterArtGroup/MarginContainer/PrtPnl2/MarginContainer/UnitPrt2
 @onready var prtPanel1 = $CharacterArtGroup/MarginContainer/PrtPnl1
@@ -258,8 +258,8 @@ func _hide_sprites():
 		p.visible = false
 
 func _load_names(units:Array):
-	var name1 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox1/NamePnl1/MarginContainer/NameLb1
-	var name2 = $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer/TradeBox2/NamePnl2/MarginContainer/NameLb2
+	var name1 = %NameLb1
+	var name2 = %NameLb2
 	var names = [name1, name2]
 	var i = 0
 	for unit in units:

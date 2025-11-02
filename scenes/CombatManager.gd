@@ -571,7 +571,7 @@ func _get_crit_damage(unit) -> int: #GOTCHA BITCH. THERE IS ANOTHER CRIT FUNCTIO
 	var critEffects = unit.get_crit_dmg_effects()
 	
 	print("Initial crit reach: ", str(dmgRange))
-	if subCat and subCat == Enums.SUB_GROUP.KNIFE:
+	if subCat and subCat == Enums.WEAPON_SUB.KNIFE:
 		print("It's a knife crit, wew lad")
 		dmgRange = Global.knifeCrit
 		

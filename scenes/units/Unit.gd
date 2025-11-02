@@ -1649,8 +1649,8 @@ func update_combatdata():
 		combatData.Dmg = wep.dmg + active_stats.Mag + tBonus.MagBonus
 	elif wep.damage_type == Enums.DAMAGE_TYPE.TRUE:
 		combatData.Dmg = wep.dmg
-	combatData.Hit = active_stats.Eleg * 2 + (wep.hit + active_stats.Cha + tBonus.HitBonus)
-	combatData.Graze = active_stats.Cele * 2 + active_stats.Cha + tBonus.GrzBonus
+	combatData.Hit = (active_stats.Eleg * 2) + (wep.hit + active_stats.Cha + tBonus.HitBonus)
+	combatData.Graze = (active_stats.Cele * 2) + active_stats.Cha + tBonus.GrzBonus
 	combatData.Barrier = wep.barrier
 	combatData.BarPrc = (active_stats.Eleg/2) + (active_stats.Def/2) + wep.barrier_chance + tBonus.DefBonus
 	combatData.Crit = active_stats.Eleg + wep.crit
@@ -1660,7 +1660,7 @@ func update_combatdata():
 	combatData.CompBonus = active_stats.Cha / 4
 	combatData.MagBase = active_stats.Mag
 	combatData.PwrBase = active_stats.Pwr
-	combatData.HitBase = active_stats.Eleg * 2 + active_stats.Cha
+	combatData.HitBase = (active_stats.Eleg * 2) + active_stats.Cha
 	combatData.CritBase = active_stats.Eleg
 	combatData.Resist = active_stats.Cha * 2
 	combatData.EffHit = active_stats.Cha

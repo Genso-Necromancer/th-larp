@@ -7,7 +7,8 @@ class_name Cursor
 signal cursor_path_complete
 signal cursor_moved(cell)
 
-@onready var cursorSprite: Sprite2D = $Sprite2D
+@onready var cursorSprite: Sprite2D = $anchor/Sprite2D
+@onready var anim_player:AnimationPlayer = $AnimationPlayer
 #do I even need this?
 var canter = false
 # Coordinates of the current cell the cursor is hovering.
@@ -27,8 +28,8 @@ var tick = 1
 var originPoint := Vector2i.ZERO
 var tween : Tween
 	
-#func _ready():
-	#visible = false
+func _ready():
+	anim_player.play("idle")
 
 
 func _process(_delta):
