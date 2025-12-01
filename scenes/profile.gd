@@ -117,7 +117,6 @@ func _update_features(unit) -> Array:
 			s.get_button().add_to_group("SkillsTT")
 			s.set_meta_data(skill, unit, false)
 			fBox.add_child(s)
-		
 	return buttons
 
 

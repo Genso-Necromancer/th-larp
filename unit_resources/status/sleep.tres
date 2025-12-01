@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="StatusData" load_steps=3 format=3 uid="uid://hq8mvr11eun5"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_2aup0"]
+[ext_resource type="Script" uid="uid://ciyb3yd58kj0w" path="res://unit_resources/status/status_data.gd" id="1_e2fex"]
+
+[resource]
+script = ExtResource("1_e2fex")
+id = "sleep"
+name = "Sleep"
+curable = true
+default_duration = 0
+duration_type = 1
+effects = Array[ExtResource("1_2aup0")]([])

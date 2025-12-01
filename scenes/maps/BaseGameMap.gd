@@ -390,6 +390,24 @@ func get_movement_cost(cell, moveType):
 	elif modTile: cost += costData[modTile][moveType]
 	return cost
 
+func get_terrain_data(cell:Vector2i)-> Dictionary:
+	var data:={"tags":get_terrain_tags(cell),"values":get_terrain_values(cell)}
+	return data
+
+func get_terrain_values(cell:Vector2i)-> Dictionary:
+	var tags:=get_terrain_tags(cell)
+	var values:={"GrzBonus": 0, "DefBonus": 0, "PwrBonus": 0, "MagBonus": 0, "HitBonus": 0,}
+	var terrainData = PlayerData.terrainData
+	
+	if tags.BaseType:
+		for bonus in values:
+			values[bonus] += terrainData[tags.BaseType][bonus]
+			
+	if tags.ModType:
+		for bonus in values:
+			values[bonus] += terrainData[tags.ModType][bonus]
+	return values
+
 
 func get_terrain_tags(cell:Vector2i) -> Dictionary:
 	var terrainTags: Dictionary = {"BaseType": "", "ModType": "", "BaseId": "", "ModId": "", "Locked": false}

@@ -52,6 +52,7 @@ position = Vector2(0, 0.75)
 shape = SubResource("RectangleShape2D_51pth")
 
 [node name="HPbar" type="TextureProgressBar" parent="PathFollow2D/Sprite" groups=["HPBar"]]
+visible = false
 z_index = 1
 anchors_preset = -1
 anchor_right = 0.5

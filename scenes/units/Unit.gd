@@ -278,7 +278,7 @@ var unarmed : Weapon = load("res://unit_resources/items/weapons/unarmed.tres").d
 @export_category("Conditions")
 ##Afflicted status conditions, do not change unless you have a good reason for a unit to begin play with specified condition.
 @export var status : Dictionary = {"Acted":false, "Sleep":false}
-var sParam : Dictionary = {}
+var status_data : Dictionary = {}
 
 @onready var _sprite: Sprite2D = $PathFollow2D/Sprite
 @onready var _animPlayer: AnimationPlayer = %AnimationPlayer:
@@ -320,14 +320,14 @@ var persistant_data : Dictionary
 var killer : Unit
 #queueing
 var life_updated:bool = false
+#AI support
+var threats:Array=[]
+
 #endregion
 #unit base data
 
 var firstLoad := false
 var tick = 1
-
-#var forced : bool = false
-
 var needDeath := false
 var deathFlag := false
 
@@ -579,6 +579,7 @@ func _ready() -> void:
 	hitBox.set_master(self)
 	hitBox.area_entered.connect(self._on_aura_entered)
 	hitBox.area_exited.connect(self._on_aura_exited)
+	unit_relocated.connect(self._on_unit_relocated)
 	_animPlayer.play("idle")
 	#Create the curve resource here because creating it in the editor prevents moving the unit
 	_signals()
@@ -622,6 +623,11 @@ func _on_fx_end(_fx_name:String):
 
 #region persistant data handling
 func save_parameters() -> Dictionary:
+	var saveParam = data_to_dict()
+	return saveParam
+
+
+func data_to_dict(with_terrain:=true)->Dictionary:
 	var RC:= ResourceConverter.new()
 	var inventoryConvert := RC.resources_to_save_data(inventory)
 	var naturalConvert :Dictionary = {}
@@ -632,7 +638,10 @@ func save_parameters() -> Dictionary:
 	var personalPassives := RC.resources_to_save_data(personal_passives)
 	var activeBuffs := RC.effects_to_save_data(active_buffs)
 	var activeDebuffs := RC.effects_to_save_data(active_debuffs)
-	var data :Dictionary ={
+	var combatDup:Dictionary
+	if with_terrain: combatDup = combatData.duplicate(true)
+	else: combatDup = factor_combat_data()
+	var dict :Dictionary ={
 		"unit_id" = unit_id,
 		"killer"= killer,
 		#"deployment" = deployment,
@@ -650,28 +659,57 @@ func save_parameters() -> Dictionary:
 		"mod_growth" = mod_growth,
 		"mod_stats" = mod_stats,
 		"mod_caps" = mod_caps,
-		#"skills" = skills,
-		#"base_skills" = base_skills,
+		"skills" = skills,
+		"base_skills" = base_skills,
 		"personal_skills" = personalSkills,
 		"bonus_skills" = bonusSkills,
-		#"passives" = passives,
-		#"base_passives" = base_passives,
+		"passives" = passives,
+		"base_passives" = base_passives,
 		"personal_passives" = personalPassives,
 		"bonus_passives" = bonusPassives,
 		"status" = status,
-		#"active_auras" = active_auras, #Not good to do it this way. Need to put a check in _ready() to see if they are within any auras when loaded in
-		#"active_item_effects" = active_item_effects,
+		"active_auras" = active_auras, #Not good to do it this way. Need to put a check in _ready() to see if they are within any auras when loaded in
+		"active_item_effects" = active_item_effects,
 		"active_buffs" = activeBuffs,
 		"active_debuffs" = activeDebuffs,
 		"current_life" = active_stats.CurLife,
 		"current_comp" = active_stats.CurComp,
+		"combat_data" = combatData,
 		"natural" = naturalConvert,
 		"inventory" = inventoryConvert,
 		"SPEC_ID" = SPEC_ID,
 		"ROLE_ID" = ROLE_ID,
 		"move_type" = move_type,
 	}
-	return data
+	return dict
+
+func to_sim() -> UnitSim:
+	var sim = UnitSim.new()
+	var RC:= ResourceConverter.new()
+	var bonusSkills := RC.resources_to_save_data(bonus_skills)
+	var personalSkills := RC.resources_to_save_data(personal_skills)
+	var bonusPassives := RC.resources_to_save_data(bonus_passives)
+	var personalPassives := RC.resources_to_save_data(personal_passives)
+	var activeBuffs := RC.effects_to_save_data(active_buffs)
+	var activeDebuffs := RC.effects_to_save_data(active_debuffs)
+	sim.id = unit_id
+	sim.team = FACTION_ID
+	sim.cell = cell
+	sim.hp = active_stats.CurLife
+	sim.comp = active_stats.CurComp
+	sim.total_stats = total_stats.duplicate(true)
+	sim.active_stats = active_stats.duplicate(true)
+	sim.status = status.duplicate(true)
+	sim.status_data = status_data.duplicate(true)
+	sim.passives = RC.resources_to_save_data(passives).duplicate(true)
+	sim.skills = RC.resources_to_save_data(skills).duplicate(true)
+	sim.inventory = RC.resources_to_save_data(inventory).duplicate(true)
+	sim.weapon = get_equipped_weapon().convert_to_save_data().duplicate(true)
+	if natural: sim.natural = natural.convert_to_save_data().duplicate(true)
+	sim.threats = threats.duplicate()
+	sim.move_type = move_type
+	sim.terrain_tags = terrainTags.duplicate(true)
+	return sim
 
 
 ##Replaces unit's initial data, returns false if dead, true if alive
@@ -999,12 +1037,12 @@ func status_duration_tick(duration:Enums.DURATION_TYPE)->void:
 			if active_buffs[effect].Duration == 0: remove_buff(effect)
 	
 	for key in status: #Why is status conditions so fucking convoluted????
-			if status[key] and sParam.has(key) and sParam[key].DurationType != duration: continue
-			if status[key] and sParam.has(key) and sParam[key].Duration > 0:
-				sParam[key].Duration -= 1
-			if status[key] and sParam.has(key) and sParam[key].Duration <= 0:
+			if status[key] and status_data.has(key) and status_data[key].DurationType != duration: continue
+			if status[key] and status_data.has(key) and status_data[key].Duration > 0:
+				status_data[key].Duration -= 1
+			if status[key] and status_data.has(key) and status_data[key].Duration <= 0:
 				status[key] = false
-				sParam.erase(key)
+				status_data.erase(key)
 	#%Cell2.set_text(str(status.Sleep))
 	update_stats()
 
@@ -1639,38 +1677,45 @@ func get_crit_dmg_effects():
 
 
 func update_combatdata():
-	#no catch for empty inv!!!!! HERE Wait, isn't there one? setting it to Null, and then having null translate to "NONE" when all null instances could just be "NONE" is retarded. Fix this, you god damned retard.
-	var tBonus = update_terrain_bonus()
-	var wep :Weapon = get_equipped_weapon()
-	combatData.Type = wep.damage_type
-	if wep.damage_type == Enums.DAMAGE_TYPE.PHYS:
-		combatData.Dmg = wep.dmg + active_stats.Pwr + tBonus.PwrBonus
-	elif wep.damage_type == Enums.DAMAGE_TYPE.MAG:
-		combatData.Dmg = wep.dmg + active_stats.Mag + tBonus.MagBonus
-	elif wep.damage_type == Enums.DAMAGE_TYPE.TRUE:
-		combatData.Dmg = wep.dmg
-	combatData.Hit = (active_stats.Eleg * 2) + (wep.hit + active_stats.Cha + tBonus.HitBonus)
-	combatData.Graze = (active_stats.Cele * 2) + active_stats.Cha + tBonus.GrzBonus
-	combatData.Barrier = wep.barrier
-	combatData.BarPrc = (active_stats.Eleg/2) + (active_stats.Def/2) + wep.barrier_chance + tBonus.DefBonus
-	combatData.Crit = active_stats.Eleg + wep.crit
-	combatData.Luck = active_stats.Cha
-	combatData.CompRes = (active_stats.Cha / 2) + (active_stats.Eleg / 2)
-	combatData.CompRes = clampi(combatData.CompRes, -200, 75)
-	combatData.CompBonus = active_stats.Cha / 4
-	combatData.MagBase = active_stats.Mag
-	combatData.PwrBase = active_stats.Pwr
-	combatData.HitBase = (active_stats.Eleg * 2) + active_stats.Cha
-	combatData.CritBase = active_stats.Eleg
-	combatData.Resist = active_stats.Cha * 2
-	combatData.EffHit = active_stats.Cha
-	combatData.DRes = {Enums.DAMAGE_TYPE.PHYS: active_stats.Def, Enums.DAMAGE_TYPE.MAG: active_stats.Mag, Enums.DAMAGE_TYPE.TRUE: 0}
-	combatData.CanMiss = true
-	if status.Sleep:
-		combatData.Graze = 0
-		combatData.BarPrc = 0
+	var tBonus := get_terrain_bonus()
+	combatData = factor_combat_data(tBonus)
 	baseCombat = combatData.duplicate()
-	
+
+
+func factor_combat_data(tBonus:Dictionary={"GrzBonus": 0, "DefBonus": 0, "PwrBonus": 0, "MagBonus": 0, "HitBonus": 0,})->Dictionary:
+	#no catch for empty inv!!!!! HERE Wait, isn't there one? setting it to Null, and then having null translate to "NONE" when all null instances could just be "NONE" is retarded. Fix this, you god damned retard.
+	var wep :Weapon = get_equipped_weapon()
+	var newCombat:=combatData.duplicate(true)
+	newCombat.Type = wep.damage_type
+	if wep.damage_type == Enums.DAMAGE_TYPE.PHYS:
+		newCombat.Dmg = wep.dmg + active_stats.Pwr + tBonus.PwrBonus
+	elif wep.damage_type == Enums.DAMAGE_TYPE.MAG:
+		newCombat.Dmg = wep.dmg + active_stats.Mag + tBonus.MagBonus
+	elif wep.damage_type == Enums.DAMAGE_TYPE.TRUE:
+		newCombat.Dmg = wep.dmg
+	newCombat.Hit = (active_stats.Eleg * 2) + (wep.hit + active_stats.Cha + tBonus.HitBonus)
+	newCombat.Graze = (active_stats.Cele * 2) + active_stats.Cha + tBonus.GrzBonus
+	newCombat.Barrier = wep.barrier
+	newCombat.BarPrc = (active_stats.Eleg/2) + (active_stats.Def/2) + wep.barrier_chance + tBonus.DefBonus
+	newCombat.Crit = active_stats.Eleg + wep.crit
+	newCombat.Luck = active_stats.Cha
+	newCombat.CompRes = (active_stats.Cha / 2) + (active_stats.Eleg / 2)
+	newCombat.CompRes = clampi(newCombat.CompRes, -200, 75)
+	newCombat.CompBonus = active_stats.Cha / 4
+	newCombat.MagBase = active_stats.Mag
+	newCombat.PwrBase = active_stats.Pwr
+	newCombat.HitBase = (active_stats.Eleg * 2) + active_stats.Cha
+	newCombat.CritBase = active_stats.Eleg
+	newCombat.Resist = active_stats.Cha * 2
+	newCombat.EffHit = active_stats.Cha
+	newCombat.DRes = {Enums.DAMAGE_TYPE.PHYS: active_stats.Def, Enums.DAMAGE_TYPE.MAG: active_stats.Mag, Enums.DAMAGE_TYPE.TRUE: 0}
+	newCombat.CanMiss = true
+	if status.Sleep:
+		newCombat.Graze = 0
+		newCombat.BarPrc = 0
+	return newCombat
+
+
 func get_skill_combat_stats(skill:SlotWrapper, augmented := false):
 	var stats = combatData.duplicate()
 	var dmgStat := 0
@@ -1942,17 +1987,17 @@ func cure_status(cureType, ignoreCurable = false): #Unnest this someday? I dunno
 	var s : String = statusKeys[cureType].to_pascal_case()
 	if s == "All":
 		for condition in status:
-			if status[condition] and sParam.has(condition) and sParam[condition].Curable and condition != "Acted":
+			if status[condition] and status_data.has(condition) and status_data[condition].Curable and condition != "Acted":
 				status[condition] = false
-				sParam.erase(condition)
+				status_data.erase(condition)
 				_clear_status_fx(condition)
-	elif status[s] and sParam.has(s) and !ignoreCurable and sParam.Curable:
+	elif status[s] and status_data.has(s) and !ignoreCurable and status_data.Curable:
 		status[s] = false
-		sParam.erase(s)
+		status_data.erase(s)
 		_clear_status_fx(s)
-	elif status[s] and sParam.has(s) and ignoreCurable:
+	elif status[s] and status_data.has(s) and ignoreCurable:
 		status[s] = false
-		sParam.erase(s)
+		status_data.erase(s)
 		_clear_status_fx(s)
 	else:
 		print("No status cured")
@@ -1977,10 +2022,10 @@ func set_status(effect): #Missing a check for "duration type", same goes for tic
 	var statusKeys : Array = Enums.SUB_TYPE.keys()
 	var s : String = statusKeys[effect.sub_type].to_pascal_case()
 	status[s] = true
-	if sParam.has(s) and !sParam[s].curable:
-		sParam[s].duration = effect.duration
+	if status_data.has(s) and !status_data[s].curable:
+		status_data[s].duration = effect.duration
 	else:
-		sParam[s] = {"Duration":effect.duration, "Curable":effect.curable, "DurationType":effect.duration_type}
+		status_data[s] = {"Duration":effect.duration, "Curable":effect.curable, "DurationType":effect.duration_type}
 	fxPath = fxPath % [s.to_snake_case()]
 	var fxAnimation = load(fxPath).instantiate()
 	if fxAnimation:
@@ -2044,30 +2089,13 @@ func update_terrain_data():
 	terrainTags = map.get_terrain_tags(cell)
 
 
-func update_terrain_bonus() -> Dictionary:
-#	print(combatData.Graze)
-	var tVal := {"GrzBonus": 0, "DefBonus": 0, "PwrBonus": 0, "MagBonus": 0, "HitBonus": 0,}
-	var terrainData = PlayerData.terrainData
+func get_terrain_bonus() -> Dictionary:
+	var tVal :={"GrzBonus": 0, "DefBonus": 0, "PwrBonus": 0, "MagBonus": 0, "HitBonus": 0,}
 	if !is_active or move_type == Enums.MOVE_TYPE.FLY: return tVal
-	
-	if terrainTags.BaseType:
-		for bonus in tVal:
-			tVal[bonus] += terrainData[terrainTags.BaseType][bonus]
-			
-	if terrainTags.ModType:
-		for bonus in tVal:
-			tVal[bonus] += terrainData[terrainTags.ModType][bonus]
-	
+	else: tVal = map.get_terrain_values(cell)
 	return tVal
-	#if deployed:
-		#var i = find_nested(terrainData, Vector2i(cell))
-		#if i != -1:
-			#bonus = terrainData[i][2]
-		#return bonus
-	#else:
-		#return 0
 
-	
+
 func find_nested(array, value):
 #	print(value)
 	if array == null:
@@ -2161,3 +2189,21 @@ func _set_faction_group(faction:Enums.FACTION_ID)->void:
 		Enums.FACTION_ID.NPC: 
 			fString = "NPC"
 	add_to_group(fString)
+
+#region self signals
+func _on_unit_relocated():
+	update_threats()
+
+
+#region ai helpers
+func get_threats(set_cell:Vector2i=cell)->Array:
+	var newThreats:=[]
+	var aHex := AHexGrid2D.new(map)
+	var range:= get_weapon_reach()
+	var walkable := aHex.find_all_unit_paths(self,cell)
+	newThreats = aHex.find_threat(walkable,range)
+	return newThreats
+
+
+func update_threats(): threats = get_threats()
+func get_simulated_threats(sim_cell:Vector2i)->Array: return get_threats(sim_cell)

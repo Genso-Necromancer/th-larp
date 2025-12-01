@@ -164,9 +164,11 @@
 			<entry id = "passive_name_charisma"><![CDATA[Charisma]]></entry>
 			<entry id = "passive_name_night_person"><![CDATA[Night Person]]></entry>
 			<entry id = "passive_name_plot_armor"><![CDATA[Plot Armor]]></entry>
+			<entry id = "passive_name_lockpick"><![CDATA[Knock-Knock]]></entry>
 			<!-- Skill Names -->
 			<!--Sakuya-->
 			<entry id = "skill_name_locked_corpse"><![CDATA[Locked Corpse]]></entry>
+			<entry id = "skill_name_slow_time05"><![CDATA[Slow Time 1/2]]></entry>
 			<!--Remilia-->
 			<entry id = "skill_name_life_steal_rem"><![CDATA[Scarlet Thirst]]></entry>
 			<!--Reimu-->

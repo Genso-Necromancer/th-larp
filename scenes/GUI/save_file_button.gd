@@ -46,7 +46,7 @@ func _format_save_slot(header: Dictionary):
 	var date:= "%d/%d/%d - %d:%d:%d" % [header.Date.month,header.Date.day,header.Date.year,header.Date.hour,header.Date.minute,header.Date.second]
 	var saveSlot:String= header.FileName.get_slice(".",0)
 	var denote:String
-	var timeUnits : Dictionary = Global.float_to_time(header.game_time)
+	var timeUnits : Dictionary = header.game_time
 	var timeString : String = Global.time_to_string(timeUnits.Hours, timeUnits.Minutes)
 	var vLb:= $ContentsHBox/SaveMargin/SaveVBox/ChapterHBox/IsComplete
 	var chTimeLb:= $ContentsHBox/SaveMargin/SaveVBox/ChapterHBox/ChapterTime

@@ -85,4 +85,5 @@ func _get_property_list():
 
 func get_resource_path()->String:
 	var path:String = "res://unit_resources/effects/%s.tres" % id
+	resource_name
 	return path

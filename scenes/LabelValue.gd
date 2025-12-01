@@ -8,7 +8,7 @@ class_name LabelValue
 @export_dir var iconDir 
 @export var hideIfEmpty: bool = false
 
-var specKeys := Enums.SPEC_ID.keys()
+
 var default : String = get_text()
 #var errorThrown := false
 
@@ -24,8 +24,12 @@ func you_need_to_update_yourself_NOW(unit) -> void:
 	
 	if !_check_to_show(newValue): return
 	
-	if key1 == "Species" or key2 == "Species" or key3 == "Species":
+	if key1 == "SPEC_ID":
+		var specKeys := Enums.SPEC_ID.keys()
 		newValue = StringGetter.get_string("species_name_%s" % [specKeys[newValue].to_snake_case()])
+	elif key1 == "ROLE_ID":
+		var roleKeys := Enums.ROLE_ID.keys()
+		newValue = StringGetter.get_string("role_name_%s" % [roleKeys[newValue].to_snake_case()])
 	elif key2 == "Move":
 		var typeKeys : Array = Enums.MOVE_TYPE.keys()
 		var moveType : String = typeKeys[unit.active_stats.move_type]

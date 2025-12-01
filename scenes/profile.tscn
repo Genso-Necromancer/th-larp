@@ -637,7 +637,8 @@ mouse_filter = 1
 text = "%s"
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
-key1 = &"move_type"
+key1 = &"active_stats"
+key2 = &"Move"
 pairedIcon = NodePath("../MoveType")
 iconDir = "res://sprites/icons/move_types"
 

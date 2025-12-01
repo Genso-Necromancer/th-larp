@@ -235,7 +235,7 @@ func toggle_profile() -> void:
 		prevFocus = null
 		unitProf.toggle_profile()
 		GameState.change_state()
-		focusViewer.visible = true
+		if sState == sStates.BEGIN:focusViewer.visible = true 
 
 
 func update_prof():

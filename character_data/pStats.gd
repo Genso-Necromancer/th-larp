@@ -1219,6 +1219,8 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.FOOT: 5,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 5,
+				Enums.MOVE_TYPE.MOUNT: 20,
+				Enums.MOVE_TYPE.ARMOR: 20,
 				},
 			"Sanzu":{
 				"GrzBonus": 20,
@@ -1226,6 +1228,8 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.FOOT: 5,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 5,
+				Enums.MOVE_TYPE.MOUNT: 20,
+				Enums.MOVE_TYPE.ARMOR: 20,
 				},
 			"HotSpring":{
 				"GrzBonus": 0,
@@ -1233,6 +1237,8 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.FOOT: 1,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 1,
+				Enums.MOVE_TYPE.MOUNT: 2,
+				Enums.MOVE_TYPE.ARMOR: 2,
 				},
 			"Rough":{
 				"GrzBonus": 5,
@@ -1240,6 +1246,8 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.FOOT: 1,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 0.5,
+				Enums.MOVE_TYPE.MOUNT: 3,
+				Enums.MOVE_TYPE.ARMOR: 3,
 				},
 			"OpenRough":{
 				"GrzBonus": -3,
@@ -1247,6 +1255,8 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.FOOT: 1,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 0.5,
+				Enums.MOVE_TYPE.MOUNT: 3,
+				Enums.MOVE_TYPE.ARMOR: 3,
 				},
 			"HellSand":{
 				"GrzBonus": 3,
@@ -1254,13 +1264,18 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.FOOT: 2,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 2,
+				Enums.MOVE_TYPE.MOUNT: 4,
+				Enums.MOVE_TYPE.ARMOR: 4,
 				},
 			"Fort":{
 				"GrzBonus": 20,
 				"DefBonus": 3,
+				"HitBonus": 10,
 				Enums.MOVE_TYPE.FOOT: 2,
 				Enums.MOVE_TYPE.FLY: 1,
 				Enums.MOVE_TYPE.RANGER: 2,
+				Enums.MOVE_TYPE.MOUNT: 2,
+				Enums.MOVE_TYPE.ARMOR: 2,
 			},
 			"Bridge":{
 				"GrzBonus": -5,
@@ -1268,10 +1283,12 @@ static func get_terrain_data():
 			},
 			"Hill":{
 				"GrzBonus": 10,
-				"HitBonus": 10,
+				"HitBonus": 5,
 				Enums.MOVE_TYPE.FOOT: 2,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 1,
+				Enums.MOVE_TYPE.MOUNT: 3,
+				Enums.MOVE_TYPE.ARMOR: 3,
 				},
 			"Woodland":{
 				"GrzBonus": 15,
@@ -1279,13 +1296,16 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.FOOT: 1,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 0.5,
+				Enums.MOVE_TYPE.MOUNT: 3,
+				Enums.MOVE_TYPE.ARMOR: 3,
 				},
 			"House":{
 				"GrzBonus": 10,
-				"DefBonus": 0,
 				Enums.MOVE_TYPE.FOOT: 1,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 1,
+				Enums.MOVE_TYPE.MOUNT: 2,
+				Enums.MOVE_TYPE.ARMOR: 2,
 				},
 			"Shrine":{
 				"GrzBonus": 10,
@@ -1295,28 +1315,38 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.FOOT: 1,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 1,
+				Enums.MOVE_TYPE.MOUNT: 2,
+				Enums.MOVE_TYPE.ARMOR: 2,
 				},
 			"Shop":{
 				"GrzBonus": 10,
-				"DefBonus": 0,
 				Enums.MOVE_TYPE.FOOT: 1,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 1,
+				Enums.MOVE_TYPE.MOUNT: 2,
+				Enums.MOVE_TYPE.ARMOR: 2,
 				},
 			"Wall":{
 				Enums.MOVE_TYPE.FOOT: 99,
 				Enums.MOVE_TYPE.FLY: 99,
 				Enums.MOVE_TYPE.RANGER: 99,
+				Enums.MOVE_TYPE.MOUNT: 99,
+				Enums.MOVE_TYPE.ARMOR: 99,
+				
 				},
 			"WallShoot":{
 				Enums.MOVE_TYPE.FOOT: 99,
 				Enums.MOVE_TYPE.FLY: 99,
 				Enums.MOVE_TYPE.RANGER: 99,
+				Enums.MOVE_TYPE.MOUNT: 99,
+				Enums.MOVE_TYPE.ARMOR: 99,
 				},
 			"WallFly":{
 				Enums.MOVE_TYPE.FOOT: 99,
 				Enums.MOVE_TYPE.FLY: 1,
 				Enums.MOVE_TYPE.RANGER: 99,
+				Enums.MOVE_TYPE.MOUNT: 99,
+				Enums.MOVE_TYPE.ARMOR: 99,
 				},
 }
 	return terrainData

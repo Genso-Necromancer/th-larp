@@ -289,16 +289,16 @@ func _generate_formula(params:Array)->String:
 
 
 func get_status(unit:Unit, status:String) -> String:
-	var sParams = unit.sParam
+	var status_datas = unit.status_data
 	var parts := {}
 	var working : String
 	var finished : String
 	working = "{Status}"
 	parts["Status"] = StringGetter.get_string("status_"+status.to_snake_case())
-	if sParams.get(status,false):
+	if status_datas.get(status,false):
 		working += "\n" + StringGetter.get_string("remaining_label")
-		parts["Duration"] = str(sParams[status].get("Duration", ""))
-		var durationType = Enums.DURATION_TYPE.keys()[sParams[status].DurationType]
+		parts["Duration"] = str(status_datas[status].get("Duration", ""))
+		var durationType = Enums.DURATION_TYPE.keys()[status_datas[status].DurationType]
 		parts["DurationType"] = StringGetter.get_string("duration_"+durationType.to_snake_case())
 	finished = _mash_together(working, parts)
 	return finished
