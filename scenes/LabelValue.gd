@@ -13,14 +13,13 @@ var default : String = get_text()
 #var errorThrown := false
 
 
-func you_need_to_update_yourself_NOW(unit) -> void:
+func you_need_to_update_yourself_NOW(unit:Path2D) -> void:
 	var newValue
-	if unit.get(key1) == null:
-		return
-	elif unit.get(key1) == null: return
-	elif key3: newValue = unit[key1][key2].get(key3, 0)
-	elif key2: newValue = unit[key1][key2]
-	else: newValue = unit[key1]
+	match key1:
+		"combatData": newValue = unit.get_combat_breakdown(key2).final
+		"active_stats","activeStats": newValue = unit.get_stat(key2)
+		null: return
+		_: if unit.get(key1) != null: newValue = unit[key1]
 	
 	if !_check_to_show(newValue): return
 	
@@ -32,10 +31,11 @@ func you_need_to_update_yourself_NOW(unit) -> void:
 		newValue = StringGetter.get_string("role_name_%s" % [roleKeys[newValue].to_snake_case()])
 	elif key2 == "Move":
 		var typeKeys : Array = Enums.MOVE_TYPE.keys()
-		var moveType : String = typeKeys[unit.active_stats.move_type]
+		var moveType : String = typeKeys[unit.move_type]
 		var path = (iconDir + "/" + moveType + ".png").to_snake_case()
 		_set_icon(moveType, path)
 	elif key1 == "dmkName":
+		if unit is not Danmaku: return
 		var template :String = StringGetter.get_template("unit_ownership")
 		var masterName = unit.get("master")
 		if masterName: masterName = masterName.get("unitName")
@@ -44,7 +44,7 @@ func you_need_to_update_yourself_NOW(unit) -> void:
 		newValue = template.format(stringDick)
 	
 	newValue = default % [str(newValue)]
-	
+	#print("Key1: %s Key2: %s newValue: %s" % [key1,key2,newValue])
 	set_text(str(newValue))
 	
 

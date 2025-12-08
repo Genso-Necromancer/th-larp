@@ -502,8 +502,7 @@ theme_override_constants/outline_size = 2
 text = "%s"
 horizontal_alignment = 2
 script = ExtResource("6_f5i04")
-key1 = &"active_stats"
-key2 = &"CurLife"
+key1 = &"current_life"
 
 [node name="Split" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1/HpVBox"]
 layout_mode = 2
@@ -542,8 +541,7 @@ text = "%s"
 horizontal_alignment = 2
 vertical_alignment = 1
 script = ExtResource("6_f5i04")
-key1 = &"active_stats"
-key2 = &"CurComp"
+key1 = &"current_comp"
 
 [node name="Split" type="Label" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/StatHBox/ValuesVBox1/CmpVBox"]
 layout_mode = 2

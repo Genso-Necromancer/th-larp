@@ -213,8 +213,7 @@ theme_override_font_sizes/font_size = 15
 text = "%s"
 horizontal_alignment = 2
 script = ExtResource("5_5j1g2")
-key1 = &"activeStats"
-key2 = &"CurLife"
+key1 = &"current_life"
 
 [node name="Split" type="Label" parent="SideBar/PreviewMargin/stat Margin/previewHbox/StatVbox/StatsPanel/MarginContainer/StatsBox/Condition/HPBox/HBoxContainer"]
 layout_mode = 2
@@ -264,8 +263,7 @@ text = "%s"
 horizontal_alignment = 2
 vertical_alignment = 1
 script = ExtResource("5_5j1g2")
-key1 = &"activeStats"
-key2 = &"CurComp"
+key1 = &"current_comp"
 
 [node name="Split" type="Label" parent="SideBar/PreviewMargin/stat Margin/previewHbox/StatVbox/StatsPanel/MarginContainer/StatsBox/Condition/CmpBox/HBoxContainer2"]
 layout_mode = 2

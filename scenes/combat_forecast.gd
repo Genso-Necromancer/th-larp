@@ -60,7 +60,7 @@ func update_fc(foreCast:Dictionary) -> void: #HERE labels need updating to using
 		var lifeTemplate : String = StringGetter.get_template("combat_hp")
 		var remainTemplate : String = StringGetter.get_template("combat_hp_remain")
 		var lifeText : String = "[center]%s[/center]"
-		var hp = lifeTemplate % [active.CurLife, active.Life]
+		var hp = lifeTemplate % [active.current_life, active.Life]
 		#var iconPath : String = "res://sprites/icons/items/%s/%s.png"
 		var actionPath : String
 		var actionString : String = "--"
@@ -83,7 +83,7 @@ func update_fc(foreCast:Dictionary) -> void: #HERE labels need updating to using
 		
 		if fcSwings and fcCounter and fcReach and fcSwings > 1: dmg = dmg + " x" + str(fcSwings)
 		
-		if fcCombat.has("Rlife") and active.CurLife != fcCombat.Rlife:
+		if fcCombat.has("Rlife") and active.current_life != fcCombat.Rlife:
 			lifeText = lifeText % [remainTemplate]
 			lifeText = lifeText % [fcCombat.Rlife, hp]
 		else: lifeText = lifeText % [hp]

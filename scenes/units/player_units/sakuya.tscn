@@ -79,7 +79,7 @@ simulate_leveling = false
 unit_level = 5
 SPEC_ID = 2
 ROLE_ID = 4
-move_type = 1
+_move_type = null
 mod_stats = Dictionary[StringName, int]({
 &"Cele": 0,
 &"Cha": 0,

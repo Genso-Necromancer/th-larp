@@ -8,7 +8,7 @@ signal collision_detected
 
 @onready var _pathFollow: DanmakuType = $DanmakuType
 @onready var sprite : Sprite2D = _pathFollow.get_sprite2D()
-@onready var _animPlayer :AnimationPlayer = _pathFollow.animPlayer
+@onready var _anim_player :AnimationPlayer = _pathFollow.animPlayer
 
 #var texture : = "res://sprites/danmaku/danmaku.png":
 	#get:
@@ -103,19 +103,19 @@ func init_bullet(dmk_master:Unit):
 
 func _signals():
 	var hitBox = _pathFollow.area2d
-	if !_animPlayer.animation_finished.is_connected(self._on_animation_finished):
-		_animPlayer.animation_finished.connect(self._on_animation_finished)
+	if !_anim_player.animation_finished.is_connected(self._on_animation_finished):
+		_anim_player.animation_finished.connect(self._on_animation_finished)
 	hitBox.set_master(self)
 	hitBox.area_entered.connect(self._on_area_entered)
 	hitBox.area_exited.connect(self._on_area_exited)
 
 func play_animation(animation):
-	_animPlayer.play(animation)
+	_anim_player.play(animation)
 
 
 func _on_animation_finished(anim):
 	match anim:
-		"Spawning": _animPlayer.play("Idle")
+		"Spawning": _anim_player.play("Idle")
 		"Collision": unitHit.danmaku_collision()
 	emit_signal("animation_completed", anim, self)
 	
@@ -184,7 +184,7 @@ func _process_motion(delta):
 	norm_move_vec = current_move_vec.normalized()
 	direction_id = int(directionsSize * (norm_move_vec.rotated(PI / directionsSize).angle() + PI) / TAU)
 	cell = get_parent().local_to_map(sprite.global_position)
-	#_animPlayer.play(str(directions[direction_id]))
+	#_anim_player.play(str(directions[direction_id]))
 	#print(_pathFollow.progress_ratio)
 	#print(_pathFollow.progress)
 	
@@ -227,7 +227,7 @@ func _collided(unit):
 func play_collide():
 	isMoving = true
 	apply_collision_effect()
-	_animPlayer.play("Collision")
+	_anim_player.play("Collision")
 
 
 func apply_collision_effect():

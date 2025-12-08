@@ -13,7 +13,7 @@ const ROLE_ID = Enums.ROLE_ID
 #static func get_named_unit_data():
 	#var units = {
 		#"Remilia": {
-				#"CurLife": 1,
+				#"current_life": 1,
 				#"Profile": {
 					#"UnitName": "Remilia",
 					#"Prt": "res://sprites/RemiliaPrt.png",
@@ -75,7 +75,7 @@ const ROLE_ID = Enums.ROLE_ID
 				#"MoveType": MOVE_TYPE.FLY
 			#},
 		#"Sakuya": {
-				#"CurLife": 1,
+				#"current_life": 1,
 				#"Profile": {
 					#"UnitName": "Sakuya",
 					#"Prt": "res://sprites/SakuyaPrt.png",
@@ -137,7 +137,7 @@ const ROLE_ID = Enums.ROLE_ID
 				#"MoveType": MOVE_TYPE.RANGER
 			#},
 		#"Patchouli": {
-			#"CurLife": 1,
+			#"current_life": 1,
 				#"Profile": {
 					#"UnitName": "Patchouli",
 					#"Prt": "res://sprites/PatchouliPrt.png",
@@ -198,7 +198,7 @@ const ROLE_ID = Enums.ROLE_ID
 					#"Sub": false},
 				#"MoveType": MOVE_TYPE.FOOT
 			#},
-		#"Meiling": {"CurLife": 1,
+		#"Meiling": {"current_life": 1,
 				#"Profile": {
 					#"UnitName": "Meiling",
 					#"Prt": "res://sprites/MeilingPrt.png",
@@ -260,7 +260,7 @@ const ROLE_ID = Enums.ROLE_ID
 				#"MoveType": MOVE_TYPE.FOOT
 			#},
 		#"Reimu": {
-				#"CurLife": 1,
+				#"current_life": 1,
 				#"Profile": {
 					#"UnitName": "Reimu",
 					#"Prt": "res://sprites/ReimuPrt.png",
@@ -322,7 +322,7 @@ const ROLE_ID = Enums.ROLE_ID
 				#"MoveType": MOVE_TYPE.FOOT
 			#},
 		#"Cirno": {
-				#"CurLife": 1,
+				#"current_life": 1,
 				#"Profile": {
 					#"UnitName": "Cirno",
 					#"Prt": "res://sprites/character/cirno/cirno_prt.png",
@@ -966,7 +966,7 @@ static func get_job(jobInd):
 			"StatGroups":{
 				"Stats": {
 					"Move": 4,
-					"Life": 20,
+					"Life": 22,
 					"Comp": 100,
 					"Pwr": 8,
 					"Mag": 0,

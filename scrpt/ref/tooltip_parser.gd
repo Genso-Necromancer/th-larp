@@ -202,41 +202,38 @@ func get_lore(unit:Unit, key:String) -> String:
 	return finished
 
 
-func get_active(unit:Unit, keyStat:String) -> String:
-	var keyBase : String = "total_stats"
-	var keyTotal : String = "active_stats"
-	var string = _generate_stat_tt(unit, keyBase, keyTotal,keyStat,)
+func get_active(unit:Unit, key_stat:String) -> String:
+	var base := unit.get_base_stat(key_stat)
+	var bonus := unit.get_stat_bonus(key_stat)
+	#var string:= "%s (%s + %s)" % [base + bonus, base, bonus]
+	var string:= _generate_stat_tt(unit,key_stat,base, bonus)
 	return string
 
 
-func get_combat(unit:Unit, keyStat:String) -> String:
-	var keyBase : String = "baseCombat"
-	var keyTotal : String = "combatData"
-	var string = _generate_stat_tt(unit, keyBase, keyTotal, keyStat,)
+func get_combat(unit:Unit, key_stat:String) -> String:
+	var cb = unit.get_combat_breakdown(key_stat)
+	#var string := "%s%% (%s + %s)" % [cb.final, cb.base, cb.bonus]
+	var string:= _generate_stat_tt(unit,key_stat,cb.base, cb.bonus)
 	return string
 
-
-func _generate_stat_tt(unit:Unit, keyBase:String, keyTotal:String, keyStat: String) -> String:
+func _generate_stat_tt(unit:Unit, key_stat: String,base:int,bonus:int) -> String:
 	var string : String
 	var fString : String = ""
 	var finished : String
 	var stringPath:= "lore_"
-	
-	if keyStat != "move_type":
-		var difference: int = (unit[keyTotal][keyStat] - unit[keyBase][keyStat])
-		var formula : String = _generate_formula([difference])
-		#if difference == 0: fString = str(keyStat)
-		#else: fString = str(keyStat,": ",unit[keyBase][keyStat]," %s") % formula
-		fString = str(keyStat,": ",unit[keyBase][keyStat]," %s") % formula
-		string = StringGetter.get_string((stringPath+keyStat.to_snake_case()))
-	
-	
-	match keyStat:
+	if key_stat != "move_type":
+		var formula : String = _generate_formula([bonus])
+		#if difference == 0: fString = str(key_stat)
+		#else: fString = str(key_stat,": ",unit[keyBase][key_stat]," %s") % formula
+		fString = str(key_stat,": ",base," %s") % formula
+		string = StringGetter.get_string((stringPath+key_stat.to_snake_case()))
+	match key_stat:
 		"Barrier":
 			var barprc: String = StringGetter.get_string(stringPath+"barprc")
 			string = str(string, "\n", barprc)
-			var bPFormula: String = _generate_formula([(unit[keyTotal]["BarPrc"] - unit[keyBase]["BarPrc"])])
-			fString = fString + str("\n","Barrier Chance: ",unit[keyTotal].BarPrc,"%% %s") % bPFormula
+			var cbBp:Dictionary=unit.get_combat_breakdown("BarPrc")
+			var bPFormula: String = _generate_formula([cbBp.bonus])
+			fString = fString + str("\n","Barrier Chance: ",cbBp.base,"%% %s") % bPFormula
 		"Dmg": pass
 		"Hit": pass
 		"Graze": pass
@@ -245,12 +242,12 @@ func _generate_stat_tt(unit:Unit, keyBase:String, keyTotal:String, keyStat: Stri
 		"Resist" : pass
 		"EffHit": pass
 		"DRes": pass
-		"MoveType":
+		"move_type":
 			var tData : Dictionary = PlayerData.terrainData
 			var moveCosts :Dictionary
 			var count := 0
 			for t in tData:
-				var cost :int = tData[t][unit[keyTotal][keyStat]]
+				var cost :int = tData[t][unit.move_type]
 				if cost >= 99:
 						moveCosts[t] = " " + StringGetter.get_string("terrain_cannot_pass")
 				elif cost != 0:
@@ -262,7 +259,7 @@ func _generate_stat_tt(unit:Unit, keyBase:String, keyTotal:String, keyStat: Stri
 				count += 1
 				if count < moveCosts.size():
 					fString += "\n"
-			string = StringGetter.get_string((stringPath+keyStat.to_snake_case()+"_"+Enums.MOVE_TYPE.keys()[unit[keyTotal][keyStat]].to_snake_case()))
+			string = StringGetter.get_string((stringPath+key_stat.to_snake_case()+"_"+Enums.MOVE_TYPE.keys()[unit.move_type].to_snake_case()))
 	finished = string + "\n" + fString
 	return finished
 

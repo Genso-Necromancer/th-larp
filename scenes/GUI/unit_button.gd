@@ -95,7 +95,7 @@ func refresh_data():
 	role = StringGetter.get_string("role_name_"+role.to_snake_case())
 	var lv :int = unitLink.unit_level
 	var comp :int= unitLink.active_stats.Comp
-	var curComp :int= unitLink.active_stats.CurComp
+	var current_comp :int= unitLink.current_comp
 	var prt :String = unitLink.artPaths.Prt
 	
 	if prt and ResourceLoader.exists(prt):
@@ -107,4 +107,4 @@ func refresh_data():
 	c.set_text(str(comp))
 	if comp < (comp/2): _change_font_color(c, "Overstressed")
 	else: _change_font_color(c)
-	cap.set_text(str(curComp))
+	cap.set_text(str(current_comp))

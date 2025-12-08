@@ -111,8 +111,8 @@ func _evaluate_effects(a: Unit, t: Unit, skill :SlotWrapper= null): ##returns pr
 	
 	#need updating after effect handling is finished. Also lacks "action" compatability
 	var attack :SlotWrapper
-	var chance : int = a.combatData.EffHit
-	var resist : int = t.combatData.Resist
+	var chance : int = a.combat_data.EffHit
+	var resist : int = t.combat_data.Resist
 	var results : Dictionary = {}
 	
 	if skill:
@@ -163,7 +163,7 @@ func _evaluate_effects(a: Unit, t: Unit, skill :SlotWrapper= null): ##returns pr
 func _evaluate_clash(a:Unit, t:Unit, action:Dictionary) -> Dictionary:
 	var results := {}
 	var aData
-	var tData := t.combatData
+	var tData := t.combat_data
 	var tAct := t.active_stats
 	var special : SlotWrapper
 	
@@ -171,7 +171,7 @@ func _evaluate_clash(a:Unit, t:Unit, action:Dictionary) -> Dictionary:
 		special = action.Item
 		aData = a.get_skill_combat_stats(special, action.Weapon)
 	elif !action.Skill:
-		aData = a.combatData
+		aData = a.combat_data
 	else:
 		special = action.Skill
 		aData = a.get_skill_combat_stats(special, action.Weapon)
@@ -224,7 +224,7 @@ func _get_remaining_life(unit, dmg, swings = false):
 	var rLife
 	if swings:
 		dmg = dmg * (1 + swings)
-	rLife = unit.active_stats.CurLife - dmg
+	rLife = unit.current_life - dmg
 	rLife = clampi(rLife, 0, 1000)
 	return rLife
 
@@ -374,7 +374,7 @@ func _speed_check(unit1, unit2) -> bool:
 
 func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isInitiator:bool) -> Dictionary: ##Augment functionality and passiveProcs not implemented yet
 	var unitCd : Dictionary 
-	var targetCd : Dictionary = target.combatData
+	var targetCd : Dictionary = target.combat_data
 	#var augment : Dictionary
 	var DRes : int
 	var critDmg : int = 0
@@ -423,7 +423,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			weapon = unit.get_equipped_weapon()
 		elif special: unitCd = unit.get_skill_combat_stats(special)
 		elif action.Weapon:
-			unitCd = unit.combatData
+			unitCd = unit.combat_data
 			weapon = unit.get_equipped_weapon()
 			
 		unitEffects = _get_action_effects(unit, action)
@@ -496,7 +496,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 			
 		#determine damage outcome
 		if outcome[unit][swingIndx].Hit:
-			print("Target HP: ", str(target.active_stats.CurLife))
+			print("Target HP: ", str(target.current_life))
 			
 			var finalDmg := 0
 			unitCd.Dmg = clampi(unitCd.Dmg, 0, 9999)
@@ -519,7 +519,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 				finalDmg = clampi(finalDmg, 0, 9999)
 				outcome[unit][swingIndx].Dmg = finalDmg
 				target.apply_dmg(finalDmg, unit)
-				print("Dmg: ", finalDmg, " Target HP: ", str(target.active_stats.CurLife))
+				print("Dmg: ", finalDmg, " Target HP: ", str(target.current_life))
 			
 			if actionType != ACTION_TYPE.FRIENDLY_SKILL:
 				targetCompCost += _factor_combat_composure(unit, target, triggers.WAS_HIT, finalDmg)
@@ -536,7 +536,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 				targetCompCost += _get_composure_total(target, outcome[unit][swingIndx].Effects)
 				print("Harvesting Effect Comp Loss.... ", unit.unit_id, ": ", unitCompCost, " ", target.unit_id, ": ", targetCompCost)
 		
-		if target.active_stats.CurLife <= 0:
+		if target.current_life <= 0:
 			print("Shit dude, it says here ", target.unit_id, " is dead.")
 			outcome[target][swingIndx].Dead = true
 			unitCompCost += _factor_combat_composure(unit, unit, triggers.KILL)
@@ -644,8 +644,8 @@ func _get_skill_swing_count(skill):
 	
 
 func _run_effect(actor:Unit, target:Unit, effect:Effect, actionType:Enums.ACTION_TYPE, dmg := 0):
-	var targetCd = target.combatData
-	var actorCd = actor.combatData
+	var targetCd = target.combat_data
+	var actorCd = actor.combat_data
 	var focus : Unit
 	#var proc : bool = false
 	var result = {"Actor":false,"Type":false, "Target": false,"EffectId": effect, "Resisted": false, "Dmg": dmg, "Heal": false, "Comp": false, "Slayer": false}
@@ -690,14 +690,14 @@ func _run_effect(actor:Unit, target:Unit, effect:Effect, actionType:Enums.ACTION
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				target.apply_dmg(result.Dmg, actor)
 				target.apply_composure(result.Comp)
-				print("Actor: ", actor.unit_id, "Target: ", focus.unit_id, " EffectId: ",  str(effect), " Inflicted Damage: ", effect.value, " HP: ", target.active_stats.CurLife)
+				print("Actor: ", actor.unit_id, "Target: ", focus.unit_id, " EffectId: ",  str(effect), " Inflicted Damage: ", effect.value, " HP: ", target.current_life)
 			type.HEAL:
 				result.Heal = _factor_healing(actor, focus, effect)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
 				target.apply_heal(result.Heal)
 				target.apply_composure(result.Comp)
 				
-				print("Actor: ", actor.unit_id, "Target: ", focus.unit_id, " EffectId: ",  str(effect), " Healed For: ", result.Heal, " HP: ", target.active_stats.CurLife)
+				print("Actor: ", actor.unit_id, "Target: ", focus.unit_id, " EffectId: ",  str(effect), " Healed For: ", result.Heal, " HP: ", target.current_life)
 			type.CURE:
 				target.cure_status(effect.sub_type)
 				result.Comp = _factor_effect_composure(actor, focus, effect)
@@ -711,7 +711,7 @@ func _run_effect(actor:Unit, target:Unit, effect:Effect, actionType:Enums.ACTION
 				result.Comp = _factor_effect_composure(actor, focus, effect, result.Heal)
 				focus.apply_heal(result.Heal)
 				focus.apply_composure(result.Comp)
-				print("Actor: ", actor.unit_id, "Target: ", focus.unit_id, " EffectId: ",  str(effect), " Life Steal: ", result.Heal, " HP: ", target.active_stats.CurLife)
+				print("Actor: ", actor.unit_id, "Target: ", focus.unit_id, " EffectId: ",  str(effect), " Life Steal: ", result.Heal, " HP: ", target.current_life)
 			#type.ADD_SKILL: pass
 			#type.ADD_PASSIVE: pass
 			#type.MULTI_SWING: pass
@@ -776,7 +776,7 @@ func warp_to(target, cell):
 	target.relocate_unit(cell)
 
 func _factor_dmg(target, effect) -> int:
-	var targetCd = target.combatData
+	var targetCd = target.combat_data
 	var dmg
 	dmg = effect.value - targetCd.DRes[effect.sub_type]
 	return dmg
@@ -791,7 +791,7 @@ func _factor_healing(actor, target, effect) -> int:
 	else:
 		statBonus = actor.active_stats.Mag
 	healPower = effect.value + statBonus + bonusEff
-	print("Target Life: ", target.active_stats.CurLife, " Heal:", healPower, " New Life Total: ", target.active_stats.CurLife)
+	print("Target Life: ", target.current_life, " Heal:", healPower, " New Life Total: ", target.current_life)
 	return healPower
 
 
@@ -799,16 +799,16 @@ func _factor_life_steal(target, effect, dmg) -> int:
 	var bonusEff := 0
 	var healPower : int
 	healPower = (dmg * effect.value) + bonusEff
-	print("Target Life: ", target.active_stats.CurLife, " Life Steal:", healPower, " New Life Total: ", target.active_stats.CurLife)
+	print("Target Life: ", target.current_life, " Life Steal:", healPower, " New Life Total: ", target.current_life)
 	return healPower
 
 
 func _factor_effect_composure(actor, target, effect, lifeStolen: int = 0) -> int:
 	var compLoss := 0
-	var targetRes = 1 - (target.combatData.CompRes / 100)
+	var targetRes = 1 - (target.combat_data.CompRes / 100)
 	var actorBonus = 1
 	if actor != target:
-		actorBonus = 1 + (actor.combatData.CompBonus / 100)
+		actorBonus = 1 + (actor.combat_data.CompBonus / 100)
 	match effect.type:
 		Enums.EFFECT_TYPE.HEAL:
 			compLoss += Global.compCosts.Healed + (effect.value / 4)
@@ -829,10 +829,10 @@ func _factor_effect_composure(actor, target, effect, lifeStolen: int = 0) -> int
 
 func _factor_combat_composure(actor, target, type, dmg := 0) -> int: ##Pass skill Cost through dmg
 	var compLoss := 0
-	var targetRes = 1 - (target.combatData.CompRes / 100)
+	var targetRes = 1 - (target.combat_data.CompRes / 100)
 	var actorBonus = 1
 	if actor != target:
-		actorBonus = 1 + (actor.combatData.CompBonus / 100)
+		actorBonus = 1 + (actor.combat_data.CompBonus / 100)
 	match type:
 		Enums.COMP_TRIGGERS.ATTACK:
 			compLoss += Global.compCosts.Attack

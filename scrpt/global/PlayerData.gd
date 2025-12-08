@@ -312,7 +312,7 @@ func stat_gen(job :int, spec : int):
 	genData["Profile"].merge(art)
 	genData["Profile"].merge({"Level": 1})
 	genData["Profile"].merge({"Exp": 00})
-	#genData["CurLife"] = genData["Bases"]["Life"]
+	#genData["current_life"] = genData["Bases"]["Life"]
 	genData["MaxInv"] = 6
 	genData["Inv"] = []
 	genData["Passives"] = combinePassives

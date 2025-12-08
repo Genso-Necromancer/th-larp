@@ -65,6 +65,3 @@ map = NodePath("..")
 position = Vector2(712, 501)
 _hp = 5
 map = NodePath("..")
-
-[node name="AiManager" parent="." index="15"]
-mind = null

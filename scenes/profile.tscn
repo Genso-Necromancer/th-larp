@@ -722,8 +722,7 @@ theme_override_font_sizes/font_size = 24
 text = "%s"
 horizontal_alignment = 2
 script = ExtResource("7_2r62x")
-key1 = &"active_stats"
-key2 = &"CurLife"
+key1 = &"current_life"
 
 [node name="Split" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/HPMargin/HpVBox"]
 layout_mode = 2
@@ -785,8 +784,7 @@ text = "%s"
 horizontal_alignment = 2
 vertical_alignment = 1
 script = ExtResource("7_2r62x")
-key1 = &"active_stats"
-key2 = &"CurComp"
+key1 = &"current_comp"
 
 [node name="Split" type="Label" parent="ProfileMargin/ProfileHBox/ProfileContainer/DataMargin/DataVBox/CoreMargin/CoreVBox/HBoxContainer/HBoxContainer/StatMargin/StatVBox/HPCompMargin/HpCompVBox/CompMargin/VBoxContainer2"]
 layout_mode = 2
