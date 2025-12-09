@@ -1,14 +1,5 @@
 # EquipmentHelper.gd
-# Handles all equipping, unequipping, validation, weapon finding, accessory limits,
-# temporary equips, and item effect integration.
-# Preserves your EXACT existing behavior:
-# - Weapons use .equipped boolean
-# - Only one weapon can be equipped
-# - Accessory-equipped items keep their position
-# - Weapons move to front of inventory for clarity
-# - temp_remove (temporary unequip) supported
-# - Natural and Unarmed logic preserved
-
+# Handles all equipping, unequipping, validation, weapon finding, accessory limits,temporary equips, and item effect integration.
 class_name EquipmentHelper
 extends RefCounted
 
@@ -18,10 +9,8 @@ func _init(u: Unit) -> void:
 	unit = u
 
 
-# ============================================================================
-# PUBLIC ENTRY POINTS
-# ============================================================================
 
+# PUBLIC ENTRY POINTS
 func set_equipped(item: Item = null, is_temp := false) -> void:
 	# Determine if we're equipping a weapon, accessory, or auto-equip first valid.
 	if item == null:
@@ -73,10 +62,8 @@ func restore_temp_weapon() -> void:
 			return
 
 
-# ============================================================================
-# INTERNAL IMPLEMENTATION
-# ============================================================================
 
+# INTERNAL IMPLEMENTATION
 func _has_equipped_weapon() -> bool:
 	for item in unit.inventory:
 		if item is Weapon and item.equipped:
@@ -151,10 +138,8 @@ func _equip_accessory(acc: Accessory) -> void:
 	_add_item_effects(acc)
 
 
-# ============================================================================
-# ITEM EFFECTS
-# ============================================================================
 
+# ITEM EFFECTS
 func _add_item_effects(item: Item) -> void:
 	if not item.effects.is_empty():
 		for effect in item.effects:
@@ -170,10 +155,8 @@ func _remove_item_effects(item: Item) -> void:
 				unit.active_item_effects.remove_at(idx)
 
 
-# ============================================================================
-# VALIDATION RULES
-# ============================================================================
 
+# VALIDATION RULES
 func check_valid_equip(item: Item) -> bool:
 	var iCat = item.category
 	var subCat = item.sub_group

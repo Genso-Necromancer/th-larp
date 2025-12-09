@@ -418,8 +418,8 @@ var originLocation
 
 #Unit Modules
 var stats_block : StatsBlock
-
-
+var equipment_helper: EquipmentHelper
+var buff_controller: BuffController
 
 
 #region spec/role set functions
@@ -555,7 +555,10 @@ func _simulate_levels():
 #endregion
 
 func _init():
-	stats_block = StatsBlock.new(self) #New Modularization code
+	#New Modularization code
+	stats_block = StatsBlock.new(self) 
+	equipment_helper = EquipmentHelper.new(self)
+	buff_controller = BuffController.new(self)
 
 func _ready() -> void:
 	var hitBox = $PathFollow2D/Sprite/UnitArea
@@ -1271,25 +1274,6 @@ func _on_self_aura_exited(area, ownArea):
 
 
 #region Equipment functions
-##searches for first valid weapon if false, otherwise unequips current and equips the passed Item
-func set_equipped(item : Item = null, is_temp := false) -> void:
-	var alreadyEquipped:bool = false
-	for weapon in inventory:
-		if weapon is Weapon and weapon.equipped: alreadyEquipped = true
-	if item == null and natural and natural.equipped:
-		return
-	elif item == null:
-		if alreadyEquipped: return
-		item = _find_first_valid()
-	elif !check_valid_equip(item) and item != unarmed and item != natural: 
-		return
-	if item is Weapon:
-		_equip_weapon(item, is_temp)
-	if item is Accessory:
-		_equip_acc(item)
-	stats_block.update_stats()
-
-
 ##returns the currently equipped weapon within inventory. Returns generic "unarmed", or unit's Natural weapon if there is none.
 func get_equipped_weapon() -> Weapon:
 	for item in inventory:
@@ -1309,133 +1293,21 @@ func get_equipped_accs() -> Array[Accessory]:
 		if item.equipped: equipped.append(item)
 	return equipped
 
+##searches for first valid weapon if false, otherwise unequips current and equips the passed Item
+func set_equipped(item: Item = null, is_temp := false) -> void:
+	equipment_helper.set_equipped(item, is_temp)
 
-##Equips the given weapon, and unequips whatever was already equipped. if isTemp, it sets it as a temporary equip and remembers it's true equip.
-func _equip_weapon(weapon : Weapon, is_temp := false) -> void:
-	var oldEquip : Array[Weapon]
-	var original : Weapon
-	var replaced : Weapon
-	for item in inventory:
-		if item is not Weapon: continue
-		elif item.equipped and item == weapon: return
-		elif item.temp_remove: original = item
-		elif item.equipped:
-			oldEquip.append(item)
-	
-	if !oldEquip.is_empty():
-		replaced = oldEquip.pop_front()
-		if is_temp and !original: replaced.temp_remove = is_temp
-		unequip(replaced)
-	weapon.equipped = true
-	if !is_temp and inventory.has(weapon):
-		var i := inventory.find(weapon)
-		var storage :Item = inventory.pop_at(i)
-		inventory.push_front(storage)
-	if !is_temp and original: original.temp_remove = false
-	_add_equip_effects(weapon)
+func unequip(item: Item, as_command := false) -> void:
+	equipment_helper.unequip(item, as_command)
 
-
-##Equips the given Accessory, if this would go over Accessory limit, unequips the first equipped accessory to make room
-func _equip_acc(acc : Accessory) -> void:
-	var limit : int = 2 ##Replace with a unit parameter later
-	var count : int = 0
-	var equipped : Array[Item] = []
-	for item in inventory:
-		if item is not Accessory: continue
-		elif item.equipped:
-			equipped.append(item)
-			count += 1
-	while count >= limit:
-		var remove : Item = equipped.pop_back()
-		unequip(remove)
-		count -= 1
-	acc.equipped = true
-	_add_equip_effects(acc)
-
-
-##unequips the given item, removing it's effects if any. if as_command is true, it acts as the unequip command and assigns unarmed/natural if there are no weapons equipped after unequipping.
-func unequip(item:Item, as_command:=false) -> void:
-	item.equipped = false
-	_remove_equip_effects(item)
-	if !as_command: return
-	for weapon : Weapon in inventory:
-		if weapon is Weapon and weapon.equipped:
-			return
-	if natural: _equip_weapon(natural)
-	else: _equip_weapon(unarmed)
-	stats_block.update_stats()
-
-
-##returns the first valid weapon of a unit, if none are found, returns unarmed. If unit has natural, it has priority.
-func _find_first_valid() -> Weapon:
-	if natural: return natural
-	for i : Weapon in inventory:
-		if i is Weapon and check_valid_equip(i):
-			return i
-	return unarmed
-
-
-##Validates if an Item can be equipped by unit.
-func check_valid_equip(item : Item) -> bool:
-	var iCat = item.category
-	var subCat = item.sub_group
-	if item is Weapon or item is Consumable:
-			if is_proficient(iCat, subCat) and !item.is_broken:
-				return true
-	elif item is Accessory: return is_rule_met(item.rule_type, item.sub_rule)
-	return false
-
-
-##check if unit can use weapon's type
-func is_proficient(i_cat : Enums.WEAPON_CATEGORY, sub_cat : Enums.WEAPON_SUB) -> bool:
-	#Update for Unit Resource
-	var catKeys = Enums.WEAPON_CATEGORY.keys()
-	var subKeys = Enums.WEAPON_SUB.keys()
-	if sub_cat == Enums.WEAPON_SUB.NONE and i_cat == Enums.WEAPON_CATEGORY.NONE: return true
-	elif i_cat == Enums.WEAPON_CATEGORY.ITEM: return false
-	elif i_cat == Enums.WEAPON_CATEGORY.ACC: return true
-	elif sub_cat != Enums.WEAPON_SUB.NONE and weapon_prof[subKeys[sub_cat].to_pascal_case()]: return true
-	elif weapon_prof[catKeys[i_cat].to_pascal_case()]: return true
-	return false
-
-
-##Checks if unit meets the given rule types returns true or false
-func is_rule_met(rule_type:Enums.RULE_TYPE, sub_type:Enums.SUB_RULE) -> bool:
-	#check if unit meets rules given
-	return true
-
-##Restores the temporarily unequipped weapon
 func restore_equip() -> void:
-	for weapon :Item in inventory:
-		if weapon is Weapon and weapon.temp_remove:
-			weapon.temp_remove = false
-			set_equipped(weapon)
-			break
+	equipment_helper.restore_temp_weapon()
 
+func check_valid_equip(item: Item) -> bool:
+	return equipment_helper.check_valid_equip(item)
 
-func _add_equip_effects(item:Item):
-	if !item.effects.is_empty():
-		for effect in item.effects:
-			if effect.target == Enums.EFFECT_TARGET.EQUIPPED:
-				_add_effect(effect)
-	#print(active_item_effects)
-
-
-func _remove_equip_effects(item):
-	if item.get("effects"):
-		for effect in item.effects:
-			var i = active_item_effects.find(effect)
-			active_item_effects.remove_at(i)
-	#print(active_item_effects)
-
-
-func _add_effect(effect):
-	active_item_effects.append(effect)
-
-
-func _remove_effect(effect):
-	var i = active_item_effects.find(effect)
-	active_item_effects.remove_at(i)
+func is_proficient(cat, sub) -> bool:
+	return equipment_helper.is_proficient(cat, sub)
 #endregion
 
 #region reach functions
