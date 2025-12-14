@@ -13,17 +13,18 @@ func update_stats():
 	var base_stats = _compute_base_totals()
 	unit.base_stats_final = base_stats  # Store for UI
 	
-	# 2. Build modifier groups
+	# 2. mod groups
 	var time_mods  = _compute_time_modifiers()
 	var aura_mods  = _compute_aura_modifiers()
 	var buff_mods  = _compute_buff_modifiers()
+	var ui_buff_mods = _compute_buff_modifiers_for_ui()
 	var item_mods  = _compute_item_modifiers()
 
 	# Groups for UI
 	unit.stat_mod_breakdown = {
 		"time": time_mods,
 		"aura": aura_mods,
-		"buffs": buff_mods,
+		"buffs": ui_buff_mods,
 		"items": item_mods,
 	}
 
@@ -32,8 +33,9 @@ func update_stats():
 	var final_stats = base_stats.duplicate(true)
 	_apply_mod_group(final_stats, time_mods)
 	_apply_mod_group(final_stats, aura_mods)
+	#print("aura_mods: %s" % [aura_mods])
 	_apply_mod_group(final_stats, buff_mods)
-	_apply_mod_group(final_stats, item_mods)
+	#_apply_mod_group(final_stats, item_mods)
 
 	_apply_status_locks(final_stats)
 	_clamp_final_stats(final_stats)
@@ -41,7 +43,12 @@ func update_stats():
 
 	# 4. Compute combat values (base & final)
 	var base_combat = _compute_combat_stats(base_stats)
+	print("base_stats: %s" % [base_combat])
 	var finalCombat = _compute_combat_stats(final_stats)
+	_apply_mod_group(finalCombat, time_mods)
+	_apply_mod_group(finalCombat, buff_mods)
+	_apply_mod_group(finalCombat, aura_mods)
+	print("final_stats: %s" % [finalCombat])
 	unit.base_combat = base_combat
 	unit.combat_data = finalCombat
 
@@ -82,40 +89,25 @@ func _compute_time_modifiers() -> Dictionary:
 	return mods
 
 func _compute_aura_modifiers() -> Dictionary:
-	if not unit.active_auras: return {}
-	var mods := {}
-	var subKeys = Enums.SUB_TYPE.keys()
-
-	for area in unit.active_auras.keys():
-		for effect in unit.active_auras[area]:
-			var stat_name = subKeys[effect.sub_type].to_pascal_case()
-			mods[stat_name] = mods.get(stat_name, 0) + effect.value
-
-	return mods
+	return unit.aura_controller.get_stat_modifiers()
 
 func _compute_buff_modifiers() -> Dictionary:
+	return unit.buff_controller.get_modifiers()
+
+func _compute_buff_modifiers_for_ui() -> Dictionary:
+	var all :Dictionary= unit.buff_controller.get_modifiers()
 	var mods := {}
-	var subKeys = Enums.SUB_TYPE.keys()
-
-	# Buffs
-	for key in unit.active_buffs:
-		var e = unit.active_buffs[key].Effect
-		var stat_name = subKeys[e.sub_type].to_pascal_case()
-		mods[stat_name] = mods.get(stat_name, 0) + e.value
-
-	# Debuffs
-	for key in unit.active_debuffs:
-		var e = unit.active_debuffs[key].Effect
-		var stat_name = subKeys[e.sub_type].to_pascal_case()
-		mods[stat_name] = mods.get(stat_name, 0) + e.value
-
+	for id in all.keys():
+		if all[id].source == Enums.EFFECT_SOURCE.BUFF:
+			var s = all[id].stat_name
+			mods[s] = mods.get(s, 0) + all[id].value
 	return mods
 
 func _compute_item_modifiers() -> Dictionary:
 	var mods := {}
 	var subKeys = Enums.SUB_TYPE.keys()
 
-	for effect in unit.active_item_effects:
+	for effect in unit.equipment_helper.equipped_effects:
 		if effect.type == Enums.EFFECT_TYPE.BUFF or effect.type == Enums.EFFECT_TYPE.DEBUFF:
 			var stat_name = subKeys[effect.sub_type].to_pascal_case()
 			mods[stat_name] = mods.get(stat_name, 0) + effect.value
@@ -124,8 +116,14 @@ func _compute_item_modifiers() -> Dictionary:
 #Mod Merge
 func _apply_mod_group(target, group):
 	for key in group:
+		#if key == "DRes" and target.has(key): _apply_dres_values(target, group)
 		if target.has(key):
 			target[key] += group[key]
+
+#func _apply_dres_values(target:Dictionary, group:Dictionary):
+	#for res in target.DRes:
+		#if group.DRes.keys().has(res):
+			#target.DRes[res] += group.DRes[res]
 
 func _apply_status_locks(stats: Dictionary) -> void:
 	if unit.status.Sleep:
@@ -155,11 +153,7 @@ func _compute_combat_stats(stats: Dictionary) -> Dictionary:
 		"CritBase": stats.Eleg,
 		"Resist": stats.Cha * 2,
 		"EffHit": stats.Cha,
-		"DRes": {
-			Enums.DAMAGE_TYPE.PHYS: stats.Def,
-			Enums.DAMAGE_TYPE.MAG:  stats.Mag,
-			Enums.DAMAGE_TYPE.TRUE: 0
-		},
+		"DRes": 0,
 		"CanMiss": true,
 	}
 	
@@ -189,12 +183,4 @@ func _combat_difference(base: Dictionary, final: Dictionary) -> Dictionary:
 			# Complex values like DRes may need custom handling later
 			diff[key] = null
 	return diff
-
-#func _add_mod_group(target: Dictionary, mods: Dictionary) -> void:
-	#for key in mods.keys():
-		#if key == "DRes":
-			## skip complex types here, handled separately by combat calculator
-			#continue
-		#if target.has(key):
-			#target[key] += mods[key]
 #endregion

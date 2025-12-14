@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://dt7tkhud3igbt"]
 
 [ext_resource type="Script" uid="uid://7kobvh6lfjcr" path="res://scenes/Danmaku/danmaku_parameters.gd" id="1_6i3q2"]
-[ext_resource type="Script" uid="uid://bv74dylssenec" path="res://scenes/UnitArea.gd" id="3_lsjf0"]
+[ext_resource type="Script" uid="uid://bv74dylssenec" path="res://scenes/area_unit.gd" id="3_lsjf0"]
 
 [sub_resource type="Animation" id="Animation_oy20w"]
 resource_name = "Collision"

@@ -213,6 +213,9 @@ func get_active(unit:Unit, key_stat:String) -> String:
 func get_combat(unit:Unit, key_stat:String) -> String:
 	var cb = unit.get_combat_breakdown(key_stat)
 	#var string := "%s%% (%s + %s)" % [cb.final, cb.base, cb.bonus]
+	#print("cb Bonus: %s" % [cb.bonus])
+	print("key_stat: %s" %[key_stat])
+	print("cb breakdown: %s" % [cb])
 	var string:= _generate_stat_tt(unit,key_stat,cb.base, cb.bonus)
 	return string
 
@@ -226,6 +229,7 @@ func _generate_stat_tt(unit:Unit, key_stat: String,base:int,bonus:int) -> String
 		#if difference == 0: fString = str(key_stat)
 		#else: fString = str(key_stat,": ",unit[keyBase][key_stat]," %s") % formula
 		fString = str(key_stat,": ",base," %s") % formula
+		print("Bonus: %s String: %s" % [bonus, formula])
 		string = StringGetter.get_string((stringPath+key_stat.to_snake_case()))
 	match key_stat:
 		"Barrier":
@@ -270,6 +274,7 @@ func _generate_formula(params:Array)->String:
 	for p in params:
 		var color: String = "[color=%s]"
 		var value :String = "%+-d" % p
+		print("String: %s Param: %s" % [value,p])
 		if p == 0:
 			continue
 		elif value.begins_with("+"): 

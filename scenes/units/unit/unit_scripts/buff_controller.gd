@@ -15,7 +15,7 @@ func _init(u: Unit) -> void:
 	unit = u
 
 # APPLYING / REMOVING BUFFS
-func apply_effect(effect: Effect) -> void:
+func apply_effect(effect: Effect,source:Enums.EFFECT_SOURCE=Enums.EFFECT_SOURCE.BUFF) -> void:
 	if effect == null:
 		printerr("[BuffController] Tried to apply null effect")
 		return
@@ -32,7 +32,8 @@ func apply_effect(effect: Effect) -> void:
 
 	pool[effect_id] = {
 		"effect": effect,
-		"duration": effect.duration
+		"duration": effect.duration,
+		"source": source
 	}
 
 	unit.update_stats()

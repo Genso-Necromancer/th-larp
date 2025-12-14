@@ -4,7 +4,7 @@
 
 [resource]
 script = ExtResource("1_ae6vw")
-type = 0
+type = 3
 target = 0
 instant = false
 on_hit = true
@@ -22,7 +22,7 @@ crit_dmg = Array[int]([0, 0])
 crit_mult = false
 crit_rate = 0
 value = 0.0
-sub_type = 0
+sub_type = 23
 id = ""
 rule_type = 0
 metadata/_custom_type_script = "uid://2basg3niuvlr"

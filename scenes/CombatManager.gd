@@ -376,7 +376,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 	var unitCd : Dictionary 
 	var targetCd : Dictionary = target.combat_data
 	#var augment : Dictionary
-	var DRes : int
+	var DmgReduc : int
 	var critDmg : int = 0
 	var grzDef : int = 0
 	var slayerMulti := 1
@@ -437,8 +437,9 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 				slayerMulti = Global.slayerMulti
 		#check units passive procs
 		
-		#determine DRes used
-		DRes = targetCd.DRes[unitCd.Type]
+		#determine DmgReduc used
+		DmgReduc = _get_damage_reduction(target, unitCd.Type)
+		
 
 		
 		
@@ -515,7 +516,7 @@ func _run_action(unit:Unit, target:Unit, action:Dictionary, actionType, _isIniti
 				elif critDmg:
 					outcome[unit][swingIndx].Crit = critDmg
 					
-				finalDmg = (((unitCd.Dmg + critDmg) - (DRes + finalBarrier)) * slayerMulti)
+				finalDmg = (((unitCd.Dmg + critDmg) - (DmgReduc + finalBarrier)) * slayerMulti)
 				finalDmg = clampi(finalDmg, 0, 9999)
 				outcome[unit][swingIndx].Dmg = finalDmg
 				target.apply_dmg(finalDmg, unit)
@@ -775,11 +776,24 @@ func shove_or_toss_unit(actor, target, reach, pivotHex, matchHex, mode = 0):
 func warp_to(target, cell):
 	target.relocate_unit(cell)
 
-func _factor_dmg(target, effect) -> int:
-	var targetCd = target.combat_data
-	var dmg
-	dmg = effect.value - targetCd.DRes[effect.sub_type]
+func _factor_dmg(target:Unit, effect:Effect) -> int:
+	var dmg:int
+	var reduction:int = _get_damage_reduction(target, effect.sub_type)
+	dmg = effect.value - reduction
 	return dmg
+
+func _get_damage_reduction(target:Unit, damage_type:Enums.DAMAGE_TYPE)->int:
+	var reduction:int
+	var targetDef:int
+	var targetDR:int = target.combat_data.DRes
+	match damage_type:
+		Enums.DAMAGE_TYPE.PHYS: targetDef = target.get_stat("Def")
+		Enums.DAMAGE_TYPE.MAG: targetDef = target.get_stat("Mag")
+		Enums.DAMAGE_TYPE.TRUE: 
+			targetDef = 0
+			targetDR = 0
+	reduction = targetDef + targetDR
+	return reduction
 
 func _factor_healing(actor, target, effect) -> int:
 	var bonusEff := 0

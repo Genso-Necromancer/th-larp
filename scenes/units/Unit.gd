@@ -278,6 +278,7 @@ var unarmed : Weapon = load("res://unit_resources/items/weapons/unarmed.tres").d
 @export_category("Conditions")
 ##Afflicted status conditions, do not change unless you have a good reason for a unit to begin play with specified condition.
 @export var status : Dictionary = {"Acted":false, "Sleep":false}
+var sParam:Dictionary= {}
 var status_data : Dictionary = {}
 
 @onready var _sprite: Sprite2D = $PathFollow2D/Sprite
@@ -300,13 +301,13 @@ var alive:= true
 var on_chest:=false
 var current_life:int = 1
 var current_comp:int = 1
-var unitAuras := {}
+
 var remaining_move:int = 0
 #de/buffs applied to unit
-var active_buffs :Dictionary[String,Dictionary]= {}
-var active_debuffs :Dictionary[String,Dictionary]= {}
-var active_item_effects := []
-var active_auras := {}
+#var active_buffs :Dictionary[String,Dictionary]= {}
+#var active_debuffs :Dictionary[String,Dictionary]= {}
+##var active_item_effects := []
+
 #Stats and derivatives
 var base_stats_final:Dictionary
 var stat_mod_breakdown:Dictionary
@@ -346,7 +347,7 @@ var postSequenceFlags := {"Bars":false, "Death":false}
 #var unarmed := {"ID": "NONE", "Equip": false, "Dur": -1, "Broken": false}
 var tempSet = false
 var isAmbushing := false
-#aura owned by unit
+
 #Unique NPC/Enemy params
 var isElite : bool = false
 #Danmaku
@@ -420,7 +421,8 @@ var originLocation
 var stats_block : StatsBlock
 var equipment_helper: EquipmentHelper
 var buff_controller: BuffController
-
+var status_controller : StatusController
+var aura_controller : AuraController
 
 #region spec/role set functions
 func _generate_base_stats():
@@ -556,9 +558,11 @@ func _simulate_levels():
 
 func _init():
 	#New Modularization code
-	stats_block = StatsBlock.new(self) 
-	equipment_helper = EquipmentHelper.new(self)
+	stats_block = StatsBlock.new(self)
 	buff_controller = BuffController.new(self)
+	equipment_helper = EquipmentHelper.new(self)
+	status_controller = StatusController.new(self)
+	aura_controller = AuraController.new(self)
 
 func _ready() -> void:
 	var hitBox = $PathFollow2D/Sprite/UnitArea
@@ -567,8 +571,8 @@ func _ready() -> void:
 	set_equipped()
 	_load_sprites()
 	hitBox.set_master(self)
-	hitBox.area_entered.connect(self._on_aura_entered)
-	hitBox.area_exited.connect(self._on_aura_exited)
+	hitBox.area_entered.connect(aura_controller.on_aura_entered)
+	hitBox.area_exited.connect(aura_controller.on_aura_exited)
 	unit_relocated.connect(self._on_unit_relocated)
 	_anim_player.play("idle")
 	#Create the curve resource here because creating it in the editor prevents moving the unit
@@ -626,8 +630,8 @@ func data_to_dict()->Dictionary:
 	var personalSkills := RC.resources_to_save_data(personal_skills)
 	var bonusPassives := RC.resources_to_save_data(bonus_passives)
 	var personalPassives := RC.resources_to_save_data(personal_passives)
-	var activeBuffs := RC.effects_to_save_data(active_buffs)
-	var activeDebuffs := RC.effects_to_save_data(active_debuffs)
+	var activeBuffs := RC.effects_to_save_data(buff_controller.active_buffs)
+	var activeDebuffs := RC.effects_to_save_data(buff_controller.active_debuffs)
 	var combatDup:Dictionary
 	combatDup = combat_data.duplicate(true)
 	var dict :Dictionary ={
@@ -657,8 +661,8 @@ func data_to_dict()->Dictionary:
 		"personal_passives" = personalPassives,
 		"bonus_passives" = bonusPassives,
 		"status" = status,
-		"active_auras" = active_auras, #Not good to do it this way. Need to put a check in _ready() to see if they are within any auras when loaded in
-		"active_item_effects" = active_item_effects,
+		#"active_auras" = active_auras, #Not good to do it this way. Need to put a check in _ready() to see if they are within any auras when loaded in
+		"active_item_effects" = equipment_helper.equipped_effects,
 		"active_buffs" = activeBuffs,
 		"active_debuffs" = activeDebuffs,
 		"current_life" = current_life,
@@ -679,8 +683,8 @@ func to_sim() -> UnitSim:
 	var personalSkills := RC.resources_to_save_data(personal_skills)
 	var bonusPassives := RC.resources_to_save_data(bonus_passives)
 	var personalPassives := RC.resources_to_save_data(personal_passives)
-	var activeBuffs := RC.effects_to_save_data(active_buffs)
-	var activeDebuffs := RC.effects_to_save_data(active_debuffs)
+	var activeBuffs := RC.effects_to_save_data(buff_controller.active_buffs)
+	var activeDebuffs := RC.effects_to_save_data(buff_controller.active_debuffs)
 	sim.id = unit_id
 	sim.team = FACTION_ID
 	sim.cell = cell
@@ -743,8 +747,8 @@ func post_load(unit_data:Dictionary, set_cell:bool=false)->void:
 	current_comp = int(unit_data.current_comp)
 	status = unit_data.status
 	#active_item_effects = unit_data.active_item_effects
-	_load_buff_effects(unit_data.active_buffs,active_buffs)
-	_load_buff_effects(unit_data.active_debuffs,active_debuffs)
+	_load_buff_effects(unit_data.active_buffs,buff_controller.active_buffs)
+	_load_buff_effects(unit_data.active_debuffs,buff_controller.active_debuffs)
 	if set_cell:
 		convCell = str_to_var("Vector2i" + unit_data.cell) as Vector2i
 		relocate_unit(convCell)
@@ -964,77 +968,34 @@ func return_original():
 	return cell
 
 
-#keep track of active de/buffs during gameplay, seperate from actual stats
-func set_buff(effect:Effect):
-	var type := effect.type
-	var buffs
-	var effectId:= effect.id
-	match type:
-		Enums.EFFECT_TYPE.BUFF: buffs = active_buffs
-		Enums.EFFECT_TYPE.DEBUFF: buffs = active_debuffs
-	if effect == null:
-		print("No effect found")
-		return
-	if effect.stack:
-		effectId = _increment_unique_id(buffs,effect.id)
-	if effect.duration_type == Enums.DURATION_TYPE.PERMANENT:
-		apply_permanent_stat_mod(effect.sub_type,effect.value)
-	else:
-		buffs[effectId] = _generate_buff_entry(effect)
-	stats_block.update_stats()
+#region buff functions
+func add_buff(effect: Effect) -> void:
+	buff_controller.apply_effect(effect)
+
+func remove_buff(id: String) -> void:
+	buff_controller.remove_effect(id)
+
+func tick_buffs(duration_type: Enums.DURATION_TYPE) -> void:
+	buff_controller.tick(duration_type)
+#endregion
 
 
-func _generate_buff_entry(effect:Effect)->Dictionary:
-	var entry:={"Effect":effect,"Duration":effect.duration}
-	return entry
+#region status functions
+func set_status(effect: Effect) -> void:
+	status_controller.apply_from_effect(effect)
 
 
-func _increment_unique_id(storage:Dictionary,id:String)->String:
-	var i := 0
-	var newId:= id + str(i)
-	while storage.has(newId):
-			i += 1
-			newId = id + str(i)
-	return newId
+func cure_status(cure_type: Enums.SUB_TYPE, ignoreCurable := false) -> void:
+	status_controller.cure_status(cure_type, ignoreCurable)
 
 
-func apply_permanent_stat_mod(stat,value)->void:
-	var statKeys : Array = Enums.CORE_STAT.keys()
-	if stat is int: stat = statKeys[stat]
-	if stat is not String:
-		printerr("stat type or value mistmatch: stat must be an appropriate String or Enums.CORE_STAT value")
-		return
-	mod_stats[stat] += value
+func status_duration_tick(duration: Enums.DURATION_TYPE) -> void:
+	status_controller.tick(duration)
 
 
-func remove_buff(effect_id:String):
-	if active_buffs.has(effect_id):
-		active_buffs.erase(effect_id)
-	if active_debuffs.has(effect_id):
-		active_debuffs.erase(effect_id)
-	stats_block.update_stats()
-	
-	
-##tracks duration of effects, then removes them when reaching 0.
-func status_duration_tick(duration:Enums.DURATION_TYPE)->void:
-	var keys = active_buffs.keys()
-	for i in range(0,1):
-		if i == 1: keys = active_debuffs.keys()
-		for effect in keys:
-			if active_buffs[effect].Effect.duration_type != duration: continue
-			if active_buffs[effect].Duration > 0: active_buffs[effect].Duration -= 1
-			if active_buffs[effect].Duration == 0: remove_buff(effect)
-	
-	for key in status: #Why is status conditions so fucking convoluted????
-			if status[key] and status_data.has(key) and status_data[key].DurationType != duration: continue
-			if status[key] and status_data.has(key) and status_data[key].Duration > 0:
-				status_data[key].Duration -= 1
-			if status[key] and status_data.has(key) and status_data[key].Duration <= 0:
-				status[key] = false
-				status_data.erase(key)
-	#%Cell2.set_text(str(status.Sleep))
-	stats_block.update_stats()
-
+func check_status(condition: String) -> bool:
+	return status_controller.has_status(condition)
+#endregion
 
 func _set_art_paths():
 	var roleKeys : Array = Enums.ROLE_ID.keys()
@@ -1076,19 +1037,39 @@ func can_act() -> bool:
 
 
 #region Passive Functions
-func check_passives() ->void:
-	var auras :Array[Aura]= []
-	if !passives: return
+func check_passives() -> void:
+	if passives.is_empty():
+		aura_controller.validate_auras([])
+		return
+
+	var valid_auras : Array[Aura] = []
+
 	for p in passives:
-		if p == null: continue
+		if p == null:
+			continue
+
 		match p.type:
 			Enums.PASSIVE_TYPE.AURA:
-				auras.append(_assign_auras(p))
+				var aura := _resolve_passive_aura(p)
+				if aura:
+					valid_auras.append(aura)
+					aura_controller.load_owned_aura(aura)
 			Enums.PASSIVE_TYPE.SUB_WEAPON:
 				_add_sub_weap(p.sub_weapon)
 				_update_natural(p)
-	if auras: validate_auras(auras)
 
+func _resolve_passive_aura(passive: Passive) -> Aura:
+	match passive.rule_type:
+		Enums.RULE_TYPE.MORPH:
+			return passive[Enums.TIME.keys()[Global.time_of_day].to_lower()]
+
+		Enums.RULE_TYPE.TIME:
+			if passive.rule == Global.time_of_day:
+				return passive.aura
+			return null
+
+		_:
+			return passive.aura
 
 func can_canto()->bool:
 	if PlayerData.canto_triggered and has_passive(Enums.PASSIVE_TYPE.CANTO) and remaining_move>0: return true
@@ -1121,7 +1102,7 @@ func validate_skills(): #The fuck am I trying to do here???
 ##Validate skills from effects
 func validate_active_effect_skills():
 	bonus_skills.clear()
-	for effect in active_item_effects:
+	for effect in equipment_helper.equipped_effects:
 		if effect.type == Enums.EFFECT_TYPE.ADD_SKILL:
 			_resolve_bonus_skill(effect)
 	_update_features()
@@ -1147,7 +1128,7 @@ func _assign_auras(passive:Passive) -> Aura:
 		Enums.RULE_TYPE.TIME: 
 			if passive.rule == Global.time_of_day: aura = passive.aura
 		_: aura = passive.aura
-	if !unitAuras.has(aura):load_aura(aura)
+	if !aura_controller.active_auras.has(aura):load_aura(aura)
 	return aura
 
 
@@ -1177,100 +1158,103 @@ func search_passive_id(type):
 
 
 ##Aura Functions
-func validate_auras(valid:Array[Aura]):
-	for a in unitAuras:
-		if !valid.has(a):
-			remove_aura(a)
+func validate_auras(auras:Array[Aura]):
+	aura_controller.validate_auras(auras)
 
 
 func remove_aura(a:Aura):
-	if unitAuras.has(a):
-		unitAuras[a].queue_free()
-		unitAuras.erase(a)
+	aura_controller.remove_owned_aura(a)
 
 
 func load_aura(aura:Aura):
-	if unitAuras.has(aura):
-		return
-	var auraArea :AuraArea= load("res://scenes/aura_collision.tscn").instantiate()
-	var pathFollow = $PathFollow2D
-	
-	pathFollow.add_child(auraArea)
-	auraArea.call_deferred("set_aura",self, aura)
-	unitAuras[aura] = auraArea
+	aura_controller.load_owned_aura(aura)
 	
 	
+#func get_visual_aura_range() -> int:
+	#var highest := 0
+	#for p in unitAuras:
+		#var a = p.aura
+		#if a.range > highest:
+			#highest = a.range
+	#return highest
+
+#region aura functions
 func get_visual_aura_range() -> int:
-	var highest := 0
-	for p in unitAuras:
-		var a = p.aura
-		if a.range > highest:
-			highest = a.range
-	return highest
-		
+	return aura_controller.get_visual_aura_range()
+	
+#endregion
 
-func _on_aura_entered(area):
-	#print("Aura Entered: ", area)
-	if !area.aura:
-		return
-	
-	match area.aura.target_team:
-		Enums.TARGET_TEAM.ALLY:
-			if area.master.FACTION_ID != Enums.FACTION_ID.ENEMY and FACTION_ID == Enums.FACTION_ID.NPC:
-				pass
-			elif area.master.FACTION_ID != FACTION_ID:
-				return
-		Enums.TARGET_TEAM.ENEMY:
-			if area.master.FACTION_ID == FACTION_ID:
-				return
-	
-	if area.aura.target == Enums.EFFECT_TARGET.SELF:
-		return
-	elif !active_auras.has(area):
-		active_auras[area] = area.aura.effects.duplicate()
-	stats_block.update_stats()
+#region aura signals
 
+func _on_self_aura_entered(area:AuraArea,):
+	aura_controller.on_self_aura_enter(area)
 
-func _on_aura_exited(area):
-	#print("Aura Exited: ", area)
-	if active_auras.has(area):
-		active_auras.erase(area)
-		#print("Active Aura Effects: ", active_auras)
-	stats_block.update_stats()
+func _on_self_aura_exited(area:AuraArea,):
+	aura_controller.on_self_aura_exit(area)
+#endregion
 
-func _on_self_aura_entered(area, ownArea):
-	#print("on_self_aura_entered: ", area.master)
-	match ownArea.aura.target_team:
-		Enums.TARGET_TEAM.ALLY:
-			if area.master.FACTION_ID != Enums.FACTION_ID.ENEMY and FACTION_ID == Enums.FACTION_ID.NPC:
-				pass
-			elif area.master.FACTION_ID != FACTION_ID:
-				return
-		Enums.TARGET_TEAM.ENEMY:
-			if area.master.FACTION_ID == FACTION_ID:
-				return
-	
-	if ownArea.aura.target == Enums.EFFECT_TARGET.SELF:
-		if !active_auras.has(ownArea):
-			active_auras[ownArea] = ownArea.aura.effects.duplicate()
-		else: 
-			for effect in ownArea.aura.effects:
-				if effect.stack:
-					active_auras[ownArea].append(effect)
-	
-	
-	stats_block.update_stats()
+#func _on_aura_entered(area):
+	##print("Aura Entered: ", area)
+	#if !area.aura:
+		#return
+	#
+	#match area.aura.target_team:
+		#Enums.TARGET_TEAM.ALLY:
+			#if area.master.FACTION_ID != Enums.FACTION_ID.ENEMY and FACTION_ID == Enums.FACTION_ID.NPC:
+				#pass
+			#elif area.master.FACTION_ID != FACTION_ID:
+				#return
+		#Enums.TARGET_TEAM.ENEMY:
+			#if area.master.FACTION_ID == FACTION_ID:
+				#return
+	#
+	#if area.aura.target == Enums.EFFECT_TARGET.SELF:
+		#return
+	#elif !active_auras.has(area):
+		#active_auras[area] = area.aura.effects.duplicate()
+	#stats_block.update_stats()
+#
+#
+#func _on_aura_exited(area):
+	##print("Aura Exited: ", area)
+	#if active_auras.has(area):
+		#active_auras.erase(area)
+		##print("Active Aura Effects: ", active_auras)
+	#stats_block.update_stats()
+#
+#func _on_self_aura_entered(area, ownArea):
+	##print("on_self_aura_entered: ", area.master)
+	#match ownArea.aura.target_team:
+		#Enums.TARGET_TEAM.ALLY:
+			#if area.master.FACTION_ID != Enums.FACTION_ID.ENEMY and FACTION_ID == Enums.FACTION_ID.NPC:
+				#pass
+			#elif area.master.FACTION_ID != FACTION_ID:
+				#return
+		#Enums.TARGET_TEAM.ENEMY:
+			#if area.master.FACTION_ID == FACTION_ID:
+				#return
+	#
+	#if ownArea.aura.target == Enums.EFFECT_TARGET.SELF:
+		#if !active_auras.has(ownArea):
+			#active_auras[ownArea] = ownArea.aura.effects.duplicate()
+		#else: 
+			#for effect in ownArea.aura.effects:
+				#if effect.stack:
+					#active_auras[ownArea].append(effect)
+	#
+	#
+	#stats_block.update_stats()
+	##print("Active Aura Effects: ", active_auras)
+		#
+#
+#func _on_self_aura_exited(area, ownArea):
+	##print("on_self_aura_exited: ", area.master)
+	#if active_auras.has(ownArea) and active_auras[ownArea].size() > 0:
+		#active_auras[ownArea].pop_back()
+	#if active_auras.has(ownArea) and active_auras[ownArea].size() <= 0:
+		#active_auras.erase(ownArea)
 	#print("Active Aura Effects: ", active_auras)
-		
-
-func _on_self_aura_exited(area, ownArea):
-	#print("on_self_aura_exited: ", area.master)
-	if active_auras.has(ownArea) and active_auras[ownArea].size() > 0:
-		active_auras[ownArea].pop_back()
-	if active_auras.has(ownArea) and active_auras[ownArea].size() <= 0:
-		active_auras.erase(ownArea)
-	print("Active Aura Effects: ", active_auras)
-	stats_block.update_stats()
+	#stats_block.update_stats()
 
 
 #region Equipment functions
@@ -1497,7 +1481,7 @@ func _get_natural_weapon(natId:String)->Natural:
 
 func get_multi_swing():
 	var swings : int = 0
-	for effect in active_item_effects:
+	for effect in equipment_helper.equipped_effects:
 		if effect.type == Enums.EFFECT_TYPE.MULTI_SWING and effect.value > swings:
 			swings = effect.value
 	if swings == 0:
@@ -1508,7 +1492,7 @@ func get_multi_swing():
 
 func get_multi_round():
 	var rounds : int = 0
-	for effect in active_item_effects:
+	for effect in equipment_helper.equipped_effects:
 		if effect.type == Enums.EFFECT_TYPE.MULTI_ROUND and effect.value > rounds:
 			rounds = effect.value
 	if rounds == 0:
@@ -1522,7 +1506,7 @@ func get_crit_dmg_effects():
 	var highest := 0
 	var dmgStack := [0, 0]
 	
-	for effect in active_item_effects:
+	for effect in equipment_helper.equipped_effects:
 		if effect.type == Enums.EFFECT_TYPE.CRIT_BUFF and effect["CritDmg"]:
 			dmgStack[0] += effect["CritDmg"][0]
 			dmgStack[1] += effect["CritDmg"][1]
@@ -1669,10 +1653,10 @@ func apply_dmg(dmg : int, source : Unit = null):
 	if current_life == 0:
 		if source: killer = source
 		deathFlag = true
-	if dmg > 0 and status.Sleep:
-		cure_status("Sleep")
 	if dmg > 0:
 		hp_changed = 0 - dmg
+		
+	status_controller.on_damage_taken(dmg)
 	stats_block.update_stats()
 
 
@@ -1697,90 +1681,18 @@ func has_enough_comp(cost:int) -> bool:
 	if cost <= current_comp: isValid = true
 	return isValid
 
-
-func cure_status(cureType, ignoreCurable = false): #Unnest this someday? I dunno, eat shit.
-	var statusKeys : Array = Enums.SUB_TYPE.keys()
-	var s : String = statusKeys[cureType].to_pascal_case()
-	if s == "All":
-		for condition in status:
-			if status[condition] and status_data.has(condition) and status_data[condition].Curable and condition != "Acted":
-				status[condition] = false
-				status_data.erase(condition)
-				_clear_status_fx(condition)
-	elif status[s] and status_data.has(s) and !ignoreCurable and status_data.Curable:
-		status[s] = false
-		status_data.erase(s)
-		_clear_status_fx(s)
-	elif status[s] and status_data.has(s) and ignoreCurable:
-		status[s] = false
-		status_data.erase(s)
-		_clear_status_fx(s)
-	else:
-		print("No status cured")
-	stats_block.update_stats()
-	#$PathFollow2D/Cell2.set_text(str(status))
-	
-func _clear_status_fx(condition):
-	var sprite = $PathFollow2D/Sprite
-	var kids = sprite.get_children()
-	for kid in kids:
-		if kid is AnimatedSprite2D and kid.get_animation() == condition.to_pascal_case():
-			kid.queue_free()
-	
-func set_status(effect): #Missing a check for "duration type", same goes for ticking the duration
-	#I wish I could inflict sleep status on myself
-	var fxPath = "res://scenes/animations/status_effects/animated_sprite_%s.tscn"
-	var sprite = $PathFollow2D/Sprite
-	var hp = $PathFollow2D/Sprite/HPbar
-	if !effect:
-		print("No condition found")
-		return
-	var statusKeys : Array = Enums.SUB_TYPE.keys()
-	var s : String = statusKeys[effect.sub_type].to_pascal_case()
-	status[s] = true
-	if status_data.has(s) and !status_data[s].curable:
-		status_data[s].duration = effect.duration
-	else:
-		status_data[s] = {"Duration":effect.duration, "Curable":effect.curable, "DurationType":effect.duration_type}
-	fxPath = fxPath % [s.to_snake_case()]
-	var fxAnimation = load(fxPath).instantiate()
-	if fxAnimation:
-		fxAnimation.play(s)
-		sprite.add_child(fxAnimation)
-		fxAnimation.call_deferred("move_before",hp)
-	stats_block.update_stats()
-
-
-func check_status(condition:String):
-	if status[condition]:
-		return true
-	else:
-		return false
-
 func set_acted(actState: bool):
-	status.Acted = actState
-	match status.Acted:
-		false:
-			_anim_player.play("idle")
-			#print(unit_id,":", _anim_player.current_animation,"Set Acted")
-		true: 
-			if one_time_leash and leash > -1: leash = -1
-			_anim_player.play("disabled")
-			status_duration_tick(Enums.DURATION_TYPE.TURN)
-			#print(unit_id,":", _anim_player.current_animation,"Set Acted"
-	stats_block.update_stats()
+	status_controller.set_acted(actState)
 
 #Turn Signals
 func _on_turn_changed():
-	stats_block.update_stats()
+	status_duration_tick(Enums.DURATION_TYPE.TURN)
+	update_stats()
 	
 	
 func _on_new_round(_to):
 	status_duration_tick(Enums.DURATION_TYPE.ROUND)
-
-
-#func _on_turn_changed():
-	#status_duration_tick(Enums.DURATION_TYPE.TURN)
+	update_stats()
 	
 #DEATH
 func run_death():

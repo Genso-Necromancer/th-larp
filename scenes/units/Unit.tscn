@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://wnmi00k2g1y6" path="res://sprites/character/fairy/thief_sprite.png" id="2_3vwvo"]
 [ext_resource type="Script" uid="uid://ctblbjqcv65a5" path="res://scenes/unit_sprite.gd" id="2_me1b5"]
 [ext_resource type="AnimationLibrary" uid="uid://d4f2xcrr7c15q" path="res://scenes/unit_anim.tres" id="3_3vwvo"]
-[ext_resource type="Script" uid="uid://bv74dylssenec" path="res://scenes/UnitArea.gd" id="4_xr077"]
+[ext_resource type="Script" uid="uid://bv74dylssenec" path="res://scenes/area_unit.gd" id="4_xr077"]
 [ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="5_4067k"]
 [ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="6_eo5f0"]
 [ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="7_66viq"]

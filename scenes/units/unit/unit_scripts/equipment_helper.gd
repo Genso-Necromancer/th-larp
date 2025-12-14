@@ -4,11 +4,10 @@ class_name EquipmentHelper
 extends RefCounted
 
 var unit : Unit
+var equipped_effects := []
 
 func _init(u: Unit) -> void:
 	unit = u
-
-
 
 # PUBLIC ENTRY POINTS
 func set_equipped(item: Item = null, is_temp := false) -> void:
@@ -144,15 +143,17 @@ func _add_item_effects(item: Item) -> void:
 	if not item.effects.is_empty():
 		for effect in item.effects:
 			if effect.target == Enums.EFFECT_TARGET.EQUIPPED:
-				unit.active_item_effects.append(effect)
+				equipped_effects.append(effect)
+				unit.buff_controller.apply_effect(effect, Enums.EFFECT_SOURCE.ITEM)
 
 
 func _remove_item_effects(item: Item) -> void:
 	if item.effects:
 		for effect in item.effects:
-			var idx = unit.active_item_effects.find(effect)
+			var idx = equipped_effects.find(effect)
 			if idx >= 0:
-				unit.active_item_effects.remove_at(idx)
+				equipped_effects.remove_at(idx)
+				unit.buff_controller.remove_effect(effect.id)
 
 
 
