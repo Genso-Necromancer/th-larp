@@ -15,9 +15,9 @@ func set_aura(unit: Unit, auraData: Aura):
 	#print("Aura Cells:","[",unit,"]",auraCells)
 	if !aura.is_self:
 		auraCells.erase(Vector2i(0,0))
-	if aura.target == Enums.EFFECT_TARGET.SELF:
-			self.area_entered.connect(master._on_self_aura_entered)
-			self.area_exited.connect(master._on_self_aura_exited)
+	#if aura.target == Enums.EFFECT_TARGET.SELF:
+			#self.area_entered.connect(master._on_self_aura_entered)
+			#self.area_exited.connect(master._on_self_aura_exited)
 	_place_areas(auraCells)
 
 func _place_areas(cells: Array) -> void:

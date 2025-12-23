@@ -4,179 +4,112 @@ extends RefCounted
 
 var unit : Unit
 
-# Auras this unit EMITS (from passives, etc.)
-# Key = Aura resource, Value = spawned AuraArea node
-var owned_areas : Dictionary[Aura,AuraArea] = {} # Dictionary[Aura, AuraArea]
+# Auras OWNED by this unit
+# Key = Aura resource
+# Val = AuraArea instance
+var owned_auras : Dictionary[Aura, AuraArea] = {}
 
-# Auras currently AFFECTING this unit
-# Key = AuraArea instance, Value = Array[Effect] currently applied from that area
-var active_effects : Dictionary[AuraArea,Array] = {} # Dictionary[AuraArea, Array[Effect]]
+# Auras CURRENTLY AFFECTING this unit
+# Key = AuraArea instance
+var active_areas : Dictionary[AuraArea, bool] = {}
+# self buffing auras
+#var self_aura_triggers : Dictionary[Aura, Dictionary] = {}
 
-func _init(u: Unit) -> void:
+func _init(u : Unit) -> void:
 	unit = u
 
 
-# ==========================================================
-# OWNED AURAS (emitters) — moved from Unit.gd
-# ==========================================================
+# -------------------------------------------------
+# OWNED AURAS (from passives)
+# -------------------------------------------------
+func validate_auras(valid : Array[Aura]) -> void:
+	for aura in owned_auras.keys():
+		if not valid.has(aura):
+			remove_aura(aura)
 
-func validate_auras(valid: Array[Aura]) -> void:
-	# Remove any owned aura not in valid list
-	var to_remove : Array[Aura] = []
-	for a in owned_areas.keys():
-		if not valid.has(a):
-			to_remove.append(a)
-
-	for a in to_remove:
-		remove_owned_aura(a)
+	for aura in valid:
+		load_aura(aura)
 
 
-func load_owned_aura(aura: Aura) -> void:
-	if aura == null:
-		return
-	if owned_areas.has(aura):
+func load_aura(aura : Aura) -> void:
+	if owned_auras.has(aura):
 		return
 
-	var aura_area : AuraArea = load("res://scenes/aura_collision.tscn").instantiate()
-	var path_follow := unit.get_node_or_null("PathFollow2D")
-	if path_follow == null:
-		printerr("AuraController.load_owned_aura: Unit missing PathFollow2D")
+	var area : AuraArea = load("res://scenes/aura_collision.tscn").instantiate()
+	unit.get_node("PathFollow2D").add_child(area)
+	area.call_deferred("set_aura", unit, aura)
+	owned_auras[aura] = area
+
+
+func remove_aura(aura : Aura) -> void:
+	if not owned_auras.has(aura):
 		return
 
-	path_follow.add_child(aura_area)
-	aura_area.call_deferred("set_aura", unit, aura)
-	owned_areas[aura] = aura_area
-
-
-func remove_owned_aura(aura: Aura) -> void:
-	if not owned_areas.has(aura):
-		return
-
-	var area: AuraArea = owned_areas[aura]
+	var area := owned_auras[aura]
 	if is_instance_valid(area):
 		area.queue_free()
-	owned_areas.erase(aura)
+	owned_auras.erase(aura)
 
 
 func get_visual_aura_range() -> int:
 	var highest := 0
-	for a in owned_areas.keys():
-		if a and a.range > highest:
-			highest = a.range
+	for aura in owned_auras.keys():
+		highest = max(highest, aura.range)
 	return highest
 
 
-# ==========================================================
-# AFFECTED AURAS (receivers) — signal-driven
-# ==========================================================
+# -------------------------------------------------
+# ACTIVE AURAS (collision driven)
+# -------------------------------------------------
+func on_aura_enter(area : AuraArea) -> void:
+	active_areas[area] = true
 
-func on_aura_entered(area: AuraArea) -> void:
-	#print("%s entered %s's aura [%s]" % [unit,area.master,area])
-	if area == null or area.aura == null:
-		return
+func on_aura_trigger_enter(aura:Aura,source:Unit)->void:
+	for effect:Effect in aura.effects:
+		unit.buff_controller.apply_effect(effect, Enums.EFFECT_SOURCE.AURA, source)
+	#if not aura.effects: return
+	#var triggers :Dictionary= self_aura_triggers.get(aura,{})
+	#if triggers.has(source): return # already triggered
+	#triggers[source]=1
+	#self_aura_triggers[aura]=triggers
+	#_apply_self_aura_stack(aura)
 
-	# Team filtering (preserves your existing logic)
-	match area.aura.target_team:
-		Enums.TARGET_TEAM.ALLY:
-			if area.master.FACTION_ID != Enums.FACTION_ID.ENEMY and unit.FACTION_ID == Enums.FACTION_ID.NPC:
-				pass
-			elif area.master.FACTION_ID != unit.FACTION_ID:
-				return
+func on_aura_exit(area : AuraArea) -> void:
+	active_areas.erase(area)
 
-		Enums.TARGET_TEAM.ENEMY:
-			if area.master.FACTION_ID == unit.FACTION_ID:
-				return
-
-	# SELF-only auras handled in on_self_aura_enter
-	if area.aura.target == Enums.EFFECT_TARGET.SELF:
-		return
-
-	if not active_effects.has(area):
-		active_effects[area] = area.aura.effects.duplicate(true)
-
-	_request_stat_update()
-
-
-func on_aura_exited(area: AuraArea) -> void:
-	print("%s exited aura [%s]" % [unit,area])
-	if active_effects.has(area):
-		active_effects.erase(area)
-		_request_stat_update()
+func on_aura_trigger_exit(aura: Aura, source: Unit) -> void:
+	for effect:Effect in aura.effects:
+		unit.buff_controller.remove_effect(effect, source)
+	#if not self_aura_triggers.has(aura): return
+	#var triggers := self_aura_triggers[aura]
+	#if not triggers.has(source): return
+	#triggers.erase(source)
+	#_remove_self_aura_stack(aura)
+	#if triggers.is_empty(): self_aura_triggers.erase(aura)
 
 
-func on_self_aura_enter(area: AuraArea) -> void:
-	print("%s entered aura [%s]" % [unit,area])
-	if area == null or area.aura == null:
-		return
-
-	match area.aura.target_team:
-		Enums.TARGET_TEAM.ALLY:
-			if area.master.FACTION_ID != Enums.FACTION_ID.ENEMY and unit.FACTION_ID == Enums.FACTION_ID.NPC:
-				pass
-			elif area.master.FACTION_ID != unit.FACTION_ID:
-				return
-
-		Enums.TARGET_TEAM.ENEMY:
-			if area.master.FACTION_ID == unit.FACTION_ID:
-				return
-
-	if area.aura.target != Enums.EFFECT_TARGET.SELF:
-		return
-
-	if not active_effects.has(area):
-		active_effects[area] = area.aura.effects.duplicate(true)
-	else:
-		# Preserve your stacking behavior: only append stackable effects
-		for effect in area.aura.effects:
-			if effect.stack:
-				active_effects[area].append(effect)
-
-	_request_stat_update()
-
-
-func on_self_aura_exit(area: AuraArea) -> void:
-	#print("%s exited aura [%s]" % [unit,area])
-	if not active_effects.has(area):
-		return
-
-	# Mirror your old logic: pop one stack, delete when empty
-	if active_effects[area].size() > 1:
-		active_effects[area].pop_back()
-	else:
-		active_effects.erase(area)
-
-	_request_stat_update()
-
-
-# ==========================================================
-# StatBlock integration
-# ==========================================================
-
+# -------------------------------------------------
+# STAT CONTRIBUTION
+# -------------------------------------------------
 func get_stat_modifiers() -> Dictionary:
 	var mods := {}
-	var sub_keys :Array[String]
-	sub_keys.assign(Enums.SUB_TYPE.keys())
-	
-	for area in active_effects.keys():
-		for effect in active_effects[area]:
-			var stat_name := sub_keys[effect.sub_type].to_pascal_case()
-			mods[stat_name] = mods.get(stat_name, 0) + effect.value
-	#print(mods)
+	var sub_keys := Enums.SUB_TYPE.keys()
+
+	for area in active_areas.keys():
+		var aura :Aura= area.aura
+		for effect in aura.effects:
+			var stat :String= sub_keys[effect.sub_type].to_pascal_case()
+			mods[stat] = mods.get(stat, 0) + effect.value
 	return mods
 
+func _apply_self_aura_stack(aura: Aura) -> void:
+	for effect in aura.effects:
+		if effect.stack:
+			unit.buff_controller.add_stack(effect)
+		else:
+			unit.buff_controller.apply_or_refresh(effect)
 
-# ==========================================================
-# Utilities
-# ==========================================================
-
-func clear_active_effects() -> void:
-	active_effects.clear()
-	_request_stat_update()
-
-
-func _request_stat_update() -> void:
-	# Prefer your existing pipeline
-	if unit.has_method("update_stats"):
-		unit.update_stats()
-	elif unit.has("stats_block"):
-		unit.stats_block.update_stats()
+func _remove_self_aura_stack(aura: Aura) -> void:
+	for effect in aura.effects:
+		if effect.stack:
+			unit.buff_controller.remove_stack(effect)

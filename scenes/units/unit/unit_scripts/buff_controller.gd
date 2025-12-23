@@ -15,7 +15,7 @@ func _init(u: Unit) -> void:
 	unit = u
 
 # APPLYING / REMOVING BUFFS
-func apply_effect(effect: Effect,source:Enums.EFFECT_SOURCE=Enums.EFFECT_SOURCE.BUFF) -> void:
+func apply_effect(effect: Effect,source:Enums.EFFECT_SOURCE=Enums.EFFECT_SOURCE.BUFF,context=null) -> void:
 	if effect == null:
 		printerr("[BuffController] Tried to apply null effect")
 		return
@@ -23,30 +23,30 @@ func apply_effect(effect: Effect,source:Enums.EFFECT_SOURCE=Enums.EFFECT_SOURCE.
 	if effect.duration_type == Enums.DURATION_TYPE.PERMANENT:
 		_apply_permanent_stat_mod(effect)
 		return
-
-	var pool = _get_pool(effect)
-
-	var effect_id = effect.id
+		
 	if effect.stack:
-		effect_id = _generate_unique_id(pool, effect.id)
+		_add_stack(effect, source, context)
+	else:
+		_apply_or_refresh(effect, source)
+	#var pool = _get_pool(effect)
+	
+	#var effect_id = effect.id
+	#if effect.stack:
+		#effect_id = _generate_unique_id(pool, effect.id)
+#
+	#pool[effect_id] = {
+		#"effect": effect,
+		#"duration": effect.duration,
+		#"source": source
+	#}
+	#unit.update_stats()
 
-	pool[effect_id] = {
-		"effect": effect,
-		"duration": effect.duration,
-		"source": source
-	}
 
-	unit.update_stats()
-
-
-func remove_effect(effect_id: String) -> void:
-	if active_buffs.has(effect_id):
-		active_buffs.erase(effect_id)
-
-	if active_debuffs.has(effect_id):
-		active_debuffs.erase(effect_id)
-
-	unit.update_stats()
+func remove_effect(effect: Effect, context = null) -> void:
+	if effect.stack:
+		_remove_stack(effect, context)
+	else:
+		_remove_nonstack(effect)
 
 
 func clear_all() -> void:
@@ -54,11 +54,61 @@ func clear_all() -> void:
 	active_debuffs.clear()
 	unit.update_stats()
 
+# Effect Application
+func _add_stack(effect: Effect, source, context) -> void:
+	var pool = _get_pool(effect)
+
+	var stack_key := ""
+	if context != null:
+		stack_key = str(context.get_instance_id())
+	else:
+		stack_key = "generic"
+
+	var id := "%s_%s" % [effect.id, stack_key]
+
+	if pool.has(id):
+		return # already stacked
+
+	pool[id] = {
+		"effect": effect,
+		"duration": effect.duration,
+		"source": source
+	}
+
+	unit.update_stats()
+
+func _apply_or_refresh(effect: Effect, source:= Enums.EFFECT_SOURCE.AURA) -> void:
+	var pool = _get_pool(effect)
+
+	for id in pool.keys():
+		var entry = pool[id]
+		if entry.effect.id == effect.id and entry.source == source:
+			entry.duration = effect.duration
+			unit.update_stats()
+			return
+
+	apply_effect(effect, source)
+
+func _remove_stack(effect: Effect, context) -> void:
+	if context == null:
+		return
+
+	var stack_key := str(context.get_instance_id())
+	var id := "%s_%s" % [effect.id, stack_key]
+
+	if active_buffs.erase(id) or active_debuffs.erase(id):
+		unit.update_stats()
+
+func _remove_nonstack(effect: Effect) -> void:
+	for pool in [active_buffs, active_debuffs]:
+		for id in pool.keys():
+			if pool[id].effect.id == effect.id:
+				pool.erase(id)
+				unit.update_stats()
+				return
 
 
 # DURATION TICK
-
-
 func tick(duration_type: Enums.DURATION_TYPE) -> void:
 	_tick_group(active_buffs, duration_type)
 	_tick_group(active_debuffs, duration_type)

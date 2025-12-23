@@ -571,8 +571,8 @@ func _ready() -> void:
 	set_equipped()
 	_load_sprites()
 	hitBox.set_master(self)
-	hitBox.area_entered.connect(aura_controller.on_aura_entered)
-	hitBox.area_exited.connect(aura_controller.on_aura_exited)
+	hitBox.area_entered.connect(self.on_aura_entered)
+	hitBox.area_exited.connect(self.on_aura_exited)
 	unit_relocated.connect(self._on_unit_relocated)
 	_anim_player.play("idle")
 	#Create the curve resource here because creating it in the editor prevents moving the unit
@@ -969,11 +969,11 @@ func return_original():
 
 
 #region buff functions
-func add_buff(effect: Effect) -> void:
+func set_buff(effect: Effect) -> void:
 	buff_controller.apply_effect(effect)
 
-func remove_buff(id: String) -> void:
-	buff_controller.remove_effect(id)
+func remove_buff(effect: Effect) -> void:
+	buff_controller.remove_effect(effect)
 
 func tick_buffs(duration_type: Enums.DURATION_TYPE) -> void:
 	buff_controller.tick(duration_type)
@@ -1157,7 +1157,7 @@ func search_passive_id(type):
 	return found
 
 
-##Aura Functions
+#region Aura Functions
 func validate_auras(auras:Array[Aura]):
 	aura_controller.validate_auras(auras)
 
@@ -1168,17 +1168,8 @@ func remove_aura(a:Aura):
 
 func load_aura(aura:Aura):
 	aura_controller.load_owned_aura(aura)
-	
-	
-#func get_visual_aura_range() -> int:
-	#var highest := 0
-	#for p in unitAuras:
-		#var a = p.aura
-		#if a.range > highest:
-			#highest = a.range
-	#return highest
 
-#region aura functions
+
 func get_visual_aura_range() -> int:
 	return aura_controller.get_visual_aura_range()
 	
@@ -1186,12 +1177,75 @@ func get_visual_aura_range() -> int:
 
 #region aura signals
 
-func _on_self_aura_entered(area:AuraArea,):
-	aura_controller.on_self_aura_enter(area)
+#func _on_self_aura_entered(area:AuraArea,):
+	#aura_controller.on_self_aura_enter(area)
+#
+#func _on_self_aura_exited(area:AuraArea,):
+	#aura_controller.on_self_aura_exit(area)
 
-func _on_self_aura_exited(area:AuraArea,):
-	aura_controller.on_self_aura_exit(area)
+
+#func _on_self_aura_entered(area:AuraArea):
+	##print("on_self_aura_entered: ", area.master)
+	#if not is_aura_applicable(area): return
+	#
+	#if area.aura.target == Enums.EFFECT_TARGET.SELF:
+		#aura_controller.on_aura_enter(area)
+		##if !active_auras.has(area):
+			##active_auras[area] = area.aura.effects.duplicate()
+		##else: 
+			##for effect in area.aura.effects:
+				##if effect.stack:
+					##active_auras[area].append(effect)
+	#
+	#
+	#stats_block.update_stats()
+	##print("Active Aura Effects: ", active_auras)
+		#
+#
+#func _on_self_aura_exited(area:AuraArea):
+	##print("on_self_aura_exited: ", area.master)
+	#aura_controller.on_aura_enter(area)
+	##print("Active Aura Effects: ", active_auras)
+	#stats_block.update_stats()
+
+
+func _on_aura_entered(area : AuraArea) -> void:
+	if not is_aura_applicable(area): return
+	aura_controller.on_aura_enter(area)
+	if area.aura.target == Enums.EFFECT_TARGET.SELF:
+		area.master.aura_controller.on_aura_trigger_enter(area.aura,self)
+	update_stats()
+
+func _on_aura_exited(area : AuraArea) -> void:
+	aura_controller.on_aura_exit(area)
+	if area.aura.target == Enums.EFFECT_TARGET.SELF:
+		area.master.aura_controller.on_aura_trigger_exit(area.aura, self)
+	update_stats()
+
+func is_aura_applicable(area: AuraArea) -> bool:
+	if area == null or area.aura == null:
+		return false
+
+	var aura := area.aura
+	var source := area.master
+
+	match aura.target_team:
+		Enums.TARGET_TEAM.ALLY:
+			# NPC ally edge case preserved
+			if source.FACTION_ID != Enums.FACTION_ID.ENEMY and FACTION_ID == Enums.FACTION_ID.NPC:
+				return true
+			return source.FACTION_ID == FACTION_ID
+
+		Enums.TARGET_TEAM.ENEMY:
+			return source.FACTION_ID != FACTION_ID
+
+		Enums.TARGET_TEAM.NONE:
+			return true
+
+	return false
 #endregion
+
+
 
 #func _on_aura_entered(area):
 	##print("Aura Entered: ", area)
@@ -1222,39 +1276,7 @@ func _on_self_aura_exited(area:AuraArea,):
 		##print("Active Aura Effects: ", active_auras)
 	#stats_block.update_stats()
 #
-#func _on_self_aura_entered(area, ownArea):
-	##print("on_self_aura_entered: ", area.master)
-	#match ownArea.aura.target_team:
-		#Enums.TARGET_TEAM.ALLY:
-			#if area.master.FACTION_ID != Enums.FACTION_ID.ENEMY and FACTION_ID == Enums.FACTION_ID.NPC:
-				#pass
-			#elif area.master.FACTION_ID != FACTION_ID:
-				#return
-		#Enums.TARGET_TEAM.ENEMY:
-			#if area.master.FACTION_ID == FACTION_ID:
-				#return
-	#
-	#if ownArea.aura.target == Enums.EFFECT_TARGET.SELF:
-		#if !active_auras.has(ownArea):
-			#active_auras[ownArea] = ownArea.aura.effects.duplicate()
-		#else: 
-			#for effect in ownArea.aura.effects:
-				#if effect.stack:
-					#active_auras[ownArea].append(effect)
-	#
-	#
-	#stats_block.update_stats()
-	##print("Active Aura Effects: ", active_auras)
-		#
-#
-#func _on_self_aura_exited(area, ownArea):
-	##print("on_self_aura_exited: ", area.master)
-	#if active_auras.has(ownArea) and active_auras[ownArea].size() > 0:
-		#active_auras[ownArea].pop_back()
-	#if active_auras.has(ownArea) and active_auras[ownArea].size() <= 0:
-		#active_auras.erase(ownArea)
-	#print("Active Aura Effects: ", active_auras)
-	#stats_block.update_stats()
+
 
 
 #region Equipment functions
