@@ -1,0 +1,436 @@
+[gd_scene load_steps=6 format=3 uid="uid://ct2rsfnl7fi6u"]
+
+[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_3ryf8"]
+[ext_resource type="Theme" uid="uid://codhrldeva37q" path="res://fonts/Izayoi_Theme_Forecast.tres" id="1_4jwcs"]
+[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_jeq77"]
+[ext_resource type="Script" uid="uid://bqrxnm8bi7no" path="res://scenes/GUI/hud/forecast/combat_forecast.gd" id="2_npc5x"]
+[ext_resource type="Script" uid="uid://c2e1stpb6yppa" path="res://scenes/GUI/hud/forecast/animation_handler.gd" id="5_knule"]
+
+[node name="CombatForecast" type="PanelContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 0
+theme = ExtResource("1_4jwcs")
+script = ExtResource("2_npc5x")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Dimmer" type="ColorRect" parent="PanelContainer"]
+layout_mode = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.545098)
+
+[node name="ForecastMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_top = 100
+
+[node name="ForecastBox" type="VBoxContainer" parent="ForecastMargin"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+alignment = 1
+
+[node name="StatRow" type="HBoxContainer" parent="ForecastMargin/ForecastBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+alignment = 1
+
+[node name="AtkPanel" type="PanelContainer" parent="ForecastMargin/ForecastBox/StatRow"]
+custom_minimum_size = Vector2(167, 147)
+layout_mode = 2
+
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+texture = ExtResource("1_3ryf8")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="AMa" type="MarginContainer" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+
+[node name="AVB" type="VBoxContainer" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="NAME" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+custom_minimum_size = Vector2(80, 16)
+layout_mode = 2
+size_flags_horizontal = 8
+bbcode_enabled = true
+text = "Null
+"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+horizontal_alignment = 2
+vertical_alignment = 1
+
+[node name="LIFE" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+custom_minimum_size = Vector2(24, 10)
+layout_mode = 2
+size_flags_horizontal = 9
+theme_override_font_sizes/normal_font_size = 0
+bbcode_enabled = true
+text = "[center]Null[/center]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+meta_underlined = false
+hint_underlined = false
+deselect_on_focus_loss_enabled = false
+text_direction = 1
+
+[node name="ACC" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+size_flags_horizontal = 9
+bbcode_enabled = true
+text = "Null"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DMG" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+size_flags_horizontal = 9
+bbcode_enabled = true
+text = "Null"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CRIT" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+size_flags_horizontal = 9
+bbcode_enabled = true
+text = "Null"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Weapon" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+size_flags_horizontal = 9
+bbcode_enabled = true
+text = "Null"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Labels" type="PanelContainer" parent="ForecastMargin/ForecastBox/StatRow"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/StatRow/Labels"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+texture = ExtResource("1_3ryf8")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="Margin" type="MarginContainer" parent="ForecastMargin/ForecastBox/StatRow/Labels"]
+layout_mode = 2
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="HSeparator" type="HSeparator" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+self_modulate = Color(1, 1, 1, 0)
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+
+[node name="BLANK" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(50, 16)
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="LIFELB" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+layout_mode = 2
+bbcode_enabled = true
+text = "Life"
+fit_content = true
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ACCLB" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "Accuracy"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DMGLB" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "Damage"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CRITLB" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "Crit"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="WepLb" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "Attack"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="TargetPanel" type="PanelContainer" parent="ForecastMargin/ForecastBox/StatRow"]
+custom_minimum_size = Vector2(167, 147)
+layout_mode = 2
+
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+texture = ExtResource("1_3ryf8")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="TMa" type="MarginContainer" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel"]
+layout_mode = 2
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+
+[node name="TVB" type="VBoxContainer" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="NAME" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+custom_minimum_size = Vector2(80, 16)
+layout_mode = 2
+size_flags_horizontal = 0
+bbcode_enabled = true
+text = "Null"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+vertical_alignment = 1
+
+[node name="LIFE" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+custom_minimum_size = Vector2(15, 10)
+layout_mode = 2
+bbcode_enabled = true
+text = "[center]Null[/center]"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+meta_underlined = false
+hint_underlined = false
+deselect_on_focus_loss_enabled = false
+
+[node name="ACC" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "Null"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="DMG" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "Null"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="CRIT" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+custom_minimum_size = Vector2(50, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "Null"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Weapon" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+custom_minimum_size = Vector2(50, 16)
+layout_mode = 2
+bbcode_enabled = true
+text = "Null"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="EffectRow" type="HBoxContainer" parent="ForecastMargin/ForecastBox"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+alignment = 1
+
+[node name="AtkEfPanel" type="PanelContainer" parent="ForecastMargin/ForecastBox/EffectRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/EffectRow/AtkEfPanel"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+texture = ExtResource("1_3ryf8")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="AMa" type="MarginContainer" parent="ForecastMargin/ForecastBox/EffectRow/AtkEfPanel"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 10
+
+[node name="AVB" type="VBoxContainer" parent="ForecastMargin/ForecastBox/EffectRow/AtkEfPanel/AMa"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Labels2" type="PanelContainer" parent="ForecastMargin/ForecastBox/EffectRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/EffectRow/Labels2"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+texture = ExtResource("1_3ryf8")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="Margin" type="MarginContainer" parent="ForecastMargin/ForecastBox/EffectRow/Labels2"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 10
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ForecastMargin/ForecastBox/EffectRow/Labels2/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="EFFLB" type="RichTextLabel" parent="ForecastMargin/ForecastBox/EffectRow/Labels2/Margin/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 1
+bbcode_enabled = true
+text = "[center]Effects[/center]"
+fit_content = true
+scroll_active = false
+
+[node name="TargetEfPanel" type="PanelContainer" parent="ForecastMargin/ForecastBox/EffectRow"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+
+[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/EffectRow/TargetEfPanel"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+texture = ExtResource("1_3ryf8")
+patch_margin_left = 16
+patch_margin_top = 16
+patch_margin_right = 16
+patch_margin_bottom = 16
+
+[node name="TMa" type="MarginContainer" parent="ForecastMargin/ForecastBox/EffectRow/TargetEfPanel"]
+layout_mode = 2
+theme = ExtResource("1_jeq77")
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 10
+
+[node name="TVB" type="VBoxContainer" parent="ForecastMargin/ForecastBox/EffectRow/TargetEfPanel/TMa"]
+layout_mode = 2
+theme_override_constants/separation = 2
+alignment = 2
+
+[node name="GridContainer" type="GridContainer" parent="ForecastMargin"]
+layout_mode = 2
+
+[node name="AnimationHandler" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 200
+theme_override_constants/margin_top = 200
+theme_override_constants/margin_right = 200
+theme_override_constants/margin_bottom = 200
+script = ExtResource("5_knule")
+
+[node name="InitiatorNode" type="Control" parent="AnimationHandler"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="InitiateNode" type="Control" parent="AnimationHandler"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0

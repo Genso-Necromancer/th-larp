@@ -6,7 +6,6 @@
 [resource]
 script = ExtResource("1_e2fex")
 id = "sleep"
-name = "Sleep"
 curable = true
 default_duration = 0
 duration_type = 1

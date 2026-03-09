@@ -8,7 +8,7 @@
 [ext_resource type="Script" uid="uid://dsoc750igrsw6" path="res://scenes/status_tray.gd" id="5_543hk"]
 [ext_resource type="Texture2D" uid="uid://dt8g5xp8171gn" path="res://sprites/UI/ui_status_tray.png" id="6_6pukg"]
 [ext_resource type="FontFile" uid="uid://byluxrpq7rwkq" path="res://fonts/JimNightshade/JimNightshade.otf" id="6_cj8vs"]
-[ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/inventory_panel.tscn" id="6_uhtry"]
+[ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/hud/inventory/inventory_panel.tscn" id="6_uhtry"]
 [ext_resource type="Script" uid="uid://dim0gnwc08st" path="res://scenes/LabelValue.gd" id="7_2r62x"]
 [ext_resource type="Script" uid="uid://q1fvpd16pg1" path="res://scenes/status_grid.gd" id="7_2xdcq"]
 [ext_resource type="PackedScene" uid="uid://b5pdi6fx5chy7" path="res://scenes/GUI/info_panel.tscn" id="7_rfpg3"]

@@ -33,7 +33,7 @@ func negamax(state:BoardState, depth:int, alpha:float, beta:float)->float:
 func evaluate(state:BoardState)->float:
 	var score:=0.0
 	for unit in state.units.values():
-		var val:float= unit.value * (unit.hp / unit.max_hp)
+		var val:float= unit.value * (unit.current_life / unit.max_hp)
 		if unit.FACTION_ID == Enums.FACTION_ID.ENEMY:
 			score += val
 		else: score -= val

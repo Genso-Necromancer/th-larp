@@ -1,0 +1,1170 @@
+[gd_scene load_steps=25 format=3 uid="uid://jmdc2n1a1cmw"]
+
+[ext_resource type="Script" uid="uid://d4l2iyyc8mdsi" path="res://scenes/GUI/hud/clock/chapter_clock.gd" id="2_o1dct"]
+[ext_resource type="Texture2D" uid="uid://ctrylx4t1fk3q" path="res://sprites/UI/clock/clockwip.png" id="2_v5csy"]
+[ext_resource type="Texture2D" uid="uid://dl3ckihid50a3" path="res://sprites/UI/clock/gem1.png" id="4_3de2a"]
+[ext_resource type="Texture2D" uid="uid://vdbbueaustg7" path="res://sprites/UI/clock/gem7.png" id="4_45hym"]
+[ext_resource type="Texture2D" uid="uid://wd4d8kshbmvi" path="res://sprites/UI/clock/sun_dial.png" id="4_oy2tn"]
+[ext_resource type="Texture2D" uid="uid://dghkcjx20lboh" path="res://sprites/UI/clock/gem3.png" id="4_v24dc"]
+[ext_resource type="Texture2D" uid="uid://b5p861ovsqmix" path="res://sprites/UI/clock/gem6.png" id="6_bmr4r"]
+[ext_resource type="Texture2D" uid="uid://6m0pnct3tk41" path="res://sprites/UI/clock/gem2.png" id="6_gusjw"]
+[ext_resource type="Texture2D" uid="uid://c7okwlld0uycd" path="res://sprites/UI/clock/gem5.png" id="6_mhbrn"]
+[ext_resource type="Texture2D" uid="uid://dgm26y6ednp1y" path="res://sprites/UI/clock/gem4.png" id="6_nco17"]
+[ext_resource type="Texture2D" uid="uid://bft4icyickpx4" path="res://sprites/UI/clock/clockface.png" id="8_04pvf"]
+[ext_resource type="Texture2D" uid="uid://dywo15638g3vq" path="res://sprites/UI/clock/clockwingleft.png" id="9_oy2tn"]
+[ext_resource type="Theme" uid="uid://crq87yjolg6r0" path="res://fonts/clock_theme.tres" id="10_5p7p7"]
+[ext_resource type="Texture2D" uid="uid://c4db0ammih1yj" path="res://sprites/UI/clock/digitalclockhangers.png" id="10_bqfgj"]
+[ext_resource type="Script" uid="uid://cxibrswbg60fd" path="res://scenes/GUI/hud/clock/digital_display.gd" id="11_2pgwi"]
+[ext_resource type="Texture2D" uid="uid://ei64drwlnbo4" path="res://sprites/UI/clock/digitalclock.png" id="11_5p7p7"]
+[ext_resource type="Texture2D" uid="uid://pnlg68ya51am" path="res://sprites/UI/clock/clockcenter.png" id="12_2pgwi"]
+[ext_resource type="Texture2D" uid="uid://dbiio27awr3rr" path="res://sprites/UI/clock/clockmhand.png" id="13_vb1qc"]
+[ext_resource type="Texture2D" uid="uid://dys6yxa5cklvv" path="res://sprites/UI/clock/clockhhand.png" id="14_0bgo7"]
+
+[sub_resource type="Animation" id="Animation_04pvf"]
+resource_name = "RESET"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Skeleton2D/center/WingRight:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Skeleton2D/center/WingLeft:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Skeleton2D/center:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 128.571)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Skeleton2D/center/WingRight:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(138.571, 20.0004)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Skeleton2D/center/mHand:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Skeleton2D/center/WingLeft/TealGemBone2D:rotation")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-3.14159]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Skeleton2D/center/WingLeft/GreenGemBone2D:rotation")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.14159]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Skeleton2D/center/WingLeft/YellowGemBone2D:rotation")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.14159]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Skeleton2D/center/WingLeft/OrangeGemBone2D:rotation")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.14159]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Skeleton2D/center/WingLeft/PurpleGemBone2D:rotation")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.14159]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("Skeleton2D/center/WingLeft/BlueGemBone2D:rotation")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.14159]
+}
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("Skeleton2D/center/WingLeft/PinkGemBone2D:rotation")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.14159]
+}
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("Skeleton2D/center/WingRight/PinkGemBone2D:rotation")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Skeleton2D/center/WingRight/TealGemBone2D:rotation")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/14/type = "value"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath("Skeleton2D/center/WingRight/GreenGemBone2D:rotation")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/15/type = "value"
+tracks/15/imported = false
+tracks/15/enabled = true
+tracks/15/path = NodePath("Skeleton2D/center/WingRight/YellowGemBone2D:rotation")
+tracks/15/interp = 1
+tracks/15/loop_wrap = true
+tracks/15/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/16/type = "value"
+tracks/16/imported = false
+tracks/16/enabled = true
+tracks/16/path = NodePath("Skeleton2D/center/WingRight/OrangeGemBone2D:rotation")
+tracks/16/interp = 1
+tracks/16/loop_wrap = true
+tracks/16/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/17/type = "value"
+tracks/17/imported = false
+tracks/17/enabled = true
+tracks/17/path = NodePath("Skeleton2D/center/WingRight/PurpleGemBone2D:rotation")
+tracks/17/interp = 1
+tracks/17/loop_wrap = true
+tracks/17/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/18/type = "value"
+tracks/18/imported = false
+tracks/18/enabled = true
+tracks/18/path = NodePath("Skeleton2D/center/WingRight/BlueGemBone2D:rotation")
+tracks/18/interp = 1
+tracks/18/loop_wrap = true
+tracks/18/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/19/type = "value"
+tracks/19/imported = false
+tracks/19/enabled = true
+tracks/19/path = NodePath("Skeleton2D/center/WingLeft/TealGemBone2D:position")
+tracks/19/interp = 1
+tracks/19/loop_wrap = true
+tracks/19/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-307.805, -18.9914)]
+}
+tracks/20/type = "value"
+tracks/20/imported = false
+tracks/20/enabled = true
+tracks/20/path = NodePath("Skeleton2D/center/WingLeft/GreenGemBone2D:position")
+tracks/20/interp = 1
+tracks/20/loop_wrap = true
+tracks/20/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-278.32, 0.828247)]
+}
+tracks/21/type = "value"
+tracks/21/imported = false
+tracks/21/enabled = true
+tracks/21/path = NodePath("Skeleton2D/center/WingLeft/YellowGemBone2D:position")
+tracks/21/interp = 1
+tracks/21/loop_wrap = true
+tracks/21/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-242.68, 12.5603)]
+}
+tracks/22/type = "value"
+tracks/22/imported = false
+tracks/22/enabled = true
+tracks/22/path = NodePath("Skeleton2D/center/WingLeft/OrangeGemBone2D:position")
+tracks/22/interp = 1
+tracks/22/loop_wrap = true
+tracks/22/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-60.9354, 8.35939)]
+}
+tracks/23/type = "value"
+tracks/23/imported = false
+tracks/23/enabled = true
+tracks/23/path = NodePath("Skeleton2D/center/WingLeft/PurpleGemBone2D:position")
+tracks/23/interp = 1
+tracks/23/loop_wrap = true
+tracks/23/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(11.2048, 50.8694)]
+}
+tracks/24/type = "value"
+tracks/24/imported = false
+tracks/24/enabled = true
+tracks/24/path = NodePath("Skeleton2D/center/WingLeft/BlueGemBone2D:position")
+tracks/24/interp = 1
+tracks/24/loop_wrap = true
+tracks/24/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(29.2323, 41.9422)]
+}
+tracks/25/type = "value"
+tracks/25/imported = false
+tracks/25/enabled = true
+tracks/25/path = NodePath("Skeleton2D/center/WingLeft/PinkGemBone2D:position")
+tracks/25/interp = 1
+tracks/25/loop_wrap = true
+tracks/25/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-12.8571, -58.5714)]
+}
+tracks/26/type = "value"
+tracks/26/imported = false
+tracks/26/enabled = true
+tracks/26/path = NodePath("Skeleton2D/center/WingRight/PinkGemBone2D:position")
+tracks/26/interp = 1
+tracks/26/loop_wrap = true
+tracks/26/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(8.57178, -55.7142)]
+}
+tracks/27/type = "value"
+tracks/27/imported = false
+tracks/27/enabled = true
+tracks/27/path = NodePath("Skeleton2D/center/WingRight/TealGemBone2D:position")
+tracks/27/interp = 1
+tracks/27/loop_wrap = true
+tracks/27/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(304.398, -17.8892)]
+}
+tracks/28/type = "value"
+tracks/28/imported = false
+tracks/28/enabled = true
+tracks/28/path = NodePath("Skeleton2D/center/WingRight/GreenGemBone2D:position")
+tracks/28/interp = 1
+tracks/28/loop_wrap = true
+tracks/28/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(274.035, 3.68538)]
+}
+tracks/29/type = "value"
+tracks/29/imported = false
+tracks/29/enabled = true
+tracks/29/path = NodePath("Skeleton2D/center/WingRight/YellowGemBone2D:position")
+tracks/29/interp = 1
+tracks/29/loop_wrap = true
+tracks/29/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(238.395, 15.4174)]
+}
+tracks/30/type = "value"
+tracks/30/imported = false
+tracks/30/enabled = true
+tracks/30/path = NodePath("Skeleton2D/center/WingRight/OrangeGemBone2D:position")
+tracks/30/interp = 1
+tracks/30/loop_wrap = true
+tracks/30/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(56.6503, 11.2165)]
+}
+tracks/31/type = "value"
+tracks/31/imported = false
+tracks/31/enabled = true
+tracks/31/path = NodePath("Skeleton2D/center/WingRight/PurpleGemBone2D:position")
+tracks/31/interp = 1
+tracks/31/loop_wrap = true
+tracks/31/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-15.49, 53.7266)]
+}
+tracks/32/type = "value"
+tracks/32/imported = false
+tracks/32/enabled = true
+tracks/32/path = NodePath("Skeleton2D/center/WingRight/BlueGemBone2D:position")
+tracks/32/interp = 1
+tracks/32/loop_wrap = true
+tracks/32/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-33.5175, 44.7993)]
+}
+
+[sub_resource type="Animation" id="Animation_5m31i"]
+resource_name = "enter"
+length = 0.9
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Skeleton2D/center:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.47, 0.7, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, -191.429), Vector2(0, 154.286), Vector2(0, 124), Vector2(0, 128.571)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Skeleton2D/center/WingRight:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.47, 0.72, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [-0.733038, 0.174533, -0.0872665, 0.0]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Skeleton2D/center/WingLeft:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.47, 0.72, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [0.733038, -0.174533, 0.0872665, 0.0]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Skeleton2D/center/WingLeft/TealGemBone2D:rotation")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [-3.14159]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("Skeleton2D/center/WingLeft/GreenGemBone2D:rotation")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.14159]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Skeleton2D/center/WingLeft/YellowGemBone2D:rotation")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.14159]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Skeleton2D/center/WingLeft/OrangeGemBone2D:rotation")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.14159]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Skeleton2D/center/WingLeft/PurpleGemBone2D:rotation")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.14159]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Skeleton2D/center/WingLeft/BlueGemBone2D:rotation")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.14159]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Skeleton2D/center/WingLeft/PinkGemBone2D:rotation")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [3.14159]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("Skeleton2D/center/WingRight/PinkGemBone2D:rotation")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/11/type = "value"
+tracks/11/imported = false
+tracks/11/enabled = true
+tracks/11/path = NodePath("Skeleton2D/center/WingRight/TealGemBone2D:rotation")
+tracks/11/interp = 1
+tracks/11/loop_wrap = true
+tracks/11/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/12/type = "value"
+tracks/12/imported = false
+tracks/12/enabled = true
+tracks/12/path = NodePath("Skeleton2D/center/WingRight/GreenGemBone2D:rotation")
+tracks/12/interp = 1
+tracks/12/loop_wrap = true
+tracks/12/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/13/type = "value"
+tracks/13/imported = false
+tracks/13/enabled = true
+tracks/13/path = NodePath("Skeleton2D/center/WingRight/YellowGemBone2D:rotation")
+tracks/13/interp = 1
+tracks/13/loop_wrap = true
+tracks/13/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/14/type = "value"
+tracks/14/imported = false
+tracks/14/enabled = true
+tracks/14/path = NodePath("Skeleton2D/center/WingRight/OrangeGemBone2D:rotation")
+tracks/14/interp = 1
+tracks/14/loop_wrap = true
+tracks/14/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/15/type = "value"
+tracks/15/imported = false
+tracks/15/enabled = true
+tracks/15/path = NodePath("Skeleton2D/center/WingRight/PurpleGemBone2D:rotation")
+tracks/15/interp = 1
+tracks/15/loop_wrap = true
+tracks/15/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+tracks/16/type = "value"
+tracks/16/imported = false
+tracks/16/enabled = true
+tracks/16/path = NodePath("Skeleton2D/center/WingRight/BlueGemBone2D:rotation")
+tracks/16/interp = 1
+tracks/16/loop_wrap = true
+tracks/16/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_oy2tn"]
+resource_name = "exit"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Skeleton2D/center/WingRight:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.166667, 0.366667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, 0.267035, 0.20944]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Skeleton2D/center/WingLeft:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.166667, 0.366667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [0.0, -0.261799, -0.20944]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Skeleton2D/center:position")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 128.571), Vector2(0, -180)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("Skeleton2D/center/WingRight:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(138.571, 20.0004)]
+}
+
+[sub_resource type="Animation" id="Animation_epmeb"]
+resource_name = "idle"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Skeleton2D/center:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, -180)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_oy2tn"]
+_data = {
+&"RESET": SubResource("Animation_04pvf"),
+&"enter": SubResource("Animation_5m31i"),
+&"exit": SubResource("Animation_oy2tn"),
+&"idle": SubResource("Animation_epmeb")
+}
+
+[node name="ChapterClock" type="Control"]
+layout_mode = 3
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+grow_horizontal = 2
+scale = Vector2(0.7, 0.7)
+mouse_filter = 1
+script = ExtResource("2_o1dct")
+
+[node name="Assets" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 127.143
+offset_bottom = 127.143
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.55, 0.55)
+mouse_filter = 1
+
+[node name="Clockwip" type="Sprite2D" parent="Assets"]
+visible = false
+self_modulate = Color(1, 1, 1, 0.313726)
+position = Vector2(1.90735e-05, 44.1556)
+texture = ExtResource("2_v5csy")
+
+[node name="ClockPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_oy2tn")
+}
+
+[node name="Skeleton2D" type="Skeleton2D" parent="."]
+position = Vector2(0, -1.19209e-07)
+
+[node name="center" type="Bone2D" parent="Skeleton2D"]
+position = Vector2(0, 128.571)
+rest = Transform2D(1, 0, 0, 1, 0, 128.571)
+editor_settings/show_bone_gizmo = false
+
+[node name="SunDial" type="Bone2D" parent="Skeleton2D/center"]
+rest = Transform2D(1, 0, 0, 1, 0, 0)
+auto_calculate_length_and_angle = false
+length = 16.0
+bone_angle = 0.0
+editor_settings/show_bone_gizmo = false
+
+[node name="SunDial" type="Polygon2D" parent="Skeleton2D/center/SunDial"]
+position = Vector2(-41.4285, -42.8567)
+scale = Vector2(0.55, 0.55)
+antialiased = true
+texture = ExtResource("4_oy2tn")
+skeleton = NodePath("../../..")
+polygon = PackedVector2Array(156, 76, 156, 0, 0, 0, 0, 156, 156, 156)
+uv = PackedVector2Array(156, 76, 156, 0, 0, 0, 0, 156, 156, 156)
+polygons = [PackedInt32Array(0, 1, 2, 3, 4)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0), "center/digital", PackedFloat32Array(0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(1, 1, 1, 1, 1)]
+
+[node name="WingLeft" type="Bone2D" parent="Skeleton2D/center"]
+position = Vector2(-137.143, 20.0004)
+scale = Vector2(1, 1)
+rest = Transform2D(1, 0, 0, 1, -137.143, 20.0004)
+auto_calculate_length_and_angle = false
+length = 304.248
+bone_angle = 180.0
+editor_settings/show_bone_gizmo = false
+
+[node name="WingLeft" type="Polygon2D" parent="Skeleton2D/center/WingLeft"]
+position = Vector2(-335.714, -85.7142)
+scale = Vector2(0.55, 0.55)
+antialiased = true
+texture = ExtResource("9_oy2tn")
+skeleton = NodePath("../../..")
+polygon = PackedVector2Array(495.135, 352.224, 688, 348, 688, -24, -16, -24, -16, 184, 136, 272)
+uv = PackedVector2Array(495.135, 352.224, 688, 348, 688, -24, -16, -24, -16, 184, 136, 272)
+polygons = [PackedInt32Array(3, 4, 5, 0, 1, 2)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(1, 1, 1, 1, 1, 1)]
+
+[node name="TealGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingLeft"]
+position = Vector2(-307.805, -18.9914)
+rotation = -3.14159
+scale = Vector2(0.55, -0.55)
+rest = Transform2D(-0.55, -4.80825e-08, -4.80825e-08, 0.55, -307.805, -18.9914)
+auto_calculate_length_and_angle = false
+length = 137.373
+bone_angle = -15.299
+
+[node name="TealGem" type="Polygon2D" parent="Skeleton2D/center/WingLeft/TealGemBone2D"]
+position = Vector2(1.27619, -2.23357)
+offset = Vector2(-10.3462, -47.0583)
+texture = ExtResource("4_45hym")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(-1, 38, -1, 58, 25, 58, 53, 66, 165, 10, 155, -4, 39, 18, 21, 38)
+uv = PackedVector2Array(-1, 38, -1, 58, 25, 58, 53, 66, 165, 10, 155, -4, 39, 18, 21, 38)
+polygons = [PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="GreenGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingLeft"]
+position = Vector2(-278.32, 0.828247)
+rotation = 3.14159
+scale = Vector2(0.55, -0.55)
+rest = Transform2D(-0.55, 0, 0, 0.55, -278.32, 0.828247)
+auto_calculate_length_and_angle = false
+length = 85.356
+bone_angle = 33.559
+
+[node name="GreenGem" type="Polygon2D" parent="Skeleton2D/center/WingLeft/GreenGemBone2D"]
+offset = Vector2(-11.9478, -8.26184)
+texture = ExtResource("6_bmr4r")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(1, 0, 1, 16, 11, 16, 21, 42, 91, 62, 97, 60, 95, 52, 57, 16, 25, 8, 19, 0)
+uv = PackedVector2Array(1, 0, 1, 16, 11, 16, 21, 42, 91, 62, 97, 60, 95, 52, 57, 16, 25, 8, 19, 0)
+polygons = [PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="YellowGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingLeft"]
+position = Vector2(-242.68, 12.5603)
+rotation = 3.14159
+scale = Vector2(0.55, -0.55)
+rest = Transform2D(-0.55, 0, 0, 0.55, -242.68, 12.5603)
+auto_calculate_length_and_angle = false
+length = 76.686
+bone_angle = 57.966
+
+[node name="YellowGem" type="Polygon2D" parent="Skeleton2D/center/WingLeft/YellowGemBone2D"]
+offset = Vector2(-7.54932, -7.14722)
+texture = ExtResource("6_mhbrn")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(-0.999992, 0, -0.999992, 16, 3.00001, 16, -0.999992, 40, 45, 74, 51, 74, 45, 28, 17, 10, 17, 0)
+uv = PackedVector2Array(-0.999992, 0, -0.999992, 16, 3.00001, 16, -0.999992, 40, 45, 74, 51, 74, 45, 28, 17, 10, 17, 0)
+polygons = [PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="OrangeGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingLeft"]
+position = Vector2(-60.9354, 8.35939)
+rotation = 3.14159
+scale = Vector2(0.55, -0.55)
+rest = Transform2D(-0.55, 0, 0, 0.55, -60.9354, 8.35939)
+
+[node name="OrangeGem" type="Polygon2D" parent="Skeleton2D/center/WingLeft/OrangeGemBone2D"]
+offset = Vector2(-20.4238, -7.59106)
+texture = ExtResource("6_nco17")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(13, -2, 13, 54, -1.00001, 86, 13, 140, 25, 140, 49, 96, 29, 54, 29, -2)
+uv = PackedVector2Array(13, -2, 13, 54, -1.00001, 86, 13, 140, 25, 140, 49, 96, 29, 54, 29, -2)
+polygons = [PackedInt32Array(1, 6, 5, 4, 3, 2), PackedInt32Array(1, 6, 7, 0)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="PurpleGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingLeft"]
+position = Vector2(11.2048, 50.8694)
+rotation = 3.14159
+scale = Vector2(0.55, -0.55)
+rest = Transform2D(-0.55, 0, 0, 0.55, 11.2048, 50.8694)
+
+[node name="PurpleGem" type="Polygon2D" parent="Skeleton2D/center/WingLeft/PurpleGemBone2D"]
+offset = Vector2(-26.3113, -8.02295)
+texture = ExtResource("6_gusjw")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(3, 24, 17, 12, 17, 0, 35, 0, 35, 14, 33, 16, 39, 36, 7, 66, -1, 58)
+uv = PackedVector2Array(3, 24, 17, 12, 17, 0, 35, 0, 35, 14, 33, 16, 39, 36, 7, 66, -1, 58)
+polygons = [PackedInt32Array(2, 3, 4, 5, 6, 7, 8, 0, 1)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="BlueGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingLeft"]
+position = Vector2(29.2323, 41.9422)
+rotation = 3.14159
+scale = Vector2(0.55, -0.55)
+rest = Transform2D(-0.55, 0, 0, 0.55, 29.2323, 41.9422)
+
+[node name="BlueGem" type="Polygon2D" parent="Skeleton2D/center/WingLeft/BlueGemBone2D"]
+offset = Vector2(-49.3508, -7.79221)
+texture = ExtResource("4_3de2a")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(15, 18, -3, 60, 7, 68, 49, 46, 53, 16, 61, 6, 47, -6, 39, 4)
+uv = PackedVector2Array(15, 18, -3, 60, 7, 68, 49, 46, 53, 16, 61, 6, 47, -6, 39, 4)
+polygons = [PackedInt32Array(6, 7, 0, 1, 2, 3, 4, 5)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="PinkGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingLeft"]
+position = Vector2(-12.8571, -58.5714)
+rotation = 3.14159
+scale = Vector2(0.55, -0.55)
+rest = Transform2D(-0.55, 0, 0, 0.55, -12.8571, -58.5714)
+
+[node name="PinkGem" type="Polygon2D" parent="Skeleton2D/center/WingLeft/PinkGemBone2D"]
+offset = Vector2(-10.3894, -70.1299)
+texture = ExtResource("4_v24dc")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(0.805473, 77.7179, 1, 60, 9, 60, 31, 18, 101, -4, 111, 6, 71, 68, 19, 72, 19, 78)
+uv = PackedVector2Array(0.805473, 77.7179, 1, 60, 9, 60, 31, 18, 101, -4, 111, 6, 71, 68, 19, 72, 19, 78)
+polygons = [PackedInt32Array(1, 0, 8, 7, 6, 5, 4, 3, 2)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="WingRight" type="Bone2D" parent="Skeleton2D/center"]
+position = Vector2(138.571, 20.0004)
+scale = Vector2(1, 1)
+rest = Transform2D(1, 0, 0, 1, 138.571, 20.0004)
+auto_calculate_length_and_angle = false
+length = 304.248
+bone_angle = 0.0
+editor_settings/show_bone_gizmo = false
+
+[node name="WingRight" type="Polygon2D" parent="Skeleton2D/center/WingRight"]
+position = Vector2(331.429, -82.8571)
+rotation = 3.14159
+scale = Vector2(0.55, -0.55)
+antialiased = true
+texture = ExtResource("9_oy2tn")
+skeleton = NodePath("../../..")
+polygon = PackedVector2Array(495.135, 352.224, 688, 348, 688, -24, -16, -24, -16, 184, 136, 272)
+uv = PackedVector2Array(495.135, 352.224, 688, 348, 688, -24, -16, -24, -16, 184, 136, 272)
+polygons = [PackedInt32Array(3, 4, 5, 0, 1, 2)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(1, 1, 1, 1, 1, 1), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0)]
+
+[node name="PinkGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingRight"]
+position = Vector2(8.57178, -55.7142)
+scale = Vector2(0.55, 0.55)
+rest = Transform2D(0.55, 0, 0, 0.55, 8.57178, -55.7142)
+
+[node name="PinkGem" type="Polygon2D" parent="Skeleton2D/center/WingRight/PinkGemBone2D"]
+offset = Vector2(-10.3894, -70.1299)
+texture = ExtResource("4_v24dc")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(0.805473, 77.7179, 1, 60, 9, 60, 31, 18, 101, -4, 111, 6, 71, 68, 19, 72, 19, 78)
+uv = PackedVector2Array(0.805473, 77.7179, 1, 60, 9, 60, 31, 18, 101, -4, 111, 6, 71, 68, 19, 72, 19, 78)
+polygons = [PackedInt32Array(1, 0, 8, 7, 6, 5, 4, 3, 2)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="TealGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingRight"]
+position = Vector2(304.398, -17.8892)
+scale = Vector2(0.55, 0.55)
+rest = Transform2D(0.55, 0, 0, 0.55, 304.398, -17.8892)
+
+[node name="TealGem" type="Polygon2D" parent="Skeleton2D/center/WingRight/TealGemBone2D"]
+offset = Vector2(-10.3462, -47.0583)
+texture = ExtResource("4_45hym")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(-1, 38, -1, 58, 25, 58, 53, 66, 165, 10, 155, -4, 39, 18, 21, 38)
+uv = PackedVector2Array(-1, 38, -1, 58, 25, 58, 53, 66, 165, 10, 155, -4, 39, 18, 21, 38)
+polygons = [PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="GreenGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingRight"]
+position = Vector2(274.035, 3.68538)
+scale = Vector2(0.55, 0.55)
+rest = Transform2D(0.55, 0, 0, 0.55, 274.035, 3.68538)
+
+[node name="GreenGem" type="Polygon2D" parent="Skeleton2D/center/WingRight/GreenGemBone2D"]
+offset = Vector2(-11.9478, -8.26184)
+texture = ExtResource("6_bmr4r")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(1, 0, 1, 16, 11, 16, 21, 42, 91, 62, 97, 60, 95, 52, 57, 16, 25, 8, 19, 0)
+uv = PackedVector2Array(1, 0, 1, 16, 11, 16, 21, 42, 91, 62, 97, 60, 95, 52, 57, 16, 25, 8, 19, 0)
+polygons = [PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="YellowGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingRight"]
+position = Vector2(238.395, 15.4174)
+scale = Vector2(0.55, 0.55)
+rest = Transform2D(0.55, 0, 0, 0.55, 238.395, 15.4174)
+
+[node name="YellowGem" type="Polygon2D" parent="Skeleton2D/center/WingRight/YellowGemBone2D"]
+offset = Vector2(-7.54932, -7.14722)
+texture = ExtResource("6_mhbrn")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(-0.999992, 0, -0.999992, 16, 3.00001, 16, -0.999992, 40, 45, 74, 51, 74, 45, 28, 17, 10, 17, 0)
+uv = PackedVector2Array(-0.999992, 0, -0.999992, 16, 3.00001, 16, -0.999992, 40, 45, 74, 51, 74, 45, 28, 17, 10, 17, 0)
+polygons = [PackedInt32Array(0, 1, 2, 3, 4, 5, 6, 7, 8)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="OrangeGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingRight"]
+position = Vector2(56.6503, 11.2165)
+scale = Vector2(0.55, 0.55)
+rest = Transform2D(0.55, 0, 0, 0.55, 56.6503, 11.2165)
+
+[node name="OrangeGem" type="Polygon2D" parent="Skeleton2D/center/WingRight/OrangeGemBone2D"]
+offset = Vector2(-20.4238, -7.59106)
+texture = ExtResource("6_nco17")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(13, -2, 13, 54, -1.00001, 86, 13, 140, 25, 140, 49, 96, 29, 54, 29, -2)
+uv = PackedVector2Array(13, -2, 13, 54, -1.00001, 86, 13, 140, 25, 140, 49, 96, 29, 54, 29, -2)
+polygons = [PackedInt32Array(1, 6, 5, 4, 3, 2), PackedInt32Array(1, 6, 7, 0)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="PurpleGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingRight"]
+position = Vector2(-15.49, 53.7266)
+scale = Vector2(0.55, 0.55)
+rest = Transform2D(0.55, 0, 0, 0.55, -15.49, 53.7266)
+
+[node name="PurpleGem" type="Polygon2D" parent="Skeleton2D/center/WingRight/PurpleGemBone2D"]
+offset = Vector2(-26.3113, -8.02295)
+texture = ExtResource("6_gusjw")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(3, 24, 17, 12, 17, 0, 35, 0, 35, 14, 33, 16, 39, 36, 7, 66, -1, 58)
+uv = PackedVector2Array(3, 24, 17, 12, 17, 0, 35, 0, 35, 14, 33, 16, 39, 36, 7, 66, -1, 58)
+polygons = [PackedInt32Array(2, 3, 4, 5, 6, 7, 8, 0, 1)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1), "center/WingRight/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="BlueGemBone2D" type="Bone2D" parent="Skeleton2D/center/WingRight"]
+position = Vector2(-33.5175, 44.7993)
+scale = Vector2(0.55, 0.55)
+rest = Transform2D(0.55, 0, 0, 0.55, -33.5175, 44.7993)
+
+[node name="BlueGem" type="Polygon2D" parent="Skeleton2D/center/WingRight/BlueGemBone2D"]
+offset = Vector2(-49.3508, -7.79221)
+texture = ExtResource("4_3de2a")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(15, 18, -3, 60, 7, 68, 49, 46, 53, 16, 61, 6, 47, -6, 39, 4)
+uv = PackedVector2Array(15, 18, -3, 60, 7, 68, 49, 46, 53, 16, 61, 6, 47, -6, 39, 4)
+polygons = [PackedInt32Array(6, 7, 0, 1, 2, 3, 4, 5)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/BlueGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingLeft/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PinkGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/TealGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/GreenGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/YellowGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/OrangeGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/PurpleGemBone2D", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/WingRight/BlueGemBone2D", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1), "center/face", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="face" type="Bone2D" parent="Skeleton2D/center"]
+scale = Vector2(1, 1)
+rest = Transform2D(1, 0, 0, 1, 0, 0)
+editor_settings/show_bone_gizmo = false
+
+[node name="face" type="Polygon2D" parent="Skeleton2D/center/face"]
+position = Vector2(-107.8, -126.278)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("8_04pvf")
+skeleton = NodePath("../../..")
+polygon = PackedVector2Array(0, 432, 0, -16, 400, -16, 400, 432)
+uv = PackedVector2Array(0, 432, 0, -16, 400, -16, 400, 432)
+polygons = [PackedInt32Array(1, 0, 3, 2)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0), "center/face", PackedFloat32Array(1, 1, 1, 1)]
+
+[node name="Hangers" type="Bone2D" parent="Skeleton2D/center"]
+position = Vector2(0, 92.858)
+scale = Vector2(1, 1)
+rest = Transform2D(1, 0, 0, 1, 0, 92.858)
+editor_settings/show_bone_gizmo = false
+
+[node name="Digital" type="Bone2D" parent="Skeleton2D/center/Hangers"]
+position = Vector2(3.48091e-05, 19.9996)
+scale = Vector2(1, 1)
+rest = Transform2D(1, 0, 0, 1, 3.48091e-05, 19.9996)
+auto_calculate_length_and_angle = false
+length = 61.215
+bone_angle = 90.0
+editor_settings/show_bone_gizmo = false
+
+[node name="Digital" type="Polygon2D" parent="Skeleton2D/center/Hangers/Digital"]
+position = Vector2(-65.7141, 5.71428)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("11_5p7p7")
+skeleton = NodePath("../../../..")
+polygon = PackedVector2Array(-3.99999, 0, -3.99999, 96, 248, 96, 248, 0)
+uv = PackedVector2Array(-3.99999, 0, -3.99999, 96, 248, 96, 248, 0)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0), "center/Hangers", PackedFloat32Array(0, 0, 0, 0), "center/Hangers/Digital", PackedFloat32Array(1, 1, 1, 1), "center/SunDial", PackedFloat32Array(0, 0, 0, 0)]
+
+[node name="TimeBox" type="HBoxContainer" parent="Skeleton2D/center/Hangers/Digital"]
+custom_minimum_size = Vector2(190, 96)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -52.8572
+offset_top = 5.71428
+offset_right = 137.143
+offset_bottom = 101.714
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.55, 0.55)
+theme = ExtResource("10_5p7p7")
+alignment = 1
+script = ExtResource("11_2pgwi")
+
+[node name="Hour10s" type="Label" parent="Skeleton2D/center/Hangers/Digital/TimeBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Hour1s" type="Label" parent="Skeleton2D/center/Hangers/Digital/TimeBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="center" type="Label" parent="Skeleton2D/center/Hangers/Digital/TimeBox"]
+layout_mode = 2
+mouse_filter = 1
+text = ":"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Minute10s" type="Label" parent="Skeleton2D/center/Hangers/Digital/TimeBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Minute1s" type="Label" parent="Skeleton2D/center/Hangers/Digital/TimeBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+text = "0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Hangers" type="Polygon2D" parent="Skeleton2D/center/Hangers"]
+position = Vector2(-54.2858, -11.429)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("10_bqfgj")
+skeleton = NodePath("../../..")
+polygon = PackedVector2Array(1.43051e-06, 96, 1.43051e-06, 0, 196, 0, 196, 96)
+uv = PackedVector2Array(1.43051e-06, 96, 1.43051e-06, 0, 196, 0, 196, 96)
+polygons = [PackedInt32Array(1, 0, 3, 2)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0), "center/face", PackedFloat32Array(0, 0, 0, 0), "center/Hangers", PackedFloat32Array(1, 1, 1, 1), "center/Hangers/Digital", PackedFloat32Array(0, 0, 0, 0), "center/SunDial", PackedFloat32Array(0, 0, 0, 0)]
+
+[node name="mHand" type="Bone2D" parent="Skeleton2D/center"]
+rest = Transform2D(1, 0, 0, 1, 0, 0)
+auto_calculate_length_and_angle = false
+length = 74.457
+bone_angle = -90.0
+editor_settings/show_bone_gizmo = false
+
+[node name="mhand" type="Polygon2D" parent="Skeleton2D/center/mHand"]
+position = Vector2(-25.7142, -84.2853)
+scale = Vector2(0.55, 0.55)
+antialiased = true
+texture = ExtResource("13_vb1qc")
+skeleton = NodePath("../../..")
+polygon = PackedVector2Array(45, -4, -1, 46, 15, 62, 41, 62, 41, 158, 51, 158, 51, 62, 77, 62, 91, 46)
+uv = PackedVector2Array(45, -4, -1, 46, 15, 62, 41, 62, 41, 158, 51, 158, 51, 62, 77, 62, 91, 46)
+polygons = [PackedInt32Array(3, 4, 5, 6, 7, 8, 0, 1, 2)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1), "center/hHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0)]
+
+[node name="hHand" type="Bone2D" parent="Skeleton2D/center"]
+rest = Transform2D(1, 0, 0, 1, 0, 0)
+auto_calculate_length_and_angle = false
+length = 51.074
+bone_angle = -90.0
+editor_settings/show_bone_gizmo = false
+
+[node name="hhand" type="Polygon2D" parent="Skeleton2D/center/hHand"]
+position = Vector2(-8.57141, 1.429)
+scale = Vector2(0.55, 0.55)
+antialiased = true
+texture = ExtResource("14_0bgo7")
+texture_rotation = 1.5708
+skeleton = NodePath("../../..")
+polygon = PackedVector2Array(-0.527564, -92, 9.47243, -92, 9.47243, -9.68575e-07, 19.4724, 2.83122e-07, 19.4724, -92, 29.4724, -92, 29.4724, -122, -0.527565, -122)
+uv = PackedVector2Array(-0.527564, -92, 9.47243, -92, 9.47243, -9.68575e-07, 19.4724, 2.83122e-07, 19.4724, -92, 29.4724, -92, 29.4724, -122, -0.527565, -122)
+polygons = [PackedInt32Array(2, 1, 0, 7, 6, 5, 4, 3)]
+bones = ["center", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/mHand", PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0), "center/hHand", PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1)]
+
+[node name="Center" type="Polygon2D" parent="Skeleton2D/center"]
+position = Vector2(-7.14282, -7.14242)
+scale = Vector2(0.55, 0.55)
+texture = ExtResource("12_2pgwi")
+skeleton = NodePath("../..")
+polygon = PackedVector2Array(0, 0, 0, 32, 32, 32, 32, 0)
+uv = PackedVector2Array(0, 0, 0, 32, 32, 32, 32, 0)
+polygons = [PackedInt32Array(0, 1, 2, 3)]
+bones = ["center", PackedFloat32Array(1, 1, 1, 1), "center/mHand", PackedFloat32Array(0, 0, 0, 0), "center/hHand", PackedFloat32Array(0, 0, 0, 0), "center/WingRight", PackedFloat32Array(0, 0, 0, 0), "center/WingLeft", PackedFloat32Array(0, 0, 0, 0)]

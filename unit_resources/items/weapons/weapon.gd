@@ -9,6 +9,8 @@ class_name Weapon
 var dmg : int = 0
 var hit : int = 00
 var crit : int = 00
+var crit_min: int = 0
+var crit_max: int = 0
 var barrier : int = 0
 var barrier_chance : int = 0
 var min_reach : int = 1:
@@ -27,6 +29,8 @@ func _init(resource:WeaponResource = stats) ->void:
 		dmg = properties.dmg
 		hit = properties.hit
 		crit = properties.crit
+		crit_min = properties.crit_min
+		crit_max = properties.crit_max
 		barrier = properties.barrier
 		barrier_chance = properties.barrier_chance
 		min_reach = properties.min_reach
@@ -37,6 +41,17 @@ func _init(resource:WeaponResource = stats) ->void:
 func _get_values()->Dictionary:
 	var values:Dictionary = super._get_values()
 	values["class"] = "Weapon"
+	values["dmg"] = dmg
+	values["hit"] = hit
+	values["crit"] = crit
+	values["crit_min"] = crit_min
+	values["crit_max"] = crit_max
+	values["barrier"] = barrier
+	values["barrier_chance"] = barrier_chance
+	values["min_reach"] = min_reach
+	values["max_reach"] = max_reach
+	values["damage_type"] = damage_type
+	
 	return values
 
 

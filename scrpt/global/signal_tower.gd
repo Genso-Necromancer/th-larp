@@ -28,7 +28,7 @@ signal seize_event(cell:Vector2i)
 signal unit_death(unit_id:String)
 
 ##Combat Animation Signals
-signal forecast_predicted(fcData : Dictionary)
+signal forecast_predicted(fc_data)
 signal sequence_initiated(sequence:Dictionary)
 signal sequence_complete
 

@@ -43,12 +43,12 @@ func update_stats():
 
 	# 4. Compute combat values (base & final)
 	var base_combat = _compute_combat_stats(base_stats)
-	print("base_stats: %s" % [base_combat])
+	#print("base_stats: %s" % [base_combat])
 	var finalCombat = _compute_combat_stats(final_stats)
 	_apply_mod_group(finalCombat, time_mods)
 	_apply_mod_group(finalCombat, buff_mods)
 	_apply_mod_group(finalCombat, aura_mods)
-	print("final_stats: %s" % [finalCombat])
+	#print("final_stats: %s" % [finalCombat])
 	unit.base_combat = base_combat
 	unit.combat_data = finalCombat
 

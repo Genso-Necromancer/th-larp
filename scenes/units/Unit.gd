@@ -311,7 +311,7 @@ var remaining_move:int = 0
 #Stats and derivatives
 var base_stats_final:Dictionary
 var stat_mod_breakdown:Dictionary
-var active_stats :={}
+var active_stats :Dictionary={}
 var combat_bonus_breakdown:Dictionary
 #Call for pre-formualted combat stats
 var base_combat := {}
@@ -571,8 +571,8 @@ func _ready() -> void:
 	set_equipped()
 	_load_sprites()
 	hitBox.set_master(self)
-	hitBox.area_entered.connect(self.on_aura_entered)
-	hitBox.area_exited.connect(self.on_aura_exited)
+	hitBox.area_entered.connect(self._on_aura_entered)
+	hitBox.area_exited.connect(self._on_aura_exited)
 	unit_relocated.connect(self._on_unit_relocated)
 	_anim_player.play("idle")
 	#Create the curve resource here because creating it in the editor prevents moving the unit
@@ -687,8 +687,9 @@ func to_sim() -> UnitSim:
 	var activeDebuffs := RC.effects_to_save_data(buff_controller.active_debuffs)
 	sim.id = unit_id
 	sim.team = FACTION_ID
+	sim.spec = SPEC_ID
 	sim.cell = cell
-	sim.hp = current_life
+	sim.current_life = current_life
 	sim.comp = current_comp
 	sim.total_stats = total_stats.duplicate(true)
 	sim.active_stats = active_stats.duplicate(true)
@@ -698,12 +699,64 @@ func to_sim() -> UnitSim:
 	sim.skills = RC.resources_to_save_data(skills).duplicate(true)
 	sim.inventory = RC.resources_to_save_data(inventory).duplicate(true)
 	sim.weapon = get_equipped_weapon().convert_to_save_data().duplicate(true)
+	# Equip/passive aggregated effects (needed for multi-swing, etc.)
+	if equipment_helper and equipment_helper.equipped_effects:
+		for e in equipment_helper.equipped_effects:
+			if e is Effect:
+					var wep = get_equipped_weapon()
+					sim.weapon = wep.convert_to_save_data().duplicate(true) if wep else {}
 	if natural: sim.natural = natural.convert_to_save_data().duplicate(true)
 	sim.threats = threats.duplicate()
 	sim.move_type = move_type
 	sim.terrain_tags = terrainTags.duplicate(true)
+	sim.combat_data = combat_data.duplicate(true)
+	sim.weapon_reach = get_weapon_reach().duplicate(true) # optional but very helpful
 	return sim
 
+func _effects_to_sim_data(effects_any) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+
+	if effects_any == null:
+		return out
+
+	# Case A: Array of Effect
+	if effects_any is Array:
+		for e in effects_any:
+			if e is Effect:
+				out.append(e.convert_to_data())
+			elif typeof(e) == TYPE_DICTIONARY:
+				# already converted or instance bundle
+				# if it contains an Effect reference, convert it
+				var eff: Effect = e.get("effect", null)
+				if eff:
+					var d := eff.convert_to_data()
+					# preserve optional instance duration if present
+					if e.has("duration"):
+						d["duration"] = int(e["duration"])
+					out.append(d)
+		return out
+
+	# Case B: Dictionary (keyed by something)
+	if effects_any is Dictionary:
+		for k in effects_any.keys():
+			var entry = effects_any[k]
+
+			# entry might be an Effect directly
+			if entry is Effect:
+				out.append(entry.convert_to_data())
+				continue
+
+			# or entry might be { effect = Effect, duration = int, ... }
+			if typeof(entry) == TYPE_DICTIONARY:
+				var eff2: Effect = entry.get("effect", null)
+				if eff2:
+					var d2 := eff2.convert_to_data()
+					if entry.has("duration"):
+						d2["duration"] = int(entry["duration"])
+					out.append(d2)
+		return out
+
+	return out
 
 ##Replaces unit's initial data, returns false if dead, true if alive
 func pre_load(unit_data:Dictionary) -> bool:
@@ -1053,7 +1106,7 @@ func check_passives() -> void:
 				var aura := _resolve_passive_aura(p)
 				if aura:
 					valid_auras.append(aura)
-					aura_controller.load_owned_aura(aura)
+					aura_controller.load_aura(aura)
 			Enums.PASSIVE_TYPE.SUB_WEAPON:
 				_add_sub_weap(p.sub_weapon)
 				_update_natural(p)
@@ -1504,8 +1557,8 @@ func _get_natural_weapon(natId:String)->Natural:
 func get_multi_swing():
 	var swings : int = 0
 	for effect in equipment_helper.equipped_effects:
-		if effect.type == Enums.EFFECT_TYPE.MULTI_SWING and effect.value > swings:
-			swings = effect.value
+		if effect.type == Enums.EFFECT_TYPE.MULTI_SWING and int(effect.multi_swing) > swings:
+			swings = int(effect.multi_swing)
 	if swings == 0:
 		return false
 	else:
@@ -1515,8 +1568,8 @@ func get_multi_swing():
 func get_multi_round():
 	var rounds : int = 0
 	for effect in equipment_helper.equipped_effects:
-		if effect.type == Enums.EFFECT_TYPE.MULTI_ROUND and effect.value > rounds:
-			rounds = effect.value
+		if effect.type == Enums.EFFECT_TYPE.MULTI_ROUND and int(effect.multi_round) > rounds:
+			rounds = int(effect.multi_round)
 	if rounds == 0:
 		return false
 	else:
@@ -1670,6 +1723,7 @@ func pick_door(door:DoorTile):
 
 
 func apply_dmg(dmg : int, source : Unit = null):
+	print(source)
 	current_life -= dmg
 	current_life = clampi(current_life, 0, active_stats.Life)
 	if current_life == 0:

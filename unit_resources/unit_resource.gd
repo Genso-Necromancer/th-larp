@@ -61,5 +61,16 @@ func get_property_names() -> Array[String]:
 
 func get_resource_path()->String:
 	var path:String = ""
-	
 	return path
+
+func convert_to_data()->Dictionary:
+	var converted:Dictionary={}
+	converted = _get_values()
+	return converted
+
+func _get_values()->Dictionary:
+	var values:Dictionary ={}
+	values["id"] = id
+	values["sub_rule"] = sub_rule
+	values["rule_type"] = rule_type
+	return values

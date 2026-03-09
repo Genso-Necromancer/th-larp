@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://cpgw8kx7m5v6q"]
 
-[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_qanyg"]
+[ext_resource type="Script" path="res://unit_resources/effects/effect.gd" id="1_qanyg"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_iqb6e"]
 
 [resource]
@@ -20,6 +20,8 @@ bonus_max_range = 0
 hit = 0
 dmg = 0
 crit = 0
+crit_min = 0
+crit_max = 0
 dmg_type = 0
 effects = Array[ExtResource("1_qanyg")]([])
 feature_id = ""

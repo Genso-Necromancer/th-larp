@@ -94,23 +94,31 @@ func set_stylized_string(s = "damage"):
 	text.add_theme_color_override("font_color", fColor)
 	text.add_theme_color_override("font_outline_color", lColor)
 	
-func set_effect_result(effectResult):
+func set_effect_result(effectResult:Dictionary):
 	var effect = effectResult.EffectId
-	
-	var type = effect.type
-	var subType = effect.sub_type
+	if effect == null:
+		return
+
+	var type = int(effect.type)
+	var subType = int(effect.sub_type)
+
+	# Optional override: allows caller to force style category (rare)
+	if effectResult.has("StyleType"):
+		type = int(effectResult.StyleType)
+
 	var value = 0
-
 	if effectResult.Dmg:
-		value = effectResult.Dmg
+		value = int(effectResult.Dmg)
 	elif effectResult.Heal:
-		value = effectResult.Heal
-	set_value(value)
-	if effectResult.Resisted:
-		type = false
-	_set_effect_style(type, subType)
+		value = int(effectResult.Heal)
 
-func _set_effect_style(type, subType):
+	set_value(value)
+
+	var resisted := bool(effectResult.get("Resisted", false))
+	_set_effect_style(type, subType, resisted)
+
+
+func _set_effect_style(type, subType, resisted := false):
 	var EFF_TYPE = Enums.EFFECT_TYPE
 	var typeKeys = Enums.EFFECT_TYPE.keys()
 	var subKeys = Enums.SUB_TYPE.keys()
@@ -119,12 +127,11 @@ func _set_effect_style(type, subType):
 	var base = "pop_up_template"
 	var stringPath = "effect_pop_text_%s"
 	var subPath = "effect_pop_text_%s"
-	
+
 	var string
 	var subString
 	var template
 	var finalString
-	#var font
 	var fColor
 	var lColor
 	var useValue := true
@@ -135,21 +142,22 @@ func _set_effect_style(type, subType):
 	if subType:
 		subPath = subPath % [subKeys[subType].to_snake_case()]
 		subString = getter.get_string(subPath)
-		
-	if type:
-		stringPath = stringPath  % [typeKeys[type].to_snake_case()]
-	else:
+
+	# When resisted: use "resisted" phrase, but KEEP colors based on original type
+	if resisted:
 		stringPath = stringPath % ["resisted"]
-		
+	else:
+		stringPath = stringPath % [typeKeys[type].to_snake_case()]
+
 	string = getter.get_string(stringPath)
-	
+
+	# Color selection still uses the original type even if resisted
 	match type:
-		EFF_TYPE.LIFE_STEAL, EFF_TYPE.HEAL: 
+		EFF_TYPE.LIFE_STEAL, EFF_TYPE.HEAL:
 			fColor = _healColor
 			lColor = _healOutline
 			usePhrase = false
-		EFF_TYPE.STATUS: 
-			#get subtype colors?
+		EFF_TYPE.STATUS:
 			fColor = _statusColor
 			lColor = _statusOutline
 			useValue = false
@@ -159,11 +167,11 @@ func _set_effect_style(type, subType):
 			lColor = _buffOutline
 			useValue = false
 			isBuff = true
-		EFF_TYPE.DAMAGE: 
+		EFF_TYPE.DAMAGE:
 			fColor = _damageColor
 			lColor = _damageOutline
 			usePhrase = false
-		EFF_TYPE.DEBUFF: 
+		EFF_TYPE.DEBUFF:
 			fColor = _debuffColor
 			lColor = _debuffOutline
 			useValue = false
@@ -184,9 +192,12 @@ func _set_effect_style(type, subType):
 			fColor = _resistColor
 			lColor = _resistOutline
 			useValue = false
-			
-	#text.add_theme_font_override("font", font)
-	
+
+	# IMPORTANT: resisted should never show numbers; keep phrase-only.
+	if resisted:
+		usePhrase = true
+		useValue = false
+
 	if !usePhrase:
 		template = getter.get_template(base)
 		finalString = template % [v]
@@ -206,7 +217,7 @@ func _set_effect_style(type, subType):
 	else:
 		template = getter.get_template(base)
 		finalString = template % [string]
-		
+
 	text.set_text(finalString)
 	text.add_theme_color_override("font_color", fColor)
 	text.add_theme_color_override("font_outline_color", lColor)

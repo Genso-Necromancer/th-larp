@@ -43,5 +43,5 @@ func load_save_data(data:Dictionary):
 	enabled = data.enabled
 	is_locked = data.is_locked
 	hardness = data.hardness
-	hp = data.hp
+	hp = data.current_life
 	is_destroyed = data.is_destroyed

@@ -7,6 +7,8 @@ class_name WeaponResource
 @export var dmg : int = 0
 @export var hit : int = 00
 @export var crit : int = 00
+@export_range(0,99,1.0) var crit_min:int= 10
+@export_range(0,99,1.0) var crit_max:int= 20
 @export var barrier : int = 0
 @export var barrier_chance : int = 0
 @export var min_reach : int = 1:

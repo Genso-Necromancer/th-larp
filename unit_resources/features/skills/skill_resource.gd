@@ -20,6 +20,10 @@ class_name Skill
 @export var hit : int = 0
 @export var dmg : int = 0
 @export var crit : int = 0
+##this is *added* to existing weapon crit range if used on a weapon skill, otherwise is the literal crit range of a normal skill
+@export_range(0,99,1.0) var crit_min:int= 0
+##this is *added* to existing weapon crit range if used on a weapon skill, otherwise is the literal crit range of a normal skill
+@export_range(0,99,1.0) var crit_max:int= 0
 @export var dmg_type : Enums.DAMAGE_TYPE = Enums.DAMAGE_TYPE.NONE
 @export_category("Effects")
 @export var effects : Array[Effect] = []

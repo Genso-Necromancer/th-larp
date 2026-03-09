@@ -76,8 +76,12 @@ func update_prof():
 
 func _update_portrait(path : String) -> void:
 	var texture : CompressedTexture2D
-	if !ResourceLoader.exists(path): texture = load("res://sprites/ERROR.png")
-	else: texture = load(path)
+	if !ResourceLoader.exists(path): 
+		print("[CursorFocusViewer/UnitPanel] _update_portrait: Failed to Load path (%s)" % [path])
+		texture = load("res://sprites/ERROR.png")
+	else:
+		print("[CursorFocusViewer/UnitPanel] _update_portrait: Path Accepted (%s)" % [path])
+		texture = load(path)
 	portrait.set_texture(texture)
 
 

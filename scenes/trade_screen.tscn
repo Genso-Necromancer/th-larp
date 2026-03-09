@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://drxuqtqtkggi1" path="res://scenes/trade_screen.gd" id="2_xrvbo"]
 [ext_resource type="Texture2D" uid="uid://dqqimoeongvyg" path="res://sprites/character/debug/portrait_full.png" id="4_g8gfs"]
 [ext_resource type="Theme" uid="uid://bkw5gyl1rlgs2" path="res://fonts/Theme_Trade_Panel_Extra.tres" id="6_dc2pd"]
-[ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/inventory_panel.tscn" id="8_hil8c"]
+[ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/hud/inventory/inventory_panel.tscn" id="8_hil8c"]
 [ext_resource type="PackedScene" uid="uid://dfr2jdyxd14oy" path="res://scenes/GUI/convoy_pnl.tscn" id="9_fjgok"]
 [ext_resource type="PackedScene" uid="uid://b2v4effpiibrw" path="res://scenes/GUI/options_pop_up.tscn" id="9_htpwm"]
 [ext_resource type="PackedScene" uid="uid://b5pdi6fx5chy7" path="res://scenes/GUI/info_panel.tscn" id="10_pdk1d"]

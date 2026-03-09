@@ -8,7 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://ctghq2fkc43vl" path="res://sprites/ERROR.png" id="6_831id"]
 [ext_resource type="Script" uid="uid://dsoc750igrsw6" path="res://scenes/status_tray.gd" id="7_xa7rv"]
 [ext_resource type="Script" uid="uid://q1fvpd16pg1" path="res://scenes/status_grid.gd" id="8_fh3sa"]
-[ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/inventory_panel.tscn" id="9_my0xn"]
+[ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/hud/inventory/inventory_panel.tscn" id="9_my0xn"]
 
 [node name="UnitPreviewPanel" type="AspectRatioContainer" node_paths=PackedStringArray("inventory", "fBox", "statusTray")]
 custom_minimum_size = Vector2(250, 350)

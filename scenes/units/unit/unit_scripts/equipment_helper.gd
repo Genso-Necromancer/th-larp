@@ -4,7 +4,7 @@ class_name EquipmentHelper
 extends RefCounted
 
 var unit : Unit
-var equipped_effects := []
+var equipped_effects :Array[Effect]= []
 
 func _init(u: Unit) -> void:
 	unit = u
@@ -153,7 +153,8 @@ func _remove_item_effects(item: Item) -> void:
 			var idx = equipped_effects.find(effect)
 			if idx >= 0:
 				equipped_effects.remove_at(idx)
-				unit.buff_controller.remove_effect(effect.id)
+				# HERE was effect.id, but threw an error. Sends the whole effect now. no idea if this is correct fix
+				unit.buff_controller.remove_effect(effect)
 
 
 

@@ -55,25 +55,25 @@ func _get_values()->Dictionary:
 	values["dropped"] = dropped
 	values["is_broken"] = is_broken
 	values["temp_remove"] = temp_remove
-	#values["max_dur"] = max_dur
-	#values["trade"] = trade
-	#values["dur"] = dur
-	#values["level"] = level
-	#values["personal"] = personal
-	#values["breakable"] = breakable
-	#values["expendable"] = expendable
-	#values["equippable"] = equippable
-	#values["use"] = use
-	#values["category"] = category
-	#values["sub_group"] = sub_group
-	#values["effects"] = {}
-	#if effects:
-		#var order:int=0
-		#for effect in effects:
-			#values.effects[order] = effect.get_resource_path()
-			#order+=1
-	#values["rule_type"] = rule_type
-	#values["sub_rule"] = sub_rule
+	values["max_dur"] = max_dur
+	values["trade"] = trade
+	values["dur"] = dur
+	values["level"] = level
+	values["personal"] = personal
+	values["breakable"] = breakable
+	values["expendable"] = expendable
+	values["equippable"] = equippable
+	values["use"] = use
+	values["category"] = category
+	values["sub_group"] = sub_group
+	values["effects"] = {}
+	if effects:
+		var order:int=0
+		for effect in effects:
+			values.effects[order] = effect.get_resource_path()
+			order+=1
+	values["rule_type"] = rule_type
+	values["sub_rule"] = sub_rule
 	return values
 
 func load_save_data(save_data:Dictionary):

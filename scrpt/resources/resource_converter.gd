@@ -17,7 +17,7 @@ func effects_to_save_data(effects:Dictionary)->Dictionary:
 	var converted:Dictionary = {}
 	for key in effects:
 		var effect:Effect = effects[key].effect
-		var path= effect.convert_to_save_data().Properties
+		var path= effect.get_resource_path()
 		converted[key] = {"Path":path,"Duration":effect[key].duration}
 	return converted
 

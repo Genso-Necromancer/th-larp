@@ -7,6 +7,7 @@ class_name RngTool
 
 var rng:RandomNumberGenerator
 
+
 func _init():
 	_new_generator()
 
@@ -21,7 +22,7 @@ func random():
 	rng.randomize()
 
 
-func save_state()->int:
+func save_state()->int: #used by the global save function to get the current state and save it to file
 	return rng.get_state()
 #endregion
 

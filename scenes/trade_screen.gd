@@ -109,9 +109,11 @@ func _connect_signals():
 func _reparent_info(mode:int) -> void:
 	var oldParent = infoPanel.get_parent()
 	var newParent
+	var tradeHorizontal := $TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer
 	match mode:
 		0: newParent = $TradeContainer/MarginContainer/TradeScreenVBox
-		_: newParent = box1
+		_: newParent =tradeHorizontal
+		#_: newParent = box1
 	
 	if !oldParent:
 		pass
@@ -120,6 +122,7 @@ func _reparent_info(mode:int) -> void:
 	else:
 		oldParent.remove_child(infoPanel)
 	newParent.add_child(infoPanel)
+	infoPanel
 	#var newPath = get_path_to(infoPanel)
 	#infoPanel = get_node(newPath)
 
@@ -240,13 +243,16 @@ func close_manage_menu(emit:=true):
 func _load_sprites(units:Array):
 	var sprites = [sprite1, sprite2]
 	var panels = [prtPanel1, prtPanel2]
+	var roleKeys : Array = Enums.ROLE_ID.keys()
+	
 	var i = 0
-	for unit in units:
-		var path = "res://sprites/character/%s/portrait_full.png" 
-		var fallBack = "debug"
-		var texture = load(path % [unit.unit_name])
+	for unit : Unit in units:
+		var path = "res://sprites/character/%s/%s_portrait_full.png"
+		var fallBack = "res://sprites/character/debug/portrait_full.png"
+		var role : String = roleKeys[unit.ROLE_ID].to_snake_case()
+		var texture = load(path % [unit.unit_id.to_snake_case(), role])
 		if !texture:
-			texture = load(path % [fallBack])
+			texture = load(fallBack)
 		sprites[i].set_texture(texture)
 		panels[i].visible = true
 		i += 1

@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_2ldy3")
 type = 5
+proc = 10
 sub_type = 0
 sub_weapon = 0
 day_id = ""

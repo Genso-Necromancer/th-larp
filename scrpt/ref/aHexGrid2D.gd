@@ -700,7 +700,7 @@ func find_closest(_atkrCell, dfndCell, atkrWalkable, moveType: int):
 			minDist = path.size()
 	return closestCell
 
-func find_distance(start, target,):
+func find_distance(start, target,)->int:
 	var path = find_path(start, target,)
 	path.pop_back()
 	return path.size()
