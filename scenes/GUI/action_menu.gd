@@ -2,6 +2,7 @@ extends PanelContainer
 
 class_name ActionMenu
 
+#old
 signal action_menu_canceled
 signal action_menu_selected(bName)
 signal action_menu_item_pressed(unit)
@@ -9,6 +10,18 @@ signal action_menu_item_pressed(unit)
 signal action_menu_trade_pressed(unit)
 signal action_menu_suspending_game
 
+#new
+signal move_selected
+signal attack_selected
+signal skill_selected(skill)
+signal item_selected(unit)
+signal trade_selected(unit)
+signal wait_selected
+signal ofuda_selected(unit, ofuda)
+signal door_selected
+signal seize_selected(cell)
+signal suspend_requested
+signal menu_canceled
 
 enum MENU_STATES {NONE, OPTIONS, ACTION,ACTION2, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE, OFUDA_OPEN, OFUDA_TARGETING, SUSPEND_PROMPT, SUSPENDING, DOOR}
 @onready var aContainer : MarginContainer = $ScreenMargin/ActionBackgroundMargin
@@ -210,33 +223,57 @@ func _action_open(moved:bool = false):
 #Button functions
 func _on_button_pressed(bName):
 	match bName:
-		"MoveBtn": 
+		"MoveBtn":
 			_clear_states()
 			state = MENU_STATES.NONE
+			# New intent signal
+			move_selected.emit()
+			# Legacy compatibility
 			action_menu_selected.emit(bName)
 		"TalkBtn": pass
-		"SeizeBtn": 
+		"SeizeBtn":
+			# New intent signal
+			seize_selected.emit(currentUnit.cell)
+			# Legacy behavior
 			SignalTower.action_seize.emit(currentUnit.cell)
 			_clear_states()
 			action_menu_selected.emit(bName)
 		"VisitBtn": pass
 		"ShopBtn": pass
-		"AtkBtn": _change_state(MENU_STATES.WEAPONS_TARGETING)
-		"SklBtn": _change_state(MENU_STATES.SKILLS_OPEN)
-		"OpenDoorBtn": _change_state(MENU_STATES.DOOR)
+		"AtkBtn":
+			# New intent signal (player chose Attack)
+			attack_selected.emit()
+			# Keep old state flow for now
+			_change_state(MENU_STATES.WEAPONS_TARGETING)
+		"SklBtn":
+			# Do not emit skill_selected yet; actual skill choice happens in _on_skill_pressed
+			_change_state(MENU_STATES.SKILLS_OPEN)
+		"OpenDoorBtn":
+			# New intent signal
+			door_selected.emit()
+			# Keep old flow for now
+			_change_state(MENU_STATES.DOOR)
 		"OpenChestBtn": pass
 		"StealBtn": pass
-		"OfudaBtn": 
+		"OfudaBtn":
 			_change_state(MENU_STATES.OFUDA_OPEN)
-			
-		"ItmBtn": 
+		"ItmBtn":
 			_change_state(MENU_STATES.ITEM_MANAGE)
+			# New intent signal
+			item_selected.emit(currentUnit)
+			# Legacy compatibility
 			action_menu_item_pressed.emit(currentUnit)
-		"TrdBtn": 
+		"TrdBtn":
 			_change_state(MENU_STATES.ITEM_TRADE)
+			# New intent signal
+			trade_selected.emit(currentUnit)
+			# Legacy compatibility
 			action_menu_trade_pressed.emit(currentUnit)
-		"WaitBtn": 
+		"WaitBtn":
 			_clear_states()
+			# New intent signal
+			wait_selected.emit()
+			# Legacy compatibility
 			action_menu_selected.emit(bName)
 		"EndBtn": pass
 		"StatBtn": pass
@@ -259,15 +296,22 @@ func _switch_to_save_warning():
 
 
 func _on_skill_pressed(sButton : Control):
-	Global.activeSkill = sButton.get_meta("ID")
+	var skill = sButton.get_meta("ID")
+	# Legacy compatibility
+	Global.activeSkill = skill
+	# New intent signal
+	skill_selected.emit(skill)
 	_change_state(MENU_STATES.SKILL_TARGETING)
 
 
 func _on_ofuda_pressed(oButton : Control):
 	var unit: Unit = oButton.get_meta("Unit")
-	var ofuda : Ofuda = oButton.get_meta("Item")
-	unit.use_item(ofuda)
-	#Global.activeSkill = oButton.get_meta("ID")
+	var ofuda: Ofuda = oButton.get_meta("Item")
+	# New intent signal
+	ofuda_selected.emit(unit, ofuda)
+	# Legacy compatibility:
+	# For now we do NOT force use_item() here anymore.
+	# Let higher-level code decide what happens next.
 	_change_state(MENU_STATES.OFUDA_TARGETING)
 
 
@@ -348,7 +392,9 @@ func return_previous_state() -> void:
 		return
 	
 	#if curState == MENU_STATES.ITEM_MANAGE: emit_signal("action_menu_item_canceled")
-	if newState == MENU_STATES.NONE: action_menu_canceled.emit()
+	if newState == MENU_STATES.NONE: 
+		action_menu_canceled.emit()
+		menu_canceled.emit()
 
 func _clear_states():
 	_change_state(MENU_STATES.NONE)
@@ -363,6 +409,9 @@ func _on_skill_confirm_pressed():
 
 func _on_suspend_confirm_button_pressed(_button):
 	_change_state(MENU_STATES.SUSPENDING)
+	# New intent signal
+	suspend_requested.emit()
+	# Legacy compatibility
 	action_menu_suspending_game.emit()
 
 

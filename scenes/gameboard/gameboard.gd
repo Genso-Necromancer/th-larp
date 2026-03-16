@@ -1,6 +1,14 @@
 extends Node
 class_name GameBoard
 
+#New Control Functions
+# _connect_signals
+# _connect_gui_signals
+# _set_active_action
+# _begin_targeting_for_active_action
+
+
+
 signal map_loaded(map:GameMap)
 signal map_added(map:GameMap)
 #turn/round signal
@@ -129,6 +137,9 @@ var stored_cell : Vector2i = Vector2i(-1,-1)
 var exp_events:Array[Dictionary] = []
 var active_died:bool = true
 
+#GUI
+var guiManager:GUIManager
+
 #region init/ready/process
 func _init():
 	pass
@@ -136,7 +147,7 @@ func _init():
 
 func _ready():
 	if !cam_con: cam_con = CameraController.new(get_viewport())
-	_connect_general_signals()
+	_connect_signals()
 
 
 func _process(_delta):
@@ -174,10 +185,39 @@ func _match_step(step):
 
 
 #region signal connection
+func _connect_signals():
+	_connect_general_signals()
+	_connect_gui_signals()
+
 func _connect_general_signals():
 	#self.gb_ready.connect(GameState.set_new_state)
 	cursor.cursor_moved.connect(self._on_cursor_moved)
 	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
+
+func _connect_gui_signals():
+	if guiManager == null: return
+	if not guiManager.ui_move_selected.is_connected(_on_gui_move_selected):
+		guiManager.ui_move_selected.connect(_on_gui_move_selected)
+	if not guiManager.ui_attack_selected.is_connected(_on_gui_attack_selected):
+		guiManager.ui_attack_selected.connect(_on_gui_attack_selected)
+	if not guiManager.ui_skill_selected.is_connected(_on_gui_skill_selected):
+		guiManager.ui_skill_selected.connect(_on_gui_skill_selected)
+	if not guiManager.ui_item_selected.is_connected(_on_gui_item_selected):
+		guiManager.ui_item_selected.connect(_on_gui_item_selected)
+	if not guiManager.ui_trade_selected.is_connected(_on_gui_trade_selected):
+		guiManager.ui_trade_selected.connect(_on_gui_trade_selected)
+	if not guiManager.ui_wait_selected.is_connected(_on_gui_wait_selected):
+		guiManager.ui_wait_selected.connect(_on_gui_wait_selected)
+	if not guiManager.ui_ofuda_selected.is_connected(_on_gui_ofuda_selected):
+		guiManager.ui_ofuda_selected.connect(_on_gui_ofuda_selected)
+	if not guiManager.ui_door_selected.is_connected(_on_gui_door_selected):
+		guiManager.ui_door_selected.connect(_on_gui_door_selected)
+	if not guiManager.ui_seize_selected.is_connected(_on_gui_seize_selected):
+		guiManager.ui_seize_selected.connect(_on_gui_seize_selected)
+	if not guiManager.ui_suspend_requested.is_connected(_on_gui_suspend_requested):
+		guiManager.ui_suspend_requested.connect(_on_gui_suspend_requested)
+	if not guiManager.ui_action_menu_canceled.is_connected(_on_gui_action_menu_canceled):
+		guiManager.ui_action_menu_canceled.connect(_on_gui_action_menu_canceled)
 	
 #endregion
 
@@ -532,19 +572,22 @@ func _apply_item(item:Consumable, unit:Unit, _target:Unit): #HERE Unfinished
 #endregion
 
 #region targeting code
+#region newly added
+func _begin_targeting_for_active_action() -> void:
+	if !active_action: return
+	if GameState: GameState.change_state(self, GameState.gState.SCENE_ACTIVE)
+	
+	if active_action.Skill: start_skill_targeting(active_action.Skill)
+	elif active_action.Item: start_item_targeting(active_action.Item)
+	elif active_action.Weapon: start_attack_targeting()
+#endregion
+
 func _draw_range(unit : Unit, maxRange : int, minRange := 0):
 	var path = _get_cells_in_range(unit.cell, maxRange, minRange,)
 	snap_path = path
 	cursor.bump_cursor()
 	current_map.draw_attack(path)
 	unit_path.stop()
-
-
-func start_item_targeting(item:Item):
-	active_action = {"Weapon": false, "Skill": null, "Item": item}
-	_draw_range(activeUnit, item.min_reach, item.max_reach)
-	turn_step = TURN_STEPS.ITEM_TARGET
-	#GameState.change_state(self, GameState.gState.GB_ITEM_TARGETING)
 
 
 func _get_cells_in_range(cell : Vector2i, maxRange : int, minRange : int)->Array: #HEX REF
@@ -566,14 +609,26 @@ func start_attack_targeting():
 	_draw_range(activeUnit, reach.Max, reach.Min)
 
 
-func start_skill_targeting():
+func start_skill_targeting(skill = null):
 	var reach : Dictionary
+	if skill == null:
+		skill = Global.activeSkill
+	if skill == null:
+		return
 	turn_step = TURN_STEPS.SKILL_TARGET
-	active_action = {"Weapon": Global.activeSkill.augment, "Skill": Global.activeSkill, "Item": null}
+	_set_active_action(skill.augment, skill, null)
 	if active_action.Weapon: reach = activeUnit.get_aug_reach(active_action.Skill)
 	else: reach = activeUnit.get_skill_reach(active_action.Skill)
 	_draw_range(activeUnit, reach.Max, reach.Min)
 
+
+func start_item_targeting(item: Consumable):
+	if item == null:
+		return
+	active_action = {"Weapon": false, "Skill": null, "Item": item}
+	_draw_range(activeUnit, item.max_reach, item.min_reach)
+	turn_step = TURN_STEPS.ITEM_TARGET
+	#GameState.change_state(self, GameState.gState.GB_ITEM_TARGETING)
 
 func door_targeting():
 	turn_step = TURN_STEPS.DOOR_TARGET
@@ -587,6 +642,36 @@ func _end_targeting():
 	gameboard_targeting_canceled.emit()
 #endregion
 
+#region action code
+#NEW
+func _begin_attack_action() -> void:
+	if activeUnit == null:
+		return
+	start_attack_targeting()
+
+func _begin_skill_action(skill) -> void:
+	if activeUnit == null:
+		return
+	start_skill_targeting(skill)
+
+func _commit_wait_action() -> void:
+	if activeUnit == null:
+		return
+	unit_wait()
+
+func _cancel_action_menu_flow() -> void:
+	if state == STATES.PLAYER_PHASE:
+		_player_phase_menu_canceled()
+
+
+func _resume_targeting_for_active_action() -> void:
+	if active_action.Item:
+		start_item_targeting(active_action.Item)
+	elif active_action.Skill:
+		start_skill_targeting(active_action.Skill)
+	elif active_action.Weapon:
+		start_attack_targeting()
+#endregion
 
 #region cursor  functions
 func gb_mouse_motion(_event):
@@ -688,6 +773,9 @@ func _ui_return_player_phase():
 		TURN_STEPS.SKILL_TARGET:
 			turn_step = last_step #
 			_end_targeting()
+		TURN_STEPS.ITEM_TARGET:
+			turn_step = last_step
+			_end_targeting()
 
 
 func toggle_unit_profile(): 
@@ -764,6 +852,7 @@ func _player_phase_select():
 		TURN_STEPS.ATTACK_TARGET: attack_target_selected()
 		TURN_STEPS.DOOR_TARGET: door_target_selected()
 		TURN_STEPS.SKILL_TARGET: _feature_target_selected(active_action.Skill)
+		TURN_STEPS.ITEM_TARGET: _feature_target_selected(active_action.Item)
 
 
 func door_target_selected():
@@ -788,7 +877,7 @@ func _select_unit(cell: Vector2i) -> void:
 	# Selects the unit in the `cell` if there's one there.
 	var occupied :bool= is_occupied(cell)
 	if !occupied:
-		turn_step == TURN_STEPS.OPTIONS
+		turn_step = TURN_STEPS.OPTIONS
 		cell_selected.emit(cell)
 	elif units[cell].FACTION_ID == Enums.FACTION_ID.ENEMY: return ##Put attack range activation here
 	elif !units.has(cell) or units[cell].status.Acted: return
@@ -956,6 +1045,46 @@ func _on_gui_manager_deploy_toggled(unit, deployed):
 		unit_loader.deploy_unit(unit)
 #endregion
 
+#region Signal Handlers
+#region GUI
+func _on_gui_move_selected() -> void:
+	if activeUnit == null:
+		return
+	move_selection()
+
+func _on_gui_attack_selected() -> void:
+	_begin_attack_action()
+
+func _on_gui_skill_selected(skill) -> void:
+	_begin_skill_action(skill)
+
+func _on_gui_wait_selected() -> void:
+	_commit_wait_action()
+
+func _on_gui_item_selected(unit) -> void:
+	activeUnit = unit
+
+func _on_gui_trade_selected(unit) -> void:
+	activeUnit = unit
+
+func _on_gui_ofuda_selected(unit, ofuda) -> void:
+	# Legacy path for now; this should later become item-use intent handled from GameBoard.
+	if unit and ofuda and unit.has_method("use_item"):
+		unit.use_item(ofuda)
+
+func _on_gui_door_selected() -> void:
+	door_targeting()
+
+func _on_gui_seize_selected(cell) -> void:
+	SignalTower.action_seize.emit(cell)
+
+func _on_gui_suspend_requested() -> void:
+	# Leave suspend behavior unchanged for now
+	pass
+
+
+#endregion
+#endregion
 
 #region chapter start
 func _on_gui_manager_map_started():
@@ -995,7 +1124,6 @@ func reset_flags():
 	#endOfRound = false
 	#startNextTurn = false
 
-
 func _clear_player_action_flags():
 	PlayerData.move_committed = false
 	PlayerData.traded = false
@@ -1012,6 +1140,15 @@ func _check_friendly(unit1, unit2, sameOnly:=false) ->bool:
 	if unit1.FACTION_ID == unit2.FACTION_ID: return true
 	elif !sameOnly and unit1.FACTION_ID != Enums.FACTION_ID.ENEMY and unit2.FACTION_ID != Enums.FACTION_ID.ENEMY: return true
 	return false
+
+#region newlyadded
+func _set_active_action(uses_weapon: bool, skill = null, item = null) -> void:
+	active_action = {
+		"Weapon": uses_weapon,
+		"Skill": skill,
+		"Item": item
+	}
+#endregion
 #endregion
 
 
@@ -1314,7 +1451,7 @@ func _on_animation_handler_sequence_complete():
 func _update_unit_bars():
 	turn_step = TURN_STEPS.BAR_ANIM
 	bar_queue.append(activeUnit)
-	bar_queue.append(focusUnit)
+	bar_queue.append(targetUnit)
 	activeUnit.update_life_bar()
 	targetUnit.update_life_bar()
 
@@ -1454,10 +1591,12 @@ func _player_phase_menu_canceled():
 		TURN_STEPS.ACTIONS: 
 			turn_step = TURN_STEPS.START
 			request_deselect()
+		TURN_STEPS.ACTIONS2:
+			turn_step = TURN_STEPS.MOVE_END
+			unit_move_ended.emit(activeUnit)
 		TURN_STEPS.FORECAST_ATTACK:
 			activeUnit.restore_equip()
-			start_attack_targeting()
-		
-		#start_skill_targeting()
-		#start_item_targeting(active_action.Item)
+			_resume_targeting_for_active_action()
+		TURN_STEPS.ATTACK_TARGET, TURN_STEPS.SKILL_TARGET, TURN_STEPS.ITEM_TARGET:
+			_end_targeting()
 #endregion

@@ -11,6 +11,7 @@ var is_suspended_load:=false
 var load_initiated:= false
 
 func _ready():
+	if gameBoard and guiManager: gameBoard.guiManager = guiManager
 	_connect_signals()
 
 

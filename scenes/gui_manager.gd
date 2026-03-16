@@ -1,6 +1,7 @@
 extends Control
 class_name GUIManager
 
+#old
 signal gui_splash_finished
 signal start_the_justice
 signal deploy_toggled(unit_id, depStatus)
@@ -9,6 +10,18 @@ signal map_started
 signal gui_action_menu_canceled
 signal set_up_loaded
 
+# ActionMenu intent relays
+signal ui_move_selected
+signal ui_attack_selected
+signal ui_skill_selected(skill)
+signal ui_item_selected(unit)
+signal ui_trade_selected(unit)
+signal ui_wait_selected
+signal ui_ofuda_selected(unit, ofuda)
+signal ui_door_selected
+signal ui_seize_selected(cell)
+signal ui_suspend_requested
+signal ui_action_menu_canceled
 
 @onready var blocker : Panel = $PanelBlocker #used to block the map easily
 @onready var HUD : Control = $HUD
@@ -341,13 +354,63 @@ func _load_assets():
 func _connect_asset_signals():
 	unitProf.tooltips_on.connect(self._on_profile_tooltips_on)
 	unitProf.tooltips_off.connect(self._on_profile_tooltips_off)
+	_connect_action_menu_signals()
+	#old act menu signals
 	actMenu.action_menu_canceled.connect(self._on_action_menu_canceled)
 	actMenu.action_menu_selected.connect(GRANDDAD._on_action_menu_selected)
 	actMenu.action_menu_item_pressed.connect(self._on_action_item_pressed)
 	actMenu.action_menu_trade_pressed.connect(self._on_action_trade_pressed)
 	actMenu.action_menu_suspending_game.connect(self._on_action_suspending)
 	#actMenu.action_menu_ofuda_open.connect(self._on_action_ofuda_open)
-	
+
+#region act menu signal handling
+func _connect_action_menu_signals():
+	if not actMenu.move_selected.is_connected(_on_action_menu_move_selected):
+		actMenu.move_selected.connect(_on_action_menu_move_selected)
+	if not actMenu.attack_selected.is_connected(_on_action_menu_attack_selected):
+		actMenu.attack_selected.connect(_on_action_menu_attack_selected)
+	if not actMenu.skill_selected.is_connected(_on_action_menu_skill_selected):
+		actMenu.skill_selected.connect(_on_action_menu_skill_selected)
+	if not actMenu.item_selected.is_connected(_on_action_menu_item_selected_relay):
+		actMenu.item_selected.connect(_on_action_menu_item_selected_relay)
+	if not actMenu.trade_selected.is_connected(_on_action_menu_trade_selected_relay):
+		actMenu.trade_selected.connect(_on_action_menu_trade_selected_relay)
+	if not actMenu.wait_selected.is_connected(_on_action_menu_wait_selected):
+		actMenu.wait_selected.connect(_on_action_menu_wait_selected)
+	if not actMenu.ofuda_selected.is_connected(_on_action_menu_ofuda_selected):
+		actMenu.ofuda_selected.connect(_on_action_menu_ofuda_selected)
+	if not actMenu.door_selected.is_connected(_on_action_menu_door_selected):
+		actMenu.door_selected.connect(_on_action_menu_door_selected)
+	if not actMenu.seize_selected.is_connected(_on_action_menu_seize_selected):
+		actMenu.seize_selected.connect(_on_action_menu_seize_selected)
+	if not actMenu.suspend_requested.is_connected(_on_action_menu_suspend_requested):
+		actMenu.suspend_requested.connect(_on_action_menu_suspend_requested)
+	if not actMenu.menu_canceled.is_connected(_on_action_menu_canceled_relay):
+		actMenu.menu_canceled.connect(_on_action_menu_canceled_relay)
+
+func _on_action_menu_move_selected() -> void: ui_move_selected.emit()
+
+func _on_action_menu_attack_selected() -> void: ui_attack_selected.emit()
+
+func _on_action_menu_skill_selected(skill) -> void: ui_skill_selected.emit(skill)
+
+func _on_action_menu_item_selected_relay(unit) -> void: ui_item_selected.emit(unit)
+
+func _on_action_menu_trade_selected_relay(unit) -> void: ui_trade_selected.emit(unit)
+
+func _on_action_menu_wait_selected() -> void: ui_wait_selected.emit()
+
+func _on_action_menu_ofuda_selected(unit, ofuda) -> void: ui_ofuda_selected.emit(unit, ofuda)
+
+func _on_action_menu_door_selected() -> void: ui_door_selected.emit()
+
+func _on_action_menu_seize_selected(cell) -> void: ui_seize_selected.emit(cell)
+
+func _on_action_menu_suspend_requested() -> void: ui_suspend_requested.emit()
+
+func _on_action_menu_canceled_relay() -> void: ui_action_menu_canceled.emit()
+#endregion
+
 #region SetUp Buttons
 func _on_btn_deploy_pressed():
 	#var sCountPnl = $SetUpMain/SetUpGrid/SetUpPnl2
