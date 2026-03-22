@@ -72,12 +72,12 @@ func fill_items(isTrade : = false, reach := [0,0], useBorder := false) -> Array:
 	var b
 	var displayItem = null
 	var reqRange : Array = range(reach[0], reach[1] + 1)
-	if _style == _styles[1] and equipped != unit.unarmed:
-		b = _generate_item_button(bPath, equipped, i, unit, isTrade)
-		b.useBorder = useBorder
-		_display_weapon(b)
-		displayItem = equipped
-		i += 1
+	#if _style == _styles[1] and equipped != unit.unarmed:
+		#b = _generate_item_button(bPath, equipped, i, unit, isTrade)
+		#b.useBorder = useBorder
+		#_display_weapon(b)
+		#displayItem = equipped
+		#i += 1
 			
 	for item : Item in inv:
 		if _style == _styles[1] and item == displayItem:

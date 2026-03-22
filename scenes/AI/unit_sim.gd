@@ -123,6 +123,64 @@ func get_best_passive_proc(p_type: int, default_proc := 0) -> int:
 			best = maxi(best, int(p.proc))
 	return best
 
+
+func _source_value(source, key: String, default_value = null):
+	if source == null:
+		return default_value
+	if typeof(source) == TYPE_DICTIONARY:
+		return source.get(key, default_value)
+	return source.get(key) if source.get(key) != null else default_value
+
+
+func _source_bool(source, key: String, default_value := false) -> bool:
+	var value = _source_value(source, key, default_value)
+	return bool(value)
+
+
+func get_skill_combat_stats(special, augmented := false) -> Dictionary:
+	var stats := combat_data.duplicate(true)
+	var dmg_stat := 0
+	var attack = get_equipped_weapon() if augmented else special
+	var skill_dmg_type = _source_value(special, "dmg_type", null)
+	var type_lord = skill_dmg_type if augmented and skill_dmg_type else _source_value(attack, "dmg_type", Enums.DAMAGE_TYPE.PHYS)
+	stats["Type"] = int(type_lord)
+
+	match int(type_lord):
+		Enums.DAMAGE_TYPE.PHYS:
+			dmg_stat = int(stats.get("PwrBase", 0))
+		Enums.DAMAGE_TYPE.MAG:
+			dmg_stat = int(stats.get("MagBase", 0))
+		Enums.DAMAGE_TYPE.TRUE:
+			dmg_stat = 0
+
+	stats["CanDmg"] = _source_bool(special, "can_dmg", true)
+	if not bool(stats["CanDmg"]):
+		stats["Dmg"] = 0
+	elif augmented:
+		stats["Dmg"] = dmg_stat + int(_source_value(attack, "dmg", 0)) + int(_source_value(special, "dmg", 0))
+	else:
+		stats["Dmg"] = dmg_stat + int(_source_value(attack, "dmg", 0))
+
+	stats["CanMiss"] = _source_bool(special, "can_miss", true)
+
+	if augmented:
+		stats["Hit"] = int(stats.get("HitBase", 0)) + int(_source_value(attack, "hit", 0)) + int(_source_value(special, "hit", 0))
+	else:
+		stats["Hit"] = int(stats.get("HitBase", 0)) + int(_source_value(attack, "hit", 0))
+
+	var skill_crit = _source_value(special, "crit", null)
+	stats["CanCrit"] = _source_bool(special, "can_crit", true)
+	if not bool(stats["CanCrit"]):
+		stats["Crit"] = 0
+	elif skill_crit == null:
+		stats["Crit"] = 0
+	elif augmented:
+		stats["Crit"] = int(stats.get("CritBase", 0)) + int(_source_value(attack, "crit", 0)) + int(skill_crit)
+	else:
+		stats["Crit"] = int(stats.get("CritBase", 0)) + int(_source_value(attack, "crit", 0))
+
+	return stats
+
 #Look ups
 func get_equipped_weapon()->Dictionary: return weapon
 

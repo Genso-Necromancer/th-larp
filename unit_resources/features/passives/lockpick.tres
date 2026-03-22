@@ -5,6 +5,7 @@
 [resource]
 script = ExtResource("1_dvfek")
 type = 10
+proc = 100
 sub_type = 0
 sub_weapon = 0
 day_id = ""

@@ -7,6 +7,7 @@ class_name FocusViewer
 @export var terrainPanel : TerrainPanel
 @export var unitPanel : UnitProfile
 @export var dmkPanel : DanmakuProfile
+@onready var anim_player : AnimationPlayer = $AnimationPlayer
 
 var enableViewer : bool = false:
 	set(value):
@@ -52,3 +53,8 @@ func _update_dmk_panel(dmk:Danmaku) -> void:
 func update_focus_weapon(unit:Unit)->void:
 	var itemB := $PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/ItemButton
 	itemB.fill_yourself(unit)
+
+
+func hide_fv(): anim_player.play("exit")
+
+func show_fv(): anim_player.play("enter")

@@ -2,12 +2,6 @@ extends PanelContainer
 
 class_name ActionMenu
 
-#old
-signal action_menu_canceled
-signal action_menu_selected(bName)
-signal action_menu_item_pressed(unit)
-#signal action_menu_item_canceled
-signal action_menu_trade_pressed(unit)
 signal action_menu_suspending_game
 
 #new
@@ -43,6 +37,11 @@ var state := MENU_STATES.NONE:
 	set(value):
 			state = value
 			match state:
+				MENU_STATES.OPTIONS, MENU_STATES.ACTION, MENU_STATES.ACTION2, MENU_STATES.SKILLS_OPEN, MENU_STATES.OFUDA_OPEN, MENU_STATES.SUSPEND_PROMPT, MENU_STATES.SUSPENDING:
+					mouse_filter = Control.MOUSE_FILTER_STOP
+				_:
+					mouse_filter = Control.MOUSE_FILTER_IGNORE
+			match state:
 				MENU_STATES.NONE: _close_self()
 				MENU_STATES.OPTIONS:
 					aBox.display_player_options()
@@ -58,7 +57,6 @@ var state := MENU_STATES.NONE:
 					_hide_cursor()
 					_hide_action_container()
 					_close_inv()
-					emit_signal("action_menu_selected", "AtkBtn")
 				MENU_STATES.WEAPON_FORECAST:
 					_give_items_focus()
 				MENU_STATES.SKILLS_OPEN:
@@ -68,7 +66,7 @@ var state := MENU_STATES.NONE:
 				MENU_STATES.SKILL_TARGETING:
 					_hide_cursor()
 					_hide_action_container()
-					emit_signal("action_menu_selected", "SklBtn")
+					_close_inv()
 				MENU_STATES.SKILL_CONFIRM:
 					_assign_cursor([skillConfirm])
 					cursor.setCursor = true
@@ -95,14 +93,15 @@ var state := MENU_STATES.NONE:
 				MENU_STATES.DOOR:
 					_hide_cursor()
 					_hide_action_container()
-					emit_signal("action_menu_selected", "OpenDoorBtn")
 
 
 var prevState : Array[MENU_STATES] = []
 var activeItem = null
+var _suppress_cancel_emit := false
 
 func _ready():
 	self.visible = false
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	aBox.connect_signals(self)
 	inv.visible = false
 	aContainer.visible = false
@@ -115,7 +114,7 @@ func _ready():
 
 #New Code
 func end_self():
-	_clear_states()
+	_clear_states(true)
 
 
 ##opens self as current unit's actions.
@@ -154,7 +153,10 @@ func _close_inv():
 
 
 func _give_items_focus():
-	_assign_cursor(inv.get_item_buttons())
+	var item_buttons := inv.get_item_buttons()
+	_assign_cursor(item_buttons)
+	if inv.items.is_empty():
+		return
 	inv.items[0].button.call_deferred("grab_focus")
 
 
@@ -185,6 +187,7 @@ func _swap_to_ofuda():
 
 func _close_self():
 	self.visible = false
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	currentUnit = null
 	aContainer.visible = false
 	_close_inv()
@@ -224,26 +227,17 @@ func _action_open(moved:bool = false):
 func _on_button_pressed(bName):
 	match bName:
 		"MoveBtn":
-			_clear_states()
+			_clear_states(true)
 			state = MENU_STATES.NONE
-			# New intent signal
 			move_selected.emit()
-			# Legacy compatibility
-			action_menu_selected.emit(bName)
 		"TalkBtn": pass
 		"SeizeBtn":
-			# New intent signal
 			seize_selected.emit(currentUnit.cell)
-			# Legacy behavior
-			SignalTower.action_seize.emit(currentUnit.cell)
-			_clear_states()
-			action_menu_selected.emit(bName)
+			_clear_states(true)
 		"VisitBtn": pass
 		"ShopBtn": pass
 		"AtkBtn":
-			# New intent signal (player chose Attack)
 			attack_selected.emit()
-			# Keep old state flow for now
 			_change_state(MENU_STATES.WEAPONS_TARGETING)
 		"SklBtn":
 			# Do not emit skill_selected yet; actual skill choice happens in _on_skill_pressed
@@ -259,22 +253,13 @@ func _on_button_pressed(bName):
 			_change_state(MENU_STATES.OFUDA_OPEN)
 		"ItmBtn":
 			_change_state(MENU_STATES.ITEM_MANAGE)
-			# New intent signal
 			item_selected.emit(currentUnit)
-			# Legacy compatibility
-			action_menu_item_pressed.emit(currentUnit)
 		"TrdBtn":
 			_change_state(MENU_STATES.ITEM_TRADE)
-			# New intent signal
 			trade_selected.emit(currentUnit)
-			# Legacy compatibility
-			action_menu_trade_pressed.emit(currentUnit)
 		"WaitBtn":
-			_clear_states()
-			# New intent signal
+			_clear_states(true)
 			wait_selected.emit()
-			# Legacy compatibility
-			action_menu_selected.emit(bName)
 		"EndBtn": pass
 		"StatBtn": pass
 		"OpBtn": pass
@@ -344,6 +329,8 @@ func _connect_forecast_signal(weapons : Array):
 
 #Menu Cursor Functions
 func _load_cursor():
+	if is_instance_valid(cursor):
+		return
 	cursor = cursorPath.instantiate()
 	cursor.cursor_offset = cursorOffset
 	add_child(cursor)
@@ -360,11 +347,31 @@ func _assign_cursor(buttons : Array):
 
 
 func _free_cursor():
+	if not is_instance_valid(cursor):
+		return
 	cursor.queue_free()
+	cursor = null
 
 
 func _hide_cursor():
-	cursor.visible = false
+	if is_instance_valid(cursor):
+		cursor.visible = false
+
+
+func suspend_menu():
+	var focus_owner = get_viewport().gui_get_focus_owner()
+	if focus_owner:
+		focus_owner.release_focus()
+	self.visible = false
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	blocker.visible = false
+	_free_cursor()
+
+
+func resume_menu():
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	self.visible = true
+	_load_cursor()
 
 
 #Menu State Management
@@ -392,18 +399,19 @@ func return_previous_state() -> void:
 		return
 	
 	#if curState == MENU_STATES.ITEM_MANAGE: emit_signal("action_menu_item_canceled")
-	if newState == MENU_STATES.NONE: 
-		action_menu_canceled.emit()
+	if newState == MENU_STATES.NONE and not _suppress_cancel_emit: 
 		menu_canceled.emit()
 
-func _clear_states():
+func _clear_states(suppress_cancel := false):
+	_suppress_cancel_emit = suppress_cancel
 	_change_state(MENU_STATES.NONE)
+	_suppress_cancel_emit = false
 	prevState.clear()
 	print(prevState)
 
 
 func _on_skill_confirm_pressed():
-	_clear_states()
+	_clear_states(true)
 	SignalTower.emit_signal("action_skill_confirmed")
 
 

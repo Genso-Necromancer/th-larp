@@ -189,8 +189,8 @@ func _get_action_string_for_unit(unit: Unit, action: Dictionary) -> String:
 	# Your old display logic: weapon unless skill/item; only show if counter/eligible.
 	# Now: always show.
 	var path := ""
-	var skill = action.get("Skill", null)
-	var item = action.get("Item", null)
+	var skill = action.get("skill_ref", null)
+	var item = action.get("item_ref", null)
 	if skill != null and skill.get("id"):
 		path = "skill_name_%s" % [skill.id]
 	elif item != null and item.get("id"):

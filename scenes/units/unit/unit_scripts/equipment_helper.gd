@@ -15,10 +15,16 @@ func set_equipped(item: Item = null, is_temp := false) -> void:
 	if item == null:
 		# If natural is equipped already, nothing to change.
 		if unit.natural and unit.natural.equipped:
+			_sync_equipped_item_effects()
+			_refresh_granted_skills()
+			unit.update_stats()
 			return
 
 		# If a weapon is already equipped, keep it.
 		if _has_equipped_weapon():
+			_sync_equipped_item_effects()
+			_refresh_granted_skills()
+			unit.update_stats()
 			return
 
 		# Otherwise find a valid weapon OR fallback to unarmed.
@@ -29,15 +35,18 @@ func set_equipped(item: Item = null, is_temp := false) -> void:
 	elif item is Accessory:
 		_equip_accessory(item)
 
+	_refresh_granted_skills()
 	unit.update_stats()
 
 
 func unequip(item: Item, as_command := false) -> void:
 	item.equipped = false
 	_remove_item_effects(item)
+	_refresh_granted_skills()
 
 	# *as_command* means: user intentionally unequipped; we must assign fallback weapon.
 	if not as_command:
+		unit.update_stats()
 		return
 
 	# Try to find another weapon to auto-equip.
@@ -49,6 +58,7 @@ func unequip(item: Item, as_command := false) -> void:
 	else:
 		_equip_weapon(unit.unarmed)
 
+	_refresh_granted_skills()
 	unit.update_stats()
 
 
@@ -59,6 +69,39 @@ func restore_temp_weapon() -> void:
 			item.temp_remove = false
 			set_equipped(item)
 			return
+
+
+func snapshot_equipment_state() -> Array[Dictionary]:
+	var snapshot: Array[Dictionary] = []
+	for item in unit.inventory:
+		snapshot.append({
+			"Item": item,
+			"Equipped": item.equipped,
+			"TempRemove": item.temp_remove,
+		})
+	return snapshot
+
+
+func restore_equipment_state(snapshot: Array[Dictionary]) -> void:
+	if snapshot.is_empty():
+		return
+
+	for effect in equipped_effects.duplicate():
+		unit.buff_controller.remove_effect(effect)
+	equipped_effects.clear()
+
+	var restored_inventory: Array[Item] = []
+	for entry in snapshot:
+		var item: Item = entry.Item
+		item.equipped = entry.Equipped
+		item.temp_remove = entry.TempRemove
+		restored_inventory.append(item)
+		if item.equipped:
+			_add_item_effects(item)
+
+	unit.inventory = restored_inventory
+	_refresh_granted_skills()
+	unit.update_stats()
 
 
 
@@ -155,6 +198,21 @@ func _remove_item_effects(item: Item) -> void:
 				equipped_effects.remove_at(idx)
 				# HERE was effect.id, but threw an error. Sends the whole effect now. no idea if this is correct fix
 				unit.buff_controller.remove_effect(effect)
+
+
+func _refresh_granted_skills() -> void:
+	if unit and unit.has_method("validate_active_effect_skills"):
+		unit.validate_active_effect_skills()
+
+
+func _sync_equipped_item_effects() -> void:
+	for effect in equipped_effects.duplicate():
+		unit.buff_controller.remove_effect(effect)
+	equipped_effects.clear()
+
+	for item in unit.inventory:
+		if item != null and item.equipped:
+			_add_item_effects(item)
 
 
 

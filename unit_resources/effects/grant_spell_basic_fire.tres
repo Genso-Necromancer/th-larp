@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="Effect" load_steps=3 format=3 uid="uid://clgmqp2u21lb5"]
 
-[ext_resource type="Script" path="res://unit_resources/effects/effect.gd" id="1_8he3i"]
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_8he3i"]
 [ext_resource type="Resource" uid="uid://dgjhkd6ch1s4l" path="res://unit_resources/features/skills/spell_basic_fire.tres" id="2_1ao8m"]
 
 [resource]

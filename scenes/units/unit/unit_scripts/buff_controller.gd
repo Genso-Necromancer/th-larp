@@ -87,7 +87,12 @@ func _apply_or_refresh(effect: Effect, source:= Enums.EFFECT_SOURCE.AURA) -> voi
 			unit.update_stats()
 			return
 
-	apply_effect(effect, source)
+	pool[effect.id] = {
+		"effect": effect,
+		"duration": effect.duration,
+		"source": source
+	}
+	unit.update_stats()
 
 func _remove_stack(effect: Effect, context) -> void:
 	if context == null:
@@ -142,6 +147,12 @@ func get_modifiers() -> Dictionary:
 	for pool in [active_buffs, active_debuffs]:
 		for id in pool.keys():
 			var effect = pool[id].effect
+			if effect == null:
+				continue
+			if typeof(effect.sub_type) != TYPE_INT:
+				continue
+			if effect.sub_type < 0 or effect.sub_type >= subKeys.size():
+				continue
 			var stat_name = subKeys[effect.sub_type].to_pascal_case()
 			mods[stat_name] = mods.get(stat_name, 0) + effect.value
 	return mods

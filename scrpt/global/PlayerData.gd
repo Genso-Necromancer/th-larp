@@ -342,9 +342,10 @@ func init_roster():
 	roster_order = {Enums.DEPLOYMENT.FORCED:[],Enums.DEPLOYMENT.DEPLOYED:[],Enums.DEPLOYMENT.UNDEPLOYED:[],Enums.DEPLOYMENT.GRAVEYARD:[]}
 	add_to_roster("remilia")
 	add_to_roster("sakuya")
+	add_to_roster("reimu")
 	add_to_roster("patchouli")
 	add_to_roster("meiling")
-	add_to_roster("reimu")
+	
 
 
 func add_to_roster(unit_id:String):

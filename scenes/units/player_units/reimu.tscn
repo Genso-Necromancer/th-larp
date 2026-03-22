@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://ehgcslevf08n"]
+[gd_scene load_steps=14 format=3 uid="uid://ehgcslevf08n"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_i0qm2"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_mx3tg"]
@@ -10,6 +10,7 @@
 [ext_resource type="Resource" uid="uid://crihx615imauw" path="res://unit_resources/items/weapons/gohei_simple.tres" id="8_fqquk"]
 [ext_resource type="Script" uid="uid://dtxt6i4bhoqpo" path="res://unit_resources/items/ofuda/ofuda.gd" id="9_634dn"]
 [ext_resource type="Resource" uid="uid://i6gxwkej1jxe" path="res://unit_resources/items/ofuda/ofuda_heal0.tres" id="10_nnev5"]
+[ext_resource type="Texture2D" uid="uid://c83g6bwvib3xh" path="res://sprites/character/reimu/miko_sprite.png" id="11_634dn"]
 
 [sub_resource type="Resource" id="Resource_tpcp1"]
 script = ExtResource("7_hh3fq")
@@ -76,7 +77,7 @@ max_inv = 6
 inventory = Array[ExtResource("6_bmyf1")]([SubResource("Resource_tpcp1"), SubResource("Resource_bmyf1")])
 
 [node name="Sprite" parent="PathFollow2D" index="0"]
-texture = null
+texture = ExtResource("11_634dn")
 
 [node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
 max_value = 20.0

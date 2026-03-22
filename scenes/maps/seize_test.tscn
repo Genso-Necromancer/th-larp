@@ -43,7 +43,7 @@ simulate_leveling = false
 unit_level = 7
 
 [node name="Fairy Cointaker lv1" parent="." index="12" instance=ExtResource("6_ub6hv")]
-position = Vector2(462, 280)
+position = Vector2(464, 387)
 leash = 1
 total_caps = Dictionary[StringName, int]({
 &"Cele": 20,

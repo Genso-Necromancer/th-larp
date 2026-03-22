@@ -378,8 +378,8 @@ func _get_swing_count(actor: UnitSim, action: Dictionary) -> int:
 	if special == null:
 		special = action.get("Skill", null)
 
-	if special != null and special.effects:
-		for effect in special.effects:
+	if special != null:
+		for effect in _get_source_effects(special):
 			if effect.type == Enums.EFFECT_TYPE.MULTI_SWING and int(effect.multi_swing) > swings:
 				swings = int(effect.multi_swing)
 		return max(swings, 1)
@@ -393,8 +393,16 @@ func _get_swing_count(actor: UnitSim, action: Dictionary) -> int:
 
 
 func _evaluate_clash(actor: UnitSim, target: UnitSim, action: Dictionary) -> Dictionary:
-	var a_cd := actor.combat_data
+	var a_cd
 	var t_cd := target.combat_data
+	var special = action.get("Item", null)
+	if special == null:
+		special = action.get("Skill", null)
+	var is_weapon := bool(action.get("Weapon", false))
+	if special != null:
+		a_cd = actor.get_skill_combat_stats(special, is_weapon)
+	else:
+		a_cd = actor.combat_data
 
 	var can_miss := true
 	var can_dmg := true
@@ -404,6 +412,10 @@ func _evaluate_clash(actor: UnitSim, target: UnitSim, action: Dictionary) -> Dic
 	hit = clampi(hit, 0, 1000)
 
 	var dmg_type := int(a_cd.get("Type", Enums.DAMAGE_TYPE.PHYS))
+	if special != null:
+		can_miss = bool(a_cd.get("CanMiss", true))
+		can_dmg = bool(a_cd.get("CanDmg", true))
+		can_crit = bool(a_cd.get("CanCrit", true))
 
 	# includes DRes in all reduction types
 	var dr := int(t_cd.get("DRes", 0))
@@ -475,15 +487,12 @@ func _evaluate_effects(actor: UnitSim, target: UnitSim, action: Dictionary) -> A
 
 	var out: Array = []
 
-	for src :Dictionary in sources:
-		if src == null:
-			continue
-		if not src.has("effects"):
-			continue
-		if src.effects == null or src.effects.size() <= 0:
+	for src in sources:
+		var effects := _get_source_effects(src)
+		if effects.is_empty():
 			continue
 
-		for effect: Effect in src.effects:
+		for effect: Effect in effects:
 			# Ignore equip-only effects in combat resolution
 			if effect.target == Enums.EFFECT_TARGET.EQUIPPED:
 				continue
@@ -710,10 +719,10 @@ func _find_multi_round_effect(action: Dictionary) -> Effect:
 		attack = action.get("Item", null)
 	# If you later support weapon-skill effects living on weapon too, check weapon here.
 
-	if attack == null or not attack.effects:
+	if attack == null:
 		return null
 
-	for e: Effect in attack.effects:
+	for e: Effect in _get_source_effects(attack):
 		if e != null and int(e.type) == Enums.EFFECT_TYPE.MULTI_ROUND:
 			return e
 	return null
@@ -792,3 +801,34 @@ func _fill_action_source_fields(action_node: Dictionary, action_input: Dictionar
 	if item != null:
 		action_node["item_ref"] = item
 		action_node["item_id"] = String(item.id)
+
+
+func _get_source_effects(source) -> Array[Effect]:
+	var out: Array[Effect] = []
+	if source == null:
+		return out
+
+	if source is SlotWrapper:
+		if source.effects == null:
+			return out
+		for effect in source.effects:
+			if effect is Effect:
+				out.append(effect)
+		return out
+
+	if typeof(source) != TYPE_DICTIONARY:
+		return out
+
+	var raw_effects = source.get("effects", [])
+	if raw_effects == null:
+		return out
+
+	for entry in raw_effects:
+		if entry is Effect:
+			out.append(entry)
+		elif typeof(entry) == TYPE_DICTIONARY:
+			var effect := Effect.from_data(entry)
+			if effect != null:
+				out.append(effect)
+
+	return out

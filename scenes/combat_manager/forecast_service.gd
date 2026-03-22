@@ -46,6 +46,7 @@ func _add_forecast_action(
 	is_initiator: bool
 ) -> Dictionary:
 	var action_node := cr.add_action(round, actor.id, target.id, action_type, is_initiator)
+	_fill_action_source_fields(action_node, action)
 
 	# Multi-swing count UI (x#)
 	var base_swings := _get_base_swing_count(actor, action)
@@ -115,10 +116,11 @@ func _evaluate_effects_preview(a: UnitSim, t: UnitSim, action: Dictionary) -> Ar
 	var out: Array = []
 
 	for src in sources:
-		if !src.effects == null:
+		var effects := _get_source_effects(src)
+		if effects.is_empty():
 			continue
 
-		for effect: Effect in src.effects:
+		for effect: Effect in effects:
 			# Ignore equip-only effects in forecast
 			if effect.target == Enums.EFFECT_TARGET.EQUIPPED: continue
 			# Skip instant/global here (handle later if desired)
@@ -172,7 +174,7 @@ func _evaluate_clash(a: UnitSim, t: UnitSim, action: Dictionary) -> Dictionary:
 	var tData := t.combat_data
 	var tAct := t.active_stats
 
-	var special: SlotWrapper = null
+	var special = null
 	var item = action.get("Item", null)
 	var skill = action.get("Skill", null)
 	var is_weapon := bool(action.get("Weapon", false))
@@ -186,7 +188,7 @@ func _evaluate_clash(a: UnitSim, t: UnitSim, action: Dictionary) -> Dictionary:
 		aData = a.combat_data
 
 	# CanMiss
-	results["CanMiss"] = special.can_miss if special != null else true
+	results["CanMiss"] = bool(aData.get("CanMiss", true))
 
 	# Hit
 	var hit := int(aData.Hit) - int(tData.Graze)
@@ -197,7 +199,7 @@ func _evaluate_clash(a: UnitSim, t: UnitSim, action: Dictionary) -> Dictionary:
 	results["DmgType"] = dmg_type
 
 	# CanDmg + base Dmg (UNREDUCED)
-	if special != null and not bool(special.can_dmg):
+	if not bool(aData.get("CanDmg", true)):
 		results["CanDmg"] = false
 		results["Dmg"] = 0
 	else:
@@ -220,7 +222,7 @@ func _evaluate_clash(a: UnitSim, t: UnitSim, action: Dictionary) -> Dictionary:
 	results["reduction"] = max(0, reduction)
 
 	# CanCrit + Crit + crit_range
-	if special != null and not bool(special.can_crit):
+	if not bool(aData.get("CanCrit", true)):
 		results["CanCrit"] = false
 		results["Crit"] = 0
 		results["crit_range"] = [0, 0]
@@ -235,12 +237,12 @@ func _evaluate_clash(a: UnitSim, t: UnitSim, action: Dictionary) -> Dictionary:
 
 		var wep = a.get_equipped_weapon()
 		if wep != null and is_weapon:
-			cmin += int(wep.crit_min)
-			cmax += int(wep.crit_max)
+			cmin += int(_source_value(wep, "crit_min", 0))
+			cmax += int(_source_value(wep, "crit_max", 0))
 
 		if special != null:
-			cmin += int(special.crit_min)
-			cmax += int(special.crit_max)
+			cmin += int(_source_value(special, "crit_min", 0))
+			cmax += int(_source_value(special, "crit_max", 0))
 
 		results["crit_range"] = [max(0, cmin), max(0, cmax)]
 
@@ -257,6 +259,28 @@ func _evaluate_clash(a: UnitSim, t: UnitSim, action: Dictionary) -> Dictionary:
 	results["FUP"] = bool(_speed_check(a, t)) and is_weapon and special == null
 
 	return results
+
+
+func _fill_action_source_fields(action_node: Dictionary, action_input: Dictionary) -> void:
+	action_node["uses_weapon"] = bool(action_input.get("Weapon", false))
+
+	var skill = action_input.get("Skill", null)
+	if skill != null:
+		action_node["skill_ref"] = skill
+		action_node["skill_id"] = String(skill.id)
+
+	var item = action_input.get("Item", null)
+	if item != null:
+		action_node["item_ref"] = item
+		action_node["item_id"] = String(item.id)
+
+
+func _source_value(source, key: String, default_value = null):
+	if source == null:
+		return default_value
+	if typeof(source) == TYPE_DICTIONARY:
+		return source.get(key, default_value)
+	return source.get(key) if source.get(key) != null else default_value
 
 
 func _get_action_type(unit1: UnitSim, unit2: UnitSim, action: Dictionary) -> int:
@@ -298,7 +322,7 @@ func _get_remaining_life(unit: UnitSim, delta: int, swings := 1) -> int:
 
 func _get_skill_swing_count(skill) -> int:
 	var swings := 1
-	for effect in skill.effects:
+	for effect in _get_source_effects(skill):
 		if effect.type == Enums.EFFECT_TYPE.MULTI_SWING and effect.multi_swing > swings:
 			swings = effect.multi_swing
 	return swings
@@ -345,11 +369,41 @@ func _get_slayer_mult_for_forecast(actor: UnitSim, target: UnitSim, action: Dict
 
 	var best := 1.0
 	for src in sources:
-		if !src.effects: continue
-		for effect: Effect in src.effects:
+		for effect: Effect in _get_source_effects(src):
 			if effect.type != Enums.EFFECT_TYPE.SLAYER:
 				continue
 			if int(effect.sub_rule) != int(target.spec):
 				continue
 			best = max(best, _get_slayer_mult_from_effect(effect))
 	return best
+
+
+func _get_source_effects(source) -> Array[Effect]:
+	var out: Array[Effect] = []
+	if source == null:
+		return out
+
+	if source is SlotWrapper:
+		if source.effects == null:
+			return out
+		for effect in source.effects:
+			if effect is Effect:
+				out.append(effect)
+		return out
+
+	if typeof(source) != TYPE_DICTIONARY:
+		return out
+
+	var raw_effects = source.get("effects", [])
+	if raw_effects == null:
+		return out
+
+	for entry in raw_effects:
+		if entry is Effect:
+			out.append(entry)
+		elif typeof(entry) == TYPE_DICTIONARY:
+			var effect := Effect.from_data(entry)
+			if effect != null:
+				out.append(effect)
+
+	return out

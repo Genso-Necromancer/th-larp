@@ -54,12 +54,77 @@ var save_enum:Enums.SAVE_TYPE = Enums.SAVE_TYPE.NONE
 # CombatEngine handoff
 var last_forecast: CombatResults = null
 var last_combat_results: CombatResults = null
+var action_context := {
+	"Actor": null,
+	"Target": null,
+	"Action": {"Weapon": false, "Skill": null, "Item": null},
+	"Forecast": null,
+	"Results": null,
+}
 
 func get_last_forecast() -> CombatResults:
-	return last_forecast
+	return action_context.Forecast
 
 func get_last_combat_results() -> CombatResults:
-	return last_combat_results
+	return action_context.Results
+
+
+func get_action_context() -> Dictionary:
+	return action_context
+
+
+func _set_action_actor(unit: Unit) -> void:
+	action_context.Actor = unit
+
+
+func _set_action_target(unit: Unit) -> void:
+	targetUnit = unit
+	action_context.Target = unit
+
+
+func _set_action_forecast(results: CombatResults) -> void:
+	last_forecast = results
+	action_context.Forecast = results
+
+
+func _set_action_results(results: CombatResults) -> void:
+	last_combat_results = results
+	action_context.Results = results
+
+
+func _clear_action_target() -> void:
+	targetUnit = null
+	action_context.Target = null
+	_set_action_forecast(null)
+	_set_action_results(null)
+
+
+func _reset_action_context() -> void:
+	_set_action_actor(activeUnit)
+	_clear_action_target()
+	_set_active_action(false, null, null)
+
+
+func _snapshot_active_unit_equipment() -> void:
+	selection_equipment_snapshot.clear()
+	if activeUnit == null:
+		return
+	selection_equipment_snapshot = activeUnit.equipment_helper.snapshot_equipment_state()
+
+
+func _restore_active_unit_equipment() -> void:
+	if activeUnit == null:
+		return
+	activeUnit.equipment_helper.restore_equipment_state(selection_equipment_snapshot)
+	selection_equipment_snapshot.clear()
+
+
+func rollback_pending_selection_state() -> void:
+	if activeUnit == null:
+		return
+	if selection_equipment_snapshot.is_empty():
+		return
+	_restore_active_unit_equipment()
 
 #nodes
 @onready var cursor:Cursor = %Cursor
@@ -87,6 +152,7 @@ var units:Dictionary[Vector2i, Unit]={}
 var unit_refs:Dictionary[String, Unit]={} #This feels redundant, it's just another look up table like "units" but uses ID instead of Cell
 var activeUnit:Unit
 var targetUnit:Unit
+var selection_equipment_snapshot: Array[Dictionary] = []
 var focusUnit:Unit:
 	set(value):
 		focusUnit = value
@@ -102,7 +168,7 @@ var focusDanmaku:Danmaku:
 		focusDanmaku = value
 		Global.focusDanmaku = focusDanmaku
 #turns/rounds
-enum TURN_STEPS {STAND_BY,PROCESSING,START,END_PHASE,END,OPTIONS,ACTIONS,MOVE_SEEK,MOVE_REMAINING,UNIT_MOVING,MOVE_END,ACTIONS2,AI_ACT,ITEM_QUEUED,ITEM_ANIMATION,ITEM_TARGET,ATTACK_TARGET,DOOR_TARGET,SKILL_TARGET,FORECAST_ATTACK,COMBAT_DISPLAY,EFFECT_QUEUE,BAR_ANIM,EVENT_QUEUE,EXP_GRANT,CANTO}
+enum TURN_STEPS {STAND_BY,PROCESSING,START,END_PHASE,END,OPTIONS,ACTIONS,MOVE_SEEK,MOVE_REMAINING,UNIT_MOVING,MOVE_END,ACTIONS2,AI_ACT,ITEM_QUEUED,ITEM_ANIMATION,ITEM_TARGET,ATTACK_TARGET,DOOR_TARGET,TRADE_TARGET,SKILL_TARGET,FORECAST_ATTACK,COMBAT_DISPLAY,EFFECT_QUEUE,BAR_ANIM,EVENT_QUEUE,EXP_GRANT,CANTO}
 enum AI_STEPS {STAND_BY,PROCESSING,START,EVALUATE,PROCESS_TURN,SELECT_UNIT,MOVE_UNIT}
 enum ROUND_STEPS {CHECK,DANMAKU,SCENE,REINFORCE,END,}
 var last_step:TURN_STEPS
@@ -138,7 +204,14 @@ var exp_events:Array[Dictionary] = []
 var active_died:bool = true
 
 #GUI
-var guiManager:GUIManager
+var guiManager:GUIManager:
+	set(value):
+		guiManager = value
+		if is_inside_tree():
+			_connect_gui_signals()
+var player_action_controller: PlayerActionController
+var board_targeting: BoardTargeting
+var board_unit_registry: BoardUnitRegistry
 
 #region init/ready/process
 func _init():
@@ -147,6 +220,9 @@ func _init():
 
 func _ready():
 	if !cam_con: cam_con = CameraController.new(get_viewport())
+	player_action_controller = PlayerActionController.new(self)
+	board_targeting = BoardTargeting.new(self)
+	board_unit_registry = BoardUnitRegistry.new(self)
 	_connect_signals()
 
 
@@ -195,7 +271,8 @@ func _connect_general_signals():
 	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
 
 func _connect_gui_signals():
-	if guiManager == null: return
+	if guiManager == null: 
+		return
 	if not guiManager.ui_move_selected.is_connected(_on_gui_move_selected):
 		guiManager.ui_move_selected.connect(_on_gui_move_selected)
 	if not guiManager.ui_attack_selected.is_connected(_on_gui_attack_selected):
@@ -326,9 +403,7 @@ func _move_active_unit(new_cell: Vector2i, set_path:Array[Vector2i]= []) -> void
 	current_map.pathAttack.clear()
 	if !new_cell == activeUnit.cell:
 		#print("it's walkable")
-		# warning-ignore:return_value_discarded
-		units.erase(activeUnit.cell)
-		units[new_cell] = activeUnit
+		board_unit_registry.relocate_unit(activeUnit.cell, new_cell, activeUnit)
 		if !ai:
 			path = unit_path.current_path
 		else:
@@ -349,6 +424,7 @@ func _on_unit_walk_finished():
 
 func _unit_at_destination():
 	unit_path.clear_path()
+	PlayerData.move_committed = true
 	turn_step = TURN_STEPS.MOVE_END
 
 
@@ -404,9 +480,7 @@ func _resolve_exp():
 
 #region movement of unit objects
 func on_unit_relocated(oldCell, newCell, unit): #updates unit locations with it's new location
-	if units.has(oldCell):
-		units.erase(oldCell)
-	units[newCell] = unit
+	board_unit_registry.relocate_unit(oldCell, newCell, unit)
 #endregion
 
 
@@ -427,30 +501,20 @@ func on_death_done(unit: Unit):
 
 
 func add_to_death_list(unit:Unit):
-	unit.visible = false
-	unit.is_active = false
-	death_list.append(unit)
+	board_unit_registry.add_to_death_list(unit)
 
 
 func _wipe_dead():
-	for dead in death_list:
-		_clear_unit(dead)
-	death_list.clear()
+	board_unit_registry.wipe_dead()
 
 
 func _clear_unit(unit):
-	var remove = unit.cell
-	var factionId = unit.FACTION_ID
-	_remove_turn(factionId)
-	units.erase(remove)
-	unit.queue_free()
+	board_unit_registry.clear_unit(unit)
 	#clear non-player units from unitData HERE!!!
 
 
 func _remove_from_grid(unit: Unit):
-	var remove = unit.cell
-	if units.has(remove):
-		units.erase(remove)
+	board_unit_registry.remove_from_grid(unit)
 
 
 
@@ -480,6 +544,7 @@ func on_turn_complete(unit):
 
 
 func _on_item_used(item:Item):
+	PlayerData.item_used = true
 	var targeting:Enums.SKILL_TARGET = item.target
 	#{NONE, SELF, ALLY, ENEMY, MAP, SELF_ALLY}
 	match targeting:
@@ -490,7 +555,6 @@ func _on_item_used(item:Item):
 
 
 func _on_item_equipped(item:Item,is_equipping:bool):
-	PlayerData.item_used = true
 	if is_equipping: activeUnit.set_equipped(item)
 	else: activeUnit.unequip(item)
 
@@ -524,11 +588,17 @@ func unit_wait():
 
 
 func _self_use_item(item: Item):
-	turn_step = TURN_STEPS.ITEM_QUEUED
-	var results: CombatResults = combatManager.use_item(activeUnit, activeUnit, item)
+	if activeUnit == null:
+		return
+	var consumable := item as Consumable
+	if consumable == null:
+		push_error("[GameBoard/_self_use_item] Expected Consumable, got %s" % [item])
+		return
+	turn_step = TURN_STEPS.PROCESSING
+	var results: CombatResults = _resolve_item_action(activeUnit, activeUnit, consumable)
 	item_queue["Item"] = item
 	item_queue["Results"] = results
-	#{"Actor":false,"Type":false, "Target": false,"EffectId": effect, "Resisted": false, "Dmg": dmg, "Heal": false, "Comp": false, "Slayer": false}
+	_unfuck_turn()
 	
 
 
@@ -565,112 +635,77 @@ func _target_use_item(item:Item):
 
 
 func _apply_item(item:Consumable, unit:Unit, _target:Unit): #HERE Unfinished
-	var results = combatManager.use_item(unit, unit, item)
-	turn_step = TURN_STEPS.ITEM_ANIMATION
-	#insert map animations for items here
-	_on_animation_handler_sequence_complete()
+	var target := _target if _target != null else unit
+	if unit == null or target == null:
+		return
+	var results: CombatResults = _resolve_item_action(unit, target, item)
+	item_queue["Item"] = item
+	item_queue["Results"] = results
+	_unfuck_turn()
 #endregion
 
 #region targeting code
 #region newly added
 func _begin_targeting_for_active_action() -> void:
-	if !active_action: return
-	if GameState: GameState.change_state(self, GameState.gState.SCENE_ACTIVE)
-	
-	if active_action.Skill: start_skill_targeting(active_action.Skill)
-	elif active_action.Item: start_item_targeting(active_action.Item)
-	elif active_action.Weapon: start_attack_targeting()
+	player_action_controller.begin_targeting_for_active_action()
 #endregion
 
 func _draw_range(unit : Unit, maxRange : int, minRange := 0):
-	var path = _get_cells_in_range(unit.cell, maxRange, minRange,)
-	snap_path = path
-	cursor.bump_cursor()
-	current_map.draw_attack(path)
-	unit_path.stop()
+	board_targeting.draw_range(unit, maxRange, minRange)
 
 
 func _get_cells_in_range(cell : Vector2i, maxRange : int, minRange : int)->Array: #HEX REF
-	var hexStar = AHexGrid2D.new(current_map)
-	var path :Array= hexStar.find_all_paths(cell, maxRange)
-	if path.size() != 1 and minRange > 0:
-		minRange = minRange - 1
-		minRange = clampi(minRange, 0, 1000)
-		var invalid = hexStar.find_all_paths(cell, minRange)
-		path = hexStar.trim_path(path, invalid)
-	return path
+	return board_targeting.get_cells_in_range(cell, maxRange, minRange)
 
 
 func start_attack_targeting():
-	var reach :Dictionary = activeUnit.get_weapon_reach()
-	turn_step = TURN_STEPS.ATTACK_TARGET
-	active_action = {"Weapon": true, "Skill": null, "Item": null}
-	#GameState.change_state(self, GameState.gState.GB_ATTACK_TARGETING)
-	_draw_range(activeUnit, reach.Max, reach.Min)
+	board_targeting.start_attack_targeting()
 
 
 func start_skill_targeting(skill = null):
-	var reach : Dictionary
-	if skill == null:
-		skill = Global.activeSkill
-	if skill == null:
-		return
-	turn_step = TURN_STEPS.SKILL_TARGET
-	_set_active_action(skill.augment, skill, null)
-	if active_action.Weapon: reach = activeUnit.get_aug_reach(active_action.Skill)
-	else: reach = activeUnit.get_skill_reach(active_action.Skill)
-	_draw_range(activeUnit, reach.Max, reach.Min)
+	board_targeting.start_skill_targeting(skill)
 
 
 func start_item_targeting(item: Consumable):
-	if item == null:
-		return
-	active_action = {"Weapon": false, "Skill": null, "Item": item}
-	_draw_range(activeUnit, item.max_reach, item.min_reach)
-	turn_step = TURN_STEPS.ITEM_TARGET
-	#GameState.change_state(self, GameState.gState.GB_ITEM_TARGETING)
+	board_targeting.start_item_targeting(item)
 
 func door_targeting():
-	turn_step = TURN_STEPS.DOOR_TARGET
-	_draw_range(activeUnit, 1, 1)
+	board_targeting.door_targeting()
+
+
+func seek_trade(unit: Unit = activeUnit) -> void:
+	board_targeting.seek_trade(unit)
 
 
 func _end_targeting():
-	_wipe_region()
-	current_map.pathAttack.clear()
-	cursor.cell = activeUnit.cell
-	gameboard_targeting_canceled.emit()
+	board_targeting.end_targeting()
+
+
+func end_targeting() -> void:
+	_end_targeting()
+
+
+func trade_target_selected() -> void:
+	board_targeting.trade_target_selected()
 #endregion
 
 #region action code
 #NEW
 func _begin_attack_action() -> void:
-	if activeUnit == null:
-		return
-	start_attack_targeting()
+	player_action_controller.begin_attack_action()
 
 func _begin_skill_action(skill) -> void:
-	if activeUnit == null:
-		return
-	start_skill_targeting(skill)
+	player_action_controller.begin_skill_action(skill)
 
 func _commit_wait_action() -> void:
-	if activeUnit == null:
-		return
-	unit_wait()
+	player_action_controller.commit_wait_action()
 
 func _cancel_action_menu_flow() -> void:
-	if state == STATES.PLAYER_PHASE:
-		_player_phase_menu_canceled()
+	player_action_controller.cancel_action_menu_flow()
 
 
 func _resume_targeting_for_active_action() -> void:
-	if active_action.Item:
-		start_item_targeting(active_action.Item)
-	elif active_action.Skill:
-		start_skill_targeting(active_action.Skill)
-	elif active_action.Weapon:
-		start_attack_targeting()
+	player_action_controller.resume_targeting_for_active_action()
 #endregion
 
 #region cursor  functions
@@ -691,6 +726,7 @@ func _player_phase_mouse_motion(position:Vector2i):
 		TURN_STEPS.MOVE_REMAINING: cursor.cell = position
 		TURN_STEPS.ATTACK_TARGET: cursor.cell = position
 		TURN_STEPS.DOOR_TARGET: cursor.cell = position
+		TURN_STEPS.TRADE_TARGET: cursor.cell = position
 		TURN_STEPS.SKILL_TARGET: cursor.cell = position
 		
 
@@ -752,6 +788,12 @@ func ui_return():
 		STATES.PLAYER_PHASE: _ui_return_player_phase()
 
 
+func _get_post_target_menu_step() -> TURN_STEPS:
+	if PlayerData.move_committed:
+		return TURN_STEPS.ACTIONS2
+	return TURN_STEPS.ACTIONS
+
+
 func _ui_return_player_phase(): 
 	match turn_step:
 		TURN_STEPS.ACTIONS, TURN_STEPS.ACTIONS2:
@@ -765,16 +807,19 @@ func _ui_return_player_phase():
 			_undo_segment()
 			#revert_partial_move()
 		TURN_STEPS.ATTACK_TARGET:
-			turn_step = last_step #If turn_steps are acting out of line during testing, this is probably the culprit
+			turn_step = _get_post_target_menu_step()
 			_end_targeting()
 		TURN_STEPS.FORECAST_ATTACK:
-			turn_step = last_step #
-			ui_returned.emit(turn_step)
+			turn_step = TURN_STEPS.ATTACK_TARGET
+			ui_returned.emit(TURN_STEPS.FORECAST_ATTACK)
 		TURN_STEPS.SKILL_TARGET:
-			turn_step = last_step #
+			turn_step = _get_post_target_menu_step()
 			_end_targeting()
 		TURN_STEPS.ITEM_TARGET:
-			turn_step = last_step
+			turn_step = _get_post_target_menu_step()
+			_end_targeting()
+		TURN_STEPS.TRADE_TARGET:
+			turn_step = _get_post_target_menu_step()
 			_end_targeting()
 
 
@@ -851,6 +896,7 @@ func _player_phase_select():
 		TURN_STEPS.MOVE_SEEK,TURN_STEPS.MOVE_REMAINING: select_destination()
 		TURN_STEPS.ATTACK_TARGET: attack_target_selected()
 		TURN_STEPS.DOOR_TARGET: door_target_selected()
+		TURN_STEPS.TRADE_TARGET: trade_target_selected()
 		TURN_STEPS.SKILL_TARGET: _feature_target_selected(active_action.Skill)
 		TURN_STEPS.ITEM_TARGET: _feature_target_selected(active_action.Item)
 
@@ -883,7 +929,8 @@ func _select_unit(cell: Vector2i) -> void:
 	elif !units.has(cell) or units[cell].status.Acted: return
 	elif units[cell].FACTION_ID == Enums.FACTION_ID.PLAYER:
 		activeUnit = units[cell]
-		#activeUnit.save_equip()
+		_reset_action_context()
+		_snapshot_active_unit_equipment()
 		activeUnit.isSelected = true
 		#walkable_cells = get_walkable_cells(activeUnit)
 		#current_map.draw(walkable_cells)
@@ -895,66 +942,19 @@ func _select_unit(cell: Vector2i) -> void:
 
 
 func _feature_target_selected(feature:SlotWrapper)-> void:
-	if !is_occupied(cursor.cell):
-		return
-	if !feature:
-		print("No Valid SkillID")
-		return
-	var friendly := false
-	var valid := false
-	if focusUnit.FACTION_ID == activeUnit.FACTION_ID or focusUnit.FACTION_ID == Enums.FACTION_ID.NPC:
-		friendly = true
-	match feature.target:
-		Enums.SKILL_TARGET.SELF:
-			if activeUnit == focusUnit:
-				valid = true
-		Enums.SKILL_TARGET.ENEMY:
-			if !friendly:
-				valid = true
-			#if skill.RuleType:
-				#match skill.RuleType:
-					#Enums.RULE_TYPE.TARGET_SPEC:
-						#if skill.Rule != focusUnit.SPEC_ID:
-							#valid = false
-		Enums.SKILL_TARGET.ALLY:
-			if friendly and activeUnit != focusUnit:
-				valid = true
-		Enums.SKILL_TARGET.SELF_ALLY:
-			if friendly:
-				valid = true
-		Enums.SKILL_TARGET.MAP:
-			if activeUnit != focusUnit:
-				valid = true
-	if valid:
-		turn_step = TURN_STEPS.FORECAST_ATTACK
-		grab_target(cursor.cell)
+	board_targeting.feature_target_selected(feature)
+
+
+func skill_target_selected() -> void:
+	_feature_target_selected(active_action.Skill)
 
 
 func attack_target_selected():
-	if is_occupied(cursor.cell) and !_check_friendly(activeUnit, focusUnit):
-#				$Cursor.visible = false
-		turn_step = TURN_STEPS.FORECAST_ATTACK
-		grab_target(cursor.cell)
+	board_targeting.attack_target_selected()
 
 
 func grab_target(cell):
-	var hexStar = AHexGrid2D.new(current_map)
-	if not units.has(cell):
-		print("oops")
-		return
-
-	targetUnit = units[cell]
-	var distance := hexStar.compute_cost(activeUnit.cell, targetUnit.cell, activeUnit)
-	var reach := [distance, distance]
-
-	# Always store forecast results for UI/other consumers
-	last_forecast = combatManager.get_forecast(activeUnit, targetUnit, active_action)
-
-	# Keep legacy "mode" behavior if UI depends on it
-	var mode := 0 if active_action.Weapon else 1
-
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	target_focused.emit(mode, reach)
+	board_targeting.grab_target(cell)
 
 
 func move_selection(isAi := false):
@@ -983,7 +983,7 @@ func select_destination() -> void: #SELECTED STATE Pathing Related
 
 
 func is_occupied(cell: Vector2i) -> bool:
-		return units.has(cell)
+		return board_unit_registry.is_occupied(cell)
 
 
 func select_formation_cell():
@@ -1011,14 +1011,7 @@ func _deploy_swap(start, end):
 		start.relocate_unit(end)
 		deselect_formation_cell()
 	else:
-		var cell1 = start.cell
-		var cell2 = end.cell
-		var unit1 = start
-		var unit2 = end
-		start.relocate_unit(cell2, false)
-		end.relocate_unit(cell1, false)
-		units[cell1] = unit2
-		units[cell2] = unit1
+		board_unit_registry.swap_units(start, end)
 		deselect_formation_cell()
 
 
@@ -1048,24 +1041,22 @@ func _on_gui_manager_deploy_toggled(unit, deployed):
 #region Signal Handlers
 #region GUI
 func _on_gui_move_selected() -> void:
-	if activeUnit == null:
-		return
-	move_selection()
+	player_action_controller.on_gui_move_selected()
 
 func _on_gui_attack_selected() -> void:
-	_begin_attack_action()
+	player_action_controller.on_gui_attack_selected()
 
 func _on_gui_skill_selected(skill) -> void:
-	_begin_skill_action(skill)
+	player_action_controller.on_gui_skill_selected(skill)
 
 func _on_gui_wait_selected() -> void:
-	_commit_wait_action()
+	player_action_controller.on_gui_wait_selected()
 
 func _on_gui_item_selected(unit) -> void:
-	activeUnit = unit
+	player_action_controller.on_gui_item_selected(unit)
 
 func _on_gui_trade_selected(unit) -> void:
-	activeUnit = unit
+	player_action_controller.on_gui_trade_selected(unit)
 
 func _on_gui_ofuda_selected(unit, ofuda) -> void:
 	# Legacy path for now; this should later become item-use intent handled from GameBoard.
@@ -1073,10 +1064,10 @@ func _on_gui_ofuda_selected(unit, ofuda) -> void:
 		unit.use_item(ofuda)
 
 func _on_gui_door_selected() -> void:
-	door_targeting()
+	player_action_controller.on_gui_door_selected()
 
 func _on_gui_seize_selected(cell) -> void:
-	SignalTower.action_seize.emit(cell)
+	player_action_controller.on_gui_seize_selected(cell)
 
 func _on_gui_suspend_requested() -> void:
 	# Leave suspend behavior unchanged for now
@@ -1148,6 +1139,16 @@ func _set_active_action(uses_weapon: bool, skill = null, item = null) -> void:
 		"Skill": skill,
 		"Item": item
 	}
+	action_context.Action = active_action.duplicate()
+
+
+func _resolve_item_action(actor: Unit, target: Unit, item: Consumable) -> CombatResults:
+	if actor == null or target == null or item == null:
+		return null
+	_set_active_action(false, null, item)
+	var results: CombatResults = combatManager.start_the_justice(actor, target, active_action)
+	_set_action_results(results)
+	return results
 #endregion
 #endregion
 
@@ -1410,9 +1411,9 @@ func _on_inventory_weapon_changed(button) -> void:
 	if button.disabled:
 		return
 	activeUnit.set_equipped(i) #See if it can find it's own index based on ID?
-	last_forecast = combatManager.get_forecast(activeUnit, targetUnit, active_action)
+	_set_action_forecast(combatManager.get_forecast(activeUnit, targetUnit, active_action))
 	SignalTower.forecast_predicted.emit({
-  "results": last_forecast,
+  "results": get_last_forecast(),
   "attacker_unit": activeUnit,   # Unit reference OK for UI
   "defender_unit": targetUnit
 })
@@ -1433,7 +1434,7 @@ func _on_action_weapon_selected(button = false):
 		activeUnit.set_equipped(weapon)
 
 	var combatResults: CombatResults = combatManager.start_the_justice(activeUnit, target, active_action)
-	last_combat_results = combatResults
+	_set_action_results(combatResults)
 	combat_sequence(combatResults)
 #endregion
 
@@ -1442,6 +1443,10 @@ func _on_action_weapon_selected(button = false):
 func _on_animation_handler_sequence_complete():
 	var hasPostEvents = _check_effect_queue()
 	GameState.change_state(self, GameState.gState.GB_DEFAULT)
+	_wipe_region()
+	current_map.pathAttack.clear()
+	if activeUnit:
+		cursor.cell = activeUnit.cell
 	
 	if hasPostEvents: turn_step = TURN_STEPS.EFFECT_QUEUE
 	else: _update_unit_bars()
@@ -1538,16 +1543,18 @@ func _deselect_active_unit(confirm) -> void:
 	#NEW: HERE setting confirm to "true" is not currently used anywhere.
 	if activeUnit != null and units.has(activeUnit.cell):
 		if !confirm: 
-			units.erase(activeUnit.cell)
+			PlayerData.move_committed = false
+			board_unit_registry.clear_cell(activeUnit.cell)
 			var new_cell = activeUnit.return_original()
-			units[new_cell] = activeUnit
-			activeUnit.restore_equip()
+			board_unit_registry.set_unit(new_cell, activeUnit)
+			_restore_active_unit_equipment()
 		else:
 			var new_cell = activeUnit.cell
 			activeUnit.originCell = activeUnit.cell
-			units[new_cell] = activeUnit
+			board_unit_registry.set_unit(new_cell, activeUnit)
 			#boardState.add_acted(activeUnit)
 			activeUnit.set_acted(true)
+			selection_equipment_snapshot.clear()
 		_snap_cursor(activeUnit.cell)
 		activeUnit.isSelected = false
 		
@@ -1560,6 +1567,7 @@ func _deselect_active_unit(confirm) -> void:
 func _clear_active_unit() -> void:
 	# Clears the reference to the activeUnit and the corresponding walkable cells
 	activeUnit = null
+	_reset_action_context()
 	walkable_cells.clear()
 #endregion
 
@@ -1581,22 +1589,10 @@ func _on_gui_set_up_loaded():
 
 
 func _on_gui_action_menu_canceled():
-	match state:
-		STATES.PLAYER_PHASE: _player_phase_menu_canceled()
+	player_action_controller.on_gui_action_menu_canceled()
 	
 
 
 func _player_phase_menu_canceled():
-	match turn_step:
-		TURN_STEPS.ACTIONS: 
-			turn_step = TURN_STEPS.START
-			request_deselect()
-		TURN_STEPS.ACTIONS2:
-			turn_step = TURN_STEPS.MOVE_END
-			unit_move_ended.emit(activeUnit)
-		TURN_STEPS.FORECAST_ATTACK:
-			activeUnit.restore_equip()
-			_resume_targeting_for_active_action()
-		TURN_STEPS.ATTACK_TARGET, TURN_STEPS.SKILL_TARGET, TURN_STEPS.ITEM_TARGET:
-			_end_targeting()
+	player_action_controller.player_phase_menu_canceled()
 #endregion

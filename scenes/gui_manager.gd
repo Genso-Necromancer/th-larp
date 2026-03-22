@@ -7,7 +7,6 @@ signal start_the_justice
 signal deploy_toggled(unit_id, depStatus)
 signal formation_selected
 signal map_started
-signal gui_action_menu_canceled
 signal set_up_loaded
 
 # ActionMenu intent relays
@@ -236,7 +235,7 @@ func toggle_profile() -> void:
 		profFocus = Global.focusUnit
 		rosterGrid.set_bar_focus(false)
 		GameState.change_state(self, GameState.gState.GB_PROFILE)
-		focusViewer.visible = false
+		focusViewer.hide_fv()
 	else:
 		_strip_menuCursor(false, unitProf.focusLabels)
 		rosterGrid.set_bar_focus(true)
@@ -248,7 +247,8 @@ func toggle_profile() -> void:
 		prevFocus = null
 		unitProf.toggle_profile()
 		GameState.change_state()
-		if sState == sStates.BEGIN:focusViewer.visible = true 
+		if sState == sStates.BEGIN:
+			focusViewer.show_fv()
 
 
 func update_prof():
@@ -355,11 +355,6 @@ func _connect_asset_signals():
 	unitProf.tooltips_on.connect(self._on_profile_tooltips_on)
 	unitProf.tooltips_off.connect(self._on_profile_tooltips_off)
 	_connect_action_menu_signals()
-	#old act menu signals
-	actMenu.action_menu_canceled.connect(self._on_action_menu_canceled)
-	actMenu.action_menu_selected.connect(GRANDDAD._on_action_menu_selected)
-	actMenu.action_menu_item_pressed.connect(self._on_action_item_pressed)
-	actMenu.action_menu_trade_pressed.connect(self._on_action_trade_pressed)
 	actMenu.action_menu_suspending_game.connect(self._on_action_suspending)
 	#actMenu.action_menu_ofuda_open.connect(self._on_action_ofuda_open)
 
@@ -394,9 +389,13 @@ func _on_action_menu_attack_selected() -> void: ui_attack_selected.emit()
 
 func _on_action_menu_skill_selected(skill) -> void: ui_skill_selected.emit(skill)
 
-func _on_action_menu_item_selected_relay(unit) -> void: ui_item_selected.emit(unit)
+func _on_action_menu_item_selected_relay(unit) -> void:
+	ui_item_selected.emit(unit)
+	_on_action_item_pressed(unit)
 
-func _on_action_menu_trade_selected_relay(unit) -> void: ui_trade_selected.emit(unit)
+func _on_action_menu_trade_selected_relay(unit) -> void:
+	ui_trade_selected.emit(unit)
+	_on_action_trade_pressed(unit)
 
 func _on_action_menu_wait_selected() -> void: ui_wait_selected.emit()
 
@@ -673,21 +672,18 @@ func _on_item_selected(b):
 	
 
 func _on_trade_closed(is_action:=false) -> void:
+	var acting_unit := trade1 if trade1 != null else GRANDDAD.gameBoard.activeUnit
 	if inSetup:
 		rosterGrid.toggle_visible()
 		_open_unit_options(activeBtn)
-	elif is_action:
+	elif is_action and PlayerData.item_used:
+		actMenu.end_self()
 		menuCursor.visible = false
+		sState = sStates.BEGIN
 		_show_hud()
-	elif trade1 and trade2:
-		menuCursor.visible = false
-		GameState.change_state()
-		GRANDDAD.trade_seeking()
+		GameState.change_state(GRANDDAD.gameBoard, GameState.gState.GB_DEFAULT)
 	else:
-		menuCursor.visible = false
-		_show_hud()
-		GameState.change_state()
-		actMenu.return_previous_state()
+		_reopen_action_menu(acting_unit)
 	trade1 = null
 	trade2 = null
 
@@ -714,6 +710,7 @@ func _on_manage_pressed():
 func _on_action_item_pressed(unit:Unit):
 	GameState.change_state(self,GameState.gState.GB_SETUP)
 	sState = sStates.MANAGE
+	actMenu.suspend_menu()
 	tradeScreen.open_manage_menu(unit,false)
 
 
@@ -731,11 +728,12 @@ func _on_action_trade_pressed(unit:Unit):
 	GRANDDAD.trade_seeking(unit)
 
 
-func start_action_trade(trade_target:Unit):
+func start_action_trade(trade_initiator:Unit, trade_target:Unit):
 		GameState.change_state(self, GameState.gState.GB_SETUP)
 		sState = sStates.TRADING
-		trade1 = Global.activeUnit
+		trade1 = trade_initiator
 		trade2 = trade_target
+		actMenu.suspend_menu()
 		_open_trade_menu()
 
 
@@ -758,9 +756,20 @@ func regress_act_menu():
 	actMenu.return_previous_state()
 
 
-func _on_action_menu_canceled():
-	#_strip_menuCursor()
-	gui_action_menu_canceled.emit()
+func _reopen_action_menu(unit: Unit) -> void:
+	if unit == null:
+		return
+	var board := GRANDDAD.gameBoard
+	menuCursor.visible = false
+	sState = sStates.BEGIN
+	_show_hud()
+	if PlayerData.move_committed:
+		board.turn_step = GameBoard.TURN_STEPS.ACTIONS2
+	else:
+		board.turn_step = GameBoard.TURN_STEPS.ACTIONS
+	GameState.change_state(board, GameState.gState.GB_DEFAULT)
+	actMenu.end_self()
+	actMenu.open_as_action(unit, PlayerData.move_committed)
 
 
 func end_action_menu():
@@ -769,10 +778,7 @@ func end_action_menu():
 
 
 func cancel_forecast():
-	#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-	_show_hud()
-	foreCast.hide_fc()
-	regress_act_menu()
+	GRANDDAD.gameBoard.ui_return()
 
 
 func _on_gameboard_action_confirmed():
@@ -795,8 +801,13 @@ func _on_gameboard_unit_selected(unit:Unit):
 
 
 func _on_gameboard_targeting_canceled():
-	#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-	regress_act_menu()
+	var was_trade_targeting := GameState.state == GameState.gState.GB_TRADE_TARGETING
+	GameState.change_state(GRANDDAD.gameBoard, GameState.gState.GB_DEFAULT)
+	if was_trade_targeting:
+		_reopen_action_menu(GRANDDAD.gameBoard.activeUnit)
+	else:
+		actMenu.resume_menu()
+		regress_act_menu()
 
 
 func _on_gameboard_ui_return(state:GameBoard.TURN_STEPS):
@@ -804,6 +815,18 @@ func _on_gameboard_ui_return(state:GameBoard.TURN_STEPS):
 		GameBoard.TURN_STEPS.FORECAST_ATTACK:
 			_show_hud()
 			foreCast.hide_fc()
+			var board := GRANDDAD.gameBoard
+			match board.turn_step:
+				GameBoard.TURN_STEPS.ATTACK_TARGET:
+					GameState.change_state(board, GameState.gState.GB_ATTACK_TARGETING)
+				GameBoard.TURN_STEPS.SKILL_TARGET:
+					GameState.change_state(board, GameState.gState.GB_SKILL_TARGETING)
+				GameBoard.TURN_STEPS.ITEM_TARGET:
+					GameState.change_state(board, GameState.gState.GB_ITEM_TARGETING)
+				GameBoard.TURN_STEPS.TRADE_TARGET:
+					GameState.change_state(board, GameState.gState.GB_TRADE_TARGETING)
+				_:
+					GameState.change_state(board, GameState.gState.GB_DEFAULT)
 	regress_act_menu()
 	
 
@@ -880,6 +903,7 @@ func _on_gameboard_sequence_initiated(_sequence):
 
 #region turn tracker signal routing
 func _on_turn_changed()->void:
+	end_action_menu()
 	turn_tracker.change_turn()
 	
 
@@ -900,9 +924,11 @@ func _on_turn_removed(team:StringName)->void:
 func _show_hud():
 	turn_tracker.unhide_self()
 	hud_clock.show_clock()
+	focusViewer.show_fv()
 
 
 func _hide_hud():
 	turn_tracker.hide_self()
 	hud_clock.hide_clock()
+	focusViewer.hide_fv()
 #endregion

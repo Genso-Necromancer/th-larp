@@ -95,12 +95,24 @@ func _compute_buff_modifiers() -> Dictionary:
 	return unit.buff_controller.get_modifiers()
 
 func _compute_buff_modifiers_for_ui() -> Dictionary:
-	var all :Dictionary= unit.buff_controller.get_modifiers()
 	var mods := {}
-	for id in all.keys():
-		if all[id].source == Enums.EFFECT_SOURCE.BUFF:
-			var s = all[id].stat_name
-			mods[s] = mods.get(s, 0) + all[id].value
+	var sub_keys = Enums.SUB_TYPE.keys()
+	for pool in [unit.buff_controller.active_buffs, unit.buff_controller.active_debuffs]:
+		for id in pool.keys():
+			var entry = pool[id]
+			if typeof(entry) != TYPE_DICTIONARY:
+				continue
+			if int(entry.get("source", -1)) != Enums.EFFECT_SOURCE.BUFF:
+				continue
+			var effect: Effect = entry.get("effect", null)
+			if effect == null:
+				continue
+			if typeof(effect.sub_type) != TYPE_INT:
+				continue
+			if effect.sub_type < 0 or effect.sub_type >= sub_keys.size():
+				continue
+			var stat_name = sub_keys[effect.sub_type].to_pascal_case()
+			mods[stat_name] = mods.get(stat_name, 0) + int(effect.value)
 	return mods
 
 func _compute_item_modifiers() -> Dictionary:
