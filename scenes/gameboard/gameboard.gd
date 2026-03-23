@@ -796,6 +796,8 @@ func _get_post_target_menu_step() -> TURN_STEPS:
 
 func _ui_return_player_phase(): 
 	match turn_step:
+		TURN_STEPS.OPTIONS:
+			turn_step = TURN_STEPS.START
 		TURN_STEPS.ACTIONS, TURN_STEPS.ACTIONS2:
 			ui_returned.emit(turn_step)
 		TURN_STEPS.MOVE_SEEK:
@@ -816,6 +818,9 @@ func _ui_return_player_phase():
 			turn_step = _get_post_target_menu_step()
 			_end_targeting()
 		TURN_STEPS.ITEM_TARGET:
+			turn_step = _get_post_target_menu_step()
+			_end_targeting()
+		TURN_STEPS.DOOR_TARGET:
 			turn_step = _get_post_target_menu_step()
 			_end_targeting()
 		TURN_STEPS.TRADE_TARGET:
@@ -917,6 +922,10 @@ func _door_zoom_complete(cell:Vector2i):
 	cam_con.camera_control_complete.disconnect(self._door_zoom_complete)
 	PlayerData.canto_triggered = true
 	activeUnit.pick_door(current_map.doors[cell])
+
+
+func object_target_selected() -> void:
+	door_target_selected()
 
 
 func _select_unit(cell: Vector2i) -> void:

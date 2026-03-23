@@ -56,6 +56,9 @@ func resume_targeting_for_active_action() -> void:
 
 func player_phase_menu_canceled() -> void:
 	match board.turn_step:
+		GameBoard.TURN_STEPS.OPTIONS:
+			board.turn_step = GameBoard.TURN_STEPS.START
+			board.ui_returned.emit(GameBoard.TURN_STEPS.OPTIONS)
 		GameBoard.TURN_STEPS.ACTIONS:
 			board.turn_step = GameBoard.TURN_STEPS.START
 			board.rollback_pending_selection_state()
@@ -71,7 +74,7 @@ func player_phase_menu_canceled() -> void:
 		GameBoard.TURN_STEPS.FORECAST_ATTACK:
 			board.activeUnit.restore_equip()
 			resume_targeting_for_active_action()
-		GameBoard.TURN_STEPS.ATTACK_TARGET, GameBoard.TURN_STEPS.SKILL_TARGET, GameBoard.TURN_STEPS.ITEM_TARGET, GameBoard.TURN_STEPS.TRADE_TARGET:
+		GameBoard.TURN_STEPS.ATTACK_TARGET, GameBoard.TURN_STEPS.SKILL_TARGET, GameBoard.TURN_STEPS.ITEM_TARGET, GameBoard.TURN_STEPS.TRADE_TARGET, GameBoard.TURN_STEPS.DOOR_TARGET:
 			board._end_targeting()
 
 

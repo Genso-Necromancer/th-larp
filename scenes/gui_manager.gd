@@ -382,6 +382,10 @@ func _connect_action_menu_signals():
 		actMenu.suspend_requested.connect(_on_action_menu_suspend_requested)
 	if not actMenu.menu_canceled.is_connected(_on_action_menu_canceled_relay):
 		actMenu.menu_canceled.connect(_on_action_menu_canceled_relay)
+	if not actMenu.weapon_confirmed.is_connected(_on_action_menu_weapon_confirmed):
+		actMenu.weapon_confirmed.connect(_on_action_menu_weapon_confirmed)
+	if not actMenu.skill_confirmed.is_connected(_on_action_menu_skill_confirmed):
+		actMenu.skill_confirmed.connect(_on_action_menu_skill_confirmed)
 
 func _on_action_menu_move_selected() -> void: ui_move_selected.emit()
 
@@ -408,6 +412,12 @@ func _on_action_menu_seize_selected(cell) -> void: ui_seize_selected.emit(cell)
 func _on_action_menu_suspend_requested() -> void: ui_suspend_requested.emit()
 
 func _on_action_menu_canceled_relay() -> void: ui_action_menu_canceled.emit()
+
+func _on_action_menu_weapon_confirmed(button) -> void:
+	_on_weapon_selected(button)
+
+func _on_action_menu_skill_confirmed() -> void:
+	_on_gameboard_forecast_confirmed()
 #endregion
 
 #region SetUp Buttons
@@ -812,6 +822,8 @@ func _on_gameboard_targeting_canceled():
 
 func _on_gameboard_ui_return(state:GameBoard.TURN_STEPS):
 	match state:
+		GameBoard.TURN_STEPS.OPTIONS:
+			GameState.change_state(GRANDDAD.gameBoard, GameState.gState.GB_DEFAULT)
 		GameBoard.TURN_STEPS.FORECAST_ATTACK:
 			_show_hud()
 			foreCast.hide_fc()

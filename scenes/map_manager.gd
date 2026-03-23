@@ -58,8 +58,6 @@ func shift_to_next_map():
 
 func _connect_signals()-> void:
 	SignalTower.inventory_weapon_changed.connect(gameBoard._on_inventory_weapon_changed)
-	SignalTower.action_weapon_selected.connect(gameBoard._on_action_weapon_selected)
-	SignalTower.action_skill_confirmed.connect(gameBoard._on_action_weapon_selected)
 	SignalTower.returning_to_title.connect(self._on_returning_to_title)
 	SignalTower.chest_opened.connect(self._on_chest_opened)
 	SignalTower.chest_stolen.connect(self._on_chest_stolen)
@@ -78,6 +76,7 @@ func _connect_signals()-> void:
 	gameBoard.action_confirmed.connect(guiManager._on_gameboard_action_confirmed)
 	gameBoard.deployment_count_updated.connect(guiManager._on_gameboard_deploy_count_updated)
 	gameBoard.formation_closed.connect(guiManager._on_gameboard_formation_closed)
+	gameBoard.cell_selected.connect(guiManager._on_gameboard_cell_selected)
 	gameBoard.unit_selected.connect(guiManager._on_gameboard_unit_selected)
 	gameBoard.ui_returned.connect(guiManager._on_gameboard_ui_return)
 	gameBoard.state_changed.connect(guiManager.DEBUG._on_gb_state_changed)

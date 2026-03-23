@@ -16,6 +16,8 @@ signal door_selected
 signal seize_selected(cell)
 signal suspend_requested
 signal menu_canceled
+signal weapon_confirmed(button)
+signal skill_confirmed
 
 enum MENU_STATES {NONE, OPTIONS, ACTION,ACTION2, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE, OFUDA_OPEN, OFUDA_TARGETING, SUSPEND_PROMPT, SUSPENDING, DOOR}
 @onready var aContainer : MarginContainer = $ScreenMargin/ActionBackgroundMargin
@@ -166,7 +168,7 @@ func _on_weapon_focus_entered(weapon):
 	
 func _on_weapon_pressed(weapon):
 	_close_self()
-	SignalTower.emit_signal("action_weapon_selected", weapon)
+	weapon_confirmed.emit(weapon)
 
 
 func _swap_to_skills():
@@ -282,9 +284,6 @@ func _switch_to_save_warning():
 
 func _on_skill_pressed(sButton : Control):
 	var skill = sButton.get_meta("ID")
-	# Legacy compatibility
-	Global.activeSkill = skill
-	# New intent signal
 	skill_selected.emit(skill)
 	_change_state(MENU_STATES.SKILL_TARGETING)
 
@@ -412,7 +411,7 @@ func _clear_states(suppress_cancel := false):
 
 func _on_skill_confirm_pressed():
 	_clear_states(true)
-	SignalTower.emit_signal("action_skill_confirmed")
+	skill_confirmed.emit()
 
 
 func _on_suspend_confirm_button_pressed(_button):

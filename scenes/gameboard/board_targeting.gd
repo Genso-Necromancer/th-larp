@@ -42,8 +42,6 @@ func start_skill_targeting(skill = null) -> void:
 		return
 	var active_skill = skill
 	if active_skill == null:
-		active_skill = Global.activeSkill
-	if active_skill == null:
 		return
 
 	board.turn_step = GameBoard.TURN_STEPS.SKILL_TARGET
