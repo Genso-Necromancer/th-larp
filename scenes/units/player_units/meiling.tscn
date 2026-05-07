@@ -31,7 +31,7 @@ total_stats = Dictionary[StringName, int]({
 &"Comp": 100,
 &"Def": 8,
 &"Eleg": 8,
-&"Life": 20,
+&"Life": 22,
 &"Mag": 0,
 &"Move": 4,
 &"Pwr": 8
@@ -39,7 +39,7 @@ total_stats = Dictionary[StringName, int]({
 total_caps = Dictionary[StringName, int]({
 &"Cele": 20,
 &"Cha": 20,
-&"Comp": 20,
+&"Comp": 100,
 &"Def": 20,
 &"Eleg": 20,
 &"Life": 20,

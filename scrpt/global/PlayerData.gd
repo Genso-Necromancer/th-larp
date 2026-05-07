@@ -78,6 +78,10 @@ func load_persistant(data:Dictionary):
 	supplyStats = data.SupplyStats
 	unitData = data.UnitData
 	_id_tag = data._id_tag
+	current_chapter = data.get("current_chapter", "")
+	chapter_title = data.get("chapter_title", "")
+	chapter_number = int(data.get("chapter_number", 0))
+	completed_chapters.clear()
 	for chapter in data.completed_chapters:
 		completed_chapters.append(chapter)
 

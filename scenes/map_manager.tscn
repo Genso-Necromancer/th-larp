@@ -15,7 +15,7 @@ position = Vector2(0, 0)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
-follow_viewport_scale = 0.001
+layer = 10
 
 [node name="GUIManager" parent="CanvasLayer" instance=ExtResource("2_3ng14")]
 unique_name_in_owner = true

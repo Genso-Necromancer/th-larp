@@ -1,0 +1,79 @@
+[gd_scene load_steps=12 format=3 uid="uid://bgq1asahykl5v"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_wcu6e"]
+[ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_b50ed"]
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="3_q6f5j"]
+[ext_resource type="Resource" uid="uid://crihx615imauw" path="res://unit_resources/items/weapons/gohei_simple.tres" id="4_4sp0s"]
+[ext_resource type="Script" uid="uid://dtxt6i4bhoqpo" path="res://unit_resources/items/ofuda/ofuda.gd" id="5_kvfh0"]
+[ext_resource type="Resource" uid="uid://i6gxwkej1jxe" path="res://unit_resources/items/ofuda/ofuda_heal0.tres" id="6_8jgdb"]
+[ext_resource type="Resource" uid="uid://d17h2pq3fv73i" path="res://unit_resources/items/ofuda/ofuda_def_buff.tres" id="7_gvtv8"]
+[ext_resource type="Texture2D" uid="uid://bunquxc20pmor" path="res://sprites/character/human/miko_sprite.png" id="8_q6f5j"]
+
+[sub_resource type="Resource" id="Resource_5gngb"]
+script = ExtResource("3_q6f5j")
+stats = ExtResource("4_4sp0s")
+equipped = true
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[sub_resource type="Resource" id="Resource_uv3gg"]
+script = ExtResource("5_kvfh0")
+stats = ExtResource("6_8jgdb")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://dtxt6i4bhoqpo"
+
+[sub_resource type="Resource" id="Resource_16aur"]
+script = ExtResource("5_kvfh0")
+stats = ExtResource("7_gvtv8")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://dtxt6i4bhoqpo"
+
+[node name="human_miko_lv1" instance=ExtResource("1_wcu6e")]
+archetype = 3
+ai_role = 3
+SPEC_ID = 2
+ROLE_ID = 6
+total_stats = Dictionary[StringName, int]({
+&"Cele": 8,
+&"Cha": 8,
+&"Comp": 100,
+&"Def": 6,
+&"Eleg": 8,
+&"Life": 20,
+&"Mag": 5,
+&"Move": 4,
+&"Pwr": 7
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 20,
+&"Cha": 20,
+&"Comp": 100,
+&"Def": 20,
+&"Eleg": 20,
+&"Life": 20,
+&"Mag": 20,
+&"Move": 10,
+&"Pwr": 20
+})
+weapon_prof = {
+"Blade": false,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": true,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": true,
+"Stick": false
+}
+max_inv = 6
+inventory = Array[ExtResource("2_b50ed")]([SubResource("Resource_5gngb"), SubResource("Resource_uv3gg"), SubResource("Resource_16aur")])
+
+[node name="Sprite" parent="PathFollow2D" index="0"]
+texture = ExtResource("8_q6f5j")

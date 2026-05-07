@@ -5,8 +5,9 @@ class_name ChapterClock
 @onready var m_bone:Bone2D = $Skeleton2D/center/mHand
 @onready var h_bone:Bone2D = $Skeleton2D/center/hHand
 @onready var sun_dial:Bone2D = $Skeleton2D/center/SunDial
-@onready var time_box:DigitalDisplay = $Assets/Digital/TimeBox
+@onready var time_box:DigitalDisplay = $Skeleton2D/center/Hangers/Digital/TimeBox
 var saved_time:float = 0.0
+var _clock_ready := false
 
 #debug values
 var debug_start:Dictionary[String,int] = {"Hours":0,"Minutes":0,"Seconds":0}
@@ -14,7 +15,9 @@ var debug_advance:Dictionary[String,int] = {"Hours":0,"Minutes":40,"Seconds":0}
 
 func _ready():
 	visible = false
+	_clock_ready = true
 	SignalTower.time_changed.connect(self.advance_clock)
+	call_deferred("_sync_clock_display")
 	hide_clock()
 	#grab_focus()
 	
@@ -40,9 +43,12 @@ func hide_clock():
 func show_clock():
 	visible = true
 	clock_player.play("enter")
+	call_deferred("_sync_clock_display")
 
 
 func advance_clock(game_time:Dictionary[String,int]):
+	if not _clock_ready or time_box == null:
+		return
 	time_box.set_time(game_time)
 	_progress_clock_hands(game_time)
 	
@@ -104,6 +110,8 @@ func _rotate_bone(weight:float,bone:Bone2D,rot:float):
 
 
 func set_time(game_time:Dictionary[String,int]):
+	if not _clock_ready or time_box == null:
+		return
 	time_box.set_time(game_time)
 	var minutes:float = float(game_time.Minutes)
 	var hours:float = float(game_time.Hours)
@@ -115,6 +123,12 @@ func set_time(game_time:Dictionary[String,int]):
 	m_bone.rotation = minuteRot
 	h_bone.rotation = hourRot
 	sun_dial.rotation = dayRot
+
+
+func _sync_clock_display():
+	if not _clock_ready or time_box == null:
+		return
+	set_time(Global.game_time)
 	
 
 

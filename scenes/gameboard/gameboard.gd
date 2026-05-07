@@ -1,14 +1,6 @@
 extends Node
 class_name GameBoard
 
-#New Control Functions
-# _connect_signals
-# _connect_gui_signals
-# _set_active_action
-# _begin_targeting_for_active_action
-
-
-
 signal map_loaded(map:GameMap)
 signal map_added(map:GameMap)
 #turn/round signal
@@ -36,11 +28,10 @@ signal action_confirmed
 #debug signals
 signal state_changed(state_keys:Array,state)
 signal step_changed(step_keys:Array,step)
-#added to make things run, not sure if needed
+signal player_flow_changed(flow_keys:Array,flow)
 signal aimove_finished
 signal gameboard_targeting_canceled
 signal map_freed
-#signal action_confirmed #Bandaid signal to close the action menu after targeted things like opening a door
 
 
 enum STATES {IDLE,LOADING,FORMATION,ROUND_END,NEW_TURN,PLAYER_PHASE,NPC_PHASE,ENEMY_PHASE,END_MAP,GAME_OVER,VICTORY}
@@ -48,6 +39,7 @@ var state:STATES = STATES.IDLE:
 	set(value):
 		state = value
 		state_changed.emit(STATES.keys(),value)
+		_sync_player_flow_from_turn_step()
 var save_enum:Enums.SAVE_TYPE = Enums.SAVE_TYPE.NONE
 
 #combat results
@@ -71,6 +63,100 @@ func get_last_combat_results() -> CombatResults:
 
 func get_action_context() -> Dictionary:
 	return action_context
+
+
+func is_targeting_step(step: TURN_STEPS = turn_step) -> bool:
+	match step:
+		TURN_STEPS.ATTACK_TARGET, TURN_STEPS.SKILL_TARGET, TURN_STEPS.ITEM_TARGET, TURN_STEPS.DOOR_TARGET, TURN_STEPS.TRADE_TARGET:
+			return true
+		_:
+			return false
+
+
+func is_move_preview_step(step: TURN_STEPS = turn_step) -> bool:
+	match step:
+		TURN_STEPS.MOVE_SEEK, TURN_STEPS.UNIT_MOVING:
+			return true
+		_:
+			return false
+
+
+func is_post_move_step(step: TURN_STEPS = turn_step) -> bool:
+	return step == TURN_STEPS.ACTIONS and PlayerData.move_committed
+
+
+func is_segmented_move_preview() -> bool:
+	return turn_step == TURN_STEPS.MOVE_SEEK and !unit_path.path_array.is_empty()
+
+
+func is_cursor_free_step(step: TURN_STEPS = turn_step) -> bool:
+	match step:
+		TURN_STEPS.START, TURN_STEPS.MOVE_SEEK:
+			return true
+		_:
+			return is_targeting_step(step)
+
+
+func is_options_menu_active() -> bool:
+	return turn_step == TURN_STEPS.OPTIONS
+
+
+func is_post_move_menu_active() -> bool:
+	return PlayerData.move_committed or is_post_move_step()
+
+
+func get_action_menu_moved_state() -> bool:
+	return is_post_move_menu_active()
+
+
+func restore_post_target_turn_step() -> void:
+	turn_step = _get_post_target_menu_step()
+
+
+func get_targeting_game_state() -> GameState.gState:
+	match turn_step:
+		TURN_STEPS.ATTACK_TARGET:
+			return GameState.gState.GB_ATTACK_TARGETING
+		TURN_STEPS.SKILL_TARGET:
+			return GameState.gState.GB_SKILL_TARGETING
+		TURN_STEPS.ITEM_TARGET:
+			return GameState.gState.GB_ITEM_TARGETING
+		TURN_STEPS.TRADE_TARGET:
+			return GameState.gState.GB_TRADE_TARGETING
+		TURN_STEPS.DOOR_TARGET:
+			return GameState.gState.GB_OBJECT_TARGETING
+		_:
+			return GameState.gState.GB_DEFAULT
+
+
+func apply_default_control_state() -> void:
+	if GameState:
+		GameState.change_state(self, GameState.gState.GB_DEFAULT)
+
+
+func apply_action_menu_control_state() -> void:
+	if GameState:
+		GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
+
+
+func apply_targeting_control_state() -> void:
+	if GameState:
+		GameState.change_state(self, get_targeting_game_state())
+
+
+func apply_forecast_control_state() -> void:
+	if GameState:
+		GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
+
+
+func apply_scene_control_state() -> void:
+	if GameState:
+		GameState.change_state(self, GameState.gState.SCENE_ACTIVE)
+
+
+func apply_formation_control_state() -> void:
+	if GameState:
+		GameState.change_state(self, GameState.gState.GB_FORMATION)
 
 
 func _set_action_actor(unit: Unit) -> void:
@@ -168,7 +254,8 @@ var focusDanmaku:Danmaku:
 		focusDanmaku = value
 		Global.focusDanmaku = focusDanmaku
 #turns/rounds
-enum TURN_STEPS {STAND_BY,PROCESSING,START,END_PHASE,END,OPTIONS,ACTIONS,MOVE_SEEK,MOVE_REMAINING,UNIT_MOVING,MOVE_END,ACTIONS2,AI_ACT,ITEM_QUEUED,ITEM_ANIMATION,ITEM_TARGET,ATTACK_TARGET,DOOR_TARGET,TRADE_TARGET,SKILL_TARGET,FORECAST_ATTACK,COMBAT_DISPLAY,EFFECT_QUEUE,BAR_ANIM,EVENT_QUEUE,EXP_GRANT,CANTO}
+enum TURN_STEPS {STAND_BY,PROCESSING,START,END_PHASE,END,OPTIONS,ACTIONS,MOVE_SEEK,UNIT_MOVING,AI_ACT,ITEM_QUEUED,ITEM_ANIMATION,ITEM_TARGET,ATTACK_TARGET,DOOR_TARGET,TRADE_TARGET,SKILL_TARGET,FORECAST_ATTACK,COMBAT_DISPLAY,EFFECT_QUEUE,BAR_ANIM,EVENT_QUEUE,EXP_GRANT,CANTO}
+enum PLAYER_FLOW {IDLE,UNIT_SELECTED,MOVE_PREVIEW,POST_MOVE_MENU,TARGETING,FORECAST,RESOLVING}
 enum AI_STEPS {STAND_BY,PROCESSING,START,EVALUATE,PROCESS_TURN,SELECT_UNIT,MOVE_UNIT}
 enum ROUND_STEPS {CHECK,DANMAKU,SCENE,REINFORCE,END,}
 var last_step:TURN_STEPS
@@ -177,12 +264,17 @@ var turn_step:TURN_STEPS = TURN_STEPS.STAND_BY:
 		last_step = turn_step
 		turn_step = value
 		step_changed.emit(TURN_STEPS.keys(),value)
+		_sync_player_flow_from_turn_step()
+var player_flow:PLAYER_FLOW = PLAYER_FLOW.IDLE:
+	set(value):
+		player_flow = value
+		player_flow_changed.emit(PLAYER_FLOW.keys(), value)
 var ai_step:AI_STEPS = AI_STEPS.STAND_BY
 var round_step:ROUND_STEPS = ROUND_STEPS.CHECK:
 	set(value):
 		round_step = value
 		step_changed.emit(ROUND_STEPS.keys(),value)
-var item_queue:Dictionary={"Item":false,"Results":false,}
+var pending_item_action:Dictionary={"Item":false,"Results":false,}
 var turn_order:Array[StringName]
 var turn_counter:int = 0
 var early_end:bool = false
@@ -196,12 +288,22 @@ var bar_queue:= []
 var cam_con:CameraController
 #AI
 var ai_target:Unit
+var pending_ai_action: Action
 #deployment
 var stored_unit : Unit
 var stored_cell : Vector2i = Vector2i(-1,-1)
 #Queued events
 var exp_events:Array[Dictionary] = []
-var active_died:bool = true
+var active_died:bool = false
+var hp_bar_visibility_before_event_zoom := true
+var hp_bar_visibility_captured := false
+var door_zoom_complete_callable: Callable
+var door_conclude_callable: Callable
+var ai_return_cursor_cell : Vector2i = Vector2i(-1, -1)
+const AI_PRESENTATION_PAN_SPEED := 0.35
+const AI_PRESENTATION_PREVIEW_DELAY := 0.22
+const AI_PRESENTATION_PRE_ACTION_DELAY := 0.18
+const AI_PRESENTATION_POST_ACTION_DELAY := 0.2
 
 #GUI
 var guiManager:GUIManager:
@@ -212,17 +314,49 @@ var guiManager:GUIManager:
 var player_action_controller: PlayerActionController
 var board_targeting: BoardTargeting
 var board_unit_registry: BoardUnitRegistry
+var board_turn_flow: BoardTurnFlow
+var board_event_resolver: BoardEventResolver
+
+
+func get_player_flow() -> PLAYER_FLOW:
+	return player_flow
+
+
+func _set_player_flow(value: PLAYER_FLOW) -> void:
+	player_flow = value
+
+
+func _sync_player_flow_from_turn_step() -> void:
+	if state != STATES.PLAYER_PHASE:
+		_set_player_flow(PLAYER_FLOW.IDLE)
+		return
+
+	if turn_step == TURN_STEPS.OPTIONS:
+		_set_player_flow(PLAYER_FLOW.UNIT_SELECTED)
+	elif turn_step == TURN_STEPS.ACTIONS:
+		if is_post_move_step():
+			_set_player_flow(PLAYER_FLOW.POST_MOVE_MENU)
+		else:
+			_set_player_flow(PLAYER_FLOW.UNIT_SELECTED)
+	elif is_move_preview_step():
+		_set_player_flow(PLAYER_FLOW.MOVE_PREVIEW)
+	elif is_targeting_step():
+		_set_player_flow(PLAYER_FLOW.TARGETING)
+	elif turn_step == TURN_STEPS.FORECAST_ATTACK:
+		_set_player_flow(PLAYER_FLOW.FORECAST)
+	elif turn_step in [TURN_STEPS.PROCESSING, TURN_STEPS.ITEM_QUEUED, TURN_STEPS.ITEM_ANIMATION, TURN_STEPS.COMBAT_DISPLAY, TURN_STEPS.EFFECT_QUEUE, TURN_STEPS.BAR_ANIM]:
+		_set_player_flow(PLAYER_FLOW.RESOLVING)
+	else:
+		_set_player_flow(PLAYER_FLOW.IDLE)
 
 #region init/ready/process
-func _init():
-	pass
-
-
 func _ready():
 	if !cam_con: cam_con = CameraController.new(get_viewport())
 	player_action_controller = PlayerActionController.new(self)
 	board_targeting = BoardTargeting.new(self)
 	board_unit_registry = BoardUnitRegistry.new(self)
+	board_turn_flow = BoardTurnFlow.new(self)
+	board_event_resolver = BoardEventResolver.new(self)
 	_connect_signals()
 
 
@@ -255,18 +389,12 @@ func _check_step():
 		STATES.ROUND_END: _check_eor_events()
 
 
-func _match_step(step):
-	pass
-#endregion
-
-
 #region signal connection
 func _connect_signals():
 	_connect_general_signals()
 	_connect_gui_signals()
 
 func _connect_general_signals():
-	#self.gb_ready.connect(GameState.set_new_state)
 	cursor.cursor_moved.connect(self._on_cursor_moved)
 	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
 
@@ -313,7 +441,6 @@ func load_map(map:String, save_data:Dictionary={}):
 
 func free_map()->void:
 	reset_flags()
-	#turnComplete = false # find a better place to reinitialize this and above value HERE
 	PlayerData.purge_npc_data()
 	if current_map:
 		current_map.queue_free()
@@ -330,8 +457,6 @@ func _on_map_loaded():
 func _load_units():
 	if !unit_loader:
 		unit_loader = UnitLoader.new(self,save_enum,current_map)
-		#unit_loader.master = self
-		#unit_loader.save_enum = save_enum
 		add_child(unit_loader)
 	unit_loader.unit_removed.connect(self._remove_from_grid)
 	unit_loader.units_loaded.connect(self._on_units_loaded)
@@ -344,8 +469,6 @@ func _on_unit_ready(unit:Unit)->void:
 	if unit.FACTION_ID != Enums.FACTION_ID.PLAYER: return
 	if !unit_loader: 
 		unit_loader = UnitLoader.new(self,save_enum,current_map)
-		#unit_loader.master = self
-		#unit_loader.save_enum = save_enum
 	unit_loader.post_load_unit(unit)
 
 
@@ -383,98 +506,357 @@ func check_passives():
 		units[unit].check_passives()
 
 
-func _update_unit_terrain(unit:Unit): #HERE BROKEN
+func _update_unit_terrain(unit:Unit):
 	unit.update_terrain_data()
 
 
 func _move_active_unit(new_cell: Vector2i, set_path:Array[Vector2i]= []) -> void: #pathing related
 	# Updates the units dictionary with the target position for the unit and asks the activeUnit to walk to it.
-#	print("move_active: ", new_cell)
 	var path = null
-	var ai:bool
-	if state == STATES.PLAYER_PHASE: ai = false
-	else: ai = true
+	var is_ai_turn := state != STATES.PLAYER_PHASE
 	turn_step = TURN_STEPS.UNIT_MOVING
-	if !new_cell == activeUnit.cell and !ai:
+	if !new_cell == activeUnit.cell and !is_ai_turn:
 		if is_occupied(new_cell) or not new_cell in walkable_cells: return
-	
-	#if !enemy:
-		#GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
 	current_map.pathAttack.clear()
 	if !new_cell == activeUnit.cell:
-		#print("it's walkable")
 		board_unit_registry.relocate_unit(activeUnit.cell, new_cell, activeUnit)
-		if !ai:
+		if !is_ai_turn:
 			path = unit_path.current_path
 		else:
-			path = set_path
+			path = PackedVector2Array(set_path)
 		activeUnit.walk_along(path,true)
-		#unit_moving = true
-		#await activeUnit.walk_finished
 
 
 func _on_unit_walk_finished():
 	_unit_at_destination()
-	#if state == STATES.PLAYER_PHASE:
-		#unit_move_ended.emit(activeUnit)
-	#else:
-		#turn_step = TURN_STEPS.AI_ACT
-		#aimove_finished.emit()
 
 
 func _unit_at_destination():
 	unit_path.clear_path()
-	PlayerData.move_committed = true
-	turn_step = TURN_STEPS.MOVE_END
+	if (state == STATES.ENEMY_PHASE or state == STATES.NPC_PHASE) and pending_ai_action != null:
+		_continue_ai_action_after_move()
+		return
+	if PlayerData.canto_triggered:
+		_wipe_region()
+		PlayerData.canto_triggered = false
+		PlayerData.move_committed = true
+		turn_step = TURN_STEPS.END_PHASE
+	else:
+		PlayerData.move_committed = true
+		turn_step = TURN_STEPS.ACTIONS
+		unit_move_ended.emit(activeUnit)
 
 
 func _start_canto():
-	turn_step = TURN_STEPS.PROCESSING
-	PlayerData.canto_triggered = false
-	#this will set off the canto features later. for now just skips over self and resolves trigger
-	turn_step = TURN_STEPS.END_PHASE
+	if activeUnit == null or activeUnit.remaining_move <= 0:
+		PlayerData.canto_triggered = false
+		turn_step = TURN_STEPS.END
+		return
+	turn_step = TURN_STEPS.MOVE_SEEK
+	unit_path.clear_path()
+	_update_walkable_range(activeUnit.remaining_move)
 #endregion
 
 
 #region AI functions
+func _get_current_ai_faction() -> Enums.FACTION_ID:
+	match state:
+		STATES.ENEMY_PHASE:
+			return Enums.FACTION_ID.ENEMY
+		STATES.NPC_PHASE:
+			return Enums.FACTION_ID.NPC
+		_:
+			return Enums.FACTION_ID.NONE
+
+
+func begin_ai_phase_action() -> void:
+	if turn_step != TURN_STEPS.START:
+		return
+	turn_step = TURN_STEPS.PROCESSING
+	if ai == null:
+		print("[AI] No AI manager present on map.")
+		turn_step = TURN_STEPS.END
+		return
+
+	var faction := _get_current_ai_faction()
+	if faction == Enums.FACTION_ID.NONE:
+		print("[AI] No active AI faction for state: ", STATES.keys()[state])
+		turn_step = TURN_STEPS.END
+		return
+
+	print("[AI] Begin phase action for faction: ", Enums.FACTION_ID.keys()[faction])
+	var choice := ai.get_best_executable_action(faction)
+	if choice.is_empty():
+		print("[AI] No executable action chosen. Ending AI phase step.")
+		turn_step = TURN_STEPS.END
+		return
+
+	var action: Action = choice.get("action", null)
+	var unit_id := String(choice.get("unit_id", ""))
+	var actor :Unit= unit_refs.get(unit_id, null)
+	if actor == null:
+		print("[AI] Chosen actor missing from unit_refs: ", unit_id)
+		turn_step = TURN_STEPS.END
+		return
+	if actor.check_status("Acted"):
+		print("[AI] Chosen actor already acted: ", unit_id)
+		turn_step = TURN_STEPS.END
+		return
+
+	activeUnit = actor
+	_set_action_actor(actor)
+	_snapshot_active_unit_equipment()
+	pending_ai_action = action
+	activeUnit.isSelected = true
+	print("[AI] Selected unit ", actor.unit_id, " at ", actor.cell, " | action=", Action.ACTION_TYPE.keys()[int(action.type)], " | from=", action.from_cell, " | target_cell=", action.target_cell, " | target_unit=", action.target_unit_id)
+
+	var launch_cell := actor.cell
+	if action != null:
+		match action.type:
+			Action.ACTION_TYPE.MOVE, Action.ACTION_TYPE.CANTO:
+				launch_cell = action.target_cell
+			_:
+				launch_cell = action.from_cell
+	await _present_ai_action(actor, action, launch_cell)
+	if action != null and launch_cell != Vector2i.ZERO and launch_cell != actor.cell:
+		print("[AI] Moving to launch cell: ", launch_cell)
+		var move_path :Array[Vector2i]= get_path_to_cell(actor.cell, launch_cell, actor)
+		_move_active_unit(launch_cell, move_path)
+	else:
+		_continue_ai_action_after_move()
+
+
+func _continue_ai_action_after_move() -> void:
+	if pending_ai_action == null or activeUnit == null:
+		print("[AI] Missing pending action or active unit after move.")
+		turn_step = TURN_STEPS.END
+		return
+
+	var action := pending_ai_action
+	await get_tree().create_timer(AI_PRESENTATION_PRE_ACTION_DELAY).timeout
+	print("[AI] Executing action: ", Action.ACTION_TYPE.keys()[int(action.type)], " for ", activeUnit.unit_id)
+	match action.type:
+		Action.ACTION_TYPE.MOVE, Action.ACTION_TYPE.WAIT:
+			unit_wait()
+		Action.ACTION_TYPE.ATTACK:
+			var target: Unit = unit_refs.get(String(action.target_unit_id), null)
+			if target == null:
+				print("[AI] Attack target missing for action.")
+				turn_step = TURN_STEPS.END
+				return
+			_set_active_action(true, null, null)
+			_begin_ai_forecast_sequence(target)
+		Action.ACTION_TYPE.SKILL_HOSTILE:
+			var skill_target := _resolve_ai_action_target(action)
+			if skill_target == null:
+				print("[AI] Skill target missing for action.")
+				turn_step = TURN_STEPS.END
+				return
+			var live_skill := _resolve_live_skill_for_action(action.skill, activeUnit)
+			if live_skill == null:
+				print("[AI] Skill payload could not be resolved for hostile skill action.")
+				turn_step = TURN_STEPS.END
+				return
+			_set_active_action(live_skill.augment, live_skill, null)
+			_begin_ai_forecast_sequence(skill_target)
+		Action.ACTION_TYPE.SKILL_FRIENDLY:
+			var support_target := _resolve_ai_action_target(action)
+			if support_target == null:
+				print("[AI] Friendly skill target missing for action.")
+				turn_step = TURN_STEPS.END
+				return
+			var live_support_skill := _resolve_live_skill_for_action(action.skill, activeUnit)
+			if live_support_skill == null:
+				print("[AI] Skill payload could not be resolved for friendly skill action.")
+				turn_step = TURN_STEPS.END
+				return
+			_set_active_action(live_support_skill.augment, live_support_skill, null)
+			_begin_ai_forecast_sequence(support_target)
+		Action.ACTION_TYPE.USE_ITEM:
+			var item_target := _resolve_ai_action_target(action)
+			if item_target == null:
+				print("[AI] Item target missing for action.")
+				turn_step = TURN_STEPS.END
+				return
+			var live_item := _resolve_live_item_for_action(action.item, activeUnit)
+			if live_item == null:
+				print("[AI] Item payload could not be resolved for action.")
+				turn_step = TURN_STEPS.END
+				return
+			_set_active_action(false, null, live_item)
+			_begin_ai_forecast_sequence(item_target)
+		Action.ACTION_TYPE.DOOR:
+			if current_map != null and current_map.doors.has(action.target_cell):
+				turn_step = TURN_STEPS.PROCESSING
+				ai_target = null
+				activeUnit.pick_door(current_map.doors[action.target_cell])
+			else:
+				turn_step = TURN_STEPS.END
+		_:
+			print("[AI] Unsupported action reached live executor: ", Action.ACTION_TYPE.keys()[int(action.type)])
+			turn_step = TURN_STEPS.END
+
+
+func finalize_ai_phase_action() -> void:
+	if activeUnit != null:
+		print("[AI] Finalizing action for ", activeUnit.unit_id, " at ", activeUnit.cell)
+		activeUnit.originCell = activeUnit.cell
+		activeUnit.isSelected = false
+		activeUnit.set_acted(true)
+	selection_equipment_snapshot.clear()
+	pending_ai_action = null
+	ai_target = null
+	_clear_active_unit()
+	_wipe_region()
+	current_map.pathAttack.clear()
+	await get_tree().create_timer(AI_PRESENTATION_POST_ACTION_DELAY).timeout
+
+
+func _resolve_ai_action_target(action: Action) -> Unit:
+	if action == null or activeUnit == null:
+		return null
+	var target_id := String(action.target_unit_id)
+	if target_id == "":
+		if action.target_cell == activeUnit.cell or action.target_cell == Vector2i.ZERO:
+			return activeUnit
+		return units.get(action.target_cell, null)
+	var target: Unit = unit_refs.get(target_id, null)
+	if target != null:
+		return target
+	if target_id == String(activeUnit.unit_id):
+		return activeUnit
+	return null
+
+
+func _begin_ai_forecast_sequence(target: Unit) -> void:
+	if activeUnit == null or target == null:
+		turn_step = TURN_STEPS.END
+		return
+
+	_set_action_target(target)
+	ai_target = target
+	var forecast: CombatResults = combatManager.get_forecast(activeUnit, target, active_action)
+	_set_action_forecast(forecast)
+	SignalTower.forecast_predicted.emit({
+		"results": get_last_forecast(),
+		"attacker_unit": activeUnit,
+		"defender_unit": target
+	})
+	target_focused.emit(2, [-1, -1])
+
+
+func _resolve_live_skill_for_action(skill_data, actor: Unit) -> Skill:
+	if actor == null or skill_data == null:
+		return null
+	if skill_data is Skill:
+		return skill_data
+	var desired_id := ""
+	var desired_path := ""
+	if typeof(skill_data) == TYPE_DICTIONARY:
+		desired_id = String(skill_data.get("id", ""))
+		desired_path = String(skill_data.get("path", skill_data.get("Properties", "")))
+	for skill in actor.skills:
+		if skill == null:
+			continue
+		if desired_id != "" and String(skill.id) == desired_id:
+			return skill
+		if desired_path != "" and String(skill.resource_path) == desired_path:
+			return skill
+	if desired_path != "" and ResourceLoader.exists(desired_path):
+		return load(desired_path) as Skill
+	return null
+
+
+func _resolve_live_item_for_action(item_data, actor: Unit) -> Consumable:
+	if actor == null or item_data == null:
+		return null
+	if item_data is Consumable:
+		return item_data
+	var desired_id := ""
+	var desired_path := ""
+	if typeof(item_data) == TYPE_DICTIONARY:
+		desired_id = String(item_data.get("id", ""))
+		desired_path = String(item_data.get("path", item_data.get("Properties", "")))
+	for item in actor.inventory:
+		if item == null or not (item is Consumable):
+			continue
+		if desired_id != "" and String(item.id) == desired_id:
+			return item as Consumable
+		if desired_path != "" and String(item.resource_path) == desired_path:
+			return item as Consumable
+	return null
+
+
+func _remember_player_cursor_view() -> void:
+	if cursor == null:
+		return
+	ai_return_cursor_cell = cursor.cell
+
+
+func _restore_player_cursor_view() -> void:
+	if cursor == null:
+		return
+	if ai_return_cursor_cell.x < 0 or ai_return_cursor_cell.y < 0:
+		_snap_cursor()
+		return
+	cursor.cell = ai_return_cursor_cell
+	await _pan_camera_to_cell(ai_return_cursor_cell, 0.45)
+	_warp_mouse_to_cursor()
+
+
+func _warp_mouse_to_cursor() -> void:
+	if cursor == null:
+		return
+	var mouse_warp := cursor.get_global_transform_with_canvas()
+	get_viewport().warp_mouse(mouse_warp.origin)
+
+
+func _pan_camera_to_cell(cell: Vector2i, speed: float = 0.35) -> void:
+	if cell.x < 0 or cell.y < 0:
+		return
+	if !cam_con:
+		cam_con = CameraController.new(get_viewport())
+	cam_con.move_camera_map(cell, speed, cam_con.camera.get_zoom(), Tween.TransitionType.TRANS_SINE, Tween.EaseType.EASE_IN_OUT)
+	await cam_con.camera_control_complete
+
+
+func _present_ai_action(actor: Unit, action: Action, launch_cell: Vector2i) -> void:
+	if actor == null or action == null:
+		return
+	await _pan_camera_to_cell(actor.cell, AI_PRESENTATION_PAN_SPEED)
+
+	var should_preview_move := launch_cell != Vector2i.ZERO and launch_cell != actor.cell
+	if not should_preview_move:
+		await get_tree().create_timer(AI_PRESENTATION_PREVIEW_DELAY).timeout
+		return
+
+	walkable_cells = get_walkable_cells(actor)
+	current_map.draw(walkable_cells)
+	await get_tree().create_timer(AI_PRESENTATION_PREVIEW_DELAY).timeout
+
+	var move_path :Array[Vector2i]= get_path_to_cell(actor.cell, launch_cell, actor)
+	if !move_path.is_empty():
+		unit_path.draw(move_path)
+
+	await _pan_camera_to_cell(launch_cell, AI_PRESENTATION_PAN_SPEED)
+	await get_tree().create_timer(AI_PRESENTATION_PRE_ACTION_DELAY).timeout
+	_wipe_region()
+	unit_path.clear_path()
 
 
 #endregion
 
 #region events
-func _run_event_queue()->void:
-	turn_step = TURN_STEPS.PROCESSING
-	current_map.check_map_completion()
-	if active_died: _resolve_active_death()
-	elif Global.meta_state == Global.META_STATES.GAME_OVER: turn_step = TURN_STEPS.END_PHASE
-	#check game over or victory
-	elif exp_events: turn_step = TURN_STEPS.EXP_GRANT
-	else: turn_step = TURN_STEPS.END_PHASE
+func _process_event_queue()->void:
+	board_event_resolver.process_event_queue()
 
 
-func _resolve_active_death():
-	active_died = false
-	match state:
-		STATES.PLAYER_PHASE: turn_step = TURN_STEPS.EVENT_QUEUE
-			#Enter a narrative scene playing state for the Unit's death, and then proceed with event queue
-		STATES.ENEMY_PHASE,STATES.NPC_PHASE: turn_step = TURN_STEPS.EVENT_QUEUE
-			#Like previous, check if narrative scene is tied to this character, and then proceed with event queue
+func _handle_active_unit_death():
+	board_event_resolver.handle_active_unit_death()
 
 
-func _resolve_exp():
-	turn_step = TURN_STEPS.PROCESSING
-	for event in exp_events:
-		var recip:Unit
-		var trig:Unit
-		match event.Type:
-			"Kill": 
-				recip = event.Killer
-				trig = event.Kill
-		if recip:
-			recip.add_exp(event.Type, trig)
-			await continue_turn
-	exp_events.clear()
-	turn_step = TURN_STEPS.EVENT_QUEUE
+func _process_exp_events():
+	await board_event_resolver.process_exp_events()
 #endregion
 
 
@@ -486,13 +868,13 @@ func on_unit_relocated(oldCell, newCell, unit): #updates unit locations with it'
 
 #region removal, death and bar updates of units
 func on_death_done(unit: Unit):
-	#Plan to alter this down the line for Seiga fight, where fallen units will be cached instead of completely removed
-	#Intention would be for Seiga to "reanimate" fallen units as part of her "danmaku"
-	#var addingExp = false
 	var killer:= unit.killer
+	if killer == null and action_context.Actor is Unit:
+		killer = action_context.Actor
+	if killer == null and activeUnit is Unit:
+		killer = activeUnit
 	if !killer: 
-		print("[Unit]on_death_done: invalid or null killer")
-		pass
+		push_warning("[Unit]on_death_done: invalid or null killer")
 	elif unit.FACTION_ID == Enums.FACTION_ID.ENEMY and killer.FACTION_ID == Enums.FACTION_ID.PLAYER:
 		exp_events.append({"Type":"Kill","Killer":killer,"Kill":unit})
 	add_to_death_list(unit)
@@ -510,7 +892,6 @@ func _wipe_dead():
 
 func _clear_unit(unit):
 	board_unit_registry.clear_unit(unit)
-	#clear non-player units from unitData HERE!!!
 
 
 func _remove_from_grid(unit: Unit):
@@ -529,18 +910,6 @@ func _remove_from_grid(unit: Unit):
 #region unit turn and action handling
 func on_turn_complete(unit):
 	pass
-	#and mainCon.state != GameState.GB_END_OF_ROUND
-	#PlayerData.save_unit_data()
-	#if sequencingUnits.has(unit):
-		#sequencingUnits[unit] = false
-	#else: return
-	#for u in sequencingUnits:
-		#if sequencingUnits[u]:
-			#return
-	#GameState.change_state(self, GameState.gState.LOADING)
-	#sequencingUnits.clear()
-	#_deselect_active_unit(true)
-	#turnComplete = true
 
 
 func _on_item_used(item:Item):
@@ -548,7 +917,7 @@ func _on_item_used(item:Item):
 	var targeting:Enums.SKILL_TARGET = item.target
 	#{NONE, SELF, ALLY, ENEMY, MAP, SELF_ALLY}
 	match targeting:
-		Enums.SKILL_TARGET.NONE: _unfuck_turn()
+		Enums.SKILL_TARGET.NONE: _advance_to_end_phase()
 		Enums.SKILL_TARGET.SELF: _self_use_item(item)
 		Enums.SKILL_TARGET.MAP: _map_use_item(item)
 		_: _target_use_item(item)
@@ -596,56 +965,53 @@ func _self_use_item(item: Item):
 		return
 	turn_step = TURN_STEPS.PROCESSING
 	var results: CombatResults = _resolve_item_action(activeUnit, activeUnit, consumable)
-	item_queue["Item"] = item
-	item_queue["Results"] = results
-	_unfuck_turn()
-	
-
-
-#func _play_item_results():
-	#var item:Item = item_queue.Item
-	#var results:Dictionary= item_queue.Results
-	#turn_step = TURN_STEPS.PROCESSING
-	#results.Actor.use_item(item)
-	#results.Target.receive_item(item)
-	#item_queue.clear()
+	pending_item_action["Item"] = item
+	pending_item_action["Results"] = results
 
 
 func _on_unit_animation_complete(_unit:Unit):
+	if turn_step == TURN_STEPS.ITEM_QUEUED and _unit == activeUnit:
+		turn_step = TURN_STEPS.END_PHASE
+		return
 	match last_step:
 		TURN_STEPS.DOOR_TARGET: 
-			cam_con.camera_control_complete.connect(self._door_conclude)
+			door_conclude_callable = Callable(self, "_door_conclude")
+			if cam_con.camera_control_complete.is_connected(door_conclude_callable):
+				cam_con.camera_control_complete.disconnect(door_conclude_callable)
+			cam_con.camera_control_complete.connect(door_conclude_callable)
 			reset_event_zoom()
 			
-		TURN_STEPS.ITEM_QUEUED: turn_step = TURN_STEPS.END_PHASE
-
-
 func _door_conclude():
-	cam_con.camera_control_complete.disconnect(self._door_conclude)
-	if hp_bar_vis: get_tree().set_group("HPBar", "visible", true)
+	if door_conclude_callable.is_valid() and cam_con.camera_control_complete.is_connected(door_conclude_callable):
+		cam_con.camera_control_complete.disconnect(door_conclude_callable)
+	door_conclude_callable = Callable()
+	if hp_bar_visibility_captured:
+		get_tree().set_group("HPBar", "visible", hp_bar_visibility_before_event_zoom)
+		hp_bar_visibility_captured = false
+	if guiManager != null:
+		guiManager._show_hud()
+		await get_tree().create_timer(1.0).timeout
 	turn_step = TURN_STEPS.END_PHASE
 
 
-func _map_use_item(item:Item):
+func _map_use_item(_item:Item):
 	pass
 
 
-func _target_use_item(item:Item):
+func _target_use_item(_item:Item):
 	pass
 
 
-func _apply_item(item:Consumable, unit:Unit, _target:Unit): #HERE Unfinished
+func _apply_item(item:Consumable, unit:Unit, _target:Unit):
 	var target := _target if _target != null else unit
 	if unit == null or target == null:
 		return
 	var results: CombatResults = _resolve_item_action(unit, target, item)
-	item_queue["Item"] = item
-	item_queue["Results"] = results
-	_unfuck_turn()
+	pending_item_action["Item"] = item
+	pending_item_action["Results"] = results
 #endregion
 
 #region targeting code
-#region newly added
 func _begin_targeting_for_active_action() -> void:
 	player_action_controller.begin_targeting_for_active_action()
 #endregion
@@ -677,8 +1043,8 @@ func seek_trade(unit: Unit = activeUnit) -> void:
 	board_targeting.seek_trade(unit)
 
 
-func _end_targeting():
-	board_targeting.end_targeting()
+func _end_targeting(emit_cancel := true):
+	board_targeting.end_targeting(emit_cancel)
 
 
 func end_targeting() -> void:
@@ -690,7 +1056,6 @@ func trade_target_selected() -> void:
 #endregion
 
 #region action code
-#NEW
 func _begin_attack_action() -> void:
 	player_action_controller.begin_attack_action()
 
@@ -720,14 +1085,8 @@ func gb_mouse_motion(_event):
 
 
 func _player_phase_mouse_motion(position:Vector2i):
-	match turn_step:
-		TURN_STEPS.START: cursor.cell = position
-		TURN_STEPS.MOVE_SEEK: cursor.cell = position
-		TURN_STEPS.MOVE_REMAINING: cursor.cell = position
-		TURN_STEPS.ATTACK_TARGET: cursor.cell = position
-		TURN_STEPS.DOOR_TARGET: cursor.cell = position
-		TURN_STEPS.TRADE_TARGET: cursor.cell = position
-		TURN_STEPS.SKILL_TARGET: cursor.cell = position
+	if is_cursor_free_step():
+		cursor.cell = position
 		
 
 
@@ -741,11 +1100,9 @@ func _cursor_toggle(enable, snapLeader = true):
 		_snap_cursor()
 
 
-func _snap_cursor(cell: Vector2i = _get_lady_cell()): #can be annoying to always have this tied to mouse, like before map starts.
+func _snap_cursor(cell: Vector2i = _get_lady_cell()):
 	cursor.cell = cell
 	var mouseWarp = cursor.get_global_transform_with_canvas()
-	#mouseWarp = to_global(mouseWarp)
-	print("Mouse Warp:", mouseWarp.origin)
 	get_viewport().warp_mouse(mouseWarp.origin)
 	cursor.align_camera()
 
@@ -756,12 +1113,13 @@ func _on_cursor_moved(new_cell: Vector2i) -> void: #Pathing
 	if units.has(new_cell) and units[new_cell] == null: units.erase(new_cell)
 	
 	if state != STATES.PLAYER_PHASE or !activeUnit or !activeUnit.isSelected: return
-	match turn_step:
-		TURN_STEPS.MOVE_SEEK: path = _draw_initial_path(new_cell)
-		TURN_STEPS.MOVE_REMAINING: path = _draw_segmented_path(new_cell)
-		_: 
-			unit_path.clear()
-			return
+	if turn_step != TURN_STEPS.MOVE_SEEK:
+		unit_path.clear()
+		return
+	if is_segmented_move_preview():
+		path = _draw_segmented_path(new_cell)
+	else:
+		path = _draw_initial_path(new_cell)
 	if path: unit_path.draw(path)
 
 
@@ -788,44 +1146,47 @@ func ui_return():
 		STATES.PLAYER_PHASE: _ui_return_player_phase()
 
 
+func regress_act_menu() -> void:
+	if guiManager != null:
+		guiManager.regress_act_menu()
+	else:
+		ui_return()
+
+
 func _get_post_target_menu_step() -> TURN_STEPS:
-	if PlayerData.move_committed:
-		return TURN_STEPS.ACTIONS2
 	return TURN_STEPS.ACTIONS
+
+
+func _cancel_targeting_step() -> void:
+	turn_step = _get_post_target_menu_step()
+	_end_targeting()
 
 
 func _ui_return_player_phase(): 
 	match turn_step:
 		TURN_STEPS.OPTIONS:
 			turn_step = TURN_STEPS.START
-		TURN_STEPS.ACTIONS, TURN_STEPS.ACTIONS2:
+		TURN_STEPS.ACTIONS:
 			ui_returned.emit(turn_step)
 		TURN_STEPS.MOVE_SEEK:
-			turn_step = TURN_STEPS.ACTIONS
-			_wipe_region()
-			#_snap_cursor(activeUnit.cell)
-			unit_selected.emit(activeUnit)
-		TURN_STEPS.MOVE_REMAINING:
-			_undo_segment()
-			#revert_partial_move()
+			if is_segmented_move_preview():
+				_undo_segment()
+			else:
+				if PlayerData.canto_triggered:
+					PlayerData.canto_triggered = false
+					_wipe_region()
+					turn_step = TURN_STEPS.END_PHASE
+				else:
+					turn_step = TURN_STEPS.ACTIONS
+					_wipe_region()
+					unit_selected.emit(activeUnit)
 		TURN_STEPS.ATTACK_TARGET:
-			turn_step = _get_post_target_menu_step()
-			_end_targeting()
+			_cancel_targeting_step()
 		TURN_STEPS.FORECAST_ATTACK:
 			turn_step = TURN_STEPS.ATTACK_TARGET
 			ui_returned.emit(TURN_STEPS.FORECAST_ATTACK)
-		TURN_STEPS.SKILL_TARGET:
-			turn_step = _get_post_target_menu_step()
-			_end_targeting()
-		TURN_STEPS.ITEM_TARGET:
-			turn_step = _get_post_target_menu_step()
-			_end_targeting()
-		TURN_STEPS.DOOR_TARGET:
-			turn_step = _get_post_target_menu_step()
-			_end_targeting()
-		TURN_STEPS.TRADE_TARGET:
-			turn_step = _get_post_target_menu_step()
-			_end_targeting()
+		_ when is_targeting_step():
+			_cancel_targeting_step()
 
 
 func toggle_unit_profile(): 
@@ -878,7 +1239,12 @@ func find_next_best_cell(currentCell, nextCell): #it's still pretty jank, but at
 #region camera functions
 func event_zoom():
 	if !cam_con: cam_con = CameraController.new(get_viewport())
-	if hp_bar_vis == true:
+	var hp_bars = get_tree().get_nodes_in_group("HPBar")
+	hp_bar_visibility_before_event_zoom = hp_bar_vis
+	if hp_bars.size() > 0:
+		hp_bar_visibility_before_event_zoom = hp_bars[0].visible
+	hp_bar_visibility_captured = true
+	if hp_bar_visibility_before_event_zoom:
 		get_tree().set_group("HPBar", "visible", false)
 	cursor.visible = false
 	cam_con.move_camera_unit(activeUnit.unit_id,0.7,Vector2(1.5,1.5),Tween.TransitionType.TRANS_BACK,Tween.EaseType.EASE_OUT)
@@ -898,7 +1264,7 @@ func _player_phase_select():
 	var cell :Vector2i = cursor.cell
 	match turn_step:
 		TURN_STEPS.START: _select_unit(cell)
-		TURN_STEPS.MOVE_SEEK,TURN_STEPS.MOVE_REMAINING: select_destination()
+		TURN_STEPS.MOVE_SEEK: select_destination()
 		TURN_STEPS.ATTACK_TARGET: attack_target_selected()
 		TURN_STEPS.DOOR_TARGET: door_target_selected()
 		TURN_STEPS.TRADE_TARGET: trade_target_selected()
@@ -910,31 +1276,33 @@ func door_target_selected():
 	if current_map.doors.has(cursor.cell):
 		turn_step = TURN_STEPS.PROCESSING
 		var dCell :Vector2i = cursor.cell
-		_end_targeting()
+		_end_targeting(false)
+		if guiManager != null:
+			guiManager._hide_hud()
 		action_confirmed.emit()
 		if !cam_con: cam_con = CameraController.new(get_viewport())
-		cam_con.camera_control_complete.connect(self._door_zoom_complete.bind(dCell))
+		door_zoom_complete_callable = Callable(self, "_door_zoom_complete").bind(dCell)
+		if cam_con.camera_control_complete.is_connected(door_zoom_complete_callable):
+			cam_con.camera_control_complete.disconnect(door_zoom_complete_callable)
+		cam_con.camera_control_complete.connect(door_zoom_complete_callable)
 		event_zoom()
 		
 
 
 func _door_zoom_complete(cell:Vector2i):
-	cam_con.camera_control_complete.disconnect(self._door_zoom_complete)
+	if door_zoom_complete_callable.is_valid() and cam_con.camera_control_complete.is_connected(door_zoom_complete_callable):
+		cam_con.camera_control_complete.disconnect(door_zoom_complete_callable)
+	door_zoom_complete_callable = Callable()
 	PlayerData.canto_triggered = true
 	activeUnit.pick_door(current_map.doors[cell])
 
 
-func object_target_selected() -> void:
-	door_target_selected()
-
-
 func _select_unit(cell: Vector2i) -> void:
-	# Selects the unit in the `cell` if there's one there.
 	var occupied :bool= is_occupied(cell)
 	if !occupied:
 		turn_step = TURN_STEPS.OPTIONS
 		cell_selected.emit(cell)
-	elif units[cell].FACTION_ID == Enums.FACTION_ID.ENEMY: return ##Put attack range activation here
+	elif units[cell].FACTION_ID == Enums.FACTION_ID.ENEMY: return
 	elif !units.has(cell) or units[cell].status.Acted: return
 	elif units[cell].FACTION_ID == Enums.FACTION_ID.PLAYER:
 		activeUnit = units[cell]
@@ -968,9 +1336,13 @@ func grab_target(cell):
 
 func move_selection(isAi := false):
 	turn_step = TURN_STEPS.MOVE_SEEK
+	unit_path.clear_path()
 	#_snap_cursor(activeUnit.cell)
-	walkable_cells = get_walkable_cells(activeUnit)
-	current_map.draw(walkable_cells)
+	if PlayerData.canto_triggered and activeUnit != null and activeUnit.remaining_move > 0:
+		_update_walkable_range(activeUnit.remaining_move)
+	else:
+		walkable_cells = get_walkable_cells(activeUnit)
+		current_map.draw(walkable_cells)
 	#if !isAi: GameState.change_state(self, GameState.gState.GB_SELECTED)
 
 
@@ -978,12 +1350,12 @@ func select_destination() -> void: #SELECTED STATE Pathing Related
 	var cell:Vector2i = cursor.cell
 	var isOccupied = is_occupied(cell)
 	var isWalkable = walkable_cells.has(cell)
-	var moveRemain :int = activeUnit.active_stats.Move - unit_path.path_array.size()
+	var available_move :int = activeUnit.remaining_move if PlayerData.canto_triggered else activeUnit.active_stats.Move
+	var moveRemain :int = available_move - unit_path.path_array.size()
 	if !isOccupied and isWalkable and moveRemain > 0 and !unit_path.path_array.has(cell):
 		unit_path.update_pathing_array(activeUnit,cell,current_map)
-		moveRemain = activeUnit.active_stats.Move - unit_path.path_array.size()
+		moveRemain = available_move - unit_path.path_array.size()
 		_update_walkable_range(moveRemain)
-		turn_step = TURN_STEPS.MOVE_REMAINING
 	elif cell == activeUnit.cell:
 		_unit_at_destination()
 	elif !isWalkable or isOccupied: return
@@ -1003,7 +1375,6 @@ func select_formation_cell():
 		stored_unit.isSelected = true
 	elif deploymentCells.has(cursor.cell) and is_occupied(cursor.cell):
 		_deploy_swap(stored_unit, units[cursor.cell])
-		# swap function here
 	elif deploymentCells.has(cursor.cell) and stored_cell != Vector2i(-1,-1):
 		stored_cell = cursor.cell
 	elif deploymentCells.has(cursor.cell):
@@ -1068,7 +1439,6 @@ func _on_gui_trade_selected(unit) -> void:
 	player_action_controller.on_gui_trade_selected(unit)
 
 func _on_gui_ofuda_selected(unit, ofuda) -> void:
-	# Legacy path for now; this should later become item-use intent handled from GameBoard.
 	if unit and ofuda and unit.has_method("use_item"):
 		unit.use_item(ofuda)
 
@@ -1079,7 +1449,6 @@ func _on_gui_seize_selected(cell) -> void:
 	player_action_controller.on_gui_seize_selected(cell)
 
 func _on_gui_suspend_requested() -> void:
-	# Leave suspend behavior unchanged for now
 	pass
 
 
@@ -1100,7 +1469,7 @@ func begin_chapter():
 	_cursor_toggle(true)
 	current_map.hide_deployment()
 	GameState.clear_state_lists()
-	GameState.change_state(self, GameState.gState.GB_DEFAULT)
+	apply_default_control_state()
 	_initialize_turns()
 	#call_deferred("set_process", true)
 #endregion
@@ -1129,11 +1498,52 @@ func _clear_player_action_flags():
 	PlayerData.traded = false
 	PlayerData.item_used = false
 	PlayerData.canto_triggered = false
+	active_died = false
 
 
-func _unfuck_turn():
-	print("[Gameboard/_unfuck_turn] Attempted undoable action. Ending Turn.")
+func _advance_to_end_phase():
 	turn_step = TURN_STEPS.END_PHASE
+
+
+func _actor_took_damage_in_last_results() -> bool:
+	var results: CombatResults = get_last_combat_results()
+	if results == null:
+		return false
+	var actor :Unit= action_context.get("Actor", null)
+	if actor == null:
+		return false
+	var actor_id := String(actor.unit_id)
+	for round in results.rounds:
+		for action in round.get("actions", []):
+			if String(action.get("target_id", "")) != actor_id:
+				continue
+			for swing in action.get("swings", []):
+				if not bool(swing.get("hit", false)):
+					continue
+				if int(swing.get("dmg", 0)) > 0:
+					return true
+				for event in swing.get("events_pre", []):
+					if String(event.get("type", "")) == "damage" and String(event.get("target_id", "")) == actor_id and int(event.get("amount", 0)) > 0:
+						return true
+				for event in swing.get("events_post", []):
+					if String(event.get("type", "")) == "damage" and String(event.get("target_id", "")) == actor_id and int(event.get("amount", 0)) > 0:
+						return true
+				for event in swing.get("events", []):
+					if String(event.get("type", "")) == "damage" and String(event.get("target_id", "")) == actor_id and int(event.get("amount", 0)) > 0:
+						return true
+	return false
+
+
+func update_canto_trigger_from_last_results() -> void:
+	if PlayerData.canto_triggered:
+		return
+	if activeUnit == null or not PlayerData.move_committed:
+		return
+	if not activeUnit.has_passive(Enums.PASSIVE_TYPE.CANTO):
+		return
+	if activeUnit.remaining_move <= 0:
+		return
+	PlayerData.canto_triggered = not _actor_took_damage_in_last_results()
 
 
 func _check_friendly(unit1, unit2, sameOnly:=false) ->bool:
@@ -1156,6 +1566,9 @@ func _resolve_item_action(actor: Unit, target: Unit, item: Consumable) -> Combat
 		return null
 	_set_active_action(false, null, item)
 	var results: CombatResults = combatManager.start_the_justice(actor, target, active_action)
+	turn_step = TURN_STEPS.ITEM_QUEUED
+	actor.use_item(item)
+	target.receive_item(item)
 	_set_action_results(results)
 	return results
 #endregion
@@ -1194,8 +1607,12 @@ func get_walkable_cells(unit: Unit) -> Array: #Pathing
 func _update_walkable_range(moveRemain:int = 0):
 	var hexStar = AHexGrid2D.new(current_map)
 	var newArea :Array = []
-	if !unit_path.path_array: newArea = get_walkable_cells(activeUnit)
+	if !unit_path.path_array and moveRemain > 0:
+		newArea = hexStar.find_remaining_unit_paths(activeUnit, activeUnit.cell, moveRemain)
+	elif !unit_path.path_array:
+		newArea = get_walkable_cells(activeUnit)
 	else: newArea = hexStar.find_remaining_unit_paths(activeUnit, unit_path.path_array[-1], moveRemain)
+	walkable_cells = newArea
 	current_map.draw(newArea)
 
 
@@ -1222,195 +1639,71 @@ func _undo_segment():
 	_update_walkable_range(moveRemain)
 	if !unit_path.path_array:
 		unit_path.clear()
-		turn_step = TURN_STEPS.MOVE_SEEK
 	else:
 		unit_path.draw(unit_path.path_array)
 #endregion
 
 
 #region turn tracker
-func _initialize_turns(ignoreActed := false): #not quite right Groups might be the problem, just use faction ID
-	turn_order.clear()
-	for cell in units: #grab unit locations
-		var unit = units[cell]
-		if ignoreActed and unit.status.Acted:
-			continue
-		else: unit.set_acted(false)
-		match unit.FACTION_ID: #turn order initializing
-			Enums.FACTION_ID.PLAYER: turn_order.append("Player")
-			Enums.FACTION_ID.ENEMY: turn_order.append("Enemy")
-			Enums.FACTION_ID.NPC: turn_order.append("NPC")
-		_update_unit_terrain(unit) #update terrain data
-	turn_order = turn_sort.sort_turns(turn_order)
-	#aiTurn = false
-	#boardState.update_remaining_turns(turn_order)
-	new_round.emit(turn_order)
-	state = STATES.NEW_TURN
-	print(turn_order)
+func _initialize_turns(ignoreActed := false):
+	board_turn_flow.initialize_turns(ignoreActed)
 
 
 func turn_change():
-	#change turn
-#	ai.rein_units(units)
-	#boardState.update_unit_data(units)
-	turn_order.pop_front()
-	turn_counter += 1
-	if turn_order.size() == 0:
-		state = STATES.ROUND_END
-		#round_change()
-	else:
-		state = STATES.NEW_TURN
-		turn_step = TURN_STEPS.STAND_BY
-	#boardState.update_remaining_turns(turn_order)
-	print(turn_order)
-	GameState.clear_state_lists()
-	_clear_player_action_flags()
-	turn_changed.emit()
+	board_turn_flow.turn_change()
 
 
 func _start_next_turn():
-	if turn_order[0] == "Enemy":
-		GameState.change_state(self, GameState.gState.LOADING)
-		state = STATES.ENEMY_PHASE
-		print("Enemy Turn")
-		_cursor_toggle(false)
-	elif turn_order[0] == "Player":	
-		GameState.change_state(self, GameState.gState.GB_DEFAULT)
-		state = STATES.PLAYER_PHASE
-		print("Player Turn")
-		_cursor_toggle(true)
-	elif turn_order[0] == "NPC": #Currently, NPC turns aren't a feature of the AI
-		GameState.change_state(self, GameState.gState.LOADING)
-		state = STATES.NPC_PHASE
-		print("NPC Turn")
-		_cursor_toggle(false)
-
-	if state == STATES.PLAYER_PHASE and early_end:
-		GameState.change_state(self, GameState.gState.LOADING)
-		set_next_acted()
-		turn_step = TURN_STEPS.END_PHASE
+	board_turn_flow.start_next_turn()
 		
 
 
 func _add_turn(faction):
-	var team : StringName
-	match faction:
-		Enums.FACTION_ID.PLAYER: team = "Player"
-		Enums.FACTION_ID.ENEMY: team = "Enemy"
-		Enums.FACTION_ID.NPC: team = "NPC"
-	turn_order.append(team)
-	turn_added.emit(team)
+	board_turn_flow.add_turn(faction)
 
 
 func _remove_turn(teamId):
-	var team : StringName
-	print("Before Removed Turn:",turn_order)
-	match teamId:
-		Enums.FACTION_ID.PLAYER: team = "Player"
-		Enums.FACTION_ID.ENEMY: team = "Enemy"
-		Enums.FACTION_ID.NPC: team = "NPC"
-	if turn_order[0] != team:
-		var i = turn_order.rfind(team)
-		turn_order.remove_at(i)
-	print("Removed Turn:",team, ":",turn_order)
-	turn_removed.emit(team)
+	board_turn_flow.remove_turn(teamId)
 
 
 func set_next_acted():
-	for cell in units:
-		if !units[cell].status.Acted and units[cell].FACTION_ID == Enums.FACTION_ID.PLAYER:
-			units[cell].set_acted(true)
-			return
+	board_turn_flow.set_next_acted()
 #endregion
 
 
 #region turn steps
 func _check_player_turn_step():
-	match turn_step:
-		TURN_STEPS.STAND_BY: _stand_by_step()
-		#TURN_STEPS.ITEM_QUEUED: _play_item_results()
-		TURN_STEPS.MOVE_END:
-			turn_step = TURN_STEPS.ACTIONS2
-			unit_move_ended.emit(activeUnit)
-		TURN_STEPS.EFFECT_QUEUE: _run_effect_queue()
-		TURN_STEPS.EVENT_QUEUE: _run_event_queue()
-		TURN_STEPS.EXP_GRANT: _resolve_exp()
-		TURN_STEPS.END_PHASE: _check_end_of_turn()
-		TURN_STEPS.CANTO: _start_canto()
-		TURN_STEPS.END:
-			if activeUnit: activeUnit.set_acted(true)
-			_check_next_state()
+	await board_turn_flow.check_player_turn_step()
 
 
 func _check_enemy_turn_step():
-	#if activeUnit: activeUnit.set_acted(true)
-	_check_next_state()
-	#match ai_step:
-		#AI_STEPS.STAND_BY: _stand_by_step()
-		#AI_STEPS.START: _get_strategy()
-		#AI_STEPS.PROCESS_TURN: _check_turn_instruct()
+	await board_turn_flow.check_enemy_turn_step()
 
 
 func _stand_by_step():
-	##This is for functions that need to slip it before a new turn starts
-	#_evaluate_position()
-	turn_step = TURN_STEPS.START
+	board_turn_flow.stand_by_step()
 	
 
 func _check_end_of_turn():
-	if death_list: await _wipe_dead()
-	
-	if !activeUnit: turn_step = TURN_STEPS.END
-	elif activeUnit.can_canto(): turn_step = TURN_STEPS.CANTO
-	else: turn_step = TURN_STEPS.END
+	await board_turn_flow.check_end_of_turn()
 
 
 func _check_next_state():
-	match Global.meta_state:
-		Global.META_STATES.GAME_OVER: state = STATES.GAME_OVER
-		Global.META_STATES.VICTORY: state = STATES.VICTORY
-		_: turn_change()
+	board_turn_flow.check_next_state()
 #endregion
 
 
 #region end of round functions
 func round_change():
-	#Changes the round and reloads the "turn order" magazine
-	#Return HERE to make sure turns flow properly, I can already see conflicting issues cropping up
-	early_end = false
-	_initialize_turns()
-	#boardState.clear_acted()
-	new_round.emit(turn_order)
+	board_turn_flow.round_change()
 
 
 func round_duration_tick():
-	var keys = global_effects.keys()
-	for effId in keys:
-		global_effects[effId].duration -= 1
-		if global_effects[effId].duration <= 0 and global_effects[effId].type == "Time":
-			Global.reset_time_factor()
-			global_effects.erase(effId)
-		else: #no other global effects exist, this needs to be expanded if a new one is made
-			global_effects.erase(effId)
+	board_turn_flow.round_duration_tick()
 
 
 func _check_eor_events()->void:
-	if cursor.visible:cursor.visible = false
-	if GameState.state != GameState.gState.GB_END_OF_ROUND: GameState.change_state(self, GameState.gState.GB_END_OF_ROUND)
-	#if round_step != ROUND_STEPS.CHECK: return
-	match round_step:
-		ROUND_STEPS.CHECK:
-			round_step = ROUND_STEPS.DANMAKU
-		ROUND_STEPS.DANMAKU:
-			round_step = ROUND_STEPS.SCENE
-		ROUND_STEPS.SCENE: 
-			round_step = ROUND_STEPS.REINFORCE
-		ROUND_STEPS.REINFORCE: 
-			round_step = ROUND_STEPS.END
-		ROUND_STEPS.END:
-			round_duration_tick()
-			round_change()
-			state = STATES.NEW_TURN
+	board_turn_flow.check_end_of_round_events()
 #endregion
 
 
@@ -1442,6 +1735,13 @@ func _on_action_weapon_selected(button = false):
 		var weapon = button.get_meta("Item")
 		activeUnit.set_equipped(weapon)
 
+	if active_action.Item:
+		var item_results: CombatResults = _resolve_item_action(activeUnit, target, active_action.Item)
+		pending_item_action["Item"] = active_action.Item
+		pending_item_action["Results"] = item_results
+		combat_sequence(item_results)
+		return
+
 	var combatResults: CombatResults = combatManager.start_the_justice(activeUnit, target, active_action)
 	_set_action_results(combatResults)
 	combat_sequence(combatResults)
@@ -1450,86 +1750,40 @@ func _on_action_weapon_selected(button = false):
 
 #region animation handling
 func _on_animation_handler_sequence_complete():
-	var hasPostEvents = _check_effect_queue()
-	GameState.change_state(self, GameState.gState.GB_DEFAULT)
-	_wipe_region()
-	current_map.pathAttack.clear()
-	if activeUnit:
-		cursor.cell = activeUnit.cell
-	
-	if hasPostEvents: turn_step = TURN_STEPS.EFFECT_QUEUE
-	else: _update_unit_bars()
+	board_event_resolver.on_animation_handler_sequence_complete()
 	
 
 
 func _update_unit_bars():
-	turn_step = TURN_STEPS.BAR_ANIM
-	bar_queue.append(activeUnit)
-	bar_queue.append(targetUnit)
-	activeUnit.update_life_bar()
-	targetUnit.update_life_bar()
+	board_event_resolver.update_unit_bars()
 
 
 func _on_bars_updated(unit:Unit):
-	bar_queue.erase(unit)
-	if !bar_queue:
-		match turn_step:
-			TURN_STEPS.BAR_ANIM: turn_step = TURN_STEPS.EVENT_QUEUE
+	board_event_resolver.on_bars_updated(unit)
 
 
 func _check_effect_queue() -> bool:
-	if effect_queue.size() > 0:
-		return true
-	return false
+	return board_event_resolver.check_effect_queue()
 
 
 func _run_effect_queue():
-	var postEvents = _sort_effect_queue()
-	var eventKeys
-	var type = Enums.EFFECT_TYPE
-	eventKeys = postEvents.keys()
-	for actor in eventKeys:
-		for event in postEvents[actor]:
-			var t = event.Type
-			var effect = event.EffectId
-			var target = event.Target
-			var isWait = true
-			match t:
-				type.RELOC:
-					combatManager.start_relocation(actor, target, effect)
-				_: isWait = false
-			if isWait:
-				await self.continue_queue
-	call_deferred("_clear_effect_queue")
+	await board_event_resolver.run_effect_queue()
 
 
 func on_effect_complete():
-	continue_queue.emit()
-	_update_unit_bars()
+	board_event_resolver.on_effect_complete()
 
 
 func _sort_effect_queue():
-	var seen := {}
-	var postEvents := {}
-	for event in effect_queue:
-		if !postEvents.has(event.Actor):
-			postEvents[event.Actor] = []
-			seen[event.Actor] = []
-		if seen[event.Actor].has(event.Type):
-			continue
-		else:
-			seen[event.Actor].append(event.Type)
-			postEvents[event.Actor].append(event)
-	return postEvents
+	return board_event_resolver.sort_effect_queue()
 
 
 func add_effect_queue(new):
-	effect_queue.append(new)
+	board_event_resolver.add_effect_queue(new)
 
 
 func _clear_effect_queue():
-	effect_queue.clear()
-	turn_step = TURN_STEPS.EVENT_QUEUE
+	board_event_resolver.clear_effect_queue()
 
 
 func combat_sequence(scenario):
@@ -1549,7 +1803,6 @@ func _deselect_active_unit(confirm) -> void:
 	# Deselects the active unit, clearing the cells overlay and interactive path drawing
 	#confirm is used to let the game know if this is a temporary movement(can be canceled by player) 
 	#or a confirmed move so it knows to retain previous position or update the units dictionary
-	#NEW: HERE setting confirm to "true" is not currently used anywhere.
 	if activeUnit != null and units.has(activeUnit.cell):
 		if !confirm: 
 			PlayerData.move_committed = false
@@ -1586,7 +1839,7 @@ func _on_gui_formation_selected():
 	match GameState.state:
 		GameState.gState.GB_SETUP:
 			_cursor_toggle(true, true)
-			GameState.change_state(self, GameState.gState.GB_FORMATION)
+			apply_formation_control_state()
 			state = STATES.FORMATION
 		GameState.gState.GB_FORMATION:
 			_cursor_toggle(false)

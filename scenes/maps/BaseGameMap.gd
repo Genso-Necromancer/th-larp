@@ -9,6 +9,8 @@ signal danmaku_progressed
 
 enum MAP_EVENT{NONE, TIME, DEATH, SEIZE}
 enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
+##WARNING: a Personality script must be attached to all maps for correct functionality
+@export var ai_personality:Personality
 @export_category("Map Values")
 ##Units required to participate in this chapter.[br]
 ##WARNING: Do not use units which can die and arrive prior to this map]
@@ -57,17 +59,16 @@ enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
 @onready var object :TileMapLayer= $Object
 @onready var deploy :TileMapLayer= $Deployments
 var seizeLayers :Array[SeizeLayer]=[]
-##tiles with Even region numbers are treated as "Enemy Team" regions, while odd are considered "player" regions.
-@onready var regions :TileMapLayer= $Regions
 @onready var pathAttack :TileMapLayer= $PathAttack
 @onready var narrative :TileMapLayer= $Narrative
+@onready var context :ContextLayer = $Context
 @onready var dev :TileMapLayer= $Dev
 
 @onready var tileSet :TileSet = ground.tile_set
 @onready var tileSize : Vector2i = tileSet.get_tile_size()
 @onready var tileShape = tileSet.get_tile_shape()
 ##Ai Manager
-@onready var ai : AiManager = $AiManager
+var ai : AiManager
 ##Object Storage
 var doors:Dictionary[Vector2i,DoorTile] = {}
 var chests:Dictionary[Vector2i,DoorTile] = {}
@@ -94,11 +95,12 @@ var completed_conditions:Dictionary[String,Array] = {"Loss":[],"Victory":[]}
 
 
 func _ready():
+	_ensure_ai_manager()
 	if not Engine.is_editor_hint():
 		_load_danmaku_scripts()
 		dev.visible = false
 		narrative.visible = false
-		regions.visible = false
+		context.visible = false
 		_ready_objectives()
 	mapSize = ground.get_used_rect().size
 	SignalTower.action_seize.connect(self._on_seize)
@@ -110,6 +112,14 @@ func _ready():
 	_gather_object_tiles()
 	_initialize_map_units()
 	emit_signal("map_ready", self)
+
+
+func _ensure_ai_manager() -> void:
+	if ai == null:
+		ai = AiManager.new()
+		ai.name = "AiManager"
+		add_child(ai)
+	ai.mind = ai_personality
 
 
 #region objective functions
@@ -249,14 +259,17 @@ func _get_interactive_states()->Dictionary[Vector2i,Dictionary]:
 
 func _load_interactive_states(data:Dictionary):
 	var kids := get_children()
-	for kid:InteractableTile in kids:
-		var d:Dictionary
-		if kid is InteractableTile:
-			d = data[str(kid.cell)]
-			kid.load_save_data(d)
-		else: continue
-		if kid is ChestTile and !d.is_locked: swap_tile_to(kid.cell,"open")
-		elif kid is DoorTile and d.is_destroyed: swap_tile_to(kid.cell,"broken")
+	for kid in kids:
+		if kid is not InteractableTile:
+			continue
+		var d:Dictionary = data.get(str(kid.cell), {})
+		if d.is_empty():
+			continue
+		kid.load_save_data(d)
+		if kid is ChestTile and not d.get("is_locked", true):
+			swap_tile_to(kid.cell,"open")
+		elif kid is DoorTile and d.get("is_destroyed", false):
+			swap_tile_to(kid.cell,"broken")
 		elif kid is DoorTile and !d.is_locked: swap_tile_to(kid.cell,"open")
 		elif kid is BreakableWall and d.is_destroyed: swap_tile_to(kid.cell, "broken")
 #endregion
@@ -378,21 +391,50 @@ func hex_centered(grid_position: Vector2i) -> Vector2i:
 func get_movement_cost(cell, moveType):
 	var base :TileData = ground.get_cell_tile_data(cell)
 	var mod :TileData = modifier.get_cell_tile_data(cell)
-	var baseTile : StringName
-	var modTile : StringName
+	var baseTile : String = ""
+	var modTile : String = ""
 	var costData :Dictionary = PlayerData.terrainData
 	var cost := 0.0
 	
-	if base: baseTile = base.get_custom_data("TerrainType")
-	if mod: modTile = mod.get_custom_data("TerrainType")
-	cost += costData[baseTile][moveType]
+	if base:
+		baseTile = String(base.get_custom_data("TerrainType"))
+	if mod:
+		modTile = String(mod.get_custom_data("TerrainType"))
+
+	if baseTile != "" and costData.has(baseTile):
+		cost += float(costData[baseTile].get(moveType, 0.0))
 	if modTile == "Bridge": cost = 0
-	elif modTile: cost += costData[modTile][moveType]
+	elif modTile != "" and costData.has(modTile):
+		cost += float(costData[modTile].get(moveType, 0.0))
 	return cost
 
 func get_terrain_data(cell:Vector2i)-> Dictionary:
 	var data:={"tags":get_terrain_tags(cell),"values":get_terrain_values(cell)}
 	return data
+
+
+func get_context_data(cell: Vector2i) -> Dictionary:
+	var data := {"Hint": "", "Priority": 0}
+	if context == null:
+		return data
+	var tile_data :TileData= context.get_cell_tile_data(cell)
+	if tile_data == null:
+		return data
+	var hint_value = tile_data.get_custom_data("Hint")
+	var priority_value = tile_data.get_custom_data("Priority")
+	if hint_value != null:
+		data.Hint = String(hint_value)
+	if priority_value != null:
+		data.Priority = int(priority_value)
+	return data
+
+
+func get_context_hint(cell: Vector2i) -> String:
+	return String(get_context_data(cell).get("Hint", ""))
+
+
+func get_context_priority(cell: Vector2i) -> int:
+	return int(get_context_data(cell).get("Priority", 0))
 
 func get_terrain_values(cell:Vector2i)-> Dictionary:
 	var tags:=get_terrain_tags(cell)
@@ -474,8 +516,10 @@ func get_forced_deploy()->Dictionary[String,Vector2i]: #make sure there is equal
 		var tileData :TileData = deploy.get_cell_tile_data(cell)
 		if tileData.get_custom_data("Trigger") == "forcedCell":
 			forcedCells.append(cell)
+	if forcedUnits.is_empty() or forcedCells.is_empty():
+		return forcedDeploy
 	for unit in forcedUnits:
-		if i > forcedCells.size()+1:
+		if i >= forcedCells.size():
 			print("Not enough forced deploy Cells!")
 			break
 		forcedDeploy[unit] = forcedCells[i]
@@ -490,8 +534,9 @@ func get_narrative_tile(id:int) -> Vector2i:
 func get_chest_tiles()->Dictionary[Vector2i,ChestTile]:
 	var chestsList:Dictionary[Vector2i,ChestTile]={}
 	var kids:=get_children()
-	for kid:ChestTile in kids:
-		if kid is ChestTile and kid.is_locked: chestsList[kid.cell] = kid
+	for kid in kids:
+		if kid is ChestTile and kid.is_locked:
+			chestsList[kid.cell] = kid
 	return chestsList
 #
 #

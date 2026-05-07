@@ -39,11 +39,8 @@ var time_of_day := Enums.TIME.DAY
 ##Never change this value directly, use Global.progess_time() or Global.set_time()
 var game_time :Dictionary[String,int]={"Minutes":0,"Hours":0,"Seconds":0}:
 	set(value):
-		#if value.Minute >= 60: 
-			#value.Minute = value.Minute-60
-			#value.Hour + 1
-		#if value.Hour >=24: value.Hour = value.Hour - 24
-		if value.Hour >= 6 and value.Hour <= 18:
+		value = normalize_game_time(value)
+		if value.Hours >= 6 and value.Hours <= 18:
 			time_of_day = Enums.TIME.DAY
 		else:
 			time_of_day = Enums.TIME.NIGHT
@@ -114,17 +111,30 @@ func save()->Dictionary:
 
 func load_persistant(Data:Dictionary):
 	var RNG := RngTool.new()
-	var mStateKey :String = META_STATES.find_key(Data.meta_state)
 	if Data.DataType != "Global": 
 		print("ERROR: ATTEMPTED TO LOAD NON-GLOBAL DATA IN GLOBAL")
 		return
+	var loaded_meta = Data.get("meta_state", META_STATES.NONE)
+	if typeof(loaded_meta) == TYPE_STRING or typeof(loaded_meta) == TYPE_STRING_NAME:
+		var meta_key := StringName(loaded_meta)
+		if META_STATES.has(meta_key):
+			meta_state = META_STATES[meta_key]
+		else:
+			meta_state = META_STATES.NONE
+	elif typeof(loaded_meta) == TYPE_INT:
+		var meta_index := int(loaded_meta)
+		if meta_index >= 0 and meta_index < META_STATES.size():
+			meta_state = meta_index
+		else:
+			meta_state = META_STATES.NONE
+	else:
+		meta_state = META_STATES.NONE
 	#time_of_day = Data.time_of_day
-	game_time = Data.game_time
+	game_time = normalize_game_time(Data.game_time)
 	time_factor = Data.time_factor
 	RNG.load_state(Data.RngState)
 	#unitObjs = Data.UnitObjs
 	flags = Data.flags
-	meta_state = META_STATES[mStateKey]
 	#time_passed = Data.time_passed
 	#language = Data.Language
 	#currentMap = Data.CurrentMapPath
@@ -134,8 +144,7 @@ func load_persistant(Data:Dictionary):
 
 
 func reset_values():
-	game_time.Hours = 12
-	game_time.Minutes = 0
+	set_time(12, 0, 0)
 	#game_time = 0.0
 	time_factor = 1.0
 	_init_flags()
@@ -147,6 +156,7 @@ func reset_values():
 func _init_flags():
 	flags = {
 		"DebugMode": true,
+		"victory": false,
 	}
 	meta_state = META_STATES.NONE
 
@@ -192,9 +202,11 @@ func progress_time(add_hours:int=0,add_minutes:int=0):
 		print("Loop: add_hours:%d, game_time:%d, combo:%d" % [hours,game_time.Hours,(game_time.Hours + hours)])
 	
 	
-	game_time.Hours += int(hours)
-	game_time.Minutes += int(minutes)
-	game_time.Seconds += int(seconds)
+	set_time(
+		game_time.Hours + int(hours),
+		game_time.Minutes + int(minutes),
+		game_time.Seconds + int(seconds)
+	)
 	print("Final Time: H:%d, M:%d, S:%d" % [game_time.Hours, game_time.Minutes, game_time.Seconds])
 
 
@@ -202,9 +214,11 @@ func set_time(hours:int=0,minutes:int=0,seconds:int=0):
 	hours = clampi(hours,0,23)
 	minutes = clampi(minutes,0,59)
 	seconds = clampi(seconds,0,59)
-	game_time.Hours = hours
-	game_time.Minutes = minutes
-	game_time.Seconds = seconds
+	game_time = {
+		"Hours": hours,
+		"Minutes": minutes,
+		"Seconds": seconds,
+	}
 
 
 func reset_time_factor():
@@ -229,6 +243,27 @@ func apply_time_factor(effectValue:float):
 	#splitTime.Hours = floori(time)
 	#splitTime.Minutes = floori((time - floori(time)) / minute)
 	#return splitTime
+
+
+func normalize_game_time(value) -> Dictionary[String, int]:
+	var normalized: Dictionary[String, int] = {"Hours": 0, "Minutes": 0, "Seconds": 0}
+
+	if value is Dictionary:
+		normalized.Hours = int(value.get("Hours", value.get("Hour", 0)))
+		normalized.Minutes = int(value.get("Minutes", value.get("Minute", 0)))
+		normalized.Seconds = int(value.get("Seconds", value.get("Second", 0)))
+		return normalized
+
+	if typeof(value) == TYPE_FLOAT or typeof(value) == TYPE_INT:
+		var raw_time: float = float(value)
+		var hours := floori(raw_time)
+		var minute_fraction := absf(raw_time - float(hours))
+		var minutes := floori((minute_fraction * 100.0) + 0.0001)
+		normalized.Hours = clampi(hours, 0, 23)
+		normalized.Minutes = clampi(minutes, 0, 59)
+		return normalized
+
+	return normalized
 
 
 func find_time_difference(prev_time:float,new_time: float) -> float:

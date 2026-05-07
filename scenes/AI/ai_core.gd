@@ -2,6 +2,8 @@ extends Node
 class_name AiCore
 
 
+# Legacy search prototype kept around as reference.
+# The live enemy AI currently routes through ai_manager.gd.
 var generator:MoveGenerator
 
 func find_best_move(state:BoardState, depth:int)->Turn:
@@ -17,6 +19,7 @@ func find_best_move(state:BoardState, depth:int)->Turn:
 	return best_move
 
 
+# Classic negamax shell left here as a future search scaffold.
 func negamax(state:BoardState, depth:int, alpha:float, beta:float)->float:
 	if depth == 0 or state.is_terminal(): return evaluate(state)
 	var best := -INF
@@ -29,7 +32,7 @@ func negamax(state:BoardState, depth:int, alpha:float, beta:float)->float:
 	return best
 
 
-#Concept. Not a true evaluation
+# Placeholder evaluation only, not the live commander personality evaluator.
 func evaluate(state:BoardState)->float:
 	var score:=0.0
 	for unit in state.units.values():

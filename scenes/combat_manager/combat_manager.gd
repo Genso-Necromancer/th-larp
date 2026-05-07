@@ -63,11 +63,19 @@ func init_manager() -> void:
 
 # Forecast should return CombatResults (not Dictionary) so UI can consume same structure
 func get_forecast(attacker: Unit, defender: Unit, action: Dictionary) -> CombatResults:
-	return forecast_service.get_forecast(attacker.to_sim(), defender.to_sim(), action)
+	var attacker_sim := attacker.to_sim()
+	var defender_sim := defender.to_sim()
+	attacker_sim.recompute_derived_state()
+	defender_sim.recompute_derived_state()
+	return forecast_service.get_forecast(attacker_sim, defender_sim, action)
 
 # Live combat: resolve + apply + return the same CombatResults
 func start_the_justice(attacker: Unit, defender: Unit, attacker_action: Dictionary) -> CombatResults:
-	var cr: CombatResults = resolver.resolve_live(attacker.to_sim(), defender.to_sim(), attacker_action)
+	var attacker_sim := attacker.to_sim()
+	var defender_sim := defender.to_sim()
+	attacker_sim.recompute_derived_state()
+	defender_sim.recompute_derived_state()
+	var cr: CombatResults = resolver.resolve_live(attacker_sim, defender_sim, attacker_action)
 	applier.apply_results(cr, {
 	String(cr.units["attacker_id"]): attacker,
 	String(cr.units["defender_id"]): defender

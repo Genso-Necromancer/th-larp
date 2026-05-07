@@ -9,6 +9,17 @@ func _ready():
 	animPlayer.animation_finished.connect(self._on_animation_finished)
 	SignalTower.prompt_accepted.connect(self._on_prompt_accepted)
 
+
+func _input(event):
+	if event.is_action_pressed("ui_accept"):
+		skip_animation()
+		accept_event()
+
+
+func _exit_tree():
+	if SignalTower.prompt_accepted.is_connected(self._on_prompt_accepted):
+		SignalTower.prompt_accepted.disconnect(self._on_prompt_accepted)
+
 #func _process(_delta):
 	#if input_accepted: input_accepted = false
 

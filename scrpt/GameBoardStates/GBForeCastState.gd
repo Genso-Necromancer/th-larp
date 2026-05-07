@@ -7,7 +7,7 @@ func _handle_bind(bind):
 		"invalid": return
 		"ui_accept": pass
 		"ui_info": pass
-		"ui_return": slave.cancel_forecast()
+		"ui_return": slave.ui_return()
 		"ui_scroll_left": pass
 		"ui_scroll_right": pass
 		"ui_right": pass

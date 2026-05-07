@@ -99,6 +99,9 @@ func restore_equipment_state(snapshot: Array[Dictionary]) -> void:
 		if item.equipped:
 			_add_item_effects(item)
 
+	if unit.natural and unit.natural.equipped:
+		_add_item_effects(unit.natural)
+
 	unit.inventory = restored_inventory
 	_refresh_granted_skills()
 	unit.update_stats()

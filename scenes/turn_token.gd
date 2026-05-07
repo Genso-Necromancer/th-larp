@@ -8,12 +8,17 @@ var is_exiting := false
 var is_entering := true
 var frame := 0
 var set_scale := Vector2(0,0)
+var play_enter_on_ready := true
 
 func _ready():
 	anim_player.animation_finished.connect(self._on_animation_finished)
 	token.frame = frame
 	token.scale = set_scale
-	anim_player.play("enter_list")
+	if play_enter_on_ready:
+		anim_player.play("enter_list")
+	else:
+		is_entering = false
+		position = Vector2.ZERO
 	
 
 func set_animation(anim:StringName) -> void:
@@ -31,6 +36,15 @@ func rise_up()->void:
 	new_pos.y =  global_position.y - (75)
 	tween.finished.connect(self._on_tween_finished)
 	tween.tween_property(self,"global_position",new_pos,0.5)
+
+
+func shift_into_slot(offset_y := 75.0) -> void:
+	if is_entering or is_exiting:
+		return
+	position = Vector2(0, offset_y)
+	var tween :Tween = get_tree().create_tween()
+	tween.finished.connect(self._on_tween_finished)
+	tween.tween_property(self, "position", Vector2.ZERO, 0.5)
 	
 
 func _on_tween_finished()->void:

@@ -1,12 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://bokxjbvpfnkqp"]
+[gd_scene load_steps=7 format=3 uid="uid://bokxjbvpfnkqp"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_86eo7"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_x0q3j"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="3_yentv"]
 [ext_resource type="Resource" uid="uid://e7drxbfl83us" path="res://unit_resources/items/weapons/club.tres" id="4_dwoc8"]
 [ext_resource type="Texture2D" uid="uid://b0dblco6xcypq" path="res://sprites/character/cirno/trblr_sprite.png" id="5_x0q3j"]
-
-[sub_resource type="Curve2D" id="Curve2D_u43h5"]
 
 [sub_resource type="Resource" id="Resource_nxc8q"]
 script = ExtResource("3_yentv")
@@ -17,14 +15,25 @@ is_broken = false
 metadata/_custom_type_script = "uid://bas4mbl00uet6"
 
 [node name="Cirno" instance=ExtResource("1_86eo7")]
-curve = SubResource("Curve2D_u43h5")
 unit_id = "cirno"
+archetype = 4
+ai_role = 7
 unique_art = true
 simulate_leveling = false
 unit_level = 3
 SPEC_ID = 1
 ROLE_ID = 1
-move_type = 2
+mod_stats = Dictionary[StringName, int]({
+&"Cele": 0,
+&"Cha": 0,
+&"Comp": 0,
+&"Def": 0,
+&"Eleg": 4,
+&"Life": 0,
+&"Mag": 0,
+&"Move": 0,
+&"Pwr": 4
+})
 total_growth = Dictionary[StringName, float]({
 &"Cele": 0.1,
 &"Cha": 0.1,
@@ -41,11 +50,11 @@ total_stats = Dictionary[StringName, int]({
 &"Cha": 2,
 &"Comp": 100,
 &"Def": 4,
-&"Eleg": 3,
+&"Eleg": 7,
 &"Life": 20,
 &"Mag": 1,
 &"Move": 4,
-&"Pwr": 6
+&"Pwr": 10
 })
 total_caps = Dictionary[StringName, int]({
 &"Cele": 20,

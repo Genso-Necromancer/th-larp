@@ -40,6 +40,7 @@ func _store_enemy_units(units:Dictionary[Vector2i,Unit], map:GameMap, refs: Dict
 		var unit := child as Unit
 		if not unit or unit.FACTION_ID == Enums.FACTION_ID.PLAYER or unit.is_queued_for_deletion(): continue
 		units[unit.cell] = unit
+		refs[unit.unit_id] = unit
 		_connect_unit_signals(unit)
 
 

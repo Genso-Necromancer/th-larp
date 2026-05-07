@@ -4,7 +4,6 @@ class_name ActionMenu
 
 signal action_menu_suspending_game
 
-#new
 signal move_selected
 signal attack_selected
 signal skill_selected(skill)
@@ -19,7 +18,7 @@ signal menu_canceled
 signal weapon_confirmed(button)
 signal skill_confirmed
 
-enum MENU_STATES {NONE, OPTIONS, ACTION,ACTION2, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE, OFUDA_OPEN, OFUDA_TARGETING, SUSPEND_PROMPT, SUSPENDING, DOOR}
+enum MENU_STATES {NONE, OPTIONS, ACTION, POST_MOVE_ACTION, WEAPONS_TARGETING, WEAPON_FORECAST, SKILLS_OPEN, SKILL_TARGETING, SKILL_CONFIRM, ITEM_MANAGE, ITEM_TRADE, OFUDA_OPEN, OFUDA_TARGETING, SUSPEND_PROMPT, SUSPENDING, DOOR}
 @onready var aContainer : MarginContainer = $ScreenMargin/ActionBackgroundMargin
 @onready var oContainer : MarginContainer = $ScreenMargin/OfudaBackgroundMargin
 @onready var sContainer : MarginContainer = $ScreenMargin/SkillBackgroundMargin
@@ -39,7 +38,7 @@ var state := MENU_STATES.NONE:
 	set(value):
 			state = value
 			match state:
-				MENU_STATES.OPTIONS, MENU_STATES.ACTION, MENU_STATES.ACTION2, MENU_STATES.SKILLS_OPEN, MENU_STATES.OFUDA_OPEN, MENU_STATES.SUSPEND_PROMPT, MENU_STATES.SUSPENDING:
+				MENU_STATES.OPTIONS, MENU_STATES.ACTION, MENU_STATES.POST_MOVE_ACTION, MENU_STATES.SKILLS_OPEN, MENU_STATES.OFUDA_OPEN, MENU_STATES.SUSPEND_PROMPT, MENU_STATES.SUSPENDING:
 					mouse_filter = Control.MOUSE_FILTER_STOP
 				_:
 					mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -53,7 +52,7 @@ var state := MENU_STATES.NONE:
 					cursor.setCursor = true
 				MENU_STATES.ACTION:
 					_action_open()
-				MENU_STATES.ACTION2:
+				MENU_STATES.POST_MOVE_ACTION:
 					_action_open(true)
 				MENU_STATES.WEAPONS_TARGETING:
 					_hide_cursor()
@@ -73,7 +72,6 @@ var state := MENU_STATES.NONE:
 					_assign_cursor([skillConfirm])
 					cursor.setCursor = true
 				MENU_STATES.ITEM_MANAGE, MENU_STATES.ITEM_TRADE:
-					#inv.visible = true
 					_hide_cursor()
 					_hide_action_container()
 				MENU_STATES.OFUDA_OPEN:
@@ -110,11 +108,7 @@ func _ready():
 	oContainer.visible = false
 	sContainer.visible = false
 	cContainer.visible = false
-	#var parent = get_parent()
-	#self.weapon_selected.connect(parent._on_weapon_selected)
-	#self.item_used.connect(parent._on_item_used)
 
-#New Code
 func end_self():
 	_clear_states(true)
 
@@ -123,7 +117,8 @@ func end_self():
 func open_as_action(unit: Unit, moved:bool = false):
 	_load_cursor()
 	currentUnit = unit
-	if moved: _change_state(MENU_STATES.ACTION2)
+	prevState.clear()
+	if moved: _change_state(MENU_STATES.POST_MOVE_ACTION)
 	else: _change_state(MENU_STATES.ACTION)
 	self.visible = true
 	cursor.setCursor = true
@@ -132,6 +127,7 @@ func open_as_action(unit: Unit, moved:bool = false):
 ##opens self as player options.
 func open_as_options():
 	_load_cursor()
+	prevState.clear()
 	_change_state(MENU_STATES.OPTIONS)
 	self.visible = true
 	cursor.setCursor = true
@@ -245,9 +241,7 @@ func _on_button_pressed(bName):
 			# Do not emit skill_selected yet; actual skill choice happens in _on_skill_pressed
 			_change_state(MENU_STATES.SKILLS_OPEN)
 		"OpenDoorBtn":
-			# New intent signal
 			door_selected.emit()
-			# Keep old flow for now
 			_change_state(MENU_STATES.DOOR)
 		"OpenChestBtn": pass
 		"StealBtn": pass
@@ -291,11 +285,7 @@ func _on_skill_pressed(sButton : Control):
 func _on_ofuda_pressed(oButton : Control):
 	var unit: Unit = oButton.get_meta("Unit")
 	var ofuda: Ofuda = oButton.get_meta("Item")
-	# New intent signal
 	ofuda_selected.emit(unit, ofuda)
-	# Legacy compatibility:
-	# For now we do NOT force use_item() here anymore.
-	# Let higher-level code decide what happens next.
 	_change_state(MENU_STATES.OFUDA_TARGETING)
 
 
@@ -336,13 +326,7 @@ func _load_cursor():
 	
 
 func _assign_cursor(buttons : Array):
-	#var bLayers:Array = []
-	#for b:Button in buttons:
-		#var bl :TextureButton= b.get_button()
-		#bLayers.append(bl)
-	#cursor.resignal_cursor(bLayers)
 	cursor.resignal_cursor(buttons)
-	#cursor.call_deferred("set_cursor")
 
 
 func _free_cursor():
@@ -377,14 +361,10 @@ func resume_menu():
 func _change_state(newState):
 	prevState.append(state)
 	state = newState
-	print(prevState)
 
 
 func return_previous_state() -> void:
 	var newState : MENU_STATES
-	#var curState : MENU_STATES = state
-	
-	print(prevState)
 	if state == MENU_STATES.ACTION and PlayerData.traded: return
 	elif state == MENU_STATES.ACTION and PlayerData.item_used: return
 	elif state == MENU_STATES.ACTION and PlayerData.move_committed: return
@@ -392,12 +372,15 @@ func return_previous_state() -> void:
 	if prevState.size() > 0:
 		newState = prevState.pop_back()
 		state = newState
-		print(prevState)
 	else: 
-		print("action_menu, attempted invalid state return: No previous states.",)
-		return
+		match state:
+			MENU_STATES.ACTION, MENU_STATES.POST_MOVE_ACTION, MENU_STATES.OPTIONS:
+				newState = MENU_STATES.NONE
+				state = newState
+			_:
+				push_warning("action_menu: attempted invalid state return with no previous states")
+				return
 	
-	#if curState == MENU_STATES.ITEM_MANAGE: emit_signal("action_menu_item_canceled")
 	if newState == MENU_STATES.NONE and not _suppress_cancel_emit: 
 		menu_canceled.emit()
 
@@ -406,7 +389,6 @@ func _clear_states(suppress_cancel := false):
 	_change_state(MENU_STATES.NONE)
 	_suppress_cancel_emit = false
 	prevState.clear()
-	print(prevState)
 
 
 func _on_skill_confirm_pressed():
@@ -418,7 +400,6 @@ func _on_suspend_confirm_button_pressed(_button):
 	_change_state(MENU_STATES.SUSPENDING)
 	# New intent signal
 	suspend_requested.emit()
-	# Legacy compatibility
 	action_menu_suspending_game.emit()
 
 

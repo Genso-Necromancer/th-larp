@@ -11,8 +11,7 @@ func _init(owner: GameBoard) -> void:
 func begin_targeting_for_active_action() -> void:
 	if !board.active_action:
 		return
-	if GameState:
-		GameState.change_state(board, GameState.gState.SCENE_ACTIVE)
+	board.apply_scene_control_state()
 
 	if board.active_action.Skill:
 		board.start_skill_targeting(board.active_action.Skill)
@@ -58,15 +57,15 @@ func player_phase_menu_canceled() -> void:
 	match board.turn_step:
 		GameBoard.TURN_STEPS.OPTIONS:
 			board.turn_step = GameBoard.TURN_STEPS.START
-			board.ui_returned.emit(GameBoard.TURN_STEPS.OPTIONS)
 		GameBoard.TURN_STEPS.ACTIONS:
-			board.turn_step = GameBoard.TURN_STEPS.START
-			board.rollback_pending_selection_state()
-			board.request_deselect()
-		GameBoard.TURN_STEPS.ACTIONS2:
-			if PlayerData.traded or PlayerData.item_used:
-				board.turn_step = GameBoard.TURN_STEPS.MOVE_END
-				board.unit_move_ended.emit(board.activeUnit)
+			if board.is_post_move_step():
+				if PlayerData.traded or PlayerData.item_used:
+					board.turn_step = GameBoard.TURN_STEPS.ACTIONS
+					board.unit_move_ended.emit(board.activeUnit)
+				else:
+					board.turn_step = GameBoard.TURN_STEPS.START
+					board.rollback_pending_selection_state()
+					board.request_deselect()
 			else:
 				board.turn_step = GameBoard.TURN_STEPS.START
 				board.rollback_pending_selection_state()
@@ -74,7 +73,7 @@ func player_phase_menu_canceled() -> void:
 		GameBoard.TURN_STEPS.FORECAST_ATTACK:
 			board.activeUnit.restore_equip()
 			resume_targeting_for_active_action()
-		GameBoard.TURN_STEPS.ATTACK_TARGET, GameBoard.TURN_STEPS.SKILL_TARGET, GameBoard.TURN_STEPS.ITEM_TARGET, GameBoard.TURN_STEPS.TRADE_TARGET, GameBoard.TURN_STEPS.DOOR_TARGET:
+		_ when board.is_targeting_step():
 			board._end_targeting()
 
 

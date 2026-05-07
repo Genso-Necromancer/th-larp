@@ -72,22 +72,33 @@ mod_stats = Dictionary[StringName, int]({
 &"Cha": 0,
 &"Comp": 0,
 &"Def": 0,
-&"Eleg": 0,
+&"Eleg": 4,
 &"Life": 0,
 &"Mag": 0,
 &"Move": 0,
-&"Pwr": 13
+&"Pwr": 0
+})
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.0,
+&"Cha": 0.0,
+&"Comp": 0.0,
+&"Def": 0.0,
+&"Eleg": 0.0,
+&"Life": 0.0,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 1.0
 })
 total_stats = Dictionary[StringName, int]({
 &"Cele": 7,
 &"Cha": 7,
 &"Comp": 100,
 &"Def": 2,
-&"Eleg": 11,
+&"Eleg": 15,
 &"Life": 20,
 &"Mag": 3,
 &"Move": 5,
-&"Pwr": 19
+&"Pwr": 6
 })
 total_caps = Dictionary[StringName, int]({
 &"Cele": 20,

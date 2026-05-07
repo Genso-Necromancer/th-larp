@@ -1,27 +1,11 @@
-[gd_resource type="TileSet" load_steps=22 format=3 uid="uid://dae0fl1fnuwvk"]
+[gd_resource type="TileSet" load_steps=13 format=3 uid="uid://dae0fl1fnuwvk"]
 
-[ext_resource type="Texture2D" uid="uid://cwrqpj7en2cof" path="res://sprites/tiles/deployment.png" id="1_ggcxa"]
-[ext_resource type="Texture2D" uid="uid://b3kybcmn08s6d" path="res://sprites/tiles/forcedDeployment.png" id="2_e3vs3"]
 [ext_resource type="Texture2D" uid="uid://wegqw3w8dxe1" path="res://sprites/tiles/movement_tile.png" id="3_v76xb"]
 [ext_resource type="Texture2D" uid="uid://dwlnwcdgwc6de" path="res://sprites/tiles/PlaceHolderModTiles.png" id="4_j2mhh"]
 [ext_resource type="Texture2D" uid="uid://cjkkbrsts6nqc" path="res://sprites/tiles/walls.png" id="5_ycrxn"]
-[ext_resource type="Texture2D" uid="uid://cvwlg1ibgcatk" path="res://sprites/tiles/event_spawner.png" id="6_6ymmv"]
 [ext_resource type="Texture2D" uid="uid://cmq0aslbpegke" path="res://sprites/tiles/interactives200x112.png" id="6_v76xb"]
-[ext_resource type="Texture2D" uid="uid://bc4tnv65u3qkk" path="res://sprites/tiles/newhex168x56.png" id="7_e3vs3"]
 [ext_resource type="Texture2D" uid="uid://bksmyj30srka5" path="res://sprites/tiles/TileSetPlaceHolder.png" id="7_s3su6"]
 [ext_resource type="Texture2D" uid="uid://dl5k64jih1qno" path="res://sprites/tiles/attack_target.png" id="8_rk7vv"]
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_qmxju"]
-texture = ExtResource("1_ggcxa")
-texture_region_size = Vector2i(160, 48)
-0:0/0 = 0
-0:0/0/custom_data_2 = &"deployCell"
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bkpol"]
-texture = ExtResource("2_e3vs3")
-texture_region_size = Vector2i(160, 48)
-0:0/0 = 0
-0:0/0/custom_data_2 = &"forcedCell"
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mbyn6"]
 texture = ExtResource("3_v76xb")
@@ -60,13 +44,6 @@ texture_region_size = Vector2i(168, 104)
 0:3/0/custom_data_0 = &"Shop"
 0:3/0/custom_data_1 = &"Shop"
 
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ggcxa"]
-resource_name = "Seize Tile"
-texture = ExtResource("6_6ymmv")
-texture_region_size = Vector2i(160, 48)
-0:0/0 = 0
-0:0/0/modulate = Color(0.890196, 0.784314, 0, 1)
-
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_j2mhh"]
 texture = ExtResource("6_v76xb")
 texture_region_size = Vector2i(200, 112)
@@ -76,17 +53,37 @@ texture_region_size = Vector2i(200, 112)
 1:0/0 = 0
 1:0/0/texture_origin = Vector2i(0, 27)
 1:0/0/custom_data_1 = &"OpenChest"
+0:1/next_alternative_id = 3
 0:1/0 = 0
 0:1/0/texture_origin = Vector2i(0, 28)
 0:1/0/custom_data_0 = &"WallShoot"
 0:1/0/custom_data_1 = &"Door"
+0:1/0/custom_data_4 = &"Enemy"
+0:1/1 = 1
+0:1/1/custom_data_0 = &"WallShoot"
+0:1/1/custom_data_1 = &"Door"
+0:1/1/custom_data_4 = &"Player"
+0:1/2 = 2
+0:1/2/custom_data_0 = &"WallShoot"
+0:1/2/custom_data_1 = &"Door"
+0:1/2/custom_data_4 = &"NPC"
 1:1/0 = 0
 1:1/0/texture_origin = Vector2i(0, 28)
 1:1/0/custom_data_1 = &"OpenDoor"
+0:2/next_alternative_id = 3
 0:2/0 = 0
 0:2/0/texture_origin = Vector2i(0, 28)
 0:2/0/custom_data_0 = &"WallFly"
 0:2/0/custom_data_1 = &"BreakableWall"
+0:2/0/custom_data_4 = &"Enemy"
+0:2/1 = 1
+0:2/1/custom_data_0 = &"WallFly"
+0:2/1/custom_data_1 = &"BreakableWall"
+0:2/1/custom_data_4 = &"Player"
+0:2/2 = 2
+0:2/2/custom_data_0 = &"WallFly"
+0:2/2/custom_data_1 = &"BreakableWall"
+0:2/2/custom_data_4 = &"NPC"
 1:2/0 = 0
 1:2/0/texture_origin = Vector2i(0, 28)
 1:2/0/custom_data_0 = &"Wall"
@@ -115,16 +112,6 @@ texture_region_size = Vector2i(168, 104)
 4:0/0/texture_origin = Vector2i(0, 25)
 4:0/0/custom_data_0 = &"Wall"
 4:0/0/custom_data_1 = &"Wall"
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_v76xb"]
-texture = ExtResource("7_e3vs3")
-texture_region_size = Vector2i(168, 56)
-0:0/0 = 0
-
-[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_njr1x"]
-texture = ExtResource("6_6ymmv")
-texture_region_size = Vector2i(160, 48)
-0:0/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2ggml"]
 resource_name = "DevTerrain"
@@ -196,14 +183,11 @@ custom_data_layer_2/name = "Trigger"
 custom_data_layer_2/type = 21
 custom_data_layer_3/name = "Locked"
 custom_data_layer_3/type = 1
-sources/6 = SubResource("TileSetAtlasSource_njr1x")
+custom_data_layer_4/name = "Team"
+custom_data_layer_4/type = 21
 sources/19 = SubResource("TileSetAtlasSource_3ivj7")
 sources/10 = SubResource("TileSetAtlasSource_mbyn6")
 sources/9 = SubResource("TileSetAtlasSource_t45qg")
 sources/7 = SubResource("TileSetAtlasSource_2ggml")
 sources/4 = SubResource("TileSetAtlasSource_fntpe")
-sources/1 = SubResource("TileSetAtlasSource_bkpol")
-sources/0 = SubResource("TileSetAtlasSource_qmxju")
-sources/2 = SubResource("TileSetAtlasSource_ggcxa")
-sources/5 = SubResource("TileSetAtlasSource_v76xb")
 sources/3 = SubResource("TileSetAtlasSource_j2mhh")

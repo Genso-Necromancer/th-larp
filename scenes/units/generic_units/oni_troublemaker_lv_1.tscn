@@ -15,8 +15,20 @@ is_broken = false
 metadata/_custom_type_script = "uid://bas4mbl00uet6"
 
 [node name="Oni Troublemaker lv1" instance=ExtResource("1_ciqkb")]
+archetype = 2
 SPEC_ID = 7
 ROLE_ID = 1
+mod_stats = Dictionary[StringName, int]({
+&"Cele": 0,
+&"Cha": 0,
+&"Comp": 0,
+&"Def": 0,
+&"Eleg": 4,
+&"Life": 0,
+&"Mag": 0,
+&"Move": 0,
+&"Pwr": 0
+})
 total_growth = Dictionary[StringName, float]({
 &"Cele": 0.0,
 &"Cha": 0.0,
@@ -33,7 +45,7 @@ total_stats = Dictionary[StringName, int]({
 &"Cha": 0,
 &"Comp": 90,
 &"Def": 5,
-&"Eleg": 2,
+&"Eleg": 6,
 &"Life": 24,
 &"Mag": 0,
 &"Move": 4,

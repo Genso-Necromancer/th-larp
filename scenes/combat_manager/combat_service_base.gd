@@ -51,9 +51,6 @@ func _factor_healing(actor:UnitSim, target:UnitSim, effect) -> int:
 func _speed_check(unit1:UnitSim, unit2:UnitSim) -> bool:
 	var unit1Spd = unit1.active_stats.get(&"Cele", 0)
 	var unit2Spd = unit2.active_stats.get(&"Cele", 0)
-	print("Checking speed... ","Unit1 Spd: ", unit1Spd, " Required Spd: ", str(unit2Spd+Global.spdGap))
 	if unit1Spd >= (unit2Spd + Global.spdGap):
-		print("Passed, follow-up allowed")
 		return true
-	print("Failed")
 	return false

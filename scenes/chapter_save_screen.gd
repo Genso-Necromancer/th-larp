@@ -113,8 +113,8 @@ func _on_continue_button_pressed(_button:TextureLabelButton)-> void:
 		SCENE_STATE.EXIT_PROMPT: 
 			_fade_and_end(1)
 		SCENE_STATE.OVERWRITE:
-			_make_new_save(cached_button)
 			_close_prompt()
+			_make_new_save(cached_button)
 		SCENE_STATE.LOADING:
 			_push_file()
 			_fade_and_end(1)
@@ -152,6 +152,10 @@ func _change_state(new_state:SCENE_STATE) -> void:
 
 
 func _to_previous_state() -> void:
+	if _state_chain.is_empty():
+		state = SCENE_STATE.FILE_SELECT
+		state_changed.emit(state)
+		return
 	var newState : SCENE_STATE = _state_chain.pop_back()
 	state = newState
 	state_changed.emit(state)

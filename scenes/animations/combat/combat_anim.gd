@@ -44,16 +44,22 @@ func set_unit(newUnit : Unit):
 	unit = newUnit
 	
 	
-func assign_action(hit, actionType, skill:Skill=null):
+func assign_action(hit, actionType, skill:SlotWrapper=null):
 	isHit = hit
 	match actionType:
 		ACTION_TYPE.WEAPON: _assign_attack_animation()
-		ACTION_TYPE.FRIENDLY_SKILL: _assign_skill_animation(skill)
-		ACTION_TYPE.HOSTILE_SKILL: 
-			if skill.augment:
-				_assign_attack_animation()
-			else:
+		ACTION_TYPE.FRIENDLY_SKILL:
+			if skill != null:
 				_assign_skill_animation(skill)
+			else:
+				activeAnim = "Cast"
+		ACTION_TYPE.HOSTILE_SKILL: 
+			if skill != null and skill.augment:
+				_assign_attack_animation()
+			elif skill != null:
+				_assign_skill_animation(skill)
+			else:
+				activeAnim = "Cast"
 
 
 func assign_defend(hit, dmg, crit, graze):
@@ -91,6 +97,8 @@ func assign_defend(hit, dmg, crit, graze):
 		dmgPop.set_stylized_string("dodge")
 		chest.add_child(dmgPop)
 		popUp = dmgPop
+	if popUp:
+		popUp.connect_signal(self)
 	if isFlipped:
 		popUp.set_scale(Vector2(-1,1))
 	activeAnim = "Defend"
@@ -115,6 +123,10 @@ func _assign_attack_animation():
 	
 		
 func _assign_skill_animation(skill:SlotWrapper):
+	if skill == null:
+		activeAnim = "Cast"
+		combatPlayer.play(activeAnim)
+		return
 	var variant : String = skill.id.to_pascal_case()
 	var default := "Cast"
 	var list = combatPlayer.get_animation_list()
@@ -183,14 +195,17 @@ func play_target_fx():
 		emit_signal("animation_end")
 
 
-func add_skill_fx(skillId):
+func add_skill_fx(skill:SlotWrapper):
+	if skill == null:
+		return
+	var skillId := String(skill.id)
 	var attackBone = $CombatSkeleton/AttackFx
 	var skillFxPath
 	#var skillAnim = ANIM_DATA.get_skill_anim()
 	skillNameFx = SKILL_NAME_PATH.instantiate()
 	var bone = $CombatSkeleton/SkillNameFx
 	
-	skillNameFx.set_skill_style(skillId)
+	skillNameFx.set_skill_style(skill)
 	bone.add_child(skillNameFx)
 		
 	if ANIM_DATA.SKILL_ANIM.has(skillId):
@@ -279,6 +294,7 @@ func _add_graze_fx():
 	var chest = $CombatSkeleton/ChestFx
 	grazeFx = GRAZE_PATH.instantiate()
 	chest.add_child(grazeFx)
+	grazeFx.connect_signal(self)
 	
 	
 func _add_crit_fx():

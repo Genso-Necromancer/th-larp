@@ -1,7 +1,7 @@
 [gd_scene load_steps=10 format=3 uid="uid://bnnxx77j4atuk"]
 
 [ext_resource type="Texture2D" uid="uid://bumofv4hd5kef" path="res://sprites/UI/turn_tokens.png" id="1_drgm0"]
-[ext_resource type="Script" path="res://scenes/turn_token.gd" id="2_flun0"]
+[ext_resource type="Script" uid="uid://bn6hc5xtnbkxp" path="res://scenes/turn_token.gd" id="2_flun0"]
 
 [sub_resource type="Animation" id="Animation_flun0"]
 resource_name = "RESET"
@@ -15,7 +15,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0, 0)]
+"values": [Vector2(575, 0)]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -167,6 +167,7 @@ _data = {
 script = ExtResource("2_flun0")
 
 [node name="TokenSprite" type="Sprite2D" parent="."]
+position = Vector2(575, 0)
 texture = ExtResource("1_drgm0")
 offset = Vector2(-239, 0)
 vframes = 4

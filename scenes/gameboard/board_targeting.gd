@@ -32,8 +32,7 @@ func start_attack_targeting() -> void:
 	var reach: Dictionary = board.activeUnit.get_weapon_reach()
 	board.turn_step = GameBoard.TURN_STEPS.ATTACK_TARGET
 	board._set_active_action(true, null, null)
-	if GameState:
-		GameState.change_state(board, GameState.gState.GB_ATTACK_TARGETING)
+	board.apply_targeting_control_state()
 	draw_range(board.activeUnit, reach.Max, reach.Min)
 
 
@@ -46,8 +45,7 @@ func start_skill_targeting(skill = null) -> void:
 
 	board.turn_step = GameBoard.TURN_STEPS.SKILL_TARGET
 	board._set_active_action(active_skill.augment, active_skill, null)
-	if GameState:
-		GameState.change_state(board, GameState.gState.GB_SKILL_TARGETING)
+	board.apply_targeting_control_state()
 
 	var reach: Dictionary
 	if board.active_action.Weapon:
@@ -64,16 +62,14 @@ func start_item_targeting(item: Consumable) -> void:
 	board._set_active_action(false, null, item)
 	draw_range(board.activeUnit, item.max_reach, item.min_reach)
 	board.turn_step = GameBoard.TURN_STEPS.ITEM_TARGET
-	if GameState:
-		GameState.change_state(board, GameState.gState.GB_ITEM_TARGETING)
+	board.apply_targeting_control_state()
 
 
 func door_targeting() -> void:
 	if board.activeUnit == null:
 		return
 	board.turn_step = GameBoard.TURN_STEPS.DOOR_TARGET
-	if GameState:
-		GameState.change_state(board, GameState.gState.GB_OBJECT_TARGETING)
+	board.apply_targeting_control_state()
 	draw_range(board.activeUnit, 1, 1)
 
 
@@ -84,15 +80,15 @@ func seek_trade(unit: Unit = null) -> void:
 	board.activeUnit = trade_unit
 	board.turn_step = GameBoard.TURN_STEPS.TRADE_TARGET
 	draw_range(board.activeUnit, 1, 1)
-	if GameState:
-		GameState.change_state(board, GameState.gState.GB_TRADE_TARGETING)
+	board.apply_targeting_control_state()
 
 
-func end_targeting() -> void:
+func end_targeting(emit_cancel := true) -> void:
 	board._wipe_region()
 	board.current_map.pathAttack.clear()
 	board.cursor.cell = board.activeUnit.cell
-	board.gameboard_targeting_canceled.emit()
+	if emit_cancel:
+		board.gameboard_targeting_canceled.emit()
 
 
 func trade_target_selected() -> void:
@@ -103,7 +99,7 @@ func trade_target_selected() -> void:
 	if not board._check_friendly(board.activeUnit, board.focusUnit):
 		return
 	board._set_action_target(board.focusUnit)
-	end_targeting()
+	end_targeting(false)
 	if board.guiManager:
 		board.guiManager.start_action_trade(board.activeUnit, board.targetUnit)
 
@@ -155,7 +151,7 @@ func grab_target(cell: Vector2i) -> void:
 		return
 
 	board._set_action_target(board.units[cell])
-	var distance := hex_star.compute_cost(board.activeUnit.cell, board.targetUnit.cell, board.activeUnit)
+	var distance := hex_star.find_distance(board.activeUnit.cell, board.targetUnit.cell)
 	var reach := [distance, distance]
 
 	board._set_action_forecast(board.combatManager.get_forecast(board.activeUnit, board.targetUnit, board.active_action))

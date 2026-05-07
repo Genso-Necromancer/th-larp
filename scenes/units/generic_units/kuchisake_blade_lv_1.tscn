@@ -1,0 +1,85 @@
+[gd_scene load_steps=9 format=3 uid="uid://bcug5vmv5c0k"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_08l3k"]
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="2_3cfdy"]
+[ext_resource type="Resource" uid="uid://3o0hv3vmn8qo" path="res://unit_resources/features/passives/ambush.tres" id="3_b2e8q"]
+[ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="4_sfx4u"]
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="5_1v3bc"]
+[ext_resource type="Resource" uid="uid://2rd8otigdweg" path="res://unit_resources/items/weapons/scissor_blade_basic.tres" id="6_xr3xv"]
+[ext_resource type="Texture2D" uid="uid://cfhofpnoguehi" path="res://sprites/character/youkai/blade_sprite.png" id="7_1v3bc"]
+
+[sub_resource type="Resource" id="Resource_facok"]
+script = ExtResource("5_1v3bc")
+stats = ExtResource("6_xr3xv")
+equipped = true
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[node name="kuchisake_blade_lv1" instance=ExtResource("1_08l3k")]
+archetype = 2
+ai_role = 2
+SPEC_ID = 6
+ROLE_ID = 9
+mod_stats = Dictionary[StringName, int]({
+&"Cele": 0,
+&"Cha": 0,
+&"Comp": 0,
+&"Def": 0,
+&"Eleg": 0,
+&"Life": 6,
+&"Mag": 0,
+&"Move": 0,
+&"Pwr": 0
+})
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.6,
+&"Cha": 0.1,
+&"Comp": 0.3,
+&"Def": 0.2,
+&"Eleg": 0.4,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.3
+})
+total_stats = Dictionary[StringName, int]({
+&"Cele": 6,
+&"Cha": 0,
+&"Comp": 100,
+&"Def": 1,
+&"Eleg": 4,
+&"Life": 20,
+&"Mag": 0,
+&"Move": 5,
+&"Pwr": 5
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 20,
+&"Cha": 20,
+&"Comp": 100,
+&"Def": 20,
+&"Eleg": 20,
+&"Life": 20,
+&"Mag": 20,
+&"Move": 10,
+&"Pwr": 20
+})
+passives = Array[ExtResource("2_3cfdy")]([ExtResource("3_b2e8q")])
+weapon_prof = {
+"Blade": true,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": true,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
+max_inv = 6
+inventory = Array[ExtResource("4_sfx4u")]([SubResource("Resource_facok")])
+
+[node name="Sprite" parent="PathFollow2D" index="0"]
+texture = ExtResource("7_1v3bc")

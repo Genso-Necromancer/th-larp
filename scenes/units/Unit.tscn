@@ -26,7 +26,6 @@ rotates = false
 loop = false
 
 [node name="Sprite" type="Sprite2D" parent="PathFollow2D"]
-self_modulate = Color(1, 1, 1, 0)
 position = Vector2(-1, -36)
 scale = Vector2(4, 4)
 texture = ExtResource("2_3vwvo")

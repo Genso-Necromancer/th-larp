@@ -1,7 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://ly80b5bj1iom"]
+[gd_scene load_steps=12 format=3 uid="uid://ly80b5bj1iom"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_w0yue"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_apnrh"]
+[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_smiby"]
+[ext_resource type="Resource" uid="uid://dgjhkd6ch1s4l" path="res://unit_resources/features/skills/spell_basic_fire.tres" id="3_3jhpt"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="3_skgj4"]
 [ext_resource type="Resource" uid="uid://bt4av6jfrwk5g" path="res://unit_resources/items/weapons/book_fire.tres" id="4_arr5s"]
 [ext_resource type="Script" uid="uid://y8vspyvvdgjj" path="res://unit_resources/items/consumables/consumable.gd" id="5_arr5s"]
@@ -46,7 +48,7 @@ total_stats = Dictionary[StringName, int]({
 total_caps = Dictionary[StringName, int]({
 &"Cele": 20,
 &"Cha": 20,
-&"Comp": 20,
+&"Comp": 100,
 &"Def": 20,
 &"Eleg": 20,
 &"Life": 20,
@@ -54,6 +56,7 @@ total_caps = Dictionary[StringName, int]({
 &"Move": 10,
 &"Pwr": 20
 })
+skills = Array[ExtResource("2_smiby")]([ExtResource("3_3jhpt")])
 weapon_prof = {
 "Blade": false,
 "Blunt": false,

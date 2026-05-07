@@ -11,6 +11,7 @@ var map_manager: MapManager
 var first_map:String = "res://scenes/maps/seize_test.tscn"
 var manager_preload:= preload("res://scenes/map_manager.tscn")
 var file_selected:bool = false
+var pending_save_file:String = ""
 
 
 func _ready():
@@ -163,13 +164,14 @@ func begin_file_select():
 
 #region save select screen
 func _on_file_selected(save_file:String):
-	_start_file_load(save_file)
+	pending_save_file = save_file
 	file_selected = true
 
 
 func _on_save_scene_finished(_save_screen:SaveScreen):
 	if file_selected:
-		#loading screen needed here
+		_start_file_load(pending_save_file)
+		pending_save_file = ""
 		file_selected = false
 	else: 
 		var startScene = load("res://scenes/GUI/title/title_screen.tscn").instantiate()

@@ -12,6 +12,7 @@ func update_stats():
 	# 1. Recompute base stats (base + mods + level_stats)
 	var base_stats = _compute_base_totals()
 	unit.base_stats_final = base_stats  # Store for UI
+	unit._refresh_total_parameters()
 	
 	# 2. mod groups
 	var time_mods  = _compute_time_modifiers()

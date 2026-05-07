@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://dwyxm5ognkbog"]
+[gd_scene load_steps=13 format=3 uid="uid://dwyxm5ognkbog"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_ku6ti"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_2l8tf"]
@@ -7,6 +7,7 @@
 [ext_resource type="Resource" uid="uid://bofq84qr3ykxf" path="res://unit_resources/features/passives/fated.tres" id="3_bmjv5"]
 [ext_resource type="Resource" uid="uid://p3wtlxq4fq1f" path="res://unit_resources/features/skills/life_steal_rem.tres" id="3_ushyw"]
 [ext_resource type="Resource" uid="uid://co546romn6pwr" path="res://unit_resources/features/passives/rem_aura.tres" id="4_302o8"]
+[ext_resource type="Resource" uid="uid://bxm1olqpp65nj" path="res://unit_resources/features/passives/canto.tres" id="5_bmjv5"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="7_u1nol"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="8_vtdhj"]
 [ext_resource type="Resource" uid="uid://da080uvnxli85" path="res://unit_resources/items/weapons/gungnir.tres" id="9_1tx70"]
@@ -27,7 +28,6 @@ unique_art = true
 simulate_leveling = false
 SPEC_ID = 3
 ROLE_ID = 3
-move_type = 2
 mod_growth = Dictionary[StringName, float]({
 &"Cele": 1.0,
 &"Cha": 0.6,
@@ -38,6 +38,17 @@ mod_growth = Dictionary[StringName, float]({
 &"Mag": 0.5,
 &"Move": 0.0,
 &"Pwr": 0.5
+})
+mod_stats = Dictionary[StringName, int]({
+&"Cele": 0,
+&"Cha": 0,
+&"Comp": 0,
+&"Def": 0,
+&"Eleg": 0,
+&"Life": 4,
+&"Mag": 0,
+&"Move": 0,
+&"Pwr": 0
 })
 total_growth = Dictionary[StringName, float]({
 &"Cele": 1.0,
@@ -56,7 +67,7 @@ total_stats = Dictionary[StringName, int]({
 &"Comp": 100,
 &"Def": 1,
 &"Eleg": 7,
-&"Life": 20,
+&"Life": 24,
 &"Mag": 4,
 &"Move": 5,
 &"Pwr": 5
@@ -64,7 +75,7 @@ total_stats = Dictionary[StringName, int]({
 total_caps = Dictionary[StringName, int]({
 &"Cele": 20,
 &"Cha": 20,
-&"Comp": 20,
+&"Comp": 100,
 &"Def": 20,
 &"Eleg": 20,
 &"Life": 20,
@@ -72,9 +83,9 @@ total_caps = Dictionary[StringName, int]({
 &"Move": 10,
 &"Pwr": 20
 })
-personal_passives = Array[ExtResource("2_ou00g")]([ExtResource("3_bmjv5"), ExtResource("4_302o8")])
+personal_passives = Array[ExtResource("2_ou00g")]([ExtResource("3_bmjv5"), ExtResource("4_302o8"), ExtResource("5_bmjv5")])
 skills = Array[ExtResource("2_2l8tf")]([ExtResource("3_ushyw")])
-passives = Array[ExtResource("2_ou00g")]([ExtResource("3_bmjv5"), ExtResource("4_302o8")])
+passives = Array[ExtResource("2_ou00g")]([ExtResource("3_bmjv5"), ExtResource("4_302o8"), ExtResource("5_bmjv5")])
 weapon_prof = {
 "Blade": false,
 "Blunt": false,

@@ -1,0 +1,30 @@
+[gd_resource type="Resource" script_class="Personality" load_steps=2 format=3 uid="uid://dh630esqxwuhu"]
+
+[ext_resource type="Script" uid="uid://ddggxto7a5s72" path="res://scrpt/ai/personality_weights.gd" id="1_os287"]
+
+[resource]
+script = ExtResource("1_os287")
+damage_preference = 3
+kill_finish_preference = 3
+accuracy_preference = 3
+focus_fire_preference = 3
+support_bias_preference = 0
+survival_preference = 3
+barrier_value_preference = 3
+lethality_respect_preference = 3
+risk_threshold = 0.5
+terrain_preference = 3
+objective_pressure_preference = 3
+formation_preference = 3
+aura_coverage_preference = 3
+protect_leader_preference = 3
+unit_pressure_preference = 3
+wait_preference = 1
+aggression_preference = 3
+overextension_tolerance_preference = 2
+tempo_preference = 3
+safe_attack_bonus = 1.4
+accuracy_curve = 2.2
+minimum_action_score = 0.5
+max_depth = 3
+metadata/_custom_type_script = "uid://ddggxto7a5s72"

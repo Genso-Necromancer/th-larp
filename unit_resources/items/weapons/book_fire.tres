@@ -7,8 +7,8 @@
 [resource]
 resource_name = "book_fire"
 script = ExtResource("2_dtir2")
-dmg = 1
-hit = 70
+dmg = 6
+hit = 60
 crit = 0
 crit_min = 10
 crit_max = 20

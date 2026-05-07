@@ -40,7 +40,7 @@ func _write_to_file(file_name:String,save_type:Enums.SAVE_TYPE)->void:
 		"Date": Time.get_datetime_dict_from_system(),
 		"game_time":global.game_time,
 		"time_of_day":global.time_of_day,
-		"victory":global.flags.victory,
+		"victory":bool(global.get("flags", {}).get("victory", false)),
 		"chapter_title":player.chapter_title,
 		"chapter_number":player.chapter_number,}
 	storage["Headstone"] = headStone

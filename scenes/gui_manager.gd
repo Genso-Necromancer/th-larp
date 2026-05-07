@@ -1,7 +1,6 @@
 extends Control
 class_name GUIManager
 
-#old
 signal gui_splash_finished
 signal start_the_justice
 signal deploy_toggled(unit_id, depStatus)
@@ -22,10 +21,9 @@ signal ui_seize_selected(cell)
 signal ui_suspend_requested
 signal ui_action_menu_canceled
 
-@onready var blocker : Panel = $PanelBlocker #used to block the map easily
+@onready var blocker : Panel = $PanelBlocker
 @onready var HUD : Control = $HUD
 @onready var DEBUG:Control = $DEBUG
-#unvetted
 @export var mapCursorPath : NodePath
 @export var menuOffSet : int = 150
 @onready var mapCursor := get_node(mapCursorPath)
@@ -53,7 +51,7 @@ enum sStates {
 var sState := sStates.HOME:
 	set(value):
 		
-		match value: #Temporary, may be best to have HUD groups to control?
+		match value:
 			sStates.FORM: focusViewer.enableViewer = true
 			sStates.BEGIN: focusViewer.enableViewer = true
 			_: 
@@ -62,9 +60,7 @@ var sState := sStates.HOME:
 			
 			
 		sState = value
-		#print("sState Changed: ", sStates.keys()[value])
-
-##preloads (this is how I should have been doing shit from the start!)
+##preloads
 var turn_tracker_res = preload("res://scenes/turn_tracker.tscn")
 var mapSetUp : MapGui
 var rosterGrid : UnitRoster
@@ -119,8 +115,6 @@ func _ready():
 	SignalTower.prompt_accepted.connect(_on_prompt_accepted)
 	SignalTower.sequence_complete.connect(self._on_animation_handler_sequence_complete)
 	SaveHub.suspend_save_complete.connect(self._on_suspend_save_complete)
-	#menuCursor.visible = false
-	#_add_hud_children()
 	_connect_asset_signals()
 
 
@@ -128,10 +122,6 @@ func _add_hud_children():
 	var hudElements := [hud_clock, turn_tracker, focusViewer]
 	for node in hudElements:
 		_relocate_child(node, HUD)
-
-
-func update_labels(): #Use this to cascade assigning strings from XML to all hard loaded buttons HERE
-	pass
 
 
 func _on_prompt_accepted():
@@ -198,19 +188,6 @@ func _font_color_change(b, style):
 	b.add_theme_color_override("font_hover_pressed_color", fColor)
 
 
-func _snap_to_cursor(node): #bug gy save for later
-	var cursorPos = mapCursor.to_local(mapCursor.position)
-	var newPos
-	
-	newPos = cursorPos
-#	newPos.x += menuOffSet
-	print("Node " + str(node.global_position))
-	print("cursor " + str(cursorPos))
-	print("new " + str(newPos))
-	node.global_position = newPos
-	print("Node " + str(node.global_position))
-
-
 func _on_gameboard_toggle_prof():
 	toggle_profile()
 
@@ -269,10 +246,10 @@ func _on_gameboard_target_focused( mode : int, reach: Array = [-1, -1]):
 	_swap_to_forecast()
 	match mode:
 		0: 
-			GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
+			GRANDDAD.gameBoard.apply_forecast_control_state()
 			actMenu.open_weapon_select(reach)
 		1: 
-			GameState.change_state(self, GameState.gState.GB_COMBAT_FORECAST)
+			GRANDDAD.gameBoard.apply_forecast_control_state()
 			actMenu.open_skill_confirm()
 		2: _ai_sequence_check()
 	
@@ -301,12 +278,17 @@ func _swap_to_forecast():
 	_hide_hud()
 
 
-#HERE
 func _on_gameboard_exp_display(oldExp:int, expSteps:Array, results:Dictionary, unitPrt:String, unitName:String):
 	var expContainer : XpContainer = $ExpGain
 	GameState.change_state(self, GameState.gState.ACCEPT_PROMPT)
 	expContainer.init_exp_display(oldExp, expSteps, results, unitPrt, unitName)
 	expContainer.toggle_visibility()
+
+
+func _on_exp_gain_exp_finished() -> void:
+	if GRANDDAD == null or GRANDDAD.gameBoard == null:
+		return
+	GRANDDAD.gameBoard._on_exp_gain_exp_finished()
 
 
 func call_setup(dep_cap:int, forced:Array, map:GameMap, unit_refs:Dictionary):
@@ -352,10 +334,13 @@ func _load_assets():
 
 
 func _connect_asset_signals():
+	var expContainer : XpContainer = $ExpGain
 	unitProf.tooltips_on.connect(self._on_profile_tooltips_on)
 	unitProf.tooltips_off.connect(self._on_profile_tooltips_off)
 	_connect_action_menu_signals()
 	actMenu.action_menu_suspending_game.connect(self._on_action_suspending)
+	if not expContainer.exp_finished.is_connected(_on_exp_gain_exp_finished):
+		expContainer.exp_finished.connect(_on_exp_gain_exp_finished)
 	#actMenu.action_menu_ofuda_open.connect(self._on_action_ofuda_open)
 
 #region act menu signal handling
@@ -598,8 +583,12 @@ func _connect_btn_to_cursor(b):
 	
 func _strip_menuCursor(p = menuCursor.menu_parent, array: Array = []):
 	var btns 
-	if array.size()>0: btns = array
-	else: btns = p.get_children()
+	if array.size()>0:
+		btns = array
+	elif p != null:
+		btns = p.get_children()
+	else:
+		btns = []
 	for b in btns:
 		if b.mouse_entered.is_connected(self._on_mouse_entered.bind(b)): 
 			b.mouse_entered.disconnect(self._on_mouse_entered.bind(b))
@@ -691,7 +680,7 @@ func _on_trade_closed(is_action:=false) -> void:
 		menuCursor.visible = false
 		sState = sStates.BEGIN
 		_show_hud()
-		GameState.change_state(GRANDDAD.gameBoard, GameState.gState.GB_DEFAULT)
+		GRANDDAD.gameBoard.apply_default_control_state()
 	else:
 		_reopen_action_menu(acting_unit)
 	trade1 = null
@@ -763,7 +752,27 @@ func _on_profile_request(newParent):
 
 #Action/Generic options menu functions
 func regress_act_menu():
+	if actMenu == null:
+		return
+	var is_root_menu := false
+	match actMenu.state:
+		ActionMenu.MENU_STATES.ACTION, ActionMenu.MENU_STATES.POST_MOVE_ACTION, ActionMenu.MENU_STATES.OPTIONS:
+			is_root_menu = true
+	if is_root_menu:
+		ui_action_menu_canceled.emit()
+		return
 	actMenu.return_previous_state()
+
+
+func _open_action_menu_for_unit(unit: Unit, moved: bool = false) -> void:
+	if unit == null:
+		return
+	GRANDDAD.gameBoard.apply_action_menu_control_state()
+	actMenu.open_as_action(unit, moved)
+
+
+func _restore_targeting_game_state(board: GameBoard) -> void:
+	board.apply_targeting_control_state()
 
 
 func _reopen_action_menu(unit: Unit) -> void:
@@ -773,72 +782,65 @@ func _reopen_action_menu(unit: Unit) -> void:
 	menuCursor.visible = false
 	sState = sStates.BEGIN
 	_show_hud()
-	if PlayerData.move_committed:
-		board.turn_step = GameBoard.TURN_STEPS.ACTIONS2
-	else:
-		board.turn_step = GameBoard.TURN_STEPS.ACTIONS
-	GameState.change_state(board, GameState.gState.GB_DEFAULT)
+	board.restore_post_target_turn_step()
 	actMenu.end_self()
-	actMenu.open_as_action(unit, PlayerData.move_committed)
+	_open_action_menu_for_unit(unit, board.get_action_menu_moved_state())
 
 
 func end_action_menu():
 	actMenu.end_self()
+
+
+func _close_forecast_ui() -> void:
+	foreCast.hide_fc()
+
+
+func _on_gameboard_player_flow_changed(_flow_keys:Array, flow) -> void:
+	var board := GRANDDAD.gameBoard
+	if board.state != GameBoard.STATES.PLAYER_PHASE:
+		return
+	match flow:
+		GameBoard.PLAYER_FLOW.IDLE:
+			end_action_menu()
+			if foreCast.visible:
+				_close_forecast_ui()
+				_show_hud()
+			board.apply_default_control_state()
+		GameBoard.PLAYER_FLOW.UNIT_SELECTED:
+			if board.is_options_menu_active():
+				board.apply_action_menu_control_state()
+				actMenu.open_as_options()
+			elif board.activeUnit != null:
+				_open_action_menu_for_unit(board.activeUnit, board.get_action_menu_moved_state())
+		GameBoard.PLAYER_FLOW.MOVE_PREVIEW:
+			end_action_menu()
+			board.apply_default_control_state()
+		GameBoard.PLAYER_FLOW.POST_MOVE_MENU:
+			if board.activeUnit != null:
+				_open_action_menu_for_unit(board.activeUnit, board.get_action_menu_moved_state())
+		GameBoard.PLAYER_FLOW.TARGETING, GameBoard.PLAYER_FLOW.FORECAST:
+			pass
+		GameBoard.PLAYER_FLOW.RESOLVING:
+			end_action_menu()
 	
-
-
-func cancel_forecast():
-	GRANDDAD.gameBoard.ui_return()
 
 
 func _on_gameboard_action_confirmed():
 	end_action_menu()
 
 
-func _on_gameboard_cell_selected(_cell): #cell is sent by signal for general use, but the specific cell selected is not currently needed
-	GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-	actMenu.open_as_options()
-
-
-func _on_gameboard_unit_move_ended(unit:Unit):
-	#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-	actMenu.open_as_action(unit, true)
-
-
-func _on_gameboard_unit_selected(unit:Unit):
-	#GameState.change_state(self, GameState.gState.GB_ACTION_MENU)
-	actMenu.open_as_action(unit)
-
-
 func _on_gameboard_targeting_canceled():
-	var was_trade_targeting := GameState.state == GameState.gState.GB_TRADE_TARGETING
-	GameState.change_state(GRANDDAD.gameBoard, GameState.gState.GB_DEFAULT)
-	if was_trade_targeting:
-		_reopen_action_menu(GRANDDAD.gameBoard.activeUnit)
-	else:
-		actMenu.resume_menu()
-		regress_act_menu()
+	var board := GRANDDAD.gameBoard
+	_reopen_action_menu(board.activeUnit)
 
 
 func _on_gameboard_ui_return(state:GameBoard.TURN_STEPS):
 	match state:
-		GameBoard.TURN_STEPS.OPTIONS:
-			GameState.change_state(GRANDDAD.gameBoard, GameState.gState.GB_DEFAULT)
 		GameBoard.TURN_STEPS.FORECAST_ATTACK:
 			_show_hud()
 			foreCast.hide_fc()
 			var board := GRANDDAD.gameBoard
-			match board.turn_step:
-				GameBoard.TURN_STEPS.ATTACK_TARGET:
-					GameState.change_state(board, GameState.gState.GB_ATTACK_TARGETING)
-				GameBoard.TURN_STEPS.SKILL_TARGET:
-					GameState.change_state(board, GameState.gState.GB_SKILL_TARGETING)
-				GameBoard.TURN_STEPS.ITEM_TARGET:
-					GameState.change_state(board, GameState.gState.GB_ITEM_TARGETING)
-				GameBoard.TURN_STEPS.TRADE_TARGET:
-					GameState.change_state(board, GameState.gState.GB_TRADE_TARGETING)
-				_:
-					GameState.change_state(board, GameState.gState.GB_DEFAULT)
+			_restore_targeting_game_state(board)
 	regress_act_menu()
 	
 
@@ -862,7 +864,7 @@ func _on_action_suspending():
 	SaveHub.save_to_file(fileName,Enums.SAVE_TYPE.SUSPENDED)
 
 
-func _on_weapon_selected(button): #weapon can change after selection if mouse moves at wrong time. HERE Fix this, you absolute fucking retard
+func _on_weapon_selected(button):
 	#foreCast.hide_fc()
 	_strip_menuCursor()
 	emit_signal("start_the_justice", button)

@@ -95,16 +95,16 @@ func _get_values() -> Dictionary:
 	values["path"] = resource_path if resource_path != "" else get_resource_path()
 
 	# effect behavior
-	values["type"] = int(type)
-	values["sub_type"] = int(sub_type)
-	values["target"] = int(target)
+	values["type"] = type if type != null else Enums.EFFECT_TYPE.NONE
+	values["sub_type"] = sub_type if sub_type != null else Enums.SUB_TYPE.NONE
+	values["target"] = target if target != null else Enums.EFFECT_TARGET.NONE
 	values["instant"] = bool(instant)
 	values["on_hit"] = bool(on_hit)
-	values["proc"] = int(proc)
+	values["proc"] = proc
 
 	# duration/stacking
-	values["duration"] = int(duration)
-	values["duration_type"] = int(duration_type)
+	values["duration"] = duration
+	values["duration_type"] = duration_type if duration_type != null else Enums.DURATION_TYPE.NONE
 	values["stack"] = bool(stack)
 	values["permanent"] = bool(permanent)
 
@@ -117,11 +117,11 @@ func _get_values() -> Dictionary:
 	values["value"] = value
 
 	# type-specific payload
-	values["multi_swing"] = int(multi_swing)
-	values["multi_round"] = int(multi_round)
+	values["multi_swing"] = multi_swing
+	values["multi_round"] = multi_round
 	values["crit_dmg"] = crit_dmg.duplicate(true)
 	values["crit_mult"] = bool(crit_mult)
-	values["crit_rate"] = int(crit_rate)
+	values["crit_rate"] = crit_rate
 
 	# References: store paths (UnitSim should not hold live Resources)
 	values["skill_path"] = (skill.resource_path if skill else "")

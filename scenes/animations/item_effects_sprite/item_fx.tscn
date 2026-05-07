@@ -6,4 +6,6 @@
 [node name="ItemFxSprite" type="AnimatedSprite2D"]
 sprite_frames = ExtResource("1_7b170")
 animation = &"Buff"
+frame = 2
+frame_progress = 1.0
 script = ExtResource("2_pbhap")

@@ -4,10 +4,10 @@
 [ext_resource type="TileSet" uid="uid://dae0fl1fnuwvk" path="res://TileSets/TestTileSet2.tres" id="2_1xy5d"]
 [ext_resource type="TileSet" uid="uid://csbjmhaysou6f" path="res://TileSets/ObjectSet.tres" id="3_6ts4f"]
 [ext_resource type="TileSet" uid="uid://d0jkuu7oqmw7d" path="res://TileSets/region_tiles.tres" id="4_ds6an"]
+[ext_resource type="Script" uid="uid://bw7nqqrsribgq" path="res://scenes/maps/context.gd" id="5_1xy5d"]
 [ext_resource type="TileSet" uid="uid://dc86d54yrw68y" path="res://TileSets/EventSet.tres" id="5_8do3e"]
 [ext_resource type="Script" uid="uid://d2s883a3vismr" path="res://scenes/maps/narrativeLayer.gd" id="6_lbo8e"]
 [ext_resource type="TileSet" uid="uid://bphorhxlrllt2" path="res://TileSets/dev_set.tres" id="7_1xy5d"]
-[ext_resource type="Script" uid="uid://c8mj43llqf2yl" path="res://scrpt/ai/ai_manager_old.gd" id="9_1xy5d"]
 [ext_resource type="PackedScene" uid="uid://d2cjx6gleg5wq" path="res://scenes/maps/Layers/seize_layer.tscn" id="10_6ts4f"]
 
 [node name="GameMap" type="Node2D" groups=["Persist"]]
@@ -37,10 +37,11 @@ tile_set = ExtResource("3_6ts4f")
 use_parent_material = true
 tile_set = ExtResource("2_1xy5d")
 
-[node name="Regions" type="TileMapLayer" parent="."]
+[node name="Context" type="TileMapLayer" parent="."]
 self_modulate = Color(1, 1, 1, 0.658824)
 use_parent_material = true
 tile_set = ExtResource("4_ds6an")
+script = ExtResource("5_1xy5d")
 
 [node name="PathAttack" type="TileMapLayer" parent="."]
 use_parent_material = true
@@ -59,6 +60,3 @@ tile_set = ExtResource("7_1xy5d")
 [node name="SeizeLayer" parent="." instance=ExtResource("10_6ts4f")]
 
 [node name="DanmakuManager" type="Node2D" parent="."]
-
-[node name="AiManager" type="Node" parent="."]
-script = ExtResource("9_1xy5d")

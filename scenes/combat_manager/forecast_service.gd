@@ -24,7 +24,7 @@ func get_forecast(a: UnitSim, t: UnitSim, action: Dictionary) -> CombatResults:
 	# --- Counter eligibility preview ---
 	var counter_possible := false
 	if a.id != t.id and action_type != ACTION_TYPE.FRIENDLY_SKILL:
-		counter_possible = t.can_act() and _reach_check(t, a) # defender reaching attacker
+		counter_possible = t.can_counterattack() and _reach_check(t, a) # defender reaching attacker
 
 	# Store on initiator node for UI convenience
 	initiator_action_node["counter_possible"] = counter_possible
@@ -123,10 +123,9 @@ func _evaluate_effects_preview(a: UnitSim, t: UnitSim, action: Dictionary) -> Ar
 		for effect: Effect in effects:
 			# Ignore equip-only effects in forecast
 			if effect.target == Enums.EFFECT_TARGET.EQUIPPED: continue
-			# Skip instant/global here (handle later if desired)
-			if bool(effect.instant): continue
-			# Forecast cares about on-hit effects
-			if not bool(effect.on_hit): continue
+			# Instant pre-damage effects like Slayer/Crit Buff still need forecast support.
+			if not bool(effect.on_hit) and not _is_pre_damage_effect(effect):
+				continue
 			#potential global skip, commented out until tested
 			#if effect.target == Enums.EFFECT_TARGET.GLOBAL: continue
 			var focus_is_actor := (effect.target == Enums.EFFECT_TARGET.SELF)
@@ -347,10 +346,24 @@ func _get_base_swing_count(actor: UnitSim, action: Dictionary) -> int:
 
 func _get_slayer_mult_from_effect(effect: Effect) -> float:
 	if typeof(effect.value) == TYPE_FLOAT:
-		return float(effect.value)
+		var mult := float(effect.value)
+		if mult > 0.0:
+			return mult
 	if typeof(effect.value) == TYPE_INT:
-		return float(int(effect.value)) / 100.0
-	return 1.0
+		var raw := int(effect.value)
+		if raw > 0:
+			return float(raw) / 100.0
+	return float(Global.slayerMulti)
+
+
+func _is_pre_damage_effect(effect: Effect) -> bool:
+	if effect == null:
+		return false
+	match int(effect.type):
+		Enums.EFFECT_TYPE.SLAYER, Enums.EFFECT_TYPE.CRIT_BUFF:
+			return true
+		_:
+			return false
 
 
 func _get_slayer_mult_for_forecast(actor: UnitSim, target: UnitSim, action: Dictionary) -> float:

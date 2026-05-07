@@ -1,17 +1,29 @@
-[gd_resource type="Resource" load_steps=2 format=3 uid="uid://b62b753ie387q"]
+[gd_resource type="Resource" script_class="Personality" load_steps=2 format=3 uid="uid://dlcq7taykov1"]
 
 [ext_resource type="Script" uid="uid://ddggxto7a5s72" path="res://scrpt/ai/personality_weights.gd" id="1_64stn"]
 
 [resource]
 script = ExtResource("1_64stn")
-tWeight = 1
-uWeight = 0.25
-ulWeight = 0.25
-dmgWeight = 0.25
-accWeight = 0.25
-grWeight = 1.2
-survWeight = 1.1
-waitWeight = 0.12
-survThresh = 0.5
-accScale = 2.2
-safeBonus = 1.4
+damage_preference = 1
+kill_finish_preference = 1
+accuracy_preference = 1
+focus_fire_preference = 1
+support_bias_preference = 0
+survival_preference = 3
+barrier_value_preference = 3
+lethality_respect_preference = 3
+risk_threshold = 0.5
+terrain_preference = 3
+objective_pressure_preference = 3
+formation_preference = 2
+aura_coverage_preference = 2
+protect_leader_preference = 2
+unit_pressure_preference = 1
+wait_preference = 1
+aggression_preference = 3
+overextension_tolerance_preference = 2
+tempo_preference = 3
+safe_attack_bonus = 1.4
+accuracy_curve = 2.2
+minimum_action_score = 0.5
+max_depth = 3

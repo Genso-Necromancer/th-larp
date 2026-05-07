@@ -68,9 +68,15 @@ func natural_to_resource(natural_data:Dictionary) ->Natural:
 func features_to_resource(features:Dictionary)->Array[Feature]:
 	var resources:Array[Feature]=[]
 	var slot:= 0
-	var size:= resources.size()
+	var size:= features.size()
 	while slot<size:
-		var feature := load(features[str(slot)].Properties)
-		resources.append(feature)
+		var entry: Dictionary = features[str(slot)]
+		var feature_path: String = String(entry.get("path", entry.get("Properties", "")))
+		if feature_path == "" or not ResourceLoader.exists(feature_path):
+			slot += 1
+			continue
+		var feature := load(feature_path) as Feature
+		if feature:
+			resources.append(feature)
 		slot += 1
 	return resources

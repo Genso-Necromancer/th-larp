@@ -28,6 +28,24 @@ enum AI_TYPE {
 	SUPPORT,
 	BOSS
 }
+enum AI_ROLE {
+	NONE,
+	OFFENSE,
+	DEFENSE,
+	SUPPORT,
+	SKIRMISHER,
+	OBJECTIVE,
+	SABOTEUR,
+	BOSS
+}
+enum AI_TASK {
+	NONE,
+	LOOT,
+	BREACH,
+	SEIZE,
+	ESCAPE,
+	HOLD
+}
 ##Unit Parameters
 @export var unit_id := "" ## Only change if unique unit
 @export var disabled := false:
@@ -51,6 +69,10 @@ var unit_name := "" #Presented strings will eventually be taken from a seperate 
 @export var archetype :AI_TYPE = AI_TYPE.NONE
 @export var leash : int = -1 ##Number of spaces a target must be for the them move and attack. -1 turns this off.
 @export var one_time_leash:bool = false ##True: After a unit is moved, their leash value will be set to -1 False: Unit never loses it's leash value
+@export var ai_role: AI_ROLE = AI_ROLE.NONE
+@export var ai_task: AI_TASK = AI_TASK.NONE
+@export var ai_lock_position: bool = false
+var leash_consumed: bool = false
 @export_group("Animation Values")
 @export var moveSpeed := 200.0
 @export var shoveSpeed := 350.0
@@ -367,10 +389,10 @@ var isSelected := false:
 		if isSelected:
 			_anim_player.play("selected")
 			#print(unit_id,":", _anim_player.current_animation,":","Selected")
-		elif status.Acted == false:
+		elif not check_status("Acted"):
 			_anim_player.play("idle")
 			#print(unit_id,":", _anim_player.current_animation,"Selected")
-		elif status.Acted == true:
+		elif check_status("Acted"):
 			_anim_player.play("disabled")
 			#print(unit_id,":", _anim_player.current_animation,"Selected")
 #Animation Variables
@@ -428,10 +450,7 @@ var aura_controller : AuraController
 func _generate_base_stats():
 	#Currently doesn't show possible stat totals when simulate_leveling is true
 	if SPEC_ID and ROLE_ID:
-		var keys = Enums.ROLE_ID.keys()
-		var rolekey = keys[ROLE_ID]
 		var newStats :Dictionary= PlayerData.get_unit_stats(SPEC_ID,ROLE_ID).duplicate()
-		#print(newStats.Stats)
 		base_stats = newStats.Stats
 		base_growth = newStats.Growths
 		base_caps = newStats.Caps
@@ -439,14 +458,22 @@ func _generate_base_stats():
 		max_inv = newStats.MaxInv
 		weapon_prof = newStats.WeaponProf
 		base_prof = weapon_prof
+		_refresh_total_parameters()
 		_set_art_paths()
-		#print(base_stats)
 		
 		_add_features(newStats.Skills, newStats.Passives)
 		_update_features()
 		set_equipped()
-		#print("unit sidebar Updated")
 		notify_property_list_changed()
+
+
+func _refresh_total_parameters() -> void:
+	for stat in base_stats.keys():
+		total_stats[stat] = base_stats.get(stat, 0) + mod_stats.get(stat, 0) + level_stats.get(stat, 0)
+	for stat in base_growth.keys():
+		total_growth[stat] = float(base_growth.get(stat, 0.0)) + float(mod_growth.get(stat, 0.0))
+	for stat in base_caps.keys():
+		total_caps[stat] = base_caps.get(stat, 0) + mod_caps.get(stat, 0)
 
 func _update_features():
 	skills.clear()
@@ -457,7 +484,8 @@ func _update_features():
 		else: skills.append(skill)
 		
 	for level in personal_leveled_skills:
-		if unit_level >= level: personal_skills.append(personal_leveled_skills[level])
+		if unit_level >= level and not personal_skills.has(personal_leveled_skills[level]):
+			personal_skills.append(personal_leveled_skills[level])
 		
 	skills = skills + personal_skills + bonus_skills
 	
@@ -466,7 +494,8 @@ func _update_features():
 		else: passives.append(passive)
 	
 	for level in personal_leveled_passives:
-		if unit_level >= level: personal_passives.append(personal_leveled_passives[level])
+		if unit_level >= level and not personal_passives.has(personal_leveled_passives[level]):
+			personal_passives.append(personal_leveled_passives[level])
 		
 	passives = passives + personal_passives + bonus_passives
 	check_passives()
@@ -490,12 +519,21 @@ func _add_features(new_skills:Array, new_passives:Array) -> void:
 	if !SPEC_ID or !ROLE_ID: return
 	base_skills.clear()
 	for skill in new_skills:
-		if skill is not Skill and FileAccess.file_exists(skill): skill = load(skill)
-		else: continue
+		if skill is Skill:
+			pass
+		elif FileAccess.file_exists(skill):
+			skill = load(skill)
+		else:
+			continue
 		base_skills.append(skill)
+	base_passives.clear()
 	for passive in new_passives:
-		if passive is not Passive and FileAccess.file_exists(passive): passive = load(passive)
-		else: continue
+		if passive is Passive:
+			pass
+		elif FileAccess.file_exists(passive):
+			passive = load(passive)
+		else:
+			continue
 		base_passives.append(passive)
 	#print("unit features Updated")
 
@@ -504,9 +542,11 @@ func _add_new_leveled_features(level_results:Dictionary):
 	var newPassives:Array = level_results.NewPassives
 	var newSkills:Array = level_results.NewSkills
 	for passive in newPassives:
-		bonus_passives[unit_level] = passive
+		if passive and not bonus_passives.has(passive):
+			bonus_passives.append(passive)
 	for skill in newSkills:
-		bonus_skills[unit_level] = skill
+		if skill and not bonus_skills.has(skill):
+			bonus_skills.append(skill)
 
 
 func set_unit_id():
@@ -679,18 +719,20 @@ func data_to_dict()->Dictionary:
 func to_sim() -> UnitSim:
 	var sim = UnitSim.new()
 	var RC:= ResourceConverter.new()
-	var bonusSkills := RC.resources_to_save_data(bonus_skills)
-	var personalSkills := RC.resources_to_save_data(personal_skills)
-	var bonusPassives := RC.resources_to_save_data(bonus_passives)
-	var personalPassives := RC.resources_to_save_data(personal_passives)
-	var activeBuffs := RC.effects_to_save_data(buff_controller.active_buffs)
-	var activeDebuffs := RC.effects_to_save_data(buff_controller.active_debuffs)
 	sim.id = unit_id
 	sim.team = FACTION_ID
 	sim.spec = SPEC_ID
 	sim.cell = cell
+	sim.origin_cell = originCell if originCell != null else cell
 	sim.current_life = current_life
 	sim.comp = current_comp
+	sim.remaining_move = remaining_move
+	sim.ai_role = ai_role
+	sim.ai_task = ai_task
+	sim.ai_lock_position = ai_lock_position
+	sim.leash_radius = leash
+	sim.leash_consumed = leash_consumed
+	sim.one_time_leash = one_time_leash
 	sim.total_stats = total_stats.duplicate(true)
 	sim.active_stats = active_stats.duplicate(true)
 	sim.status = status.duplicate(true)
@@ -698,19 +740,21 @@ func to_sim() -> UnitSim:
 	sim.passives = RC.resources_to_save_data(passives).duplicate(true)
 	sim.skills = RC.resources_to_save_data(skills).duplicate(true)
 	sim.inventory = RC.resources_to_save_data(inventory).duplicate(true)
-	sim.weapon = get_equipped_weapon().convert_to_save_data().duplicate(true)
-	# Equip/passive aggregated effects (needed for multi-swing, etc.)
-	if equipment_helper and equipment_helper.equipped_effects:
-		for e in equipment_helper.equipped_effects:
-			if e is Effect:
-					var wep = get_equipped_weapon()
-					sim.weapon = wep.convert_to_save_data().duplicate(true) if wep else {}
-	if natural: sim.natural = natural.convert_to_save_data().duplicate(true)
+	var wep = get_equipped_weapon()
+	sim.weapon = wep.convert_to_save_data().duplicate(true) if wep else {}
+	sim.equipped_effects = _effects_to_sim_data(equipment_helper.equipped_effects if equipment_helper else null)
+	sim.natural = natural.convert_to_save_data().duplicate(true) if natural else {}
+	sim.active_buffs = _effect_pool_to_sim_data(buff_controller.active_buffs if buff_controller else {})
+	sim.active_debuffs = _effect_pool_to_sim_data(buff_controller.active_debuffs if buff_controller else {})
+	sim.owned_auras = _auras_to_sim_data(aura_controller.owned_auras.keys() if aura_controller else [])
+	sim.active_auras = _active_auras_to_sim_data(aura_controller.active_areas.keys() if aura_controller else [])
 	sim.threats = threats.duplicate()
 	sim.move_type = move_type
 	sim.terrain_tags = terrainTags.duplicate(true)
+	sim.terrain_bonus = get_terrain_bonus().duplicate(true)
 	sim.combat_data = combat_data.duplicate(true)
 	sim.weapon_reach = get_weapon_reach().duplicate(true) # optional but very helpful
+	sim.recompute_derived_state()
 	return sim
 
 func _effects_to_sim_data(effects_any) -> Array[Dictionary]:
@@ -758,6 +802,44 @@ func _effects_to_sim_data(effects_any) -> Array[Dictionary]:
 
 	return out
 
+
+func _effect_pool_to_sim_data(pool: Dictionary) -> Dictionary:
+	var out: Dictionary = {}
+	for key in pool.keys():
+		var entry = pool[key]
+		if typeof(entry) != TYPE_DICTIONARY:
+			continue
+		var effect: Effect = entry.get("effect", null)
+		if effect == null:
+			continue
+		out[key] = {
+			"effect": effect.convert_to_data(),
+			"duration": int(entry.get("duration", 0)),
+			"source": int(entry.get("source", Enums.EFFECT_SOURCE.BUFF)),
+		}
+	return out
+
+
+func _auras_to_sim_data(auras: Array) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for aura in auras:
+		if aura is Aura:
+			out.append(aura.convert_to_data())
+	return out
+
+
+func _active_auras_to_sim_data(active_areas: Array) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for area in active_areas:
+		if area == null or area.aura == null:
+			continue
+		var aura_data :Dictionary= area.aura.convert_to_data()
+		if area.master:
+			aura_data["source_id"] = area.master.unit_id
+			aura_data["source_team"] = int(area.master.FACTION_ID)
+		out.append(aura_data)
+	return out
+
 ##Replaces unit's initial data, returns false if dead, true if alive
 func pre_load(unit_data:Dictionary) -> bool:
 	#deployment = unit_data.deployment
@@ -775,7 +857,7 @@ func pre_load(unit_data:Dictionary) -> bool:
 	mod_growth= Dictionary(unit_data.mod_growth,Variant.Type.TYPE_STRING_NAME,"",null,Variant.Type.TYPE_FLOAT,"",null)
 	mod_stats= Dictionary(unit_data.mod_stats,Variant.Type.TYPE_STRING_NAME,"",null,Variant.Type.TYPE_INT,"",null)
 	mod_caps= Dictionary(unit_data.mod_caps,Variant.Type.TYPE_STRING_NAME,"",null,Variant.Type.TYPE_INT,"",null)
-	base_growth= Dictionary(unit_data.base_growth,Variant.Type.TYPE_STRING_NAME,"",null,Variant.Type.TYPE_INT,"",null)
+	base_growth= Dictionary(unit_data.base_growth,Variant.Type.TYPE_STRING_NAME,"",null,Variant.Type.TYPE_FLOAT,"",null)
 	base_stats= Dictionary(unit_data.base_stats,Variant.Type.TYPE_STRING_NAME,"",null,Variant.Type.TYPE_INT,"",null)
 	level_stats= Dictionary(unit_data.level_stats,Variant.Type.TYPE_STRING_NAME,"",null,Variant.Type.TYPE_INT,"",null)
 	base_caps= Dictionary(unit_data.base_caps,Variant.Type.TYPE_STRING_NAME,"",null,Variant.Type.TYPE_INT,"",null)
@@ -790,6 +872,7 @@ func pre_load(unit_data:Dictionary) -> bool:
 	#base_passives = unit_data.base_passives
 	_load_features(unit_data.personal_passives, personal_passives)
 	_load_features(unit_data.bonus_passives, bonus_passives)
+	_update_features()
 	return true
 
 
@@ -805,6 +888,8 @@ func post_load(unit_data:Dictionary, set_cell:bool=false)->void:
 	if set_cell:
 		convCell = str_to_var("Vector2i" + unit_data.cell) as Vector2i
 		relocate_unit(convCell)
+		update_terrain_data()
+		update_stats()
 
 
 func _load_inventory(resources:Dictionary):
@@ -815,12 +900,20 @@ func _load_inventory(resources:Dictionary):
 
 func _load_buff_effects(effects:Dictionary, destination:Dictionary):
 	var RC:=ResourceConverter.new()
-	destination=RC.buff_effects_to_resource(effects)
+	destination.clear()
+	var restored := RC.buff_effects_to_resource(effects)
+	for key in restored:
+		var entry: Dictionary = restored[key]
+		destination[key] = {
+			"effect": entry.get("Effect"),
+			"duration": int(entry.get("Duration", 0)),
+			"source": Enums.EFFECT_SOURCE.BUFF,
+		}
 
 
 func _load_natural(natural_data:Dictionary):
 	var RC:=ResourceConverter.new()
-	RC.natural_to_resource(natural_data)
+	natural = RC.natural_to_resource(natural_data)
 
 
 func _load_features(features:Dictionary, destination:Array):
@@ -834,6 +927,7 @@ func initialize_cell(new_cell:Vector2i = Vector2i.ZERO):
 	originCell = cell
 	relocate_unit(cell)
 	update_terrain_data()
+	update_stats()
 
 
 func _process_motion(delta):
@@ -904,7 +998,8 @@ func _process_motion(delta):
 ## `path` is an array of grid coordinates that the function converts to map coordinates.
 func walk_along(path: PackedVector2Array, track_remaining:bool=false) -> void:
 #	#print("walk along")
-	if track_remaining: remaining_move = path.size()-total_stats.Move
+	if track_remaining:
+		remaining_move = maxi(0, int(total_stats.Move) - int(path.size()))
 	lastAnim = _anim_player.current_animation
 	if path.is_empty():
 		print("walk_along Path Empty")
@@ -1006,6 +1101,8 @@ func revert_animation():
 	if _anim_player.current_animation == lastAnim:
 		return
 	#print(lastAnim, " surely I will return to idle")
+	if _sprite:
+		_sprite.self_modulate = Color(1, 1, 1, 1)
 	_anim_player.play(lastAnim)
 	#print(unit_id,":", _anim_player.current_animation,"Revert")
 
@@ -1127,6 +1224,20 @@ func _resolve_passive_aura(passive: Passive) -> Aura:
 func can_canto()->bool:
 	if PlayerData.canto_triggered and has_passive(Enums.PASSIVE_TYPE.CANTO) and remaining_move>0: return true
 	return false
+
+
+func ai_is_position_locked() -> bool:
+	return ai_lock_position
+
+
+func ai_has_active_leash() -> bool:
+	return leash > -1 and not leash_consumed
+
+
+func consume_ai_leash() -> void:
+	leash_consumed = true
+	if one_time_leash:
+		leash = -1
 
 
 func has_passive(passive_type:Enums.PASSIVE_TYPE)->bool:
@@ -1659,15 +1770,27 @@ func _turn_complete():
 
 func update_sprite() -> void:
 	if !_anim_player: return
-	for condition in status:
-		if status[condition]:
-			if condition == "Sleep" or condition == "Acted":
-				_anim_player.play("disabled")
-				#print(unit_id,":", _anim_player.current_animation,"Update Sprite")
-				return
+	if check_status("Sleep") or check_status("Acted"):
+		_anim_player.play("disabled")
+		#print(unit_id,":", _anim_player.current_animation,"Update Sprite")
+		return
 	if !isWalking and !isShoved and !needDeath and !isSelected:
 		_anim_player.play("idle")
 		#print(unit_id,":", _anim_player.current_animation,"Update Sprite")
+
+
+func refresh_state_visual() -> void:
+	if !_anim_player:
+		return
+	update_sprite()
+	if !check_status("Sleep") and !check_status("Acted") and !isWalking and !isShoved and !needDeath and !isSelected:
+		lastAnim = "idle"
+		_anim_player.stop()
+		_anim_player.play("idle")
+		_anim_player.seek(0.0, true)
+		if _sprite:
+			_sprite.frame = 0
+			_sprite.self_modulate = Color(1, 1, 1, 1)
 		
 		
 func check_death():
@@ -1758,6 +1881,7 @@ func has_enough_comp(cost:int) -> bool:
 	return isValid
 
 func set_acted(actState: bool):
+	status["Acted"] = actState
 	status_controller.set_acted(actState)
 
 #Turn Signals
@@ -1896,7 +2020,9 @@ func _set_faction_group(faction:Enums.FACTION_ID)->void:
 	add_to_group(fString)
 
 #region self signals
-func _on_unit_relocated():
+func _on_unit_relocated(_old_cell = null, _new_cell = null, _unit = null):
+	update_terrain_data()
+	update_stats()
 	update_threats()
 
 

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Passive" load_steps=2 format=3 uid="uid://3o0hv3vmn8qo"]
+
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="1_8dbi2"]
+
+[resource]
+script = ExtResource("1_8dbi2")
+type = 1
+proc = 100
+sub_type = 0
+sub_weapon = 0
+day_id = ""
+night_id = ""
+value = 0
+string_value = &""
+is_time_sens = false
+feature_id = "ambush"
+rule_type = 0
+metadata/_custom_type_script = "uid://c5hmv6tclm43r"

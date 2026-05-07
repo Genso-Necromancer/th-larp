@@ -112,7 +112,7 @@ func _resolve(attacker_sim: UnitSim, defender_sim: UnitSim, attacker_action: Dic
 
 		# 2) Counter
 		if not blocked_counter:
-			var can_attempt := defender_sim.can_act() and _can_reach(defender_sim, attacker_sim)
+			var can_attempt := defender_sim.can_counterattack() and _can_reach(defender_sim, attacker_sim)
 			if can_attempt:
 				var allow := false
 				var vengeance_proc := false
@@ -160,9 +160,12 @@ func _resolve(attacker_sim: UnitSim, defender_sim: UnitSim, attacker_action: Dic
 		if attacker_sim.current_life <= 0 or defender_sim.current_life <= 0:
 			continue
 
-		# 3) Follow-up (attacker only): weapon-only, basic weapon only
+		# 3) Follow-up (attacker only): weapon-only, basic weapon only.
+		# A follow-up only occurs if the first exchange dealt no damage:
+		# the initiator failed to damage the defender, then also avoided damage from retaliation.
 		if not blocked_followup and bool(initiator_action.get("Weapon", false)):
-			if attacker_sim.current_life > 0 and defender_sim.current_life > 0 and (not attacker_was_hit) and _speed_check(attacker_sim, defender_sim):
+			var exchange_dealt_damage := defender_dmg_taken > 0 or attacker_dmg_taken > 0
+			if attacker_sim.current_life > 0 and defender_sim.current_life > 0 and (not exchange_dealt_damage) and _speed_check(attacker_sim, defender_sim):
 				var fup_action := _as_basic_weapon_action()
 				var fup_node := cr.add_action(rnd, attacker_sim.id, defender_sim.id, ACTION_TYPE.WEAPON, true)
 				fup_node["swing_count"] = _get_swing_count(attacker_sim, fup_action)
@@ -346,6 +349,8 @@ func _add_action_result(
 
 				_emit_effect_event(swing, actor, target, eff)
 
+		_debug_print_swing(actor, target, swing_i, swing, policy)
+
 		if target.current_life <= 0:
 			swing["target_dead"] = true
 			break
@@ -354,6 +359,25 @@ func _add_action_result(
 		"target_was_hit": target_was_hit,
 		"target_damage_taken": target_damage_taken,
 	}
+
+
+func _debug_print_swing(actor: UnitSim, target: UnitSim, swing_index: int, swing: Dictionary, policy: CombatOutcomePolicy) -> void:
+	var hit_roll_text := "Auto"
+	if policy is LiveOutcomePolicy:
+		var live_policy := policy as LiveOutcomePolicy
+		if live_policy.last_hit_roll >= 0:
+			hit_roll_text = str(live_policy.last_hit_roll)
+	print(
+		"[Combat] Swing %d | Attacker: %s | Target: %s | Hit%%: %d | Roll: %s | Hit: %s | Damage: %d" % [
+			swing_index + 1,
+			actor.id,
+			target.id,
+			int(swing.get("hit_chance", 0)),
+			hit_roll_text,
+			str(bool(swing.get("hit", false))),
+			int(swing.get("dmg", 0))
+		]
+	)
 
 
 # ============================
@@ -434,8 +458,7 @@ func _evaluate_clash(actor: UnitSim, target: UnitSim, action: Dictionary) -> Dic
 	var crit := int(a_cd.get("Crit", 0)) - int(t_cd.get("Luck", 0))
 	crit = clampi(crit, 0, 1000)
 	
-	var crit_range:Array[int]=[0,0]
-	crit_range= Array([a_cd.get("crit_min",0),a_cd.get("crit_max",0)],TYPE_INT,"",null)
+	var crit_range: Array[int] = _get_crit_range(actor, action)
 
 	var barrier_amt := 0
 	var bar_prc := 0
@@ -456,6 +479,27 @@ func _evaluate_clash(actor: UnitSim, target: UnitSim, action: Dictionary) -> Dic
 		"BarPrc": bar_prc,
 		"reduction": reduction,
 	}
+
+
+func _get_crit_range(actor: UnitSim, action: Dictionary) -> Array[int]:
+	var cmin := 0
+	var cmax := 0
+	var special = action.get("Item", null)
+	if special == null:
+		special = action.get("Skill", null)
+	var is_weapon := bool(action.get("Weapon", false))
+
+	if is_weapon:
+		var wep = actor.get_equipped_weapon()
+		if wep != null:
+			cmin += int(wep.get("crit_min", 0))
+			cmax += int(wep.get("crit_max", 0))
+
+	if special != null:
+		cmin += int(special.crit_min)
+		cmax += int(special.crit_max)
+
+	return Array([max(0, cmin), max(0, cmax)], TYPE_INT, "", null)
 
 
 func _evaluate_effects(actor: UnitSim, target: UnitSim, action: Dictionary) -> Array:
@@ -499,10 +543,11 @@ func _evaluate_effects(actor: UnitSim, target: UnitSim, action: Dictionary) -> A
 
 			# Instant effects are not handled here (flow-changing / global)
 			if bool(effect.instant):
-				continue
+				if not _is_pre_damage_effect(effect):
+					continue
 
-			# Only resolve ON-HIT effects per swing
-			if not bool(effect.on_hit):
+			# Only resolve ON-HIT effects per swing, except pre-damage combat modifiers.
+			if not bool(effect.on_hit) and not _is_pre_damage_effect(effect):
 				continue
 
 			# Focus choice based on target flag:
@@ -706,10 +751,24 @@ func _get_slayer_mult_from_effect(effect: Effect) -> float:
 	# - if effect.value is float => use it as multiplier (e.g. 1.5)
 	# - if int => interpret as percent (e.g. 150 => 1.5)
 	if typeof(effect.value) == TYPE_FLOAT:
-		return float(effect.value)
+		var mult := float(effect.value)
+		if mult > 0.0:
+			return mult
 	if typeof(effect.value) == TYPE_INT:
-		return float(int(effect.value)) / 100.0
-	return 1.0
+		var raw := int(effect.value)
+		if raw > 0:
+			return float(raw) / 100.0
+	return float(Global.slayerMulti)
+
+
+func _is_pre_damage_effect(effect: Effect) -> bool:
+	if effect == null:
+		return false
+	match int(effect.type):
+		Enums.EFFECT_TYPE.SLAYER, Enums.EFFECT_TYPE.CRIT_BUFF:
+			return true
+		_:
+			return false
 
 #Flow manipulators Deathmatch/vantage
 func _find_multi_round_effect(action: Dictionary) -> Effect:

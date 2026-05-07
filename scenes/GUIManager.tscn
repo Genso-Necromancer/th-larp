@@ -488,9 +488,6 @@ texture_progress = ExtResource("18_18bf3")
 [node name="Fader" parent="." instance=ExtResource("13_kppqt")]
 layout_mode = 1
 
-[node name="Fade" parent="Fader" index="0"]
-color = Color(0, 0, 0, 1)
-
 [node name="AudioHub" parent="." node_paths=PackedStringArray("audio_players") instance=ExtResource("13_dq5sw")]
 audio_players = {
 "Confirm": NodePath("Confirm"),
