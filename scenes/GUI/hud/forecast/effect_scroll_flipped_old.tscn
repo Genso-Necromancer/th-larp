@@ -1,0 +1,192 @@
+[gd_scene load_steps=11 format=3 uid="uid://clb2lngtw116i"]
+
+[ext_resource type="Theme" uid="uid://cb07g0akruuvi" path="res://fonts/Izayoi_Theme_Forecast_Effects.tres" id="1_n6dia"]
+[ext_resource type="Script" uid="uid://cvctmy00ebiio" path="res://scenes/GUI/hud/forecast/effect_scroll.gd" id="2_pvbjt"]
+[ext_resource type="Texture2D" uid="uid://ds40od4vk2eaa" path="res://sprites/UI/combat_forecast/uiscrolltop.png" id="3_x5msx"]
+[ext_resource type="Texture2D" uid="uid://cwbkog0srkyon" path="res://sprites/UI/combat_forecast/uiscrollback.png" id="4_ntm2j"]
+[ext_resource type="Texture2D" uid="uid://d3g7khj7g8drl" path="res://sprites/UI/combat_forecast/uiscrollbottom.png" id="5_mo5jx"]
+
+[sub_resource type="Animation" id="Animation_u7wk6"]
+resource_name = "CLOSE"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("scroll_skeleton/scroll_back/scroll_bottom:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.466667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(108, 384), Vector2(7, -31)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("scroll_skeleton/scroll_back/scroll_bottom:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.466667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.122173]
+}
+
+[sub_resource type="Animation" id="Animation_gbxbw"]
+resource_name = "OPEN"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("scroll_skeleton/scroll_back/scroll_bottom:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.466667, 0.666667, 1),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(7, -31), Vector2(108, 361), Vector2(100, 333), Vector2(108, 384)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("scroll_skeleton/scroll_back/scroll_bottom:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.466667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.150704, 0.0]
+}
+
+[sub_resource type="Animation" id="Animation_aawk8"]
+resource_name = "RESET"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("scroll_skeleton/scroll_back/scroll_bottom:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(4, -41)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("scroll_skeleton/scroll_back/scroll_bottom:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.150704]
+}
+
+[sub_resource type="Animation" id="Animation_76pr2"]
+resource_name = "SHOW_EFFECT"
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_u7wk6"]
+_data = {
+&"CLOSE": SubResource("Animation_u7wk6"),
+&"OPEN": SubResource("Animation_gbxbw"),
+&"RESET": SubResource("Animation_aawk8"),
+&"SHOW_EFFECT": SubResource("Animation_76pr2")
+}
+
+[node name="effect_scroll_flipped" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+theme = ExtResource("1_n6dia")
+script = ExtResource("2_pvbjt")
+metadata/_edit_use_anchors_ = true
+
+[node name="scroll_top" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -252.0
+offset_top = 2.0
+offset_right = 248.0
+offset_bottom = 236.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("3_x5msx")
+flip_h = true
+metadata/_edit_use_anchors_ = true
+
+[node name="scroll_back" type="Polygon2D" parent="scroll_top"]
+show_behind_parent = true
+position = Vector2(171, 194)
+rotation = -0.15708
+texture = ExtResource("4_ntm2j")
+skeleton = NodePath("../../scroll_skeleton")
+polygon = PackedVector2Array(57, 548, 381, 438, 337, 242, 345, -14, -11, 90, 1, 360)
+uv = PackedVector2Array(57, 548, 381, 438, 337, 242, 345, -14, -11, 90, 1, 360)
+polygons = [PackedInt32Array(4, 5, 0, 1, 2, 3)]
+bones = ["scroll_back", PackedFloat32Array(0, 0, 0.51, 1, 1, 0.51), "scroll_back/scroll_bottom", PackedFloat32Array(1, 1, 1, 0, 0, 1)]
+
+[node name="scroll_bottom" type="Polygon2D" parent="scroll_top/scroll_back"]
+position = Vector2(-37.8632, 360.515)
+texture = ExtResource("5_mo5jx")
+skeleton = NodePath("../../../scroll_skeleton")
+polygon = PackedVector2Array(-25, 168, 23, 250, 493, 40, 443, -42)
+uv = PackedVector2Array(-25, 168, 23, 250, 493, 40, 443, -42)
+polygons = [PackedInt32Array(0, 3, 2, 1)]
+bones = ["scroll_back", PackedFloat32Array(0, 0, 0, 0), "scroll_back/scroll_bottom", PackedFloat32Array(1, 1, 1, 1)]
+
+[node name="effect_margin" type="MarginContainer" parent="scroll_top"]
+layout_mode = 0
+offset_left = 74.0
+offset_top = 96.0
+offset_right = 382.0
+offset_bottom = 170.0
+rotation = 0.345575
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 10
+
+[node name="effect_vbox" type="VBoxContainer" parent="scroll_top/effect_margin"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="test1" type="RichTextLabel" parent="scroll_top/effect_margin/effect_vbox"]
+visible = false
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme = ExtResource("1_n6dia")
+bbcode_enabled = true
+text = "On Hit: [color=#c50505]Kill[/color] Yasa"
+fit_content = true
+
+[node name="test2" type="RichTextLabel" parent="scroll_top/effect_margin/effect_vbox"]
+visible = false
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme = ExtResource("1_n6dia")
+bbcode_enabled = true
+text = "On Hit: [color=#c50505]Kill[/color] Yasa"
+fit_content = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_u7wk6")
+}
+
+[node name="scroll_skeleton" type="Skeleton2D" parent="."]
+position = Vector2(-129, 70)
+scale = Vector2(0.5, 0.5)
+
+[node name="scroll_back" type="Bone2D" parent="scroll_skeleton"]
+position = Vector2(0, -1)
+rotation = 3.14159
+scale = Vector2(1, -1)
+rest = Transform2D(1, 0, 0, 1, 88, 104)
+
+[node name="scroll_bottom" type="Bone2D" parent="scroll_skeleton/scroll_back"]
+position = Vector2(4, -41)
+rotation = 0.150704
+scale = Vector2(0.999999, 0.999999)
+rest = Transform2D(1, 0, 0, 1, 71, 299)

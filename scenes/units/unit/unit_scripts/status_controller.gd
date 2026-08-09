@@ -49,6 +49,8 @@ func apply_from_effect(effect: Effect) -> void:
 	if s_name == "All":
 		# 'All' is only used for curing
 		return
+	if unit.buff_controller and unit.buff_controller.consume_status_buffer(effect.sub_type):
+		return
 	
 	_apply_status(s_name, effect.duration, effect.duration_type, effect.curable, true)
 	unit.update_stats()
@@ -146,6 +148,37 @@ func has_status(s_name: String) -> bool:
 	return statuses.has(s_name) and statuses[s_name].active
 
 
+func get_tray_entries() -> Array[Dictionary]:
+	var entries: Array[Dictionary] = []
+	for s_name in statuses.keys():
+		var data = statuses[s_name]
+		if not data.active or s_name == "Acted":
+			continue
+		entries.append({
+			"id": s_name,
+			"tooltip_id": "status:%s" % s_name,
+			"icon": s_name.to_snake_case(),
+			"kind": "status",
+			"duration": int(data.get("duration", 0)),
+			"duration_type": int(data.get("duration_type", Enums.DURATION_TYPE.NONE)),
+		})
+	return entries
+
+
+func get_tray_status_data(s_name: String) -> Dictionary:
+	if not statuses.has(s_name):
+		return {}
+	var data = statuses[s_name]
+	if not data.active:
+		return {}
+	return {
+		"Duration": int(data.get("duration", 0)),
+		"DurationType": int(data.get("duration_type", Enums.DURATION_TYPE.NONE)),
+		"Curable": bool(data.get("curable", true)),
+		"Stacks": int(data.get("stacks", 1)),
+	}
+
+
 # Hook from Unit.apply_dmg so Sleep can be broken on hit
 func on_damage_taken(dmg: int) -> void:
 	if dmg <= 0:
@@ -164,6 +197,16 @@ func set_acted(active: bool) -> void:
 	set_status_flag("Acted", active)
 	if active and unit.one_time_leash and unit.leash > -1:
 		unit.leash = -1
+
+
+func apply_debug_status(s_name: String, duration := 1, duration_type: Enums.DURATION_TYPE = Enums.DURATION_TYPE.NONE, curable := true) -> void:
+	var cfg = _get_status_config(s_name)
+	var resolved_duration_type := duration_type
+	if resolved_duration_type == Enums.DURATION_TYPE.NONE:
+		resolved_duration_type = cfg.default_duration_type
+	_apply_status(s_name, duration, resolved_duration_type, curable, true)
+	unit.update_stats()
+	unit.update_sprite()
 
 
 # ======================================================================
@@ -283,7 +326,9 @@ func _get_status_config(s_name: String) -> Dictionary:
 			pass
 		"Dazed", "Berserk":
 			# these will later affect AI / combat decisions
-			pass
+			cfg.default_duration_type = Enums.DURATION_TYPE.ROUND
+		"Silence":
+			cfg.default_duration_type = Enums.DURATION_TYPE.ROUND
 	
 	return cfg
 

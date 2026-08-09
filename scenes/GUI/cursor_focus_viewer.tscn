@@ -38,22 +38,6 @@ tracks/0/keys = {
 "values": [Vector2(-616, 0)]
 }
 
-[sub_resource type="Animation" id="Animation_kcadj"]
-resource_name = "exit"
-length = 0.5
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath(".:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.5),
-"transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(0, 0), Vector2(-616, 0)]
-}
-
 [sub_resource type="Animation" id="Animation_j6hjd"]
 resource_name = "enter"
 length = 0.7
@@ -68,6 +52,22 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
 "values": [Vector2(-616, 0), Vector2(56, 0), Vector2(0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_kcadj"]
+resource_name = "exit"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 0), Vector2(-616, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_j6hjd"]

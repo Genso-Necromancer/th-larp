@@ -5,7 +5,7 @@
 [ext_resource type="Resource" uid="uid://co546romn6pwr" path="res://unit_resources/features/passives/rem_aura.tres" id="5_j6kew"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="6_4yorx"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="7_ft0k7"]
-[ext_resource type="Resource" uid="uid://b7s77y3xj1qtm" path="res://unit_resources/items/weapons/knife_dagger.tres" id="8_jfw54"]
+[ext_resource type="Resource" uid="uid://b7s77y3xj1qtm" path="res://unit_resources/items/weapons/knife/knife_dagger.tres" id="8_jfw54"]
 [ext_resource type="Texture2D" uid="uid://dt05tbwqylqya" path="res://sprites/character/youkai/thief_sprite.png" id="9_l6k54"]
 
 [sub_resource type="Resource" id="Resource_tb71p"]

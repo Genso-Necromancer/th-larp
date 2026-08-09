@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="Effect" load_steps=3 format=3]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_gseln"]
+[ext_resource type="Resource" path="res://unit_resources/features/skills/spell_selene_ward.tres" id="2_gseln"]
+
+[resource]
+resource_name = "grant_spell_selene_ward"
+script = ExtResource("1_gseln")
+type = 12
+target = 4
+instant = false
+on_hit = false
+proc = 0
+duration = 0
+duration_type = 0
+stack = false
+permanent = false
+curable = false
+from_item = false
+hostile = false
+skill = ExtResource("2_gseln")
+multi_swing = 0
+multi_round = 0
+crit_dmg = Array[int]([0, 0])
+crit_mult = false
+crit_rate = 0
+value = 0.0
+sub_type = 0
+id = "grant_spell_selene_ward"
+rule_type = 0
+metadata/_custom_type_script = "uid://bu76i50vv08ad"

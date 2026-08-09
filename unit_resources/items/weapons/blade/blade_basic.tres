@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=3 format=3]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_yla8p"]
+[ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="2_jw580"]
+
+[resource]
+resource_name = "blade_basic"
+script = ExtResource("2_jw580")
+dmg = 7
+hit = 65
+crit = 0
+crit_min = 10
+crit_max = 20
+barrier = 2
+barrier_chance = 30
+min_reach = 1
+max_reach = 1
+damage_type = 1
+personal = false
+level = 1
+use = false
+equippable = true
+breakable = true
+expendable = true
+trade = true
+max_dur = 40
+weight = 4
+category = 3
+sub_group = 0
+effects = Array[ExtResource("1_yla8p")]([])
+id = "blade_basic"
+rule_type = 0
+metadata/_custom_type_script = "uid://b7y6ry7pkb23i"

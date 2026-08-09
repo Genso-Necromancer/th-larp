@@ -1,9 +1,11 @@
-[gd_resource type="Resource" script_class="Ofuda" load_steps=2 format=3 uid="uid://cbwafn336efoc"]
+[gd_resource type="Resource" script_class="Ofuda" load_steps=3 format=3 uid="uid://cbwafn336efoc"]
 
 [ext_resource type="Script" uid="uid://dtxt6i4bhoqpo" path="res://unit_resources/items/ofuda/ofuda.gd" id="1_vj512"]
+[ext_resource type="Resource" uid="uid://7fiokv42s2mu" path="res://unit_resources/items/ofuda/ofuda_warp_basic.tres" id="2_qh8qq"]
 
 [resource]
 script = ExtResource("1_vj512")
+stats = ExtResource("2_qh8qq")
 equipped = false
 dropped = false
 is_broken = false

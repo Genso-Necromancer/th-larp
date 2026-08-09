@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_ciqkb"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_715yn"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="3_frupt"]
-[ext_resource type="Resource" uid="uid://e7drxbfl83us" path="res://unit_resources/items/weapons/club.tres" id="4_iskvw"]
+[ext_resource type="Resource" uid="uid://e7drxbfl83us" path="res://unit_resources/items/weapons/blunt/club.tres" id="4_iskvw"]
 [ext_resource type="Texture2D" uid="uid://cuqf75phsds5n" path="res://sprites/character/oni/trblr_sprite.png" id="5_tn8cg"]
 
 [sub_resource type="Resource" id="Resource_lkyfi"]

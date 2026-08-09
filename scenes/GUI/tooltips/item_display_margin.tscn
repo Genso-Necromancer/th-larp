@@ -98,7 +98,7 @@ size_flags_horizontal = 0
 size_flags_vertical = 0
 theme_override_constants/h_separation = 5
 theme_override_constants/v_separation = 10
-columns = 6
+columns = 8
 
 [node name="Might" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
 layout_mode = 2
@@ -111,10 +111,22 @@ custom_minimum_size = Vector2(20, 13)
 layout_mode = 2
 size_flags_horizontal = 0
 theme_type_variation = &"ValueLabel"
-text = "--
-"
 partner = NodePath("../Might")
 metadata/Key = "dmg"
+metadata/Type = "Item"
+
+[node name="ChargeSpacer" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = ""
+
+[node name="ChargeValue" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer" node_paths=PackedStringArray("partner") groups=["ValueLabels"] instance=ExtResource("2_qy6v3")]
+custom_minimum_size = Vector2(32, 13)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"ValueLabel"
+partner = NodePath("../ChargeSpacer")
+metadata/Key = "charge_value"
 metadata/Type = "Item"
 
 [node name="Accuracy" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
@@ -147,6 +159,21 @@ partner = NodePath("../Crit")
 metadata/Key = "crit"
 metadata/Type = "Item"
 
+[node name="Weight" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Weight:"
+horizontal_alignment = 1
+
+[node name="WeightValue" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer" node_paths=PackedStringArray("partner") groups=["ValueLabels"] instance=ExtResource("2_qy6v3")]
+custom_minimum_size = Vector2(20, 13)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"ValueLabel"
+partner = NodePath("../Weight")
+metadata/Key = "weight"
+metadata/Type = "Item"
+
 [node name="Barrier" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
 layout_mode = 2
 size_flags_horizontal = 8
@@ -173,6 +200,34 @@ layout_mode = 2
 theme_type_variation = &"ValueLabel"
 partner = NodePath("../Range")
 metadata/Key = "range"
+metadata/Type = "Item"
+
+[node name="Close" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Close:"
+horizontal_alignment = 1
+
+[node name="CloseValue" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer" node_paths=PackedStringArray("partner") groups=["ValueLabels"] instance=ExtResource("2_qy6v3")]
+custom_minimum_size = Vector2(20, 13)
+layout_mode = 2
+theme_type_variation = &"ValueLabel"
+partner = NodePath("../Close")
+metadata/Key = "close_range"
+metadata/Type = "Item"
+
+[node name="Far" type="Label" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Far:"
+horizontal_alignment = 1
+
+[node name="FarValue" parent="ToolTipVBox/StatPanel/VBoxContainer/GridContainer" node_paths=PackedStringArray("partner") groups=["ValueLabels"] instance=ExtResource("2_qy6v3")]
+custom_minimum_size = Vector2(20, 13)
+layout_mode = 2
+theme_type_variation = &"ValueLabel"
+partner = NodePath("../Far")
+metadata/Key = "far_range"
 metadata/Type = "Item"
 
 [node name="EffectTitleBox" type="VBoxContainer" parent="ToolTipVBox/StatPanel/VBoxContainer"]

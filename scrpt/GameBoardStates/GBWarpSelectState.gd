@@ -8,9 +8,9 @@ func mouse_motion(event: InputEvent) -> void:
 func _handle_bind(bind):
 	match bind:
 		"invalid": return
-		"ui_accept": slave.initiate_warp()
+		"ui_accept": slave.warp_destination_selected()
 		"ui_info": slave.toggle_unit_profile()
-		"ui_return": slave.menu_step_back()
+		"ui_return": slave.ui_return()
 		"ui_scroll_left": pass
 		"ui_scroll_right": pass
 		"ui_right": 

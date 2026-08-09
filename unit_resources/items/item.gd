@@ -23,6 +23,9 @@ var breakable := true
 var expendable := true
 var equippable := true
 var use := false
+var weight : int = 0:
+	set(value):
+		weight = clampi(value, 0, 999)
 var category : Enums.WEAPON_CATEGORY = Enums.WEAPON_CATEGORY.NONE
 var sub_group : Enums.WEAPON_SUB = Enums.WEAPON_SUB.NONE
 var effects : Array[Effect] = []
@@ -40,6 +43,7 @@ func _init(resource : ItemResource = load("res://unit_resources/items/weapons/un
 	level = properties.level
 	personal = properties.personal
 	use = properties.use
+	weight = properties.weight
 	category = properties.category
 	sub_group = properties.sub_group
 	effects = properties.effects
@@ -64,6 +68,7 @@ func _get_values()->Dictionary:
 	values["expendable"] = expendable
 	values["equippable"] = equippable
 	values["use"] = use
+	values["weight"] = weight
 	values["category"] = category
 	values["sub_group"] = sub_group
 	values["effects"] = {}

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://ehgcslevf08n"]
+[gd_scene load_steps=16 format=3 uid="uid://ehgcslevf08n"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_i0qm2"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_mx3tg"]
@@ -7,10 +7,12 @@
 [ext_resource type="Resource" uid="uid://bj5u83dg0xeid" path="res://unit_resources/features/passives/plot_armor.tres" id="5_nnev5"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="6_bmyf1"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="7_hh3fq"]
-[ext_resource type="Resource" uid="uid://crihx615imauw" path="res://unit_resources/items/weapons/gohei_simple.tres" id="8_fqquk"]
+[ext_resource type="Resource" uid="uid://crihx615imauw" path="res://unit_resources/items/weapons/gohei/gohei_simple.tres" id="8_fqquk"]
 [ext_resource type="Script" uid="uid://dtxt6i4bhoqpo" path="res://unit_resources/items/ofuda/ofuda.gd" id="9_634dn"]
 [ext_resource type="Resource" uid="uid://i6gxwkej1jxe" path="res://unit_resources/items/ofuda/ofuda_heal0.tres" id="10_nnev5"]
 [ext_resource type="Texture2D" uid="uid://c83g6bwvib3xh" path="res://sprites/character/reimu/miko_sprite.png" id="11_634dn"]
+[ext_resource type="Resource" uid="uid://cbwafn336efoc" path="res://unit_resources/items/ofuda/ofuda.tres" id="11_nnev5"]
+[ext_resource type="Resource" path="res://unit_resources/items/ofuda/ofuda_rescue_debug_item.tres" id="12_rescue"]
 
 [sub_resource type="Resource" id="Resource_tpcp1"]
 script = ExtResource("7_hh3fq")
@@ -35,33 +37,67 @@ unique_art = true
 simulate_leveling = false
 SPEC_ID = 2
 ROLE_ID = 6
+mod_growth = Dictionary[StringName, float]({
+&"Cele": 0.1,
+&"Cha": -0.1,
+&"Comp": 0.05,
+&"Def": -0.05,
+&"Eleg": -0.05,
+&"Life": 0.0,
+&"Mag": -0.05,
+&"Move": 0.0,
+&"Pwr": 0.05
+})
+mod_stats = Dictionary[StringName, int]({
+&"Cele": 2,
+&"Cha": -2,
+&"Comp": 7,
+&"Def": -1,
+&"Eleg": 0,
+&"Life": 4,
+&"Mag": -1,
+&"Move": 0,
+&"Pwr": 1
+})
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.2,
+&"Comp": 0.4,
+&"Def": 0.05,
+&"Eleg": 0.25,
+&"Life": 0.25,
+&"Mag": 0.15,
+&"Move": 0.0,
+&"Pwr": 0.25
+})
 total_stats = Dictionary[StringName, int]({
-&"Cele": 8,
-&"Cha": 8,
-&"Comp": 100,
-&"Def": 6,
-&"Eleg": 8,
-&"Life": 20,
-&"Mag": 5,
+&"Cele": 10,
+&"Cha": 7,
+&"Comp": 112,
+&"Def": 4,
+&"Eleg": 9,
+&"Life": 25,
+&"Mag": 4,
 &"Move": 4,
 &"Pwr": 7
 })
 total_caps = Dictionary[StringName, int]({
-&"Cele": 20,
-&"Cha": 20,
-&"Comp": 100,
-&"Def": 20,
-&"Eleg": 20,
-&"Life": 20,
-&"Mag": 20,
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
 &"Move": 10,
-&"Pwr": 20
+&"Pwr": 30
 })
 personal_skills = Array[ExtResource("2_mx3tg")]([ExtResource("3_rrfyl")])
 personal_passives = Array[ExtResource("4_634dn")]([ExtResource("5_nnev5")])
 skills = Array[ExtResource("2_mx3tg")]([ExtResource("3_rrfyl")])
 passives = Array[ExtResource("4_634dn")]([ExtResource("5_nnev5")])
 weapon_prof = {
+"Barrier": false,
 "Blade": false,
 "Blunt": false,
 "Book": false,
@@ -74,11 +110,11 @@ weapon_prof = {
 "Stick": false
 }
 max_inv = 6
-inventory = Array[ExtResource("6_bmyf1")]([SubResource("Resource_tpcp1"), SubResource("Resource_bmyf1")])
+inventory = Array[ExtResource("6_bmyf1")]([SubResource("Resource_tpcp1"), SubResource("Resource_bmyf1"), ExtResource("11_nnev5"), ExtResource("12_rescue")])
 
 [node name="Sprite" parent="PathFollow2D" index="0"]
 texture = ExtResource("11_634dn")
 
 [node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
-max_value = 20.0
-value = 20.0
+max_value = 25.0
+value = 25.0

@@ -2,6 +2,9 @@ extends Node
 ##Used to simulate units within the AI's thinking process
 class_name UnitSim
 
+const COMP_BREAK_EFFECT_ID := "comp_break_default"
+const COMP_BREAK_EFFECT_PATH := "res://unit_resources/effects/comp_break_default.tres"
+
 # Snapshot state copied from a live Unit for AI evaluation.
 var id:String
 var team:Enums.FACTION_ID
@@ -11,6 +14,7 @@ var origin_cell:Vector2i
 var current_life:int
 var comp:int
 var remaining_move:int = 0
+var moved_hexes:int = 0
 var ai_role:int = Unit.AI_ROLE.NONE
 var ai_task:int = Unit.AI_TASK.NONE
 var ai_lock_position:bool = false
@@ -19,9 +23,6 @@ var leash_consumed:bool = false
 var one_time_leash:bool = false
 var total_stats:Dictionary
 var active_stats:Dictionary
-#var total_stats:Dictionary[StringName,int]
-#var active_stats:Dictionary[StringName,int]
-#Specific Typing removed for now as other scripts lack the typing and Godot does not play nice between the two, even if valid
 var status:Dictionary
 var status_data:Dictionary
 var weapon:Dictionary
@@ -35,16 +36,15 @@ var move_type:Enums.MOVE_TYPE
 var terrain_tags:Dictionary
 var terrain_bonus:Dictionary
 var combat_data:Dictionary
-var weapon_reach:Dictionary # {"Min": int, "Max": int} optional
-var equipped_effects: Array[Dictionary] = [] # list of Effect.convert_to_data() dicts (+ optional instance fields)
+var weapon_reach:Dictionary
+var equipped_effects: Array[Dictionary] = []
+var equipped_attack_effects: Array[Dictionary] = []
 var active_buffs: Dictionary = {}
 var active_debuffs: Dictionary = {}
 var owned_auras: Array[Dictionary] = []
 var active_auras: Array[Dictionary] = []
 
 
-# Clone is the backbone of branching AI evaluation.
-# Every hypothetical line should operate on an isolated copy.
 func clone() -> UnitSim:
 	var c = UnitSim.new()
 	c.id = id
@@ -55,6 +55,7 @@ func clone() -> UnitSim:
 	c.current_life = current_life
 	c.comp = comp
 	c.remaining_move = remaining_move
+	c.moved_hexes = moved_hexes
 	c.ai_role = ai_role
 	c.ai_task = ai_task
 	c.ai_lock_position = ai_lock_position
@@ -75,8 +76,9 @@ func clone() -> UnitSim:
 	c.terrain_tags = terrain_tags.duplicate(true) if terrain_tags != null else {}
 	c.terrain_bonus = terrain_bonus.duplicate(true) if terrain_bonus != null else {}
 	c.combat_data = combat_data.duplicate(true) if combat_data != null else {}
-	c.weapon_reach = weapon_reach.duplicate(true) if weapon_reach != null else {} # optional but very helpful
+	c.weapon_reach = weapon_reach.duplicate(true) if weapon_reach != null else {}
 	c.equipped_effects = equipped_effects.duplicate(true) if equipped_effects != null else []
+	c.equipped_attack_effects = equipped_attack_effects.duplicate(true) if equipped_attack_effects != null else []
 	c.active_buffs = active_buffs.duplicate(true) if active_buffs != null else {}
 	c.active_debuffs = active_debuffs.duplicate(true) if active_debuffs != null else {}
 	c.owned_auras = owned_auras.duplicate(true) if owned_auras != null else []
@@ -84,45 +86,83 @@ func clone() -> UnitSim:
 	c.recompute_derived_state()
 	return c
 
-# Simple mutators used by sim-side resolution.
+
 func apply_dmg(amount: int) -> void:
 	if amount <= 0:
 		return
 	current_life = max(0, current_life - amount)
-	# Optional: mirror simple “wake on damage” behavior in sim, if you track statuses:
-	# if status.get("Sleep", false): status["Sleep"] = false
+
 
 func apply_heal(amount: int, max_life: int = 9999) -> void:
 	if amount <= 0:
 		return
 	current_life = min(max_life, current_life + amount)
 
-# Basic state and eligibility checks used by action generation.
+
+func apply_composure(comp_delta := 0) -> void:
+	if comp_delta == 0:
+		return
+	set_composure(comp - int(comp_delta))
+
+
+func spend_composure(amount: int) -> void:
+	if amount <= 0:
+		return
+	apply_composure(amount)
+
+
+func restore_composure(amount: int) -> void:
+	if amount <= 0:
+		return
+	apply_composure(-amount)
+
+
+func set_composure(value: int) -> void:
+	comp = clampi(int(value), 0, _get_composure_cap())
+	refresh_composure_break_state()
+
+
+func refresh_composure_break_state() -> void:
+	var has_break := active_debuffs.has(COMP_BREAK_EFFECT_ID)
+	if comp <= 0:
+		if has_break:
+			return
+		var effect_data := _load_comp_break_data()
+		if effect_data.is_empty():
+			return
+		active_debuffs[COMP_BREAK_EFFECT_ID] = {
+			"effect": effect_data,
+			"duration": 0,
+			"source": Enums.EFFECT_SOURCE.BUFF
+		}
+		recompute_derived_state()
+		return
+	if has_break:
+		active_debuffs.erase(COMP_BREAK_EFFECT_ID)
+		recompute_derived_state()
+
+
 func is_alive() -> bool:
 	return current_life > 0
 
+
 func has_status(key) -> bool:
-	# Supports both String and StringName keys
 	if status == null:
 		return false
 	if status.has(key):
 		return bool(status[key])
-	# Common fallback if some systems stored StringName
 	if typeof(key) == TYPE_STRING and status.has(StringName(key)):
 		return bool(status[StringName(key)])
 	return false
 
+
 func can_act() -> bool:
 	if not is_alive():
 		return false
-
-	# PASS A: common “cannot act” flags
-	# Adjust keys to match what you actually store (e.g. "Acted", "Sleep", etc.)
 	if has_status("Acted"):
 		return false
 	if has_status("Sleep"):
 		return false
-
 	return true
 
 
@@ -130,6 +170,20 @@ func can_counterattack() -> bool:
 	if not is_alive():
 		return false
 	if has_status("Sleep"):
+		return false
+	return true
+
+
+func has_enough_comp(cost: int) -> bool:
+	return cost <= comp
+
+
+func can_use_skill(skill: Dictionary) -> bool:
+	if skill == null or typeof(skill) != TYPE_DICTIONARY:
+		return false
+	if not has_enough_comp(int(skill.get("cost", 0))):
+		return false
+	if bool(skill.get("magical", false)) and has_status("Silence"):
 		return false
 	return true
 
@@ -151,19 +205,16 @@ func consume_leash() -> void:
 	if one_time_leash:
 		leash_radius = -1
 
-# These iterators normalize the saved dictionary layout into flat arrays.
-# That keeps downstream AI code from caring how Unit serializes its data.
+
 func iter_passives() -> Array:
 	var out: Array = []
 	if passives == null:
 		return out
-
 	if passives is Dictionary:
 		for k in passives.keys():
 			var p = passives[k]
 			if p != null:
 				out.append(p)
-
 	return out
 
 
@@ -190,8 +241,7 @@ func iter_inventory() -> Array:
 				out.append(item)
 	return out
 
-# Passive helpers are grouped here because they are used by both legality
-# checks and combat-context rebuilding.
+
 func has_passive_type(p_type: int) -> bool:
 	for p in iter_passives():
 		if p is Dictionary and int(p.type) == p_type:
@@ -207,8 +257,6 @@ func get_best_passive_proc(p_type: int, default_proc := 0) -> int:
 	return best
 
 
-# Source helpers let the sim read either live-style resources or serialized
-# dictionaries without duplicating the same null/type checks everywhere.
 func _source_value(source, key: String, default_value = null):
 	if source == null:
 		return default_value
@@ -222,8 +270,6 @@ func _source_bool(source, key: String, default_value := false) -> bool:
 	return bool(value)
 
 
-# Skill combat data mirrors the live Unit contract closely enough for forecast
-# and resolver code to treat sim actions like live actions.
 func get_skill_combat_stats(special, augmented := false) -> Dictionary:
 	var stats := combat_data.duplicate(true)
 	var dmg_stat := 0
@@ -268,7 +314,7 @@ func get_skill_combat_stats(special, augmented := false) -> Dictionary:
 
 	return stats
 
-# Equipment and environment lookups feed the derived combat rebuild.
+
 func get_equipped_weapon()->Dictionary:
 	if weapon != null and not weapon.is_empty():
 		return weapon
@@ -276,25 +322,20 @@ func get_equipped_weapon()->Dictionary:
 		return natural
 	return {}
 
+
 func get_multi_swing():
 	var swings := 0
-
 	for ed in equipped_effects:
 		if typeof(ed) != TYPE_DICTIONARY:
 			continue
-
 		var etype := int(ed.get("type", -1))
 		if etype != Enums.EFFECT_TYPE.MULTI_SWING:
 			continue
-
-		# Prefer multi_swing field; fall back to value for older content
 		var v := int(ed.get("multi_swing", 0))
 		if v <= 0:
 			v = int(ed.get("value", 0))
-
 		if v > swings:
 			swings = v
-
 	return false if swings <= 0 else swings
 
 
@@ -321,8 +362,6 @@ func get_terrain_bonus() -> Dictionary:
 	return bonus
 
 
-# Position context is applied after hypothetical movement so terrain and aura
-# driven bonuses are recalculated from the simulated destination.
 func set_position_context(new_cell: Vector2i, new_terrain_tags: Dictionary = {}, new_active_auras: Array = []) -> void:
 	cell = new_cell
 	terrain_tags = new_terrain_tags.duplicate(true)
@@ -336,6 +375,11 @@ func _collect_effect_modifiers(effects: Array) -> Dictionary:
 	var sub_keys = Enums.SUB_TYPE.keys()
 	for effect_data in effects:
 		if typeof(effect_data) != TYPE_DICTIONARY:
+			continue
+		if bool(effect_data.get("comp_break", false)):
+			mods["Hit"] = mods.get("Hit", 0) + int(effect_data.get("hit_penalty", 0))
+			mods["Graze"] = mods.get("Graze", 0) + int(effect_data.get("graze_penalty", 0))
+			mods["Crit"] = mods.get("Crit", 0) + int(effect_data.get("crit_penalty", 0))
 			continue
 		var sub_type = int(effect_data.get("sub_type", -1))
 		if sub_type < 0 or sub_type >= sub_keys.size():
@@ -351,6 +395,8 @@ func get_buff_modifiers() -> Dictionary:
 		for id in pool.keys():
 			var entry = pool[id]
 			if typeof(entry) != TYPE_DICTIONARY:
+				continue
+			if int(entry.get("source", Enums.EFFECT_SOURCE.NONE)) == Enums.EFFECT_SOURCE.ITEM:
 				continue
 			var effect_data = entry.get("effect", {})
 			var effect_mods = _collect_effect_modifiers([effect_data])
@@ -371,16 +417,24 @@ func get_aura_modifiers() -> Dictionary:
 	return mods
 
 
+func get_item_modifiers() -> Dictionary:
+	return _collect_effect_modifiers(equipped_effects)
+
+
 func recompute_derived_state() -> void:
 	var derived_stats := total_stats.duplicate(true) if total_stats != null else {}
 	var terrain_mods := get_terrain_bonus()
 	var buff_mods := get_buff_modifiers()
 	var aura_mods := get_aura_modifiers()
+	var item_mods := get_item_modifiers()
 
-	for pool in [terrain_mods, buff_mods, aura_mods]:
+	for pool in [terrain_mods, buff_mods, aura_mods, item_mods]:
 		for key in pool.keys():
 			if derived_stats.has(key):
 				derived_stats[key] += int(pool[key])
+
+	var weight_penalty := clampi(_get_equipped_weight() - int(derived_stats.get("Pwr", 0)), 0, 999)
+	derived_stats["Cele"] = maxi(0, int(derived_stats.get("Cele", 0)) - weight_penalty)
 
 	if has_status("Sleep"):
 		derived_stats["Move"] = 0
@@ -397,8 +451,8 @@ func recompute_derived_state() -> void:
 		"BarPrc": 0,
 		"Crit": 0,
 		"Luck": int(derived_stats.get("Cha", 0)),
-		"CompRes": clampi((int(derived_stats.get("Cha", 0)) / 2) + (int(derived_stats.get("Eleg", 0)) / 2), -200, 75),
-		"CompBonus": int(derived_stats.get("Cha", 0)) / 4,
+		"CompRes": 0,
+		"CompBonus": 0,
 		"PwrBase": int(derived_stats.get("Pwr", 0)),
 		"MagBase": int(derived_stats.get("Mag", 0)),
 		"HitBase": (int(derived_stats.get("Eleg", 0)) * 2) + int(derived_stats.get("Cha", 0)),
@@ -427,6 +481,27 @@ func recompute_derived_state() -> void:
 		combat["BarPrc"] = 0
 
 	combat_data = combat
+
+func _get_equipped_weight() -> int:
+	var total := 0
+	for item in iter_inventory():
+		if not bool(item.get("equipped", false)):
+			continue
+		total += int(item.get("weight", 0))
+	return total
+
+
+func _get_composure_cap() -> int:
+	return max(0, int(active_stats.get("Comp", total_stats.get("Comp", comp))))
+
+
+func _load_comp_break_data() -> Dictionary:
+	if not ResourceLoader.exists(COMP_BREAK_EFFECT_PATH):
+		return {}
+	var effect := load(COMP_BREAK_EFFECT_PATH)
+	if effect is Effect:
+		return effect.convert_to_data()
+	return {}
 
 
 func apply_aura_enter(aura_data: Dictionary) -> void:

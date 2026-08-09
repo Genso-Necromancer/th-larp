@@ -1,0 +1,51 @@
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=16 format=3 uid="uid://cdw0nbm1f2koa"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_dbgbook"]
+[ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="2_dbgbook"]
+[ext_resource type="Resource" uid="uid://2arer6bbjbc7" path="res://unit_resources/effects/grant_spell_sunburst.tres" id="3_dbgbook"]
+[ext_resource type="Resource" path="res://unit_resources/effects/grant_spell_debug_life_shear.tres" id="4_dbgbook"]
+[ext_resource type="Resource" path="res://unit_resources/effects/grant_spell_debug_life_mend.tres" id="5_dbgbook"]
+[ext_resource type="Resource" uid="uid://px8wepw4vr8y" path="res://unit_resources/effects/grant_spell_moonveil.tres" id="6_dbgbook"]
+[ext_resource type="Resource" uid="uid://bctyhlo8cckld" path="res://unit_resources/effects/grant_spell_debug_eleg_break.tres" id="7_dbgbook"]
+[ext_resource type="Resource" uid="uid://cghqtn0x628dj" path="res://unit_resources/effects/grant_spell_water_veil.tres" id="8_dbgbook"]
+[ext_resource type="Resource" path="res://unit_resources/effects/grant_spell_silent_rain.tres" id="9_dbgbook"]
+[ext_resource type="Resource" path="res://unit_resources/effects/grant_spell_stonebind.tres" id="10_dbgbook"]
+[ext_resource type="Resource" uid="uid://c5cet1fqtwacn" path="res://unit_resources/effects/grant_spell_sprout.tres" id="11_dbgbook"]
+[ext_resource type="Resource" path="res://unit_resources/effects/grant_spell_iron_thorn.tres" id="12_dbgbook"]
+[ext_resource type="Resource" path="res://unit_resources/effects/grant_spell_selene_ward.tres" id="13_dbgbook"]
+[ext_resource type="Resource" path="res://unit_resources/effects/grant_spell_uproot.tres" id="14_dbgbook"]
+[ext_resource type="Resource" path="res://unit_resources/effects/grant_spell_clear_voice.tres" id="15_dbgbook"]
+
+[resource]
+resource_name = "book_debug_effects"
+script = ExtResource("2_dbgbook")
+dmg = 1
+charge_value = 0
+hit = 100
+crit = 0
+crit_min = 10
+crit_max = 20
+barrier = 0
+barrier_chance = 0
+min_reach = 1
+max_reach = 1
+close_min_reach = 0
+close_max_reach = 0
+far_min_reach = 0
+far_max_reach = 0
+damage_type = 1
+personal = false
+level = 1
+use = false
+equippable = true
+breakable = false
+expendable = true
+trade = true
+max_dur = 99
+weight = 0
+category = 9
+sub_group = 0
+effects = Array[ExtResource("1_dbgbook")]([ExtResource("3_dbgbook"), ExtResource("4_dbgbook"), ExtResource("5_dbgbook"), ExtResource("6_dbgbook"), ExtResource("7_dbgbook"), ExtResource("8_dbgbook"), ExtResource("9_dbgbook"), ExtResource("10_dbgbook"), ExtResource("11_dbgbook"), ExtResource("12_dbgbook"), ExtResource("13_dbgbook"), ExtResource("14_dbgbook"), ExtResource("15_dbgbook")])
+id = "book_debug_effects"
+rule_type = 0
+metadata/_custom_type_script = "uid://b7y6ry7pkb23i"

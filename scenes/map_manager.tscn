@@ -28,8 +28,6 @@ audio_players = {
 "FocusChange": NodePath("FocusChange")
 }
 
-[connection signal="time_factor_changed" from="Gameboard/CombatManager" to="Gameboard" method="_on_combat_manager_time_factor_changed"]
-[connection signal="warp_selected" from="Gameboard/CombatManager" to="Gameboard" method="_on_combat_manager_warp_selected"]
 [connection signal="deploy_toggled" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_deploy_toggled"]
 [connection signal="map_started" from="CanvasLayer/GUIManager" to="Gameboard" method="_on_gui_manager_map_started"]
 [connection signal="win_finished" from="CanvasLayer/GUIManager/WinScreen" to="." method="_on_win_screen_win_finished"]

@@ -196,8 +196,14 @@ func _add_action_result(
 
 	for swing_i in range(swings):
 		var swing := cr.add_swing(action_data)
+		if swing_i == 0 and bool(action.get("Weapon", false)):
+			_emit_durability_event(swing, actor.id, -1)
+		elif swing_i == 0 and action.get("Item", null) is Item:
+			_emit_durability_event(swing, actor.id, -1, EFFECT_PHASE.POST_DAMAGE, action.get("Item"))
 
 		var clash := _evaluate_clash(actor, target, action)
+		if swing_i == 0:
+			action["ChargeHexes"] = 0
 		swing["hit_chance"] = clamp_chance(int(clash.get("Hit", 0)))
 		swing["crit_chance"] = clamp_chance(int(clash.get("Crit", 0)))
 		swing["reduction"] = int(clash.get("reduction", 0))
@@ -222,52 +228,53 @@ func _add_action_result(
 		var crit_max_bonus := 0
 		var post_proc_effects: Array = []
 
-		if did_hit:
-			var eff_records := _evaluate_effects(actor, target, action)
+		var eff_records := _evaluate_effects(actor, target, action)
 
-			for eff in eff_records:
-				var always_proc := bool(eff.get("always_proc", false))
-				var proc_chance := int(eff.get("proc_chance", 0))
-				var procced := true if always_proc else policy.decide_effect_proc(proc_chance)
+		for eff in eff_records:
+			if bool(eff.get("requires_hit", false)) and not did_hit:
+				continue
+			var always_proc := bool(eff.get("always_proc", false))
+			var proc_chance := int(eff.get("proc_chance", 0))
+			var procced := true if always_proc else policy.decide_effect_proc(proc_chance)
 
-				eff["procced"] = procced
+			eff["procced"] = procced
+			var effect_res: Effect = eff.get("effect", null)
+			if effect_res == null:
+				continue
+			if int(effect_res.type) != Enums.EFFECT_TYPE.RELOC:
 				swing["effects"].append(eff)
 
-				if not procced:
-					continue
+			if not procced:
+				continue
 
-				var effect_res: Effect = eff.get("effect", null)
-				if effect_res == null:
-					continue
+			var phase := _classify_effect_phase(effect_res)
 
-				var phase := _classify_effect_phase(effect_res)
+			# PRE_DAMAGE effects modify local combat math before crit/dmg
+			if phase == EFFECT_PHASE.PRE_DAMAGE:
+				match int(effect_res.type):
+					Enums.EFFECT_TYPE.SLAYER:
+						if bool(eff.get("slayer", false)):
+							var mult := _get_slayer_mult_from_effect(effect_res)
+							swing["slayer_mult"] = max(float(swing.get("slayer_mult", 1.0)), mult)
 
-				# PRE_DAMAGE effects modify local combat math before crit/dmg
-				if phase == EFFECT_PHASE.PRE_DAMAGE:
-					match int(effect_res.type):
-						Enums.EFFECT_TYPE.SLAYER:
-							if bool(eff.get("slayer", false)):
-								var mult := _get_slayer_mult_from_effect(effect_res)
-								swing["slayer_mult"] = max(float(swing.get("slayer_mult", 1.0)), mult)
+					Enums.EFFECT_TYPE.CRIT_BUFF:
+						# Pass A: support crit chance + crit range bonuses
+						crit_bonus += int(effect_res.crit_rate)
 
-						Enums.EFFECT_TYPE.CRIT_BUFF:
-							# Pass A: support crit chance + crit range bonuses
-							crit_bonus += int(effect_res.crit_rate)
+						if effect_res.crit_dmg is Array and effect_res.crit_dmg.size() >= 2:
+							crit_min_bonus += int(effect_res.crit_dmg[0])
+							crit_max_bonus += int(effect_res.crit_dmg[1])
 
-							if effect_res.crit_dmg is Array and effect_res.crit_dmg.size() >= 2:
-								crit_min_bonus += int(effect_res.crit_dmg[0])
-								crit_max_bonus += int(effect_res.crit_dmg[1])
+						# crit_mult intentionally deferred until you decide the contract
 
-							# crit_mult intentionally deferred until you decide the contract
+					_:
+						pass
 
-						_:
-							pass
+				_emit_effect_event(swing, actor, target, eff)
 
-					_emit_effect_event(swing, actor, target, eff)
-
-				else:
-					# POST_DAMAGE effects are emitted after base damage is known/applied
-					post_proc_effects.append(eff)
+			else:
+				# POST_DAMAGE effects are emitted after base damage is known/applied
+				post_proc_effects.append(eff)
 
 		# --- CRIT + CRIT DMG (after PRE_DAMAGE effects) ---
 		var crit_dmg := 0
@@ -324,6 +331,8 @@ func _add_action_result(
 
 		swing["dmg"] = dmg
 
+		_apply_swing_composure(actor, target, swing, action, action_type, swing_i, clash, did_hit, did_crit, dmg, policy)
+
 		# Apply base weapon damage first
 		if did_hit and dmg > 0:
 			target_damage_taken += dmg
@@ -333,21 +342,16 @@ func _add_action_result(
 				swing["target_dead"] = true
 
 		# --- POST_DAMAGE effects ---
-		if did_hit:
-			for eff in post_proc_effects:
-				var effect_res: Effect = eff.get("effect", null)
-				if effect_res == null:
-					continue
+		for eff in post_proc_effects:
+			var effect_res: Effect = eff.get("effect", null)
+			if effect_res == null:
+				continue
 
-				# LIFE_STEAL depends on actual damage dealt by this swing
-				if int(effect_res.type) == Enums.EFFECT_TYPE.LIFE_STEAL:
-					var steal_pct := int(effect_res.value)
-					var heal_amt := 0
-					if dmg > 0 and steal_pct > 0:
-						heal_amt = int(round(float(dmg) * float(steal_pct) / 100.0))
-					eff["value"] = heal_amt
+			# LIFE_STEAL depends on actual damage dealt by this swing
+			if int(effect_res.type) == Enums.EFFECT_TYPE.LIFE_STEAL:
+				eff["value"] = _factor_life_steal(dmg, effect_res.value)
 
-				_emit_effect_event(swing, actor, target, eff)
+			_emit_effect_event(swing, actor, target, eff)
 
 		_debug_print_swing(actor, target, swing_i, swing, policy)
 
@@ -427,13 +431,21 @@ func _evaluate_clash(actor: UnitSim, target: UnitSim, action: Dictionary) -> Dic
 		a_cd = actor.get_skill_combat_stats(special, is_weapon)
 	else:
 		a_cd = actor.combat_data
+	var instant_mods := _get_instant_stat_modifiers(actor, target, action)
+	var actor_mods: Dictionary = instant_mods.get("Actor", {})
+	var target_mods: Dictionary = instant_mods.get("Target", {})
 
 	var can_miss := true
 	var can_dmg := true
 	var can_crit := true
 
-	var hit := int(a_cd.get("Hit", 0)) - int(t_cd.get("Graze", 0))
+	var actor_hit := int(a_cd.get("Hit", 0)) + int(actor_mods.get("Hit", 0))
+	var target_graze := int(t_cd.get("Graze", 0)) + int(target_mods.get("Graze", 0))
+	var hit := actor_hit - target_graze
+	hit -= _get_action_range_band_penalty(actor, target, action, special, is_weapon)
 	hit = clampi(hit, 0, 1000)
+	var raw_hit := clampi(actor_hit - _get_action_range_band_penalty(actor, target, action, special, is_weapon), 0, 1000)
+	var graze := clampi(target_graze, 0, 1000)
 
 	var dmg_type := int(a_cd.get("Type", Enums.DAMAGE_TYPE.PHYS))
 	if special != null:
@@ -441,21 +453,23 @@ func _evaluate_clash(actor: UnitSim, target: UnitSim, action: Dictionary) -> Dic
 		can_dmg = bool(a_cd.get("CanDmg", true))
 		can_crit = bool(a_cd.get("CanCrit", true))
 
-	# includes DRes in all reduction types
 	var dr := int(t_cd.get("DRes", 0))
 	var reduction := 0
+	var terrain_def := int(target.get_terrain_bonus().get("DefBonus", 0))
 	match dmg_type:
 		Enums.DAMAGE_TYPE.PHYS:
-			reduction = int(target.active_stats.get(&"Def", 0)) + dr
+			reduction = int(target.active_stats.get(&"Def", 0)) + int(target_mods.get("Def", 0)) + terrain_def + dr
 		Enums.DAMAGE_TYPE.MAG:
-			reduction = int(target.active_stats.get(&"Mag", 0)) + dr
+			reduction = int(target.active_stats.get(&"Mag", 0)) + int(target_mods.get("Mag", 0)) + dr
 		Enums.DAMAGE_TYPE.TRUE:
-			reduction = dr
+			reduction = 0
 			
-	var dmg := int(a_cd.get("Dmg", 0))
+	var charge_bonus := _get_charge_bonus(actor, target, action, is_weapon)
+	var dmg := int(a_cd.get("Dmg", 0)) + int(actor_mods.get("Dmg", 0))
+	dmg += charge_bonus
 	dmg = clampi(dmg, 0, 1000)
 
-	var crit := int(a_cd.get("Crit", 0)) - int(t_cd.get("Luck", 0))
+	var crit := int(a_cd.get("Crit", 0)) + int(actor_mods.get("Crit", 0)) - (int(t_cd.get("Luck", 0)) + int(target_mods.get("Luck", 0)))
 	crit = clampi(crit, 0, 1000)
 	
 	var crit_range: Array[int] = _get_crit_range(actor, action)
@@ -463,22 +477,186 @@ func _evaluate_clash(actor: UnitSim, target: UnitSim, action: Dictionary) -> Dic
 	var barrier_amt := 0
 	var bar_prc := 0
 	if bool(action.get("Weapon", false)) and not _is_pure_skill_or_item(action) and dmg_type == Enums.DAMAGE_TYPE.PHYS:
-		barrier_amt = int(t_cd.get("Barrier", 0))
-		bar_prc = int(t_cd.get("BarPrc", 0))
+		barrier_amt = int(t_cd.get("Barrier", 0)) + int(target_mods.get("Barrier", 0))
+		bar_prc = int(t_cd.get("BarPrc", 0)) + int(target_mods.get("BarPrc", 0))
 
 	return {
 		"CanMiss": can_miss,
+		"RawHit": raw_hit,
+		"Graze": graze,
 		"CanDmg": can_dmg,
 		"CanCrit": can_crit,
 		"Hit": hit,
 		"Dmg": dmg,
 		"Crit": crit,
+		"ChargeBonus": charge_bonus,
 		"crit_range":crit_range,
 		"DmgType": dmg_type,
 		"BarrierAmt": barrier_amt,
 		"BarPrc": bar_prc,
 		"reduction": reduction,
-	}
+}
+
+
+func _get_instant_stat_modifiers(actor: UnitSim, target: UnitSim, action: Dictionary) -> Dictionary:
+	var mods := {"Actor": {}, "Target": {}}
+	for src in _get_action_effect_sources(actor, action):
+		for effect: Effect in _get_source_effects(src):
+			if effect == null or not bool(effect.instant):
+				continue
+			if effect.type != Enums.EFFECT_TYPE.BUFF and effect.type != Enums.EFFECT_TYPE.DEBUFF:
+				continue
+			if not _effect_rule_passes(effect, actor, target):
+				continue
+			var focus_key := "Actor" if effect.target == Enums.EFFECT_TARGET.SELF else "Target"
+			var stat_name := _effect_sub_type_to_stat_name(effect.sub_type)
+			if stat_name == "":
+				continue
+			var value := int(effect.value)
+			mods[focus_key][stat_name] = int(mods[focus_key].get(stat_name, 0)) + value
+	return mods
+
+
+func _get_action_effect_sources(actor: UnitSim, action: Dictionary) -> Array:
+	var sources: Array = []
+	var is_weapon_attack := bool(action.get("Weapon", false))
+	var skill_or_item = action.get("Item", null)
+	if skill_or_item == null:
+		skill_or_item = action.get("Skill", null)
+	if is_weapon_attack:
+		var wep := actor.get_equipped_weapon()
+		if wep != null:
+			sources.append(wep)
+		if actor.equipped_attack_effects != null and not actor.equipped_attack_effects.is_empty():
+			sources.append({"effects": actor.equipped_attack_effects})
+	if skill_or_item != null:
+		sources.append(skill_or_item)
+	return sources
+
+
+func _effect_rule_passes(effect: Effect, actor: UnitSim, target: UnitSim) -> bool:
+	match int(effect.rule_type):
+		Enums.RULE_TYPE.NONE:
+			return true
+		Enums.RULE_TYPE.TARGET_SPEC:
+			return int(effect.sub_rule) == int(target.spec)
+		Enums.RULE_TYPE.SELF_SPEC:
+			return int(effect.sub_rule) == int(actor.spec)
+		Enums.RULE_TYPE.TIME:
+			return int(effect.sub_rule) == int(Global.time_of_day)
+		_:
+			return true
+
+
+func _effect_sub_type_to_stat_name(sub_type) -> String:
+	var sub_type_int := int(sub_type) if typeof(sub_type) == TYPE_INT else Enums.SUB_TYPE.NONE
+	match sub_type_int:
+		Enums.SUB_TYPE.BARPRC:
+			return "BarPrc"
+		Enums.SUB_TYPE.EFFHIT:
+			return "EffHit"
+		Enums.SUB_TYPE.DRES:
+			return "DRes"
+		Enums.SUB_TYPE.NONE, Enums.SUB_TYPE.ALL, Enums.SUB_TYPE.RANDOM:
+			return ""
+		_:
+			return Enums.SUB_TYPE.keys()[sub_type_int].to_pascal_case()
+
+
+func _apply_swing_composure(
+	actor: UnitSim,
+	target: UnitSim,
+	swing: Dictionary,
+	action: Dictionary,
+	action_type: int,
+	swing_index: int,
+	clash: Dictionary,
+	did_hit: bool,
+	did_crit: bool,
+	dmg: int,
+	policy: CombatOutcomePolicy
+) -> void:
+	var comp := Global.composure_values
+	if typeof(comp) != TYPE_DICTIONARY or comp.is_empty():
+		return
+
+	var actor_delta := 0
+	var target_delta := 0
+	var actor_reasons: Array[String] = []
+	var target_reasons: Array[String] = []
+	var is_friendly_action: bool = action_type == ACTION_TYPE.FRIENDLY_SKILL
+	var special = action.get("Item", null)
+	if special == null:
+		special = action.get("Skill", null)
+	var has_special: bool = special != null
+	var uses_attack_tax: bool = not is_friendly_action and not has_special
+
+	if uses_attack_tax:
+		var atk_cost := int(comp.get("atk", 0))
+		actor_delta += atk_cost
+		if atk_cost > 0:
+			actor_reasons.append("attack")
+
+	if swing_index == 0:
+		if special != null:
+			var skill_cost := int(_source_value(special, "cost", 0))
+			actor_delta += skill_cost
+			if skill_cost > 0:
+				var cost_label: String = "item cost" if action.get("Item", null) != null else "skill cost"
+				actor_reasons.append(cost_label)
+
+	if not is_friendly_action:
+		if not did_hit:
+			if _miss_consumes_composure(clash, swing, policy):
+				var evade_cost := int(comp.get("evade", 0))
+				target_delta += evade_cost
+				if evade_cost > 0:
+					target_reasons.append("evade")
+		else:
+			var hit_cost := int(comp.get("hit", 0))
+			target_delta += hit_cost
+			if hit_cost > 0:
+				target_reasons.append("hit")
+			if dmg > 0:
+				var ratio :int= max(1, int(comp.get("dmg_ratio", 1)))
+				var dmg_cost := int(floor(float(dmg) / float(ratio)))
+				target_delta += dmg_cost
+				if dmg_cost > 0:
+					target_reasons.append("damage")
+			if did_crit:
+				var crit_loss := int(comp.get("crit_loss", 0))
+				var crit_restore := int(comp.get("crit_restore", 0))
+				target_delta += crit_loss
+				actor_delta -= crit_restore
+				if crit_loss > 0:
+					target_reasons.append("crit taken")
+				if crit_restore > 0:
+					actor_reasons.append("crit restore")
+
+	swing["comp_actor"] = actor_delta
+	swing["comp_target"] = target_delta
+	swing["comp_actor_reasons"] = actor_reasons
+	swing["comp_target_reasons"] = target_reasons
+
+	if actor_delta != 0:
+		actor.apply_composure(actor_delta)
+	if target_delta != 0:
+		target.apply_composure(target_delta)
+
+
+func _miss_consumes_composure(clash: Dictionary, swing: Dictionary, policy: CombatOutcomePolicy) -> bool:
+	var final_hit := clampi(int(swing.get("hit_chance", 0)), 0, 1000)
+	var raw_hit := clampi(int(clash.get("RawHit", final_hit)), 0, 1000)
+	var graze := clampi(int(clash.get("Graze", 0)), 0, 1000)
+
+	if graze <= 0 or raw_hit <= final_hit:
+		return false
+
+	if policy is LiveOutcomePolicy:
+		var live_policy := policy as LiveOutcomePolicy
+		return live_policy.last_hit_roll > final_hit and live_policy.last_hit_roll <= raw_hit
+
+	return true
 
 
 func _get_crit_range(actor: UnitSim, action: Dictionary) -> Array[int]:
@@ -502,6 +680,31 @@ func _get_crit_range(actor: UnitSim, action: Dictionary) -> Array[int]:
 	return Array([max(0, cmin), max(0, cmax)], TYPE_INT, "", null)
 
 
+func _get_action_range_band_penalty(actor: UnitSim, target: UnitSim, action: Dictionary, special, is_weapon: bool) -> int:
+	if not is_weapon:
+		return 0
+	var source = actor.get_equipped_weapon()
+	if source == null:
+		return 0
+	var distance := _hex.find_distance(actor.cell, target.cell)
+	return _range_band_hit_penalty(source, distance)
+
+
+func _get_charge_bonus(actor: UnitSim, target: UnitSim, action: Dictionary, is_weapon: bool) -> int:
+	if not is_weapon:
+		return 0
+	if _has_brace_effect(target):
+		return 0
+	var source = actor.get_equipped_weapon()
+	if source == null:
+		return 0
+	var charge_value := int(_source_value(source, "charge_value", 0))
+	if charge_value <= 0:
+		return 0
+	var hexes := int(action.get("ChargeHexes", 0))
+	return charge_value * maxi(0, hexes)
+
+
 func _evaluate_effects(actor: UnitSim, target: UnitSim, action: Dictionary) -> Array:
 	# Collect effect sources based on action type:
 	# - Weapon-only: weapon effects
@@ -519,6 +722,8 @@ func _evaluate_effects(actor: UnitSim, target: UnitSim, action: Dictionary) -> A
 		var wep := actor.get_equipped_weapon()
 		if wep != null:
 			sources.append(wep)
+		if actor.equipped_attack_effects != null and not actor.equipped_attack_effects.is_empty():
+			sources.append({"effects": actor.equipped_attack_effects})
 
 	if skill_or_item != null:
 		sources.append(skill_or_item)
@@ -546,10 +751,6 @@ func _evaluate_effects(actor: UnitSim, target: UnitSim, action: Dictionary) -> A
 				if not _is_pre_damage_effect(effect):
 					continue
 
-			# Only resolve ON-HIT effects per swing, except pre-damage combat modifiers.
-			if not bool(effect.on_hit) and not _is_pre_damage_effect(effect):
-				continue
-
 			# Focus choice based on target flag:
 			# SELF/GLOBAL => actor-focus, TARGET => target-focus
 			if effect.target == Enums.EFFECT_TARGET.GLOBAL: continue
@@ -576,6 +777,10 @@ func _evaluate_effects(actor: UnitSim, target: UnitSim, action: Dictionary) -> A
 				resolved_value = _factor_dmg(target, effect)
 			elif value and effect.type == Enums.EFFECT_TYPE.HEAL:
 				resolved_value = _factor_healing(actor, target, effect)
+			elif value and effect.type == Enums.EFFECT_TYPE.DOT:
+				resolved_value = _factor_dmg(target, effect)
+			elif value and effect.type == Enums.EFFECT_TYPE.HOT:
+				resolved_value = _factor_healing(actor, target, effect)
 			elif typeof(value) == TYPE_FLOAT:
 				resolved_value = int(round(float(value) * 100.0))
 
@@ -589,6 +794,8 @@ func _evaluate_effects(actor: UnitSim, target: UnitSim, action: Dictionary) -> A
 				"proc_chance": proc_chance,
 				"value": resolved_value,
 				"slayer": slayer,
+				"warp_destination": action.get("WarpDestination", null),
+				"requires_hit": bool(effect.on_hit),
 				"procced": false
 			})
 			
@@ -601,8 +808,11 @@ func _emit_damage_event(swing: Dictionary, source_id: String, target_id: String,
 func _emit_heal_event(swing: Dictionary, source_id: String, target_id: String, amount: int, phase: int = EFFECT_PHASE.POST_DAMAGE) -> void:
 	_push_event(swing, {"type": "heal", "source_id": source_id, "target_id": target_id, "amount": amount}, phase)
 
-func _emit_durability_event(swing: Dictionary, owner_id: String, amount: int, phase: int = EFFECT_PHASE.POST_DAMAGE) -> void:
-	_push_event(swing, {"type": "durability", "owner_id": owner_id, "amount": amount}, phase)
+func _emit_durability_event(swing: Dictionary, owner_id: String, amount: int, phase: int = EFFECT_PHASE.POST_DAMAGE, item: Item = null) -> void:
+	var event := {"type": "durability", "owner_id": owner_id, "amount": amount}
+	if item != null:
+		event["item"] = item
+	_push_event(swing, event, phase)
 
 func _emit_effect_event(swing: Dictionary, actor: UnitSim, target: UnitSim, eff: Dictionary) -> void:
 	var effect_res: Effect = eff.get("effect", null)
@@ -638,15 +848,12 @@ func _emit_effect_event(swing: Dictionary, actor: UnitSim, target: UnitSim, eff:
 		Enums.EFFECT_TYPE.COMP_DMG:
 			if value != null and int(value) != 0:
 				_push_event(swing, {"type": "comp_dmg", "target_id": focus_id, "amount": int(value), "source_id": actor.id}, phase)
-				# (optional) If UnitSim tracks comp directly:
-				if focus.get("comp"):
-					focus.comp = maxi(0, int(focus.comp) - abs(int(value)))
+				focus.apply_composure(abs(int(value)))
 
 		Enums.EFFECT_TYPE.COMP_HEAL:
 			if value != null and int(value) != 0:
 				_push_event(swing, {"type": "comp_heal", "target_id": focus_id, "amount": int(value), "source_id": actor.id}, phase)
-				if focus.get("comp"):
-					focus.comp = maxi(0, int(focus.comp) + abs(int(value)))
+				focus.apply_composure(-abs(int(value)))
 
 		Enums.EFFECT_TYPE.BUFF, Enums.EFFECT_TYPE.DEBUFF:
 			_push_event(swing, {"type": "buff", "target_id": focus_id, "effect": effect_res, "context_id": actor.id}, phase)
@@ -657,18 +864,26 @@ func _emit_effect_event(swing: Dictionary, actor: UnitSim, target: UnitSim, eff:
 		Enums.EFFECT_TYPE.CURE:
 			_push_event(swing, {"type": "cure", "target_id": focus_id, "effect": effect_res}, phase)
 
+		Enums.EFFECT_TYPE.PURGE:
+			_push_event(swing, {"type": "purge", "target_id": focus_id, "effect": effect_res}, phase)
+
+		Enums.EFFECT_TYPE.PURITY:
+			_push_event(swing, {"type": "purity", "target_id": focus_id, "effect": effect_res}, phase)
+
+		Enums.EFFECT_TYPE.DOT, Enums.EFFECT_TYPE.HOT, Enums.EFFECT_TYPE.STATUS_BUFFER:
+			_push_event(swing, {"type": "buff", "target_id": focus_id, "effect": effect_res, "context_id": actor.id}, phase)
+
 		Enums.EFFECT_TYPE.RELOC:
-			_push_event(swing, {"type": "reloc", "source_id": actor.id, "target_id": focus_id, "effect": effect_res}, phase)
+			var event := {"type": "reloc", "source_id": actor.id, "target_id": focus_id, "effect": effect_res}
+			if eff.get("warp_destination", null) is Vector2i:
+				event["destination"] = eff.get("warp_destination")
+			_push_event(swing, event, phase)
 
 		Enums.EFFECT_TYPE.ADD_SKILL:
 			_push_event(swing, {"type": "add_skill", "target_id": focus_id, "skill": effect_res.skill}, phase)
 
 		Enums.EFFECT_TYPE.ADD_PASSIVE:
 			_push_event(swing, {"type": "add_passive", "target_id": focus_id, "passive": effect_res.passive}, phase)
-
-		Enums.EFFECT_TYPE.LIFE_STEAL:
-			# Pass A: emit intent; later you can compute amount from base damage dealt.
-			_push_event(swing, {"type": "life_steal", "source_id": actor.id, "target_id": focus_id, "effect": effect_res}, phase)
 
 		Enums.EFFECT_TYPE.TIME:
 			# Pass A: emit intent; CombatManager/Time system can consume.
@@ -737,13 +952,36 @@ func _get_reach(unit: UnitSim) -> Dictionary:
 	if wr is Dictionary:
 		var minr := int(wr.get("Min", 1))
 		var maxr := int(wr.get("Max", 1))
-		return {"Min": minr, "Max": maxr}
-	return {"Min": 1, "Max": 1}
+		return {
+			"Min": minr,
+			"Max": maxr,
+			"CloseMin": int(wr.get("CloseMin", 0)),
+			"CloseMax": int(wr.get("CloseMax", 0)),
+			"FarMin": int(wr.get("FarMin", 0)),
+			"FarMax": int(wr.get("FarMax", 0)),
+		}
+	return {"Min": 1, "Max": 1, "CloseMin": 0, "CloseMax": 0, "FarMin": 0, "FarMax": 0}
 
 func _can_reach(attacker: UnitSim, defender: UnitSim) -> bool:
 	var r := _get_reach(attacker)
 	var distance := _hex.find_distance(attacker.cell, defender.cell)
-	return distance >= int(r["Min"]) and distance <= int(r["Max"])
+	if distance >= int(r["Min"]) and distance <= int(r["Max"]):
+		return true
+	if _is_distance_in_reach_band(r, distance, "Close") or _is_distance_in_reach_band(r, distance, "Far"):
+		return true
+	return false
+
+
+func _is_distance_in_reach_band(reach: Dictionary, distance: int, prefix: String) -> bool:
+	var min_reach := int(reach.get("%sMin" % prefix, 0))
+	var max_reach := int(reach.get("%sMax" % prefix, 0))
+	if min_reach == 0 and max_reach == 0:
+		return false
+	if min_reach == 0:
+		min_reach = max_reach
+	if max_reach == 0:
+		max_reach = min_reach
+	return distance >= min_reach and distance <= max_reach
 
 #Slayer Multi
 func _get_slayer_mult_from_effect(effect: Effect) -> float:
@@ -882,6 +1120,9 @@ func _get_source_effects(source) -> Array[Effect]:
 	if raw_effects == null:
 		return out
 
+	if raw_effects is Dictionary:
+		raw_effects = raw_effects.values()
+
 	for entry in raw_effects:
 		if entry is Effect:
 			out.append(entry)
@@ -889,5 +1130,11 @@ func _get_source_effects(source) -> Array[Effect]:
 			var effect := Effect.from_data(entry)
 			if effect != null:
 				out.append(effect)
+		elif typeof(entry) == TYPE_STRING:
+			var path := String(entry)
+			if path != "" and ResourceLoader.exists(path):
+				var loaded = load(path)
+				if loaded is Effect:
+					out.append(loaded)
 
 	return out

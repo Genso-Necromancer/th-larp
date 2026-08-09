@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://c4pvojd7a8cxn"]
+
+[ext_resource type="PackedScene" uid="uid://niqbht2w5xkr" path="res://scenes/GUI/hud/forecast/effect_scroll.tscn" id="1_g3r4h"]
+
+[node name="effect_scroll" instance=ExtResource("1_g3r4h")]

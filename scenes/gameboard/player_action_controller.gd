@@ -1,4 +1,4 @@
-extends RefCounted
+﻿extends RefCounted
 class_name PlayerActionController
 
 var board: GameBoard
@@ -29,6 +29,8 @@ func begin_attack_action() -> void:
 
 func begin_skill_action(skill) -> void:
 	if board.activeUnit == null:
+		return
+	if skill and not board.activeUnit.can_use_skill(skill):
 		return
 	board.start_skill_targeting(skill)
 

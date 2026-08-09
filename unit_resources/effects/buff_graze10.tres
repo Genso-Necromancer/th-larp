@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="Effect" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_bgrz"]
+
+[resource]
+resource_name = "buff_graze10"
+script = ExtResource("1_bgrz")
+type = 3
+target = 2
+instant = false
+on_hit = true
+proc = -1
+duration = 1
+duration_type = 2
+stack = false
+permanent = false
+curable = true
+from_item = false
+hostile = false
+multi_swing = 0
+multi_round = 0
+crit_dmg = Array[int]([0, 0])
+crit_mult = false
+crit_rate = 0
+value = 10
+sub_type = 17
+id = "buff_graze10"
+rule_type = 0
+metadata/_custom_type_script = "uid://bu76i50vv08ad"

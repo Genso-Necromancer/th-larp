@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="Effect" load_steps=2 format=3 uid="uid://o0s3bif6t7ud"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_dotbl"]
+
+[resource]
+resource_name = "dot_bleed10"
+script = ExtResource("1_dotbl")
+type = 21
+target = 2
+instant = false
+on_hit = true
+proc = 0
+duration = 2
+duration_type = 1
+stack = false
+permanent = false
+curable = true
+from_item = false
+hostile = true
+multi_swing = 0
+multi_round = 0
+crit_dmg = Array[int]([0, 0])
+crit_mult = false
+crit_rate = 0
+value = 0.1
+sub_type = 7
+id = "dot_bleed10"
+rule_type = 0
+metadata/_custom_type_script = "uid://bu76i50vv08ad"

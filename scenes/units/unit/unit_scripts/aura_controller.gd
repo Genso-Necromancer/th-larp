@@ -13,7 +13,7 @@ var owned_auras : Dictionary[Aura, AuraArea] = {}
 # Key = AuraArea instance
 var active_areas : Dictionary[AuraArea, bool] = {}
 # self buffing auras
-#var self_aura_triggers : Dictionary[Aura, Dictionary] = {}
+var self_aura_triggers : Dictionary = {}
 
 func _init(u : Unit) -> void:
 	unit = u
@@ -49,6 +49,7 @@ func remove_aura(aura : Aura) -> void:
 	if is_instance_valid(area):
 		area.queue_free()
 	owned_auras.erase(aura)
+	_clear_nonstack_aura(aura)
 
 
 func get_visual_aura_range() -> int:
@@ -66,26 +67,32 @@ func on_aura_enter(area : AuraArea) -> void:
 
 func on_aura_trigger_enter(aura:Aura,source:Unit)->void:
 	for effect:Effect in aura.effects:
-		unit.buff_controller.apply_effect(effect, Enums.EFFECT_SOURCE.AURA, source)
-	#if not aura.effects: return
-	#var triggers :Dictionary= self_aura_triggers.get(aura,{})
-	#if triggers.has(source): return # already triggered
-	#triggers[source]=1
-	#self_aura_triggers[aura]=triggers
-	#_apply_self_aura_stack(aura)
+		if effect.stack:
+			unit.buff_controller.apply_effect(effect, Enums.EFFECT_SOURCE.AURA, source)
+			continue
+		var triggers := _get_nonstack_aura_triggers(aura, effect)
+		if triggers.has(source):
+			continue
+		var was_empty := triggers.is_empty()
+		triggers[source] = true
+		if was_empty:
+			unit.buff_controller.apply_effect(effect, Enums.EFFECT_SOURCE.AURA)
 
 func on_aura_exit(area : AuraArea) -> void:
 	active_areas.erase(area)
 
 func on_aura_trigger_exit(aura: Aura, source: Unit) -> void:
 	for effect:Effect in aura.effects:
-		unit.buff_controller.remove_effect(effect, source)
-	#if not self_aura_triggers.has(aura): return
-	#var triggers := self_aura_triggers[aura]
-	#if not triggers.has(source): return
-	#triggers.erase(source)
-	#_remove_self_aura_stack(aura)
-	#if triggers.is_empty(): self_aura_triggers.erase(aura)
+		if effect.stack:
+			unit.buff_controller.remove_effect(effect, source)
+			continue
+		var triggers := _get_nonstack_aura_triggers(aura, effect)
+		if not triggers.has(source):
+			continue
+		triggers.erase(source)
+		if triggers.is_empty():
+			unit.buff_controller.remove_effect(effect)
+			_clear_nonstack_aura_triggers(aura, effect)
 
 
 # -------------------------------------------------
@@ -113,3 +120,30 @@ func _remove_self_aura_stack(aura: Aura) -> void:
 	for effect in aura.effects:
 		if effect.stack:
 			unit.buff_controller.remove_stack(effect)
+
+
+func _get_nonstack_aura_triggers(aura: Aura, effect: Effect) -> Dictionary:
+	if not self_aura_triggers.has(aura):
+		self_aura_triggers[aura] = {}
+	var aura_triggers: Dictionary = self_aura_triggers[aura]
+	if not aura_triggers.has(effect):
+		aura_triggers[effect] = {}
+	return aura_triggers[effect]
+
+
+func _clear_nonstack_aura_triggers(aura: Aura, effect: Effect) -> void:
+	if not self_aura_triggers.has(aura):
+		return
+	var aura_triggers: Dictionary = self_aura_triggers[aura]
+	aura_triggers.erase(effect)
+	if aura_triggers.is_empty():
+		self_aura_triggers.erase(aura)
+
+
+func _clear_nonstack_aura(aura: Aura) -> void:
+	if not self_aura_triggers.has(aura):
+		return
+	var aura_triggers: Dictionary = self_aura_triggers[aura]
+	for effect: Effect in aura_triggers.keys():
+		unit.buff_controller.remove_effect(effect)
+	self_aura_triggers.erase(aura)

@@ -25,6 +25,7 @@ breakable = true
 expendable = true
 trade = true
 max_dur = 20
+weight = 0
 category = 10
 sub_group = 0
 effects = Array[ExtResource("1_j11gk")]([ExtResource("2_tpdih")])

@@ -8,9 +8,9 @@
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="7_tygqd"]
 [ext_resource type="PackedScene" uid="uid://cb7freyrit3pr" path="res://scenes/units/fairy_brigand.tscn" id="8_k3lsm"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="8_y36re"]
-[ext_resource type="Resource" uid="uid://e7drxbfl83us" path="res://unit_resources/items/weapons/club.tres" id="9_fwtvd"]
+[ext_resource type="Resource" uid="uid://e7drxbfl83us" path="res://unit_resources/items/weapons/blunt/club.tres" id="9_fwtvd"]
 [ext_resource type="Script" uid="uid://b62j6u801juy5" path="res://unit_resources/items/accessories/accessory.gd" id="10_lc3c6"]
-[ext_resource type="Resource" uid="uid://2j8nnuwph76x" path="res://unit_resources/items/accessories/pwr_ring01.tres" id="11_bw8l1"]
+[ext_resource type="Resource" uid="uid://2j8nnuwph76x" path="res://unit_resources/items/accessories/general/pwr_ring01.tres" id="11_bw8l1"]
 
 [sub_resource type="Resource" id="Resource_k3lsm"]
 script = ExtResource("4_pivsa")

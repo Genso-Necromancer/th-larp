@@ -277,12 +277,16 @@ func _switch_to_save_warning():
 
 
 func _on_skill_pressed(sButton : Control):
+	if sButton is BaseButton and sButton.disabled:
+		return
 	var skill = sButton.get_meta("ID")
 	skill_selected.emit(skill)
 	_change_state(MENU_STATES.SKILL_TARGETING)
 
 
 func _on_ofuda_pressed(oButton : Control):
+	if oButton is BaseButton and oButton.disabled:
+		return
 	var unit: Unit = oButton.get_meta("Unit")
 	var ofuda: Ofuda = oButton.get_meta("Item")
 	ofuda_selected.emit(unit, ofuda)

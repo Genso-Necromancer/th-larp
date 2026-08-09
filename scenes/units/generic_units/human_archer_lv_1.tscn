@@ -1,0 +1,64 @@
+[gd_scene load_steps=3 format=3 uid="uid://b34x3byaqmmdq"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_6v0ax"]
+[ext_resource type="Texture2D" uid="uid://cgjo8gjm150ig" path="res://sprites/character/human/archer_sprite.png" id="2_p3avv"]
+
+[node name="Human Archer Lv1" instance=ExtResource("1_6v0ax")]
+archetype = 1
+ai_role = 4
+SPEC_ID = 2
+ROLE_ID = 11
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.25,
+&"Cha": 0.25,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.4,
+&"Life": 0.25,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.25
+})
+total_stats = Dictionary[StringName, int]({
+&"Cele": 7,
+&"Cha": 6,
+&"Comp": 100,
+&"Def": 2,
+&"Eleg": 10,
+&"Life": 21,
+&"Mag": 0,
+&"Move": 4,
+&"Pwr": 5
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": false,
+"Book": false,
+"Bow": true,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
+max_inv = 6
+status = {
+"Acted": false,
+"Sleep": false
+}
+
+[node name="Sprite" parent="PathFollow2D" index="0"]
+texture = ExtResource("2_p3avv")

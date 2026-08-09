@@ -8,7 +8,7 @@ static var screen_shot_folder := "screen_shots"
 
 var gameBoard: GameBoard
 var map_manager: MapManager
-var first_map:String = "res://scenes/maps/seize_test.tscn"
+var first_map:String = "res://scenes/maps/scenes/seize_test.tscn"
 var manager_preload:= preload("res://scenes/map_manager.tscn")
 var file_selected:bool = false
 var pending_save_file:String = ""
@@ -40,6 +40,9 @@ func _init():
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		return
+	elif Input.is_action_just_pressed("debug_soft_reset") and Global.flags.DebugMode:
+		if map_manager and is_instance_valid(map_manager):
+			map_manager.soft_reset_current_map()
 	elif event.is_action_pressed("ui_snap"):
 		take_screenshot()
 	elif event.is_action_pressed("xml_debug"):
@@ -231,6 +234,7 @@ func _on_opening_complete():
 
 func _load_map_manager()->MapManager:
 	var manager :MapManager= manager_preload.instantiate()
+	map_manager = manager
 	#unload_me(title_screen)
 	load_scene(manager)
 	return manager

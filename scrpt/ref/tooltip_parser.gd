@@ -291,7 +291,19 @@ func _generate_formula(params:Array)->String:
 
 
 func get_status(unit:Unit, status:String) -> String:
+	if status.begins_with("effects:"):
+		return _get_effect_group_status_tooltip(unit, status.trim_prefix("effects:"))
+	if status.begins_with("effect:"):
+		return _get_effect_status_tooltip(unit, status.trim_prefix("effect:"))
+	if status.begins_with("status:"):
+		status = status.trim_prefix("status:")
 	var status_datas = unit.status_data
+	if unit.has_method("get_status_tray_status_data"):
+		var controller_data := unit.get_status_tray_status_data(status)
+		if not controller_data.is_empty():
+			status_datas = {status: controller_data}
+	elif unit.sParam.has(status):
+		status_datas = {status: unit.sParam[status]}
 	var parts := {}
 	var working : String
 	var finished : String
@@ -299,11 +311,83 @@ func get_status(unit:Unit, status:String) -> String:
 	parts["Status"] = StringGetter.get_string("status_"+status.to_snake_case())
 	if status_datas.get(status,false):
 		working += "\n" + StringGetter.get_string("remaining_label")
-		parts["Duration"] = str(status_datas[status].get("Duration", ""))
+		parts["duration"] = str(status_datas[status].get("Duration", ""))
 		var durationType = Enums.DURATION_TYPE.keys()[status_datas[status].DurationType]
-		parts["DurationType"] = StringGetter.get_string("duration_"+durationType.to_snake_case())
+		parts["duration_type"] = StringGetter.get_string("duration_"+durationType.to_snake_case())
 	finished = _mash_together(working, parts)
 	return finished
+
+
+func _get_effect_status_tooltip(unit: Unit, effect_key: String) -> String:
+	if unit == null or not unit.has_method("get_status_tray_effect_entry"):
+		return StringGetter.get_string("status_effect")
+	var entry: Dictionary = unit.get_status_tray_effect_entry(effect_key)
+	if entry.is_empty():
+		return StringGetter.get_string("status_effect")
+	return _format_status_tray_effect(entry)
+
+
+func _get_effect_group_status_tooltip(unit: Unit, icon_key: String) -> String:
+	if unit == null or not unit.has_method("get_status_tray_effect_entries"):
+		return StringGetter.get_string("status_effect")
+	var entries: Array = unit.get_status_tray_effect_entries(icon_key)
+	if entries.is_empty():
+		return StringGetter.get_string("status_effect")
+	var lines: Array[String] = []
+	for entry in entries:
+		lines.append(_format_status_tray_effect(entry))
+	return "\n".join(lines)
+
+
+func _format_status_tray_effect(entry: Dictionary) -> String:
+	var effect: Effect = entry.get("effect", null)
+	if effect == null:
+		return StringGetter.get_string("status_effect")
+	var text := _get_effect_string_without_duration(effect)
+	var duration := int(entry.get("duration", 0))
+	var duration_type := int(effect.duration_type)
+	if duration > 0 and duration_type != Enums.DURATION_TYPE.NONE:
+		var duration_key :String= Enums.DURATION_TYPE.keys()[duration_type].to_snake_case()
+		text += "\n" + StringGetter.get_string("remaining_label").format({
+			"duration": str(duration),
+			"duration_type": StringGetter.get_string("duration_" + duration_key),
+		})
+	return text
+
+
+func _get_effect_string_without_duration(effect: Effect) -> String:
+	var typeKeys : Array = Enums.EFFECT_TYPE.keys()
+	var subKeys : Array = Enums.SUB_TYPE.keys()
+	var damageKeys : Array = Enums.DAMAGE_TYPE.keys()
+	var templatePath : String = "effect_template_%s" % [typeKeys[effect.type].to_lower()]
+	var text : String = StringGetter.get_template(templatePath)
+	if effect.sub_type:
+		var subKey :String= damageKeys[effect.sub_type] if effect.type == Enums.EFFECT_TYPE.DAMAGE else subKeys[effect.sub_type]
+		var subTypePath := "effect_sub_type_%s" % [subKey.to_lower()]
+		var subType := StringGetter.get_string(subTypePath)
+		text = text % [subType]
+	match effect.type:
+		Enums.EFFECT_TYPE.ADD_SKILL:
+			text = text.format({"skill":StringGetter.get_string("skill_name_%s" % [effect.skill.id])})
+	if effect.value and effect.value != 0:
+		var value = effect.value
+		var path := "value_template"
+		if typeof(value) == Variant.Type.TYPE_FLOAT:
+			value = round(float(value) * 100.0)
+			path = "percent_value_template"
+		else:
+			value = int(value)
+		if _effect_tray_value_should_be_negative(effect):
+			value = -abs(value)
+		text = StringGetter.get_template(path) % [text, value]
+	return text
+
+
+func _effect_tray_value_should_be_negative(effect: Effect) -> bool:
+	match int(effect.type):
+		Enums.EFFECT_TYPE.DEBUFF, Enums.EFFECT_TYPE.DOT, Enums.EFFECT_TYPE.DAMAGE, Enums.EFFECT_TYPE.COMP_DMG:
+			return true
+	return false
 
 
 func _mash_together(string: String, stringDick : Dictionary) -> String:

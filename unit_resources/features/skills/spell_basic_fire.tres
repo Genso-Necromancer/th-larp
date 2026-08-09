@@ -2,24 +2,26 @@
 
 [ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_k4y5n"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_gexr4"]
-[ext_resource type="Resource" uid="uid://cfqn06a1jkagu" path="res://unit_resources/effects/buff_graze05.tres" id="2_ly5j5"]
+[ext_resource type="Resource" uid="uid://df5t330fw0l6p" path="res://unit_resources/effects/buff_cele02.tres" id="2_ly5j5"]
 
 [resource]
 script = ExtResource("2_gexr4")
 augment = false
+magical = true
+element = 1
 target = 3
 can_miss = true
 can_crit = true
 can_dmg = true
 min_reach = 1
 max_reach = 2
-cost = 3
+cost = 4
 weapon_category = 1
 sub_group = 0
 bonus_min_range = 0
 bonus_max_range = 0
-hit = 90
-dmg = 6
+hit = 80
+dmg = 5
 crit = 0
 crit_min = 0
 crit_max = 0

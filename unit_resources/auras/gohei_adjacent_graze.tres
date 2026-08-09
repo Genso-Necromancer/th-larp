@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Aura" load_steps=4 format=3]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_effect"]
+[ext_resource type="Script" uid="uid://blrufmbqn5ftl" path="res://unit_resources/auras/aura.gd" id="2_aura"]
+[ext_resource type="Resource" path="res://unit_resources/effects/gohei_adjacent_graze10.tres" id="3_graze"]
+
+[resource]
+resource_name = "gohei_adjacent_graze"
+script = ExtResource("2_aura")
+range = 1
+is_self = false
+target_team = 2
+target = 1
+effects = Array[ExtResource("1_effect")]([ExtResource("3_graze")])
+id = "gohei_adjacent_graze"
+rule_type = 0
+metadata/_custom_type_script = "uid://blrufmbqn5ftl"

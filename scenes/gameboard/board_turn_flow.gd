@@ -63,6 +63,7 @@ func initialize_turns(ignore_acted := false) -> void:
 			continue
 		else:
 			unit.set_acted(false)
+			unit.moved_hexes = 0
 		unit.isSelected = false
 		unit.originCell = unit.cell
 		unit.call_deferred("refresh_state_visual")

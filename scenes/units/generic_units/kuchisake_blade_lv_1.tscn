@@ -5,7 +5,7 @@
 [ext_resource type="Resource" uid="uid://3o0hv3vmn8qo" path="res://unit_resources/features/passives/ambush.tres" id="3_b2e8q"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="4_sfx4u"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="5_1v3bc"]
-[ext_resource type="Resource" uid="uid://2rd8otigdweg" path="res://unit_resources/items/weapons/scissor_blade_basic.tres" id="6_xr3xv"]
+[ext_resource type="Resource" uid="uid://2rd8otigdweg" path="res://unit_resources/items/weapons/blade/scissor_blade_basic.tres" id="6_xr3xv"]
 [ext_resource type="Texture2D" uid="uid://cfhofpnoguehi" path="res://sprites/character/youkai/blade_sprite.png" id="7_1v3bc"]
 
 [sub_resource type="Resource" id="Resource_facok"]

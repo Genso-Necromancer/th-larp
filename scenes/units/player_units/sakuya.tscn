@@ -9,14 +9,14 @@
 [ext_resource type="Resource" uid="uid://dq348uxmletm" path="res://unit_resources/features/passives/lockpick.tres" id="7_76ftn"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="7_xjp6u"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="8_04v6q"]
-[ext_resource type="Resource" uid="uid://ck2mfsbmow1ok" path="res://unit_resources/items/weapons/knife_silver.tres" id="9_srosb"]
+[ext_resource type="Resource" uid="uid://ck2mfsbmow1ok" path="res://unit_resources/items/weapons/knife/knife_silver.tres" id="9_srosb"]
 [ext_resource type="Script" uid="uid://y8vspyvvdgjj" path="res://unit_resources/items/consumables/consumable.gd" id="10_80wpv"]
 [ext_resource type="Resource" uid="uid://cmoym4xuhijeg" path="res://unit_resources/items/consumables/pizza.tres" id="11_k4fqe"]
 [ext_resource type="Texture2D" uid="uid://dljh0liccgicy" path="res://sprites/character/sakuya/maid_sprite.png" id="12_pg4wh"]
 [ext_resource type="Resource" uid="uid://thvr8fmhdir2" path="res://unit_resources/items/consumables/power_item02.tres" id="13_04v6q"]
-[ext_resource type="Resource" uid="uid://b7s77y3xj1qtm" path="res://unit_resources/items/weapons/knife_dagger.tres" id="16_04v6q"]
+[ext_resource type="Resource" uid="uid://b7s77y3xj1qtm" path="res://unit_resources/items/weapons/knife/knife_dagger.tres" id="16_04v6q"]
 [ext_resource type="Script" uid="uid://b62j6u801juy5" path="res://unit_resources/items/accessories/accessory.gd" id="17_80wpv"]
-[ext_resource type="Resource" uid="uid://2j8nnuwph76x" path="res://unit_resources/items/accessories/pwr_ring01.tres" id="18_k4fqe"]
+[ext_resource type="Resource" uid="uid://2j8nnuwph76x" path="res://unit_resources/items/accessories/general/pwr_ring01.tres" id="18_k4fqe"]
 
 [sub_resource type="Resource" id="Resource_katwc"]
 script = ExtResource("8_04v6q")
@@ -68,48 +68,59 @@ unit_level = 5
 SPEC_ID = 2
 ROLE_ID = 4
 mod_stats = Dictionary[StringName, int]({
-&"Cele": 0,
+&"Cele": 3,
 &"Cha": 0,
-&"Comp": 0,
-&"Def": 0,
-&"Eleg": 4,
-&"Life": 0,
+&"Comp": 10,
+&"Def": 1,
+&"Eleg": 0,
+&"Life": 9,
 &"Mag": 0,
 &"Move": 0,
-&"Pwr": 0
+&"Pwr": 2
+})
+mod_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.15,
+&"Comp": 0.35,
+&"Def": 0.1,
+&"Eleg": 0.25,
+&"Life": 0.25,
+&"Mag": 0.1,
+&"Move": 0.0,
+&"Pwr": -0.75
 })
 total_growth = Dictionary[StringName, float]({
-&"Cele": 0.0,
-&"Cha": 0.0,
-&"Comp": 0.0,
-&"Def": 0.0,
-&"Eleg": 0.0,
-&"Life": 0.0,
-&"Mag": 0.0,
+&"Cele": 0.3,
+&"Cha": 0.2,
+&"Comp": 0.35,
+&"Def": 0.1,
+&"Eleg": 0.3,
+&"Life": 0.25,
+&"Mag": 0.1,
 &"Move": 0.0,
-&"Pwr": 1.0
+&"Pwr": 0.25
 })
 total_stats = Dictionary[StringName, int]({
-&"Cele": 7,
-&"Cha": 7,
-&"Comp": 100,
-&"Def": 2,
-&"Eleg": 15,
-&"Life": 20,
+&"Cele": 10,
+&"Cha": 8,
+&"Comp": 110,
+&"Def": 3,
+&"Eleg": 12,
+&"Life": 29,
 &"Mag": 3,
 &"Move": 5,
-&"Pwr": 6
+&"Pwr": 8
 })
 total_caps = Dictionary[StringName, int]({
-&"Cele": 20,
-&"Cha": 20,
-&"Comp": 100,
-&"Def": 20,
-&"Eleg": 20,
-&"Life": 20,
-&"Mag": 20,
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
 &"Move": 10,
-&"Pwr": 20
+&"Pwr": 30
 })
 personal_skills = Array[ExtResource("2_mte8d")]([ExtResource("3_pg4wh"), ExtResource("4_76ftn")])
 personal_passives = Array[ExtResource("5_xihvp")]([ExtResource("6_ghyhf"), ExtResource("7_76ftn")])
@@ -134,5 +145,5 @@ inventory = Array[ExtResource("7_xjp6u")]([SubResource("Resource_katwc"), SubRes
 texture = ExtResource("12_pg4wh")
 
 [node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
-max_value = 20.0
-value = 20.0
+max_value = 29.0
+value = 29.0

@@ -9,6 +9,7 @@ var current_map:String
 var next_map:String
 var is_suspended_load:=false
 var load_initiated:= false
+var soft_reset_in_progress := false
 
 func _ready():
 	if gameBoard and guiManager: 
@@ -36,6 +37,30 @@ func load_data(save_data:Dictionary):
 func load_map(map:String):
 	if !map: print("[MapManager]load_map: empty map string")
 	gameBoard.load_map(map)
+
+
+func soft_reset_current_map() -> void:
+	if soft_reset_in_progress:
+		return
+	var map_path := current_map
+	if map_path == "" and gameBoard.current_map:
+		map_path = gameBoard.current_map.get_scene_file_path()
+	if map_path == "":
+		push_warning("[MapManager]soft_reset_current_map: no current map path.")
+		return
+	soft_reset_in_progress = true
+	load_initiated = false
+	is_suspended_load = false
+	next_map = ""
+	if dOverlay and is_instance_valid(dOverlay):
+		dOverlay.queue_free()
+		dOverlay = null
+	guiManager.reset_for_soft_reset()
+	gameBoard.save_enum = Enums.SAVE_TYPE.NONE
+	await gameBoard.free_map(false)
+	current_map = map_path
+	gameBoard.load_map(map_path)
+	soft_reset_in_progress = false
 
 
 func load_map_from_file(map:String, save_data:Dictionary, is_suspended:bool=false):

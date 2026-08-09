@@ -1,4 +1,4 @@
-extends Node
+﻿extends Node
 ##Representation of the board's current state for AI evaluation
 class_name BoardState
 
@@ -174,6 +174,21 @@ func get_units_for_faction(faction: Enums.FACTION_ID) -> Array[UnitSim]:
 		if sim.team == faction:
 			out.append(sim)
 	return out
+
+
+func can_unit_take_turn(unit: UnitSim) -> bool:
+	if unit == null or not unit.can_act():
+		return false
+	if not unit.has_status("Dazed"):
+		return true
+	for ally in get_units_for_faction(unit.team):
+		if ally == null or ally.id == unit.id:
+			continue
+		if not ally.can_act():
+			continue
+		if not ally.has_status("Dazed"):
+			return false
+	return true
 
 
 func get_enemy_units_for(unit: UnitSim) -> Array[UnitSim]:
@@ -421,7 +436,21 @@ func _is_cell_in_reach(origin: Vector2i, target: Vector2i, reach: Dictionary) ->
 	var min_range := int(reach.get("Min", 1))
 	var max_range := int(reach.get("Max", 1))
 	var distance := get_hex_distance(origin, target)
-	return distance >= min_range and distance <= max_range
+	if distance >= min_range and distance <= max_range:
+		return true
+	return _is_distance_in_reach_band(reach, distance, "Close") or _is_distance_in_reach_band(reach, distance, "Far")
+
+
+func _is_distance_in_reach_band(reach: Dictionary, distance: int, prefix: String) -> bool:
+	var min_reach := int(reach.get("%sMin" % prefix, 0))
+	var max_reach := int(reach.get("%sMax" % prefix, 0))
+	if min_reach == 0 and max_reach == 0:
+		return false
+	if min_reach == 0:
+		min_reach = max_reach
+	if max_reach == 0:
+		max_reach = min_reach
+	return distance >= min_reach and distance <= max_reach
 
 
 func _is_friendly_pair(actor: UnitSim, target: UnitSim) -> bool:
@@ -481,6 +510,10 @@ func _get_skill_reach_for_sim(actor: UnitSim, skill) -> Dictionary:
 		var reach := {
 			"Min": int(wep.get("min_reach", 0)),
 			"Max": int(wep.get("max_reach", 0)),
+			"CloseMin": int(wep.get("close_min_reach", 0)),
+			"CloseMax": int(wep.get("close_max_reach", 0)),
+			"FarMin": int(wep.get("far_min_reach", 0)),
+			"FarMax": int(wep.get("far_max_reach", 0)),
 		}
 		var skill_min := int(skill.get("min_reach", 0))
 		var skill_max := int(skill.get("max_reach", 0))
@@ -573,6 +606,7 @@ func _generate_targeted_unit_actions_for_cells(unit_id: String, move_cells: Arra
 			action.from_cell = move_cell
 			action.target_cell = target.cell
 			action.target_unit_id = target.id
+			action.moved_hexes = get_hex_distance(actor.cell, move_cell)
 			if payload_key == "skill":
 				action.skill = payload
 			elif payload_key == "item":
@@ -710,6 +744,7 @@ func _generate_attack_actions_for_cells(unit_id: String, move_cells: Array[Vecto
 			action.from_cell = move_cell
 			action.target_cell = enemy.cell
 			action.target_unit_id = enemy.id
+			action.moved_hexes = get_hex_distance(unit.cell, move_cell)
 			actions.append(action)
 
 	return actions
@@ -809,6 +844,8 @@ func generate_skill_actions_for_unit(unit_id: String) -> Array[Action]:
 	for skill in unit.iter_skills():
 		if typeof(skill) != TYPE_DICTIONARY:
 			continue
+		if not unit.can_use_skill(skill):
+			continue
 		var target_type := int(skill.get("target", Enums.SKILL_TARGET.NONE))
 		match target_type:
 			Enums.SKILL_TARGET.ENEMY:
@@ -831,6 +868,8 @@ func generate_item_actions_for_unit(unit_id: String) -> Array[Action]:
 		if typeof(item) != TYPE_DICTIONARY:
 			continue
 		if not _is_supported_ai_item(item):
+			continue
+		if not unit.has_enough_comp(int(item.get("cost", 0))):
 			continue
 		var target_type := _get_item_target_type(item)
 		match target_type:
@@ -906,6 +945,7 @@ func _apply_attack(action:Action):
 	var defender := get_unit_by_id(action.target_unit_id)
 	if attacker == null or defender == null:
 		return
+	attacker.moved_hexes = int(action.moved_hexes)
 	if action.from_cell != Vector2i.ZERO and attacker.cell != action.from_cell:
 		if can_unit_end_on_cell(attacker.id, action.from_cell):
 			set_unit_cell(attacker.id, action.from_cell)

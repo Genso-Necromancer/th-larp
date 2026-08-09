@@ -1626,7 +1626,7 @@ func _update_natural(passive) -> void:
 func _get_natural_weapon(natId:String)->Natural:
 	var natRes : NaturalResource
 	var newNat : Natural
-	var natPath : String = "res://unit_resources/items/weapons/%s.tres"
+	var natPath : String = "res://unit_resources/items/weapons/natural/%s.tres"
 	if natId: natPath = natPath % [natId]
 	#print(natPath)
 	if ResourceLoader.exists(natPath):

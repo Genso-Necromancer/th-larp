@@ -7,10 +7,10 @@
 [ext_resource type="Resource" uid="uid://bofq84qr3ykxf" path="res://unit_resources/features/passives/fated.tres" id="3_bmjv5"]
 [ext_resource type="Resource" uid="uid://p3wtlxq4fq1f" path="res://unit_resources/features/skills/life_steal_rem.tres" id="3_ushyw"]
 [ext_resource type="Resource" uid="uid://co546romn6pwr" path="res://unit_resources/features/passives/rem_aura.tres" id="4_302o8"]
-[ext_resource type="Resource" uid="uid://bxm1olqpp65nj" path="res://unit_resources/features/passives/canto.tres" id="5_bmjv5"]
+[ext_resource type="Resource" uid="uid://cjyhb0gepguhi" path="res://unit_resources/features/passives/canto_night.tres" id="5_bmjv5"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="7_u1nol"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="8_vtdhj"]
-[ext_resource type="Resource" uid="uid://da080uvnxli85" path="res://unit_resources/items/weapons/gungnir.tres" id="9_1tx70"]
+[ext_resource type="Resource" path="res://unit_resources/items/weapons/polearm/gungnir.tres" id="9_1tx70"]
 
 [sub_resource type="Resource" id="Resource_5ej2j"]
 script = ExtResource("8_vtdhj")
@@ -29,61 +29,61 @@ simulate_leveling = false
 SPEC_ID = 3
 ROLE_ID = 3
 mod_growth = Dictionary[StringName, float]({
-&"Cele": 1.0,
-&"Cha": 0.6,
-&"Comp": 1.0,
-&"Def": 0.2,
-&"Eleg": 0.7,
-&"Life": 1.0,
-&"Mag": 0.5,
+&"Cele": 0.25,
+&"Cha": 0.25,
+&"Comp": 0.35,
+&"Def": 0.05,
+&"Eleg": 0.25,
+&"Life": 0.3,
+&"Mag": 0.2,
 &"Move": 0.0,
-&"Pwr": 0.5
+&"Pwr": 0.3
 })
 mod_stats = Dictionary[StringName, int]({
-&"Cele": 0,
-&"Cha": 0,
-&"Comp": 0,
-&"Def": 0,
-&"Eleg": 0,
-&"Life": 4,
-&"Mag": 0,
+&"Cele": -1,
+&"Cha": 1,
+&"Comp": 10,
+&"Def": 1,
+&"Eleg": 2,
+&"Life": 6,
+&"Mag": 1,
 &"Move": 0,
-&"Pwr": 0
+&"Pwr": 2
 })
 total_growth = Dictionary[StringName, float]({
-&"Cele": 1.0,
-&"Cha": 0.6,
-&"Comp": 1.0,
-&"Def": 0.2,
-&"Eleg": 0.7,
-&"Life": 1.0,
-&"Mag": 0.5,
+&"Cele": 0.25,
+&"Cha": 0.25,
+&"Comp": 0.35,
+&"Def": 0.05,
+&"Eleg": 0.25,
+&"Life": 0.3,
+&"Mag": 0.2,
 &"Move": 0.0,
-&"Pwr": 0.5
+&"Pwr": 0.3
 })
 total_stats = Dictionary[StringName, int]({
-&"Cele": 10,
-&"Cha": 8,
-&"Comp": 100,
-&"Def": 1,
-&"Eleg": 7,
-&"Life": 24,
-&"Mag": 4,
+&"Cele": 9,
+&"Cha": 9,
+&"Comp": 110,
+&"Def": 2,
+&"Eleg": 9,
+&"Life": 26,
+&"Mag": 5,
 &"Move": 5,
-&"Pwr": 5
+&"Pwr": 7
 })
 total_caps = Dictionary[StringName, int]({
-&"Cele": 20,
-&"Cha": 20,
-&"Comp": 100,
-&"Def": 20,
-&"Eleg": 20,
-&"Life": 20,
-&"Mag": 20,
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
 &"Move": 10,
-&"Pwr": 20
+&"Pwr": 30
 })
-personal_passives = Array[ExtResource("2_ou00g")]([ExtResource("3_bmjv5"), ExtResource("4_302o8"), ExtResource("5_bmjv5")])
+personal_passives = Array[ExtResource("2_ou00g")]([ExtResource("3_bmjv5"), ExtResource("4_302o8")])
 skills = Array[ExtResource("2_2l8tf")]([ExtResource("3_ushyw")])
 passives = Array[ExtResource("2_ou00g")]([ExtResource("3_bmjv5"), ExtResource("4_302o8"), ExtResource("5_bmjv5")])
 weapon_prof = {
@@ -105,5 +105,5 @@ inventory = Array[ExtResource("7_u1nol")]([SubResource("Resource_5ej2j")])
 texture = ExtResource("2_tvseu")
 
 [node name="HPbar" parent="PathFollow2D/Sprite" index="2"]
-max_value = 20.0
-value = 20.0
+max_value = 26.0
+value = 26.0

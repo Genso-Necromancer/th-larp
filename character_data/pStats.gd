@@ -51,7 +51,7 @@ static func get_spec(specInd):
 			"LeveledPassives": {0:""},
 			"Skills":[],
 			"LeveledSkills": {0:""},
-			"MoveType": MOVE_TYPE.FOOT
+			"MoveType": MOVE_TYPE.RANGER
 				}
 		SPEC_ID.FAIRY: 
 			return {
@@ -103,25 +103,25 @@ static func get_spec(specInd):
 			"StatGroups":{
 				"Stats": {
 					"Move": 0,
-					"Life": 0,
+					"Life": 1,
 					"Comp": 0,
 					"Pwr": 1,
-					"Mag": 0,
+					"Mag": 1,
 					"Eleg": 0,
 					"Cele": 0,
 					"Def": 1,
-					"Cha": 0
+					"Cha": -1
 					},
 				"Growths": {
 					"Move": 0,
-					"Life": 0.0,
+					"Life": 0.05,
 					"Comp": 0,
-					"Pwr": 0.1,
-					"Mag": 0.1,
-					"Eleg": 0.1,
+					"Pwr": 0.05,
+					"Mag": 0.05,
+					"Eleg": 0.0,
 					"Cele": 0.0,
-					"Def": 0.0,
-					"Cha": 0.0
+					"Def": 0.05,
+					"Cha": -0.05
 					},
 				"Caps": {
 					"Move": 0,
@@ -150,10 +150,10 @@ static func get_spec(specInd):
 					"Comp": 0,
 					"Pwr": 0,
 					"Mag": 0,
-					"Eleg": 0,
+					"Eleg": 1,
 					"Cele": 0,
 					"Def": 0,
-					"Cha": 0
+					"Cha": 1
 					},
 				"Growths": {
 					"Move": 0,
@@ -161,10 +161,10 @@ static func get_spec(specInd):
 					"Comp": 0.0,
 					"Pwr": 0.0,
 					"Mag": 0.0,
-					"Eleg": 0.0,
+					"Eleg": 0.05,
 					"Cele": 0.0,
 					"Def": 0.0,
-					"Cha": 0.0
+					"Cha": 0.05
 					},
 				"Caps": {
 					"Move": 0,
@@ -221,7 +221,7 @@ static func get_spec(specInd):
 					"Cha": 0
 					}
 					},
-			"Passives":[],
+			"Passives":["res://unit_resources/features/passives/canto_night.tres"],
 			"LeveledPassives": {0:""},
 			"Skills":["res://unit_resources/features/skills/life_steal_rem.tres"],
 			"LeveledSkills": {0:""},
@@ -275,24 +275,24 @@ static func get_spec(specInd):
 			"StatGroups":{
 				"Stats": {
 					"Move": 0,
-					"Life": 0,
+					"Life": 4,
 					"Comp": 0,
 					"Pwr": 0,
-					"Mag": 0,
+					"Mag": 1,
 					"Eleg": 0,
 					"Cele": 0,
-					"Def": 0,
+					"Def": 2,
 					"Cha": 0
 					},
 				"Growths": {
 					"Move": 0,
-					"Life": 0.0,
+					"Life": 0.1,
 					"Comp": 0.0,
 					"Pwr": 0.0,
 					"Mag": 0.0,
 					"Eleg": 0.0,
-					"Cele": 0.0,
-					"Def": 0.0,
+					"Cele": -0.05,
+					"Def": 0.05,
 					"Cha": 0.0
 					},
 				"Caps": {
@@ -387,14 +387,14 @@ static func get_job(jobInd):
 					},
 				"Caps": {
 					"Move": 10,
-					"Life": 20,
-					"Comp": 100,
-					"Pwr": 20,
-					"Mag": 20,
-					"Eleg": 20,
-					"Cele": 20,
-					"Def": 20,
-					"Cha": 20
+					"Life": 60,
+					"Comp": 130,
+					"Pwr": 30,
+					"Mag": 30,
+					"Eleg": 30,
+					"Cele": 30,
+					"Def": 30,
+					"Cha": 30
 					}
 					},
 			"Passives":[],
@@ -412,7 +412,8 @@ static func get_job(jobInd):
 				"Bow": false,
 				"Gun": false,
 				"Knife": false,
-				"Natural":false,
+				"Natural": false,
+				"Barrier": false,
 				},
 			"MoveType": MOVE_TYPE.FLY
 				}
@@ -443,14 +444,14 @@ static func get_job(jobInd):
 					},
 				"Caps": {
 					"Move": 10,
-					"Life": 20,
-					"Comp": 100,
-					"Pwr": 20,
-					"Mag": 20,
-					"Eleg": 20,
-					"Cele": 20,
-					"Def": 20,
-					"Cha": 20
+					"Life": 60,
+					"Comp": 130,
+					"Pwr": 30,
+					"Mag": 30,
+					"Eleg": 30,
+					"Cele": 30,
+					"Def": 30,
+					"Cha": 30
 					}
 					},
 			"Passives":[],
@@ -468,7 +469,8 @@ static func get_job(jobInd):
 				"Bow": false,
 				"Gun": false,
 				"Knife": false,
-				"Natural":false,
+				"Natural": false,
+				"Barrier": false,
 				},
 			"MoveType": MOVE_TYPE.FLY
 				}
@@ -499,14 +501,14 @@ static func get_job(jobInd):
 					},
 				"Caps": {
 					"Move": 10,
-					"Life": 20,
-					"Comp": 100,
-					"Pwr": 20,
-					"Mag": 20,
-					"Eleg": 20,
-					"Cele": 20,
-					"Def": 20,
-					"Cha": 20
+					"Life": 60,
+					"Comp": 130,
+					"Pwr": 30,
+					"Mag": 30,
+					"Eleg": 30,
+					"Cele": 30,
+					"Def": 30,
+					"Cha": 30
 					}
 					},
 			"Passives":[],
@@ -524,7 +526,8 @@ static func get_job(jobInd):
 				"Bow": false,
 				"Gun": false,
 				"Knife": true,
-				"Natural":false,
+				"Natural": false,
+				"Barrier": false,
 				},
 			"MoveType": MOVE_TYPE.RANGER
 				}
@@ -555,14 +558,14 @@ static func get_job(jobInd):
 					},
 				"Caps": {
 					"Move": 10,
-					"Life": 20,
-					"Comp": 100,
-					"Pwr": 20,
-					"Mag": 20,
-					"Eleg": 20,
-					"Cele": 20,
-					"Def": 20,
-					"Cha": 20
+					"Life": 60,
+					"Comp": 130,
+					"Pwr": 30,
+					"Mag": 30,
+					"Eleg": 30,
+					"Cele": 30,
+					"Def": 30,
+					"Cha": 30
 					}
 					},
 			"Passives":[],
@@ -580,7 +583,8 @@ static func get_job(jobInd):
 				"Bow": false,
 				"Gun": false,
 				"Knife": false,
-				"Natural":false,
+				"Natural": false,
+				"Barrier": false,
 				},
 			"MoveType": MOVE_TYPE.FOOT
 				}
@@ -589,40 +593,42 @@ static func get_job(jobInd):
 			"StatGroups":{
 				"Stats": {
 					"Move": 4,
-					"Life": 22,
-					"Comp": 100,
-					"Pwr": 8,
+					"Life": 27,
+					"Comp": 110,
+					"Pwr": 6,
 					"Mag": 0,
-					"Eleg": 8,
-					"Cele": 5,
+					"Eleg": 7,
+					"Cele": 3,
 					"Def": 8,
-					"Cha": 5
+					"Cha": 4
 					},
 				"Growths": {
 					"Move": 0.0,
-					"Life": 0.0,
-					"Comp": 0.0,
-					"Pwr": 0.0,
+					"Life": 0.3,
+					"Comp": 0.3,
+					"Pwr": 0.2,
 					"Mag": 0.0,
-					"Eleg": 0.0,
-					"Cele": 0.0,
-					"Def": 0.0,
-					"Cha": 0.0
+					"Eleg": 0.15,
+					"Cele": 0.05,
+					"Def": 0.15,
+					"Cha": 0.15
 					},
 				"Caps": {
 					"Move": 10,
-					"Life": 20,
-					"Comp": 100,
-					"Pwr": 20,
-					"Mag": 20,
-					"Eleg": 20,
-					"Cele": 20,
-					"Def": 20,
-					"Cha": 20
+					"Life": 60,
+					"Comp": 130,
+					"Pwr": 30,
+					"Mag": 30,
+					"Eleg": 30,
+					"Cele": 30,
+					"Def": 30,
+					"Cha": 30
 					}
 					},
 			"Passives":[],
-			"Skills":["res://unit_resources/features/skills/toss_enemy.tres","res://unit_resources/features/skills/shove_enemy01.tres"],
+			"LeveledPassives": {0:""},
+			"Skills":["res://unit_resources/features/skills/shove_enemy01.tres"],
+			"LeveledSkills": {0:""},
 			"MaxInv": 6,
 			"Weapons": {
 				"Blade": false,
@@ -634,7 +640,8 @@ static func get_job(jobInd):
 				"Bow": false,
 				"Gun": false,
 				"Knife": false,
-				"Natural":false,
+				"Natural": false,
+				"Barrier": true,
 				},
 			"MoveType": MOVE_TYPE.FOOT
 				}
@@ -643,36 +650,36 @@ static func get_job(jobInd):
 			"StatGroups":{
 				"Stats": {
 					"Move": 4,
-					"Life": 20,
-					"Comp": 100,
-					"Pwr": 7,
+					"Life": 21,
+					"Comp": 105,
+					"Pwr": 6,
 					"Mag": 5,
 					"Eleg": 8,
 					"Cele": 8,
-					"Def": 6,
+					"Def": 5,
 					"Cha": 8
 					},
 				"Growths": {
 					"Move": 0.0,
-					"Life": 0.0,
-					"Comp": 0.0,
-					"Pwr": 0.0,
-					"Mag": 0.0,
-					"Eleg": 0.0,
-					"Cele": 0.0,
-					"Def": 0.0,
-					"Cha": 0.0
+					"Life": 0.25,
+					"Comp": 0.35,
+					"Pwr": 0.2,
+					"Mag": 0.2,
+					"Eleg": 0.25,
+					"Cele": 0.2,
+					"Def": 0.1,
+					"Cha": 0.25
 					},
 				"Caps": {
 					"Move": 10,
-					"Life": 20,
-					"Comp": 100,
-					"Pwr": 20,
-					"Mag": 20,
-					"Eleg": 20,
-					"Cele": 20,
-					"Def": 20,
-					"Cha": 20
+					"Life": 60,
+					"Comp": 130,
+					"Pwr": 30,
+					"Mag": 30,
+					"Eleg": 30,
+					"Cele": 30,
+					"Def": 30,
+					"Cha": 30
 					}
 					},
 			"Passives":[],
@@ -690,7 +697,8 @@ static func get_job(jobInd):
 				"Bow": false,
 				"Gun": false,
 				"Knife": false,
-				"Natural":false,
+				"Natural": false,
+				"Barrier": false,
 				},
 			"MoveType": MOVE_TYPE.FOOT
 				}
@@ -700,36 +708,36 @@ static func get_job(jobInd):
 			"StatGroups":{
 				"Stats": {
 					"Move": 4,
-					"Life": 20,
+					"Life": 25,
 					"Comp": 100,
-					"Pwr": 6,
+					"Pwr": 8,
 					"Mag": 0,
-					"Eleg": 4,
-					"Cele": 2,
-					"Def": 4,
-					"Cha": 0
+					"Eleg": 6,
+					"Cele": 6,
+					"Def": 2,
+					"Cha": 1
 					},
 				"Growths": {
 					"Move": 0,
-					"Life": 0.5,
-					"Comp": 0.3,
-					"Pwr": 0.45,
+					"Life": 0.35,
+					"Comp": 0.25,
+					"Pwr": 0.4,
 					"Mag": 0.0,
 					"Eleg": 0.2,
-					"Cele": 0.0,
-					"Def": 0.2,
-					"Cha": 0.0
+					"Cele": 0.25,
+					"Def": 0.05,
+					"Cha": 0.05
 					},
 				"Caps": {
 					"Move": 10,
-					"Life": 20,
-					"Comp": 100,
-					"Pwr": 20,
-					"Mag": 20,
-					"Eleg": 20,
-					"Cele": 20,
-					"Def": 20,
-					"Cha": 20
+					"Life": 60,
+					"Comp": 130,
+					"Pwr": 30,
+					"Mag": 30,
+					"Eleg": 30,
+					"Cele": 30,
+					"Def": 30,
+					"Cha": 30
 					}
 					},
 			"Passives":[],
@@ -748,6 +756,7 @@ static func get_job(jobInd):
 				"Gun": false,
 				"Knife": false,
 				"Natural": false,
+				"Barrier": false,
 				},
 			"MoveType": MOVE_TYPE.FOOT
 				}
@@ -756,36 +765,36 @@ static func get_job(jobInd):
 			"StatGroups":{
 				"Stats": {
 					"Move": 5,
-					"Life": 14,
+					"Life": 18,
 					"Comp": 100,
 					"Pwr": 4,
 					"Mag": 0,
-					"Eleg": 4,
-					"Cele": 5,
-					"Def": 0,
-					"Cha": 0
+					"Eleg": 7,
+					"Cele": 9,
+					"Def": 1,
+					"Cha": 7
 					},
 				"Growths": {
 					"Move": 0,
-					"Life": 0.4,
+					"Life": 0.2,
 					"Comp": 0.3,
-					"Pwr": 0.3,
-					"Mag": -0.1,
-					"Eleg": 0.2,
-					"Cele": 0.45,
-					"Def": 0.2,
-					"Cha": 0.0
+					"Pwr": 0.15,
+					"Mag": 0.0,
+					"Eleg": 0.25,
+					"Cele": 0.35,
+					"Def": 0.05,
+					"Cha": 0.3
 					},
 				"Caps": {
 					"Move": 10,
-					"Life": 20,
-					"Comp": 100,
-					"Pwr": 20,
-					"Mag": 20,
-					"Eleg": 20,
-					"Cele": 20,
-					"Def": 20,
-					"Cha": 20
+					"Life": 60,
+					"Comp": 130,
+					"Pwr": 30,
+					"Mag": 30,
+					"Eleg": 30,
+					"Cele": 30,
+					"Def": 30,
+					"Cha": 30
 					}
 					},
 			"Passives":[],
@@ -803,16 +812,131 @@ static func get_job(jobInd):
 				"Bow": false,
 				"Gun": false,
 				"Knife": true,
-				"Natural":false,
+				"Natural": false,
+				"Barrier": false,
 				},
 			"MoveType": MOVE_TYPE.RANGER
+				}
+		ROLE_ID.WITCH: return {
+			"Role": "Witch",
+			"StatGroups":{
+				"Stats": {
+					"Move": 4,
+					"Life": 18,
+					"Comp": 95,
+					"Pwr": 1,
+					"Mag": 9,
+					"Eleg": 9,
+					"Cele": 4,
+					"Def": 1,
+					"Cha": 6
+					},
+				"Growths": {
+					"Move": 0,
+					"Life": 0.2,
+					"Comp": 0.3,
+					"Pwr": 0.0,
+					"Mag": 0.4,
+					"Eleg": 0.3,
+					"Cele": 0.1,
+					"Def": 0.05,
+					"Cha": 0.2
+					},
+				"Caps": {
+					"Move": 10,
+					"Life": 60,
+					"Comp": 130,
+					"Pwr": 30,
+					"Mag": 30,
+					"Eleg": 30,
+					"Cele": 30,
+					"Def": 30,
+					"Cha": 30
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MaxInv": 6,
+			"Weapons": {
+				"Blade": false,
+				"Blunt": false,
+				"Stick": false,
+				"Book": true,
+				"Gohei": false,
+				"Ofuda": false,
+				"Bow": false,
+				"Gun": false,
+				"Knife": false,
+				"Natural": false,
+				"Barrier": false,
+				},
+			"MoveType": MOVE_TYPE.FOOT
+				}
+		ROLE_ID.OUTRIDER: return {
+			"Role": "Outrider",
+			"StatGroups":{
+				"Stats": {
+					"Move": 6,
+					"Life": 23,
+					"Comp": 95,
+					"Pwr": 5,
+					"Mag": 0,
+					"Eleg": 8,
+					"Cele": 8,
+					"Def": 2,
+					"Cha": 3
+					},
+				"Growths": {
+					"Move": 0,
+					"Life": 0.25,
+					"Comp": 0.25,
+					"Pwr": 0.2,
+					"Mag": 0.0,
+					"Eleg": 0.3,
+					"Cele": 0.3,
+					"Def": 0.05,
+					"Cha": 0.1
+					},
+				"Caps": {
+					"Move": 10,
+					"Life": 60,
+					"Comp": 130,
+					"Pwr": 30,
+					"Mag": 30,
+					"Eleg": 30,
+					"Cele": 30,
+					"Def": 30,
+					"Cha": 30
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MaxInv": 6,
+			"Weapons": {
+				"Blade": false,
+				"Blunt": false,
+				"Stick": true,
+				"Book": false,
+				"Gohei": false,
+				"Ofuda": false,
+				"Bow": false,
+				"Gun": false,
+				"Knife": false,
+				"Natural": false,
+				"Barrier": false,
+				},
+			"MoveType": MOVE_TYPE.MOUNT
 				}
 		ROLE_ID.BLADE: return {
 			"Role": "Blade",
 			"StatGroups":{
 				"Stats": {
 					"Move": 5,
-					"Life": 14,
+					"Life": 17,
 					"Comp": 100,
 					"Pwr": 4,
 					"Mag": 0,
@@ -834,14 +958,14 @@ static func get_job(jobInd):
 					},
 				"Caps": {
 					"Move": 10,
-					"Life": 20,
-					"Comp": 100,
-					"Pwr": 20,
-					"Mag": 20,
-					"Eleg": 20,
-					"Cele": 20,
-					"Def": 20,
-					"Cha": 20
+					"Life": 60,
+					"Comp": 130,
+					"Pwr": 30,
+					"Mag": 30,
+					"Eleg": 30,
+					"Cele": 30,
+					"Def": 30,
+					"Cha": 30
 					}
 					},
 			"Passives":["res://unit_resources/features/passives/ambush.tres"],
@@ -859,9 +983,67 @@ static func get_job(jobInd):
 				"Bow": false,
 				"Gun": false,
 				"Knife": true,
-				"Natural":false,
+				"Natural": false,
+				"Barrier": false,
 				},
 			"MoveType": MOVE_TYPE.RANGER
+				}
+		ROLE_ID.ARCHER: return {
+			"Role": "Archer",
+			"StatGroups":{
+				"Stats": {
+					"Move": 4,
+					"Life": 21,
+					"Comp": 100,
+					"Pwr": 5,
+					"Mag": 0,
+					"Eleg": 9,
+					"Cele": 7,
+					"Def": 2,
+					"Cha": 5
+					},
+				"Growths": {
+					"Move": 0,
+					"Life": 0.25,
+					"Comp": 0.25,
+					"Pwr": 0.25,
+					"Mag": 0.0,
+					"Eleg": 0.35,
+					"Cele": 0.25,
+					"Def": 0.05,
+					"Cha": 0.2
+					},
+				"Caps": {
+					"Move": 10,
+					"Life": 60,
+					"Comp": 130,
+					"Pwr": 30,
+					"Mag": 30,
+					"Eleg": 30,
+					"Cele": 30,
+					"Def": 30,
+					"Cha": 30
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MaxInv": 6,
+			"Weapons": {
+				"Blade": false,
+				"Blunt": false,
+				"Stick": false,
+				"Book": false,
+				"Gohei": false,
+				"Ofuda": false,
+				"Bow": true,
+				"Gun": false,
+				"Knife": false,
+				"Natural": false,
+				"Barrier": false,
+				},
+			"MoveType": MOVE_TYPE.FOOT
 				}
 
 static func get_art(unit):
@@ -1157,14 +1339,15 @@ static func get_items():
 				"Icon": "res://sprites/gungnir.png",
 				"Type": Enums.DAMAGE_TYPE.PHYS,
 				"Level": 1,
-				"Dmg": 5,
-				"Hit": 70,
-				"Crit": 5,
-				"Barrier": 4,
+				"Dmg": 6,
+				"Hit": 65,
+				"Crit": 0,
+				"Barrier": 0,
 				"MinRange": 1,
 				"MaxRange": 1,
 				"Category": "Gohei",
 				"MaxDur": 40,
+				"Weight": 4,
 				"Equip":true,
 				"SubGroup": false,
 				},
@@ -1552,10 +1735,10 @@ static func get_time_mods():
 							"Comp": 0,
 							"Pwr": 0,
 							"Mag": 0,
-							"Eleg": 0,
+							"Eleg": 1,
 							"Cele": 0,
 							"Def": 0,
-							"Cha": 0,
+							"Cha": 1,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"": 0, 
@@ -1574,9 +1757,9 @@ static func get_time_mods():
 							"Pwr": 0,
 							"Mag": 0,
 							"Eleg": 0,
-							"Cele": 0,
+							"Cele": -1,
 							"Def": 0,
-							"Cha": 0,
+							"Cha": -1,
 							"Dmg": 0, 
 							"Hit": 0, 
 							"": 0, 
@@ -1726,11 +1909,11 @@ static func get_time_mods():
 							"Move": 0,
 							"Life": 0,
 							"Comp": 0,
-							"Pwr": 0,
-							"Mag": 0,
+							"Pwr": -1,
+							"Mag": -1,
 							"Eleg": 0,
 							"Cele": 0,
-							"Def": 0,
+							"Def": -1,
 							"Cha": 0,
 							"Dmg": 0, 
 							"Hit": 0, 
@@ -1747,10 +1930,10 @@ static func get_time_mods():
 							"Move": 0,
 							"Life": 0,
 							"Comp": 0,
-							"Pwr": 0,
-							"Mag": 0,
+							"Pwr": 1,
+							"Mag": 1,
 							"Eleg": 0,
-							"Cele": 0,
+							"Cele": 1,
 							"Def": 0,
 							"Cha": 0,
 							"Dmg": 0, 

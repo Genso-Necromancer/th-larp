@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_eo4lj"]
 [ext_resource type="Resource" uid="uid://m8goa4ih7k0r" path="res://unit_resources/features/skills/sabo_cele05.tres" id="3_akanq"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="3_ls7l8"]
-[ext_resource type="Resource" uid="uid://b7s77y3xj1qtm" path="res://unit_resources/items/weapons/knife_dagger.tres" id="4_2tf2k"]
+[ext_resource type="Resource" uid="uid://b7s77y3xj1qtm" path="res://unit_resources/items/weapons/knife/knife_dagger.tres" id="4_2tf2k"]
 
 [sub_resource type="Resource" id="Resource_akanq"]
 script = ExtResource("3_ls7l8")
@@ -31,40 +31,41 @@ mod_stats = Dictionary[StringName, int]({
 &"Pwr": 0
 })
 total_growth = Dictionary[StringName, float]({
-&"Cele": 0.55,
-&"Cha": 0.1,
+&"Cele": 0.45,
+&"Cha": 0.4,
 &"Comp": 0.3,
-&"Def": 0.2,
-&"Eleg": 0.2,
-&"Life": 0.4,
-&"Mag": 0.0,
+&"Def": 0.05,
+&"Eleg": 0.25,
+&"Life": 0.2,
+&"Mag": 0.1,
 &"Move": 0.0,
-&"Pwr": 0.3
+&"Pwr": 0.15
 })
 total_stats = Dictionary[StringName, int]({
-&"Cele": 7,
-&"Cha": 2,
+&"Cele": 11,
+&"Cha": 9,
 &"Comp": 100,
-&"Def": 0,
-&"Eleg": 7,
-&"Life": 14,
+&"Def": 1,
+&"Eleg": 10,
+&"Life": 18,
 &"Mag": 1,
 &"Move": 5,
 &"Pwr": 4
 })
 total_caps = Dictionary[StringName, int]({
-&"Cele": 20,
-&"Cha": 20,
-&"Comp": 100,
-&"Def": 20,
-&"Eleg": 20,
-&"Life": 20,
-&"Mag": 20,
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
 &"Move": 10,
-&"Pwr": 20
+&"Pwr": 30
 })
 skills = Array[ExtResource("2_2tf2k")]([ExtResource("3_akanq")])
 weapon_prof = {
+"Barrier": false,
 "Blade": true,
 "Blunt": false,
 "Book": false,

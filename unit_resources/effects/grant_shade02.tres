@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="Effect" load_steps=3 format=3]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_gshad"]
+[ext_resource type="Resource" path="res://unit_resources/features/passives/shade.tres" id="2_gshad"]
+
+[resource]
+resource_name = "grant_shade01"
+script = ExtResource("1_gshad")
+type = 13
+target = 1
+instant = false
+on_hit = false
+proc = -1
+duration = 1
+duration_type = 2
+stack = false
+permanent = false
+curable = true
+from_item = false
+hostile = false
+passive = ExtResource("2_gshad")
+multi_swing = 0
+multi_round = 0
+crit_dmg = Array[int]([0, 0])
+crit_mult = false
+crit_rate = 0
+value = 0
+sub_type = 0
+id = "grant_shade01"
+rule_type = 0
+metadata/_custom_type_script = "uid://bu76i50vv08ad"

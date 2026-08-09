@@ -36,7 +36,8 @@ func update_stats():
 	_apply_mod_group(final_stats, aura_mods)
 	#print("aura_mods: %s" % [aura_mods])
 	_apply_mod_group(final_stats, buff_mods)
-	#_apply_mod_group(final_stats, item_mods)
+	_apply_mod_group(final_stats, item_mods)
+	_apply_weight_penalty(final_stats)
 
 	_apply_status_locks(final_stats)
 	_clamp_final_stats(final_stats)
@@ -126,6 +127,23 @@ func _compute_item_modifiers() -> Dictionary:
 			mods[stat_name] = mods.get(stat_name, 0) + effect.value
 	return mods
 
+func _apply_weight_penalty(stats: Dictionary) -> void:
+	if not stats.has("Cele"):
+		return
+	var total_weight := _compute_equipped_weight()
+	var pwr := int(stats.get("Pwr", 0))
+	var cele_penalty := clampi(total_weight - pwr, 0, 999)
+	stats["Cele"] -= cele_penalty
+
+func _compute_equipped_weight() -> int:
+	var total := 0
+	var wep: Weapon = unit.get_equipped_weapon()
+	if wep:
+		total += int(wep.weight)
+	for acc: Accessory in unit.get_equipped_accs():
+		total += int(acc.weight)
+	return total
+
 #Mod Merge
 func _apply_mod_group(target, group):
 	for key in group:
@@ -158,8 +176,8 @@ func _compute_combat_stats(stats: Dictionary) -> Dictionary:
 		"BarPrc": 0,
 		"Crit": 0,
 		"Luck": stats.Cha,
-		"CompRes": clampi((stats.Cha / 2) + (stats.Eleg / 2), -200, 75),
-		"CompBonus": stats.Cha / 4,
+		"CompRes": 0,
+		"CompBonus": 0,
 		"PwrBase": stats.Pwr,
 		"MagBase": stats.Mag,
 		"HitBase": (stats.Eleg * 2) + stats.Cha,

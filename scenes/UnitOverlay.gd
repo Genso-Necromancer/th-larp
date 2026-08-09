@@ -16,6 +16,15 @@ func draw_attack(cells: Array) -> void:
 	for cell in cells:
 #		print("draw2:", cell)
 		set_cell(cell, 1, Vector2i(0,0))
+
+func draw_attack_bands(bands: Dictionary) -> void:
+	clear()
+	for cell in bands.get("Close", []):
+		set_cell(cell, 1, Vector2i(0,0))
+	for cell in bands.get("Range", []):
+		set_cell(cell, 1, Vector2i(0,0))
+	for cell in bands.get("Far", []):
+		set_cell(cell, 1, Vector2i(0,0))
 		
 func draw_threat(walk: Array, threat: Array) -> void:
 	clear()

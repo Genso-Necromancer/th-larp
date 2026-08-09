@@ -1,4 +1,4 @@
-extends Node
+﻿extends Node
 var save_data : Dictionary = {}
 const root := "user://"
 const save_dir := "user://saves"

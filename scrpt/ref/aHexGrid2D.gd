@@ -428,23 +428,23 @@ func _get_offsets(x) -> Array:
 	return offsets
 
 
-func axial_substract(a, b):
+func axial_substract(a: Vector2i, b: Vector2i) -> Vector2i:
 	return Vector2i(a.x - b.x, a.y - b.y)
 
 
-func axial_distance(a, b):
+func axial_distance(a: Vector2i, b: Vector2i) -> int:
 	var vec = axial_substract(a, b)
-	return (abs(vec.x) + abs(vec.x + vec.y) + abs(vec.y)) / 2
+	return int((abs(vec.x) + abs(vec.x + vec.y) + abs(vec.y)) / 2)
 
 
-func oddq_to_axial(hex):
+func oddq_to_axial(hex: Vector2i) -> Vector2i:
 	var x = hex.x
 	var y = hex.y - (hex.x - fposmod(hex.x, 2)) / 2
 #	print(" O2A ", y)
 	return Vector2i(x, y)
 
 
-func axial_to_oddq(hex):
+func axial_to_oddq(hex: Vector2i) -> Vector2i:
 	var x = hex.x
 	var y = hex.y + (hex.x - fposmod(hex.x, 2)) / 2
 	return Vector2i(x, y)

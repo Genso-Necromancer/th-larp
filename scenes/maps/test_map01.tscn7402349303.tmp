@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://dshxl1mfpb0v0" path="res://scrpt/danmaku/danmaku_script.gd" id="4_pivsa"]
 [ext_resource type="PackedScene" uid="uid://b6vorq2w1b5oa" path="res://scenes/units/cirno.tscn" id="6_k3lsm"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="7_gdb2g"]
-[ext_resource type="Resource" uid="uid://e7drxbfl83us" path="res://unit_resources/items/weapons/club.tres" id="7_k3lsm"]
+[ext_resource type="Resource" uid="uid://e7drxbfl83us" path="res://unit_resources/items/weapons/blunt/club.tres" id="7_k3lsm"]
 [ext_resource type="PackedScene" uid="uid://cb7freyrit3pr" path="res://scenes/units/fairy_brigand.tscn" id="8_k3lsm"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="9_gaqw3"]
 

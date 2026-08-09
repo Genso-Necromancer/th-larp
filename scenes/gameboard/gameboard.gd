@@ -67,7 +67,7 @@ func get_action_context() -> Dictionary:
 
 func is_targeting_step(step: TURN_STEPS = turn_step) -> bool:
 	match step:
-		TURN_STEPS.ATTACK_TARGET, TURN_STEPS.SKILL_TARGET, TURN_STEPS.ITEM_TARGET, TURN_STEPS.DOOR_TARGET, TURN_STEPS.TRADE_TARGET:
+		TURN_STEPS.ATTACK_TARGET, TURN_STEPS.SKILL_TARGET, TURN_STEPS.ITEM_TARGET, TURN_STEPS.WARP_TARGET, TURN_STEPS.DOOR_TARGET, TURN_STEPS.TRADE_TARGET:
 			return true
 		_:
 			return false
@@ -121,6 +121,8 @@ func get_targeting_game_state() -> GameState.gState:
 			return GameState.gState.GB_SKILL_TARGETING
 		TURN_STEPS.ITEM_TARGET:
 			return GameState.gState.GB_ITEM_TARGETING
+		TURN_STEPS.WARP_TARGET:
+			return GameState.gState.GB_WARP
 		TURN_STEPS.TRADE_TARGET:
 			return GameState.gState.GB_TRADE_TARGETING
 		TURN_STEPS.DOOR_TARGET:
@@ -185,6 +187,15 @@ func _clear_action_target() -> void:
 	_set_action_results(null)
 
 
+func block_targeting_confirm_for_frame() -> void:
+	targeting_input_blocked = true
+	call_deferred("_clear_targeting_input_block")
+
+
+func _clear_targeting_input_block() -> void:
+	targeting_input_blocked = false
+
+
 func _reset_action_context() -> void:
 	_set_action_actor(activeUnit)
 	_clear_action_target()
@@ -238,12 +249,15 @@ var units:Dictionary[Vector2i, Unit]={}
 var unit_refs:Dictionary[String, Unit]={} #This feels redundant, it's just another look up table like "units" but uses ID instead of Cell
 var activeUnit:Unit
 var targetUnit:Unit
+var targeting_input_blocked := false
 var selection_equipment_snapshot: Array[Dictionary] = []
 var focusUnit:Unit:
 	set(value):
 		focusUnit = value
 		Global.focusUnit = focusUnit
 var active_action:Dictionary = {"Weapon":false,"Skill":null,"Item":null}
+var pending_warp_target: Unit = null
+var pending_warp_item: Consumable = null
 var lady:Unit
 var death_list :Array[Unit]= []
 var move_committed:bool = false
@@ -254,7 +268,7 @@ var focusDanmaku:Danmaku:
 		focusDanmaku = value
 		Global.focusDanmaku = focusDanmaku
 #turns/rounds
-enum TURN_STEPS {STAND_BY,PROCESSING,START,END_PHASE,END,OPTIONS,ACTIONS,MOVE_SEEK,UNIT_MOVING,AI_ACT,ITEM_QUEUED,ITEM_ANIMATION,ITEM_TARGET,ATTACK_TARGET,DOOR_TARGET,TRADE_TARGET,SKILL_TARGET,FORECAST_ATTACK,COMBAT_DISPLAY,EFFECT_QUEUE,BAR_ANIM,EVENT_QUEUE,EXP_GRANT,CANTO}
+enum TURN_STEPS {STAND_BY,PROCESSING,START,END_PHASE,END,OPTIONS,ACTIONS,MOVE_SEEK,UNIT_MOVING,AI_ACT,ITEM_QUEUED,ITEM_ANIMATION,ITEM_TARGET,ATTACK_TARGET,DOOR_TARGET,TRADE_TARGET,SKILL_TARGET,FORECAST_ATTACK,COMBAT_DISPLAY,EFFECT_QUEUE,BAR_ANIM,EVENT_QUEUE,EXP_GRANT,CANTO,WARP_TARGET}
 enum PLAYER_FLOW {IDLE,UNIT_SELECTED,MOVE_PREVIEW,POST_MOVE_MENU,TARGETING,FORECAST,RESOLVING}
 enum AI_STEPS {STAND_BY,PROCESSING,START,EVALUATE,PROCESS_TURN,SELECT_UNIT,MOVE_UNIT}
 enum ROUND_STEPS {CHECK,DANMAKU,SCENE,REINFORCE,END,}
@@ -439,14 +453,19 @@ func load_map(map:String, save_data:Dictionary={}):
 	map_added.emit(newMap)
 
 
-func free_map()->void:
+func free_map(emit_freed := true)->void:
 	reset_flags()
 	PlayerData.purge_npc_data()
+	if unit_loader:
+		unit_loader.queue_free()
+		unit_loader = null
 	if current_map:
 		current_map.queue_free()
 		await current_map.tree_exited
+	current_map = null
 	SignalTower.time_reset.emit()
-	map_freed.emit()
+	if emit_freed:
+		map_freed.emit()
 
 
 func _on_map_loaded():
@@ -970,7 +989,8 @@ func _self_use_item(item: Item):
 
 
 func _on_unit_animation_complete(_unit:Unit):
-	if turn_step == TURN_STEPS.ITEM_QUEUED and _unit == activeUnit:
+	if turn_step == TURN_STEPS.ITEM_QUEUED and (_unit == activeUnit or _unit == targetUnit):
+		apply_default_control_state()
 		turn_step = TURN_STEPS.END_PHASE
 		return
 	match last_step:
@@ -1029,10 +1049,14 @@ func start_attack_targeting():
 
 
 func start_skill_targeting(skill = null):
+	if activeUnit and skill and not activeUnit.has_enough_comp(int(skill.cost)):
+		return
 	board_targeting.start_skill_targeting(skill)
 
 
 func start_item_targeting(item: Consumable):
+	if activeUnit and item and not activeUnit.has_enough_comp(int(item.cost)):
+		return
 	board_targeting.start_item_targeting(item)
 
 func door_targeting():
@@ -1127,7 +1151,10 @@ func _on_cursor_moved(new_cell: Vector2i) -> void: #Pathing
 func _on_area_2d_area_entered(area):
 	#print("Entered: ", area.collision_layer)
 	match area.collision_layer:
-		2: focusUnit = area.get_master()
+		2:
+			var unit: Unit = area.get_master()
+			if unit != null and unit.is_active and unit.deployment != Enums.DEPLOYMENT.UNDEPLOYED:
+				focusUnit = unit
 		4: focusDanmaku = area.get_master()
 	#print("focus: ", focusDanmaku)
 
@@ -1181,6 +1208,10 @@ func _ui_return_player_phase():
 					_wipe_region()
 					unit_selected.emit(activeUnit)
 		TURN_STEPS.ATTACK_TARGET:
+			_cancel_targeting_step()
+		TURN_STEPS.WARP_TARGET:
+			pending_warp_target = null
+			pending_warp_item = null
 			_cancel_targeting_step()
 		TURN_STEPS.FORECAST_ATTACK:
 			turn_step = TURN_STEPS.ATTACK_TARGET
@@ -1270,6 +1301,7 @@ func _player_phase_select():
 		TURN_STEPS.TRADE_TARGET: trade_target_selected()
 		TURN_STEPS.SKILL_TARGET: _feature_target_selected(active_action.Skill)
 		TURN_STEPS.ITEM_TARGET: _feature_target_selected(active_action.Item)
+		TURN_STEPS.WARP_TARGET: warp_destination_selected()
 
 
 func door_target_selected():
@@ -1304,6 +1336,7 @@ func _select_unit(cell: Vector2i) -> void:
 		cell_selected.emit(cell)
 	elif units[cell].FACTION_ID == Enums.FACTION_ID.ENEMY: return
 	elif !units.has(cell) or units[cell].status.Acted: return
+	elif _is_dazed_deferred(units[cell]): return
 	elif units[cell].FACTION_ID == Enums.FACTION_ID.PLAYER:
 		activeUnit = units[cell]
 		_reset_action_context()
@@ -1324,6 +1357,14 @@ func _feature_target_selected(feature:SlotWrapper)-> void:
 
 func skill_target_selected() -> void:
 	_feature_target_selected(active_action.Skill)
+
+
+func item_target_selected() -> void:
+	_feature_target_selected(active_action.Item)
+
+
+func warp_destination_selected() -> void:
+	board_targeting.warp_destination_selected()
 
 
 func attack_target_selected():
@@ -1439,8 +1480,11 @@ func _on_gui_trade_selected(unit) -> void:
 	player_action_controller.on_gui_trade_selected(unit)
 
 func _on_gui_ofuda_selected(unit, ofuda) -> void:
-	if unit and ofuda and unit.has_method("use_item"):
-		unit.use_item(ofuda)
+	if unit == null or ofuda == null:
+		return
+	activeUnit = unit
+	_set_action_actor(unit)
+	start_item_targeting(ofuda)
 
 func _on_gui_door_selected() -> void:
 	player_action_controller.on_gui_door_selected()
@@ -1484,7 +1528,24 @@ func _randomize_rolls():
 func reset_flags():
 	Global.reset_map_flags()
 	units.clear()
+	unit_refs.clear()
+	activeUnit = null
+	targetUnit = null
+	focusUnit = null
+	Global.activeUnit = null
 	chapter_started = false
+	turn_order.clear()
+	turn_counter = 0
+	selection_equipment_snapshot.clear()
+	walkable_cells.clear()
+	snap_path.clear()
+	action_context = {
+		"Actor": null,
+		"Target": null,
+		"Action": {"Weapon": false, "Skill": null, "Item": null},
+		"Forecast": null,
+		"Results": null,
+	}
 	#state = STATES.LOADING
 	#map_end = false
 	#aiTurn = false
@@ -1551,6 +1612,24 @@ func _check_friendly(unit1, unit2, sameOnly:=false) ->bool:
 	elif !sameOnly and unit1.FACTION_ID != Enums.FACTION_ID.ENEMY and unit2.FACTION_ID != Enums.FACTION_ID.ENEMY: return true
 	return false
 
+
+func _is_dazed_deferred(unit: Unit) -> bool:
+	if unit == null or not unit.check_status("Dazed"):
+		return false
+
+	for other in units.values():
+		if other == null or other == unit:
+			continue
+		if other.FACTION_ID != unit.FACTION_ID:
+			continue
+		if other.check_status("Acted") or other.check_status("Dazed"):
+			continue
+		if not other.can_act():
+			continue
+		return true
+
+	return false
+
 #region newlyadded
 func _set_active_action(uses_weapon: bool, skill = null, item = null) -> void:
 	active_action = {
@@ -1561,16 +1640,57 @@ func _set_active_action(uses_weapon: bool, skill = null, item = null) -> void:
 	action_context.Action = active_action.duplicate()
 
 
-func _resolve_item_action(actor: Unit, target: Unit, item: Consumable) -> CombatResults:
+func _resolve_item_action(actor: Unit, target: Unit, item: Consumable, warp_destination := Vector2i(-999999, -999999)) -> CombatResults:
 	if actor == null or target == null or item == null:
 		return null
 	_set_active_action(false, null, item)
+	if warp_destination != Vector2i(-999999, -999999):
+		active_action["WarpDestination"] = warp_destination
+		action_context.Action = active_action.duplicate()
 	var results: CombatResults = combatManager.start_the_justice(actor, target, active_action)
 	turn_step = TURN_STEPS.ITEM_QUEUED
 	actor.use_item(item)
 	target.receive_item(item)
 	_set_action_results(results)
 	return results
+
+
+func should_resolve_item_without_forecast(item: Consumable) -> bool:
+	if item == null:
+		return false
+	for effect: Effect in item.effects:
+		if effect == null:
+			continue
+		if effect.type == Enums.EFFECT_TYPE.RELOC:
+			return true
+	return false
+
+
+func is_warp_item(item: Consumable) -> bool:
+	if item == null:
+		return false
+	for effect: Effect in item.effects:
+		if effect == null:
+			continue
+		if effect.type == Enums.EFFECT_TYPE.RELOC and effect.sub_type == Enums.SUB_TYPE.WARP:
+			return true
+	return false
+
+
+func resolve_item_without_forecast(item: Consumable) -> void:
+	if activeUnit == null or targetUnit == null or item == null:
+		return
+	var results: CombatResults = _resolve_item_action(activeUnit, targetUnit, item)
+	pending_item_action["Item"] = item
+	pending_item_action["Results"] = results
+
+
+func resolve_warp_without_forecast(item: Consumable, target: Unit, destination: Vector2i) -> void:
+	if activeUnit == null or target == null or item == null:
+		return
+	var results: CombatResults = _resolve_item_action(activeUnit, target, item, destination)
+	pending_item_action["Item"] = item
+	pending_item_action["Results"] = results
 #endregion
 #endregion
 
@@ -1808,6 +1928,7 @@ func _deselect_active_unit(confirm) -> void:
 			PlayerData.move_committed = false
 			board_unit_registry.clear_cell(activeUnit.cell)
 			var new_cell = activeUnit.return_original()
+			activeUnit.moved_hexes = 0
 			board_unit_registry.set_unit(new_cell, activeUnit)
 			_restore_active_unit_equipment()
 		else:

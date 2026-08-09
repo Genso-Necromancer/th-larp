@@ -247,7 +247,7 @@ func _on_gameboard_target_focused( mode : int, reach: Array = [-1, -1]):
 	match mode:
 		0: 
 			GRANDDAD.gameBoard.apply_forecast_control_state()
-			actMenu.open_weapon_select(reach)
+			foreCast.open_weapon_select(GRANDDAD.gameBoard.activeUnit, reach)
 		1: 
 			GRANDDAD.gameBoard.apply_forecast_control_state()
 			actMenu.open_skill_confirm()
@@ -308,6 +308,29 @@ func call_setup(dep_cap:int, forced:Array, map:GameMap, unit_refs:Dictionary):
 	set_up_loaded.emit()
 
 
+func reset_for_soft_reset() -> void:
+	inSetup = false
+	sState = sStates.HOME
+	if menuCursor:
+		menuCursor.visible = false
+	if mapSetUp:
+		mapSetUp.visible = false
+	if rosterGrid:
+		rosterGrid.visible = false
+	if tradeScreen:
+		tradeScreen.visible = false
+	if unitProf:
+		unitProf.visible = false
+	if actMenu:
+		actMenu.end_self()
+	if foreCast:
+		foreCast.hide_fc()
+	if focusViewer:
+		focusViewer.hide_fv()
+	if turn_tracker:
+		turn_tracker.free_tokens()
+
+
 func _load_assets():
 	mapSetUp = load("res://scenes/GUI/MapSetup.tscn").instantiate()
 	rosterGrid = load("res://scenes/GUI/unit_roster.tscn").instantiate()
@@ -315,6 +338,8 @@ func _load_assets():
 	unitProf = load("res://scenes/profile.tscn").instantiate()
 	actMenu = load("res://scenes/GUI/action_menu.tscn").instantiate()
 	foreCast = load("res://scenes/GUI/hud/forecast/combat_forecast.tscn").instantiate()
+	if not foreCast.weapon_selected.is_connected(_on_weapon_selected):
+		foreCast.weapon_selected.connect(_on_weapon_selected)
 	menuCursor = load("res://scenes/GUI/menu_cursor.tscn").instantiate()
 	focusViewer = load("res://scenes/GUI/cursor_focus_viewer.tscn").instantiate()
 	hud_clock = load("res://scenes/GUI/hud/clock/chapter_clock.tscn").instantiate()

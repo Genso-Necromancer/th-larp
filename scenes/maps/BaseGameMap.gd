@@ -846,6 +846,16 @@ func draw_attack(cells: Array) -> void:
 		pathAttack.set_cell(cell, 9, Vector2i(0,0))
 
 
+func draw_attack_bands(bands: Dictionary) -> void:
+	pathAttack.clear()
+	for cell in bands.get("Close", []):
+		pathAttack.set_cell(cell, 9, Vector2i(0,0))
+	for cell in bands.get("Range", []):
+		pathAttack.set_cell(cell, 9, Vector2i(0,0))
+	for cell in bands.get("Far", []):
+		pathAttack.set_cell(cell, 9, Vector2i(0,0))
+
+
 func draw_threat(walk: Array, threat: Array) -> void:
 	pathAttack.clear()
 	for cell in threat:

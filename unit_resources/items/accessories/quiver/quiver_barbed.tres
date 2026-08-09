@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="QuiverResource" load_steps=5 format=3 uid="uid://dso6lwe5h70fv"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_qbvfx"]
+[ext_resource type="Resource" path="res://unit_resources/effects/durability_cost_plus01.tres" id="2_qbvdur"]
+[ext_resource type="Resource" path="res://unit_resources/effects/quiver_barbed_cele_debuff.tres" id="3_qbvdeb"]
+[ext_resource type="Script" uid="uid://b8m6qwwkj7p1t" path="res://unit_resources/items/accessories/quiver/quiver_resource.gd" id="4_qbvr"]
+
+[resource]
+resource_name = "quiver_barbed"
+script = ExtResource("4_qbvr")
+personal = false
+level = 1
+use = false
+equippable = true
+breakable = false
+expendable = false
+trade = true
+max_dur = 1
+weight = 0
+category = 11
+sub_group = 0
+effects = Array[ExtResource("1_qbvfx")]([ExtResource("2_qbvdur"), ExtResource("3_qbvdeb")])
+id = "quiver_barbed"
+rule_type = 0

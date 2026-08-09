@@ -151,8 +151,9 @@ func get_scored_actions(faction: Enums.FACTION_ID) -> Array[Dictionary]:
 	for unit in state.get_units_for_faction(faction):
 		if unit == null:
 			continue
-		print("[AI] Unit ", unit.id, " | can_act=", unit.can_act(), " | cell=", unit.cell, " | role=", Unit.AI_ROLE.keys()[int(unit.ai_role)], " | task=", Unit.AI_TASK.keys()[int(unit.ai_task)])
-		if unit == null or not unit.can_act():
+		var can_take_turn: bool = state.can_unit_take_turn(unit)
+		print("[AI] Unit ", unit.id, " | can_act=", unit.can_act(), " | can_take_turn=", can_take_turn, " | cell=", unit.cell, " | role=", Unit.AI_ROLE.keys()[int(unit.ai_role)], " | task=", Unit.AI_TASK.keys()[int(unit.ai_task)])
+		if unit == null or not can_take_turn:
 			continue
 		var assigned_job := assign_unit_job(state, unit, assessment, round_intent)
 		var preferred_actions := state.generate_preferred_actions_for_unit(unit.id)
@@ -406,7 +407,7 @@ func build_board_assessment(state: BoardState, faction: Enums.FACTION_ID) -> Boa
 	assessment.faction = faction
 	assessment.objective_context = _determine_objective_context(state, faction)
 	assessment.seize_tiles = _get_seize_tiles(state)
-	assessment.actions_remaining = state.get_units_for_faction(faction).filter(func(unit): return unit != null and unit.can_act()).size()
+	assessment.actions_remaining = state.get_units_for_faction(faction).filter(func(unit): return unit != null and state.can_unit_take_turn(unit)).size()
 	assessment.player_can_seize_now = _player_can_seize_now(state)
 	assessment.player_can_seize_next_round = _player_can_seize_next_round(state)
 	assessment.seize_tile_threatened = assessment.player_can_seize_now or assessment.player_can_seize_next_round
@@ -584,7 +585,7 @@ func _player_can_seize_now(state: BoardState) -> bool:
 	if seize_tiles.is_empty():
 		return false
 	for unit in state.get_units_for_faction(Enums.FACTION_ID.PLAYER):
-		if unit == null or not unit.can_act():
+		if unit == null or not state.can_unit_take_turn(unit):
 			continue
 		if seize_tiles.has(unit.cell):
 			return true
@@ -632,7 +633,7 @@ func _get_high_value_targets(state: BoardState, faction: Enums.FACTION_ID) -> Ar
 func _get_safe_attackers(state: BoardState, faction: Enums.FACTION_ID) -> Array[String]:
 	var out: Array[String] = []
 	for unit in state.get_units_for_faction(faction):
-		if unit == null or not unit.can_act():
+		if unit == null or not state.can_unit_take_turn(unit):
 			continue
 		for action in state.generate_preferred_actions_for_unit(unit.id):
 			if action == null:
@@ -649,7 +650,7 @@ func _get_safe_attackers(state: BoardState, faction: Enums.FACTION_ID) -> Array[
 func _get_special_tasks_available(state: BoardState, faction: Enums.FACTION_ID) -> Array[String]:
 	var tasks: Array[String] = []
 	for unit in state.get_units_for_faction(faction):
-		if unit == null or not unit.can_act():
+		if unit == null or not state.can_unit_take_turn(unit):
 			continue
 		match int(unit.ai_task):
 			Unit.AI_TASK.LOOT:
@@ -702,8 +703,8 @@ func _is_line_broken(state: BoardState, faction: Enums.FACTION_ID, assessment: B
 
 
 func _has_tempo_advantage(state: BoardState, faction: Enums.FACTION_ID) -> bool:
-	var allies := state.get_units_for_faction(faction).filter(func(unit): return unit != null and unit.can_act()).size()
-	var opponents := state.get_units_for_faction(Enums.FACTION_ID.PLAYER if faction != Enums.FACTION_ID.PLAYER else Enums.FACTION_ID.ENEMY).filter(func(unit): return unit != null and unit.can_act()).size()
+	var allies := state.get_units_for_faction(faction).filter(func(unit): return unit != null and state.can_unit_take_turn(unit)).size()
+	var opponents := state.get_units_for_faction(Enums.FACTION_ID.PLAYER if faction != Enums.FACTION_ID.PLAYER else Enums.FACTION_ID.ENEMY).filter(func(unit): return unit != null and state.can_unit_take_turn(unit)).size()
 	return allies > opponents
 
 
@@ -849,9 +850,9 @@ func _get_action_forecast(state: BoardState, unit: UnitSim, action: Action) -> C
 func _to_combat_action_dict(action: Action) -> Dictionary:
 	match action.type:
 		Action.ACTION_TYPE.ATTACK:
-			return {"Weapon": true, "Skill": null, "Item": null}
+			return {"Weapon": true, "Skill": null, "Item": null, "ChargeHexes": int(action.moved_hexes)}
 		Action.ACTION_TYPE.SKILL_HOSTILE, Action.ACTION_TYPE.SKILL_FRIENDLY:
-			return {"Weapon": bool(action.skill.get("augment", false)) if typeof(action.skill) == TYPE_DICTIONARY else false, "Skill": action.skill, "Item": null}
+			return {"Weapon": bool(action.skill.get("augment", false)) if typeof(action.skill) == TYPE_DICTIONARY else false, "Skill": action.skill, "Item": null, "ChargeHexes": int(action.moved_hexes)}
 		Action.ACTION_TYPE.USE_ITEM:
 			return {"Weapon": false, "Skill": null, "Item": action.item}
 		_:

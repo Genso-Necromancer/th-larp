@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="Ofuda" load_steps=3 format=3]
+
+[ext_resource type="Script" uid="uid://dtxt6i4bhoqpo" path="res://unit_resources/items/ofuda/ofuda.gd" id="1_ofuda"]
+[ext_resource type="Resource" path="res://unit_resources/items/ofuda/ofuda_rescue_debug.tres" id="2_rescue"]
+
+[resource]
+script = ExtResource("1_ofuda")
+stats = ExtResource("2_rescue")
+equipped = false
+dropped = false
+is_broken = false

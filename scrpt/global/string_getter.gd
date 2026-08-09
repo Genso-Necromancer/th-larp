@@ -35,7 +35,7 @@ func _parse_xml(category, id) -> String:
 	var k : Array = Enums.LANGUAGE.keys()
 	var l : String = k[Global.language]
 	var pos : int = 0
-	var er : String = "[color=#00FFFF]%s[/color]" % [id]
+	var er : String = "%s" % [id]
 	p.open("xml/gui.xml")
 
 	while p.read() == OK: #Read until correct language found or end of file
@@ -102,6 +102,7 @@ func get_combat_effect_string(effect:Effect) -> String: #Time to create the stri
 	#var value = cmbData.Effects[effect].value
 	var typeKeys : Array = Enums.EFFECT_TYPE.keys()
 	var subKeys : Array = Enums.SUB_TYPE.keys()
+	var damageKeys : Array = Enums.DAMAGE_TYPE.keys()
 	#Get Template: "Buff %s"
 	var templatePath : String = "effect_template_%s" % [typeKeys[effect.type].to_lower()]
 	var s : String = get_template(templatePath)
@@ -112,19 +113,23 @@ func get_combat_effect_string(effect:Effect) -> String: #Time to create the stri
 	
 	#Get SubType "string": "Buff Pwr"
 	if effect.sub_type:
-		var subTypePath := "effect_sub_type_%s" % [subKeys[effect.sub_type].to_lower()]
+		var subKey :String= damageKeys[effect.sub_type] if effect.type == Enums.EFFECT_TYPE.DAMAGE else subKeys[effect.sub_type]
+		var subTypePath := "effect_sub_type_%s" % [subKey.to_lower()]
 		var subType := get_string(subTypePath)
 		s = s % [subType]
 		
 	#Check if Value: "Buff Power #"
-	if value and value > 0:
+	if value and value != 0:
 		var v
 		var path := "value_template"
 		if typeof(value) == Variant.Type.TYPE_FLOAT:
 			v = value * 100
 			v = round(v)
 			path = "percent_value_template"
-		s = get_template(path) % [s, value]
+		else:
+			v = value
+		v = _get_effect_display_value(effect, v)
+		s = get_template(path) % [s, v]
 	
 	#Check if Proc: "Buff Power # (98%)"
 	if effect.proc and effect.proc > -1:
@@ -149,6 +154,7 @@ func get_effect_string(effect:Effect) -> String: #Needs reworking, see tooltip p
 	#var value = cmbData.Effects[effId].value
 	var typeKeys : Array = Enums.EFFECT_TYPE.keys()
 	var subKeys : Array = Enums.SUB_TYPE.keys()
+	var damageKeys : Array = Enums.DAMAGE_TYPE.keys()
 	#Get Template: "Buff %s"
 	var templatePath : String = "effect_template_%s" % [typeKeys[effect.type].to_lower()]
 	var s : String = get_template(templatePath)
@@ -158,7 +164,8 @@ func get_effect_string(effect:Effect) -> String: #Needs reworking, see tooltip p
 	
 	#Get SubType "string": "Buff Pwr"
 	if effect.sub_type:
-		var subTypePath := "effect_sub_type_%s" % [subKeys[effect.sub_type].to_lower()]
+		var subKey :String= damageKeys[effect.sub_type] if effect.type == Enums.EFFECT_TYPE.DAMAGE else subKeys[effect.sub_type]
+		var subTypePath := "effect_sub_type_%s" % [subKey.to_lower()]
 		var subType := get_string(subTypePath)
 		s = s % [subType]
 	
@@ -170,12 +177,12 @@ func get_effect_string(effect:Effect) -> String: #Needs reworking, see tooltip p
 	if effVal and effVal != 0:
 		var v
 		var path := "value_template"
-		var test = typeof(effVal)
 		if typeof(effVal) == Variant.Type.TYPE_FLOAT:
 			v = effVal * 100
 			v = round(v)
 			path = "percent_value_template"
 		else: v = effVal
+		v = _get_effect_display_value(effect, v)
 		s = get_template(path) % [s, v]
 	
 	#Check if Duration and Duration Type: "string # (###%) for # dType"
@@ -207,6 +214,21 @@ func get_effect_string(effect:Effect) -> String: #Needs reworking, see tooltip p
 		s = s.format({"rule":StringGetter.get_string(str(value))})
 	
 	return s
+
+
+func _get_effect_display_value(effect: Effect, value) -> int:
+	if _effect_value_displays_negative(effect):
+		return -abs(int(value))
+	return int(value)
+
+
+func _effect_value_displays_negative(effect: Effect) -> bool:
+	if effect == null:
+		return false
+	match int(effect.type):
+		Enums.EFFECT_TYPE.DEBUFF, Enums.EFFECT_TYPE.DOT:
+			return true
+	return false
 
 		
 func mash_string(base: String, variables: Array) -> String:

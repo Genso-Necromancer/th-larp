@@ -101,6 +101,8 @@ func _load_new_item(path:String) -> Item:
 	var res := load(path)
 	var newItem : Item
 	if res is WeaponResource: newItem = Weapon.new().duplicate()
+	elif res is QuiverResource: newItem = Quiver.new().duplicate()
+	elif res is BarrierResource: newItem = BarrierAccessory.new().duplicate()
 	elif res is AccessoryResource: newItem = Accessory.new().duplicate()
 	elif res is ConsumableResource: newItem = Consumable.new().duplicate()
 	newItem.stats = res

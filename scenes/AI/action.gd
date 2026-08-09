@@ -9,6 +9,7 @@ var type:ACTION_TYPE
 var from_cell:Vector2i
 var target_cell:Vector2i
 var target_unit_id:String
+var moved_hexes:int = 0
 # Stored as sim-safe dictionaries rather than live resources.
 var item
 var skill

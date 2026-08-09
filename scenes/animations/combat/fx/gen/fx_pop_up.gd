@@ -36,7 +36,7 @@ var v := 0
 
 func flip_text():
 	var lbl := $fxText
-	lbl.set_scale(Vector2(-1,1))
+	#lbl.set_scale(Vector2(-1,1))
 
 func set_value(value):
 	v = value
@@ -100,7 +100,8 @@ func set_effect_result(effectResult:Dictionary):
 		return
 
 	var type = int(effect.type)
-	var subType = int(effect.sub_type)
+	var subType:int
+	if effect.sub_type: subType = int(effect.sub_type)
 
 	# Optional override: allows caller to force style category (rare)
 	if effectResult.has("StyleType"):

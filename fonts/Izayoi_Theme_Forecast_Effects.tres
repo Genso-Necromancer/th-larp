@@ -1,0 +1,10 @@
+[gd_resource type="Theme" load_steps=2 format=3 uid="uid://cb07g0akruuvi"]
+
+[ext_resource type="FontFile" uid="uid://cuuir1uibmfis" path="res://fonts/Marcellus/Marcellus.otf" id="1_i41y6"]
+
+[resource]
+RichTextLabel/colors/default_color = Color(0, 0, 0, 1)
+RichTextLabel/font_sizes/bold_font_size = 33
+RichTextLabel/font_sizes/normal_font_size = 30
+RichTextLabel/fonts/bold_font = ExtResource("1_i41y6")
+RichTextLabel/fonts/normal_font = ExtResource("1_i41y6")

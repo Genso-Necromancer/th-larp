@@ -16,6 +16,9 @@ signal item_activated(item, unit, target)
 signal animation_complete(unit:Unit)
 signal bars_updated(unit:Unit)
 
+const COMP_BREAK_EFFECT_ID := "comp_break_default"
+const COMP_BREAK_EFFECT_PATH := "res://unit_resources/effects/comp_break_default.tres"
+
 
 
 
@@ -277,6 +280,7 @@ var bonus_passives:Array[Passive] = []
 					"Ofuda": false,
 					"Bow": false,
 					"Gun": false,
+					"Barrier": false,
 					"Sub": false}
 var base_prof:Dictionary={
 					"Blade": false,
@@ -287,6 +291,7 @@ var base_prof:Dictionary={
 					"Ofuda": false,
 					"Bow": false,
 					"Gun": false,
+					"Barrier": false,
 					"Sub": false}
 ##Maximum number of items a Unit can carry, cannot exceed [TBA]. It is better to give the unit a passive that increases Inv size than to change this number manually.
 @export var max_inv : int = 0
@@ -299,7 +304,7 @@ var unarmed : Weapon = load("res://unit_resources/items/weapons/unarmed.tres").d
 
 @export_category("Conditions")
 ##Afflicted status conditions, do not change unless you have a good reason for a unit to begin play with specified condition.
-@export var status : Dictionary = {"Acted":false, "Sleep":false}
+@export var status : Dictionary = {"Acted":false, "Sleep":false, "Silence":false}
 var sParam:Dictionary= {}
 var status_data : Dictionary = {}
 
@@ -325,6 +330,7 @@ var current_life:int = 1
 var current_comp:int = 1
 
 var remaining_move:int = 0
+var moved_hexes:int = 0
 #de/buffs applied to unit
 #var active_buffs :Dictionary[String,Dictionary]= {}
 #var active_debuffs :Dictionary[String,Dictionary]= {}
@@ -579,6 +585,7 @@ func _initialize_parameters() -> void:
 	if simulate_leveling: _simulate_levels()
 	current_life = active_stats.Life
 	current_comp = active_stats.Comp
+	refresh_composure_break_state()
 	update_life_bar()
 	#print(unit_id," Parameters Initialized")
 
@@ -630,12 +637,12 @@ func _signals():
 
 func _process(delta: float) -> void:
 	if !map: return
-	elif tick == 0:
-		var coord = $PathFollow2D/Cell
-		coord.set_text(str(cell))
-		tick = 1
-	else:
-		tick -= 1
+	#elif tick == 0:
+		#var coord = $PathFollow2D/Cell
+		#coord.set_text(str(cell))
+		#tick = 1
+	#else:
+		#tick -= 1
 	
 	#swapped above needDeath, may break something. Return below if need be.
 	if !pathPaused: _process_motion(delta)
@@ -727,6 +734,7 @@ func to_sim() -> UnitSim:
 	sim.current_life = current_life
 	sim.comp = current_comp
 	sim.remaining_move = remaining_move
+	sim.moved_hexes = moved_hexes
 	sim.ai_role = ai_role
 	sim.ai_task = ai_task
 	sim.ai_lock_position = ai_lock_position
@@ -743,6 +751,7 @@ func to_sim() -> UnitSim:
 	var wep = get_equipped_weapon()
 	sim.weapon = wep.convert_to_save_data().duplicate(true) if wep else {}
 	sim.equipped_effects = _effects_to_sim_data(equipment_helper.equipped_effects if equipment_helper else null)
+	sim.equipped_attack_effects = _equipped_attack_effects_to_sim_data()
 	sim.natural = natural.convert_to_save_data().duplicate(true) if natural else {}
 	sim.active_buffs = _effect_pool_to_sim_data(buff_controller.active_buffs if buff_controller else {})
 	sim.active_debuffs = _effect_pool_to_sim_data(buff_controller.active_debuffs if buff_controller else {})
@@ -800,6 +809,15 @@ func _effects_to_sim_data(effects_any) -> Array[Dictionary]:
 					out.append(d2)
 		return out
 
+	return out
+
+
+func _equipped_attack_effects_to_sim_data() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	for acc: Accessory in get_equipped_accs():
+		for effect in acc.effects:
+			if effect is Effect and effect.target != Enums.EFFECT_TARGET.EQUIPPED:
+				out.append(effect.convert_to_data())
 	return out
 
 
@@ -885,6 +903,7 @@ func post_load(unit_data:Dictionary, set_cell:bool=false)->void:
 	#active_item_effects = unit_data.active_item_effects
 	_load_buff_effects(unit_data.active_buffs,buff_controller.active_buffs)
 	_load_buff_effects(unit_data.active_debuffs,buff_controller.active_debuffs)
+	refresh_composure_break_state()
 	if set_cell:
 		convCell = str_to_var("Vector2i" + unit_data.cell) as Vector2i
 		relocate_unit(convCell)
@@ -1000,6 +1019,7 @@ func walk_along(path: PackedVector2Array, track_remaining:bool=false) -> void:
 #	#print("walk along")
 	if track_remaining:
 		remaining_move = maxi(0, int(total_stats.Move) - int(path.size()))
+		moved_hexes = int(path.size())
 	lastAnim = _anim_player.current_animation
 	if path.is_empty():
 		print("walk_along Path Empty")
@@ -1141,10 +1161,42 @@ func cure_status(cure_type: Enums.SUB_TYPE, ignoreCurable := false) -> void:
 
 func status_duration_tick(duration: Enums.DURATION_TYPE) -> void:
 	status_controller.tick(duration)
+	tick_buffs(duration)
 
 
 func check_status(condition: String) -> bool:
 	return status_controller.has_status(condition)
+
+
+func get_status_tray_entries() -> Array[Dictionary]:
+	var entries: Array[Dictionary] = []
+	if status_controller:
+		entries.append_array(status_controller.get_tray_entries())
+	if buff_controller:
+		entries.append_array(buff_controller.get_tray_entries())
+	return entries
+
+
+func get_status_tray_status_data(status_name: String) -> Dictionary:
+	if status_controller:
+		return status_controller.get_tray_status_data(status_name)
+	if status_data.has(status_name):
+		return status_data[status_name]
+	if sParam.has(status_name):
+		return sParam[status_name]
+	return {}
+
+
+func get_status_tray_effect_entry(effect_key: String) -> Dictionary:
+	if buff_controller:
+		return buff_controller.get_tray_effect_entry(effect_key)
+	return {}
+
+
+func get_status_tray_effect_entries(icon_key: String) -> Array[Dictionary]:
+	if buff_controller:
+		return buff_controller.get_tray_effect_entries(icon_key)
+	return []
 #endregion
 
 func _set_art_paths():
@@ -1266,9 +1318,12 @@ func validate_skills(): #The fuck am I trying to do here???
 ##Validate skills from effects
 func validate_active_effect_skills():
 	bonus_skills.clear()
+	bonus_passives.clear()
 	for effect in equipment_helper.equipped_effects:
 		if effect.type == Enums.EFFECT_TYPE.ADD_SKILL:
 			_resolve_bonus_skill(effect)
+		elif effect.type == Enums.EFFECT_TYPE.ADD_PASSIVE:
+			_resolve_bonus_passive(effect)
 	_update_features()
 
 
@@ -1276,6 +1331,14 @@ func _resolve_bonus_skill(effect: Effect) -> void:
 	if personal_skills.has(effect.skill): return
 	else: 
 		bonus_skills.append(effect.skill)
+
+
+func _resolve_bonus_passive(effect: Effect) -> void:
+	if effect.passive == null:
+		return
+	if personal_passives.has(effect.passive) or bonus_passives.has(effect.passive):
+		return
+	bonus_passives.append(effect.passive)
 
 
 func _add_sub_weap(subType):
@@ -1456,8 +1519,8 @@ func get_equipped_weapon() -> Weapon:
 
 ##returns the currently equipped accessories. Return false if none.
 func get_equipped_accs() -> Array[Accessory]:
-	var equipped:= []
-	for item : Accessory in inventory:
+	var equipped: Array[Accessory] = []
+	for item in inventory:
 		if item is not Accessory:
 			continue
 		if item.equipped: equipped.append(item)
@@ -1504,7 +1567,7 @@ func get_reach() -> Dictionary:
 
 ##Returns reach = {"Max":int, "Min":int} of given currently equipped weapon
 func get_weapon_reach() -> Dictionary:
-	var reach = {"Max":-999, "Min":999}
+	var reach = {"Max":-999, "Min":999, "CloseMin":0, "CloseMax":0, "FarMin":0, "FarMax":0}
 	for weapon: Item in inventory:
 			if weapon is not Weapon and weapon is not Ofuda: 
 				continue
@@ -1512,10 +1575,35 @@ func get_weapon_reach() -> Dictionary:
 				continue
 			reach.Min = mini(weapon.min_reach, reach.Min)
 			reach.Max = maxi(weapon.max_reach, reach.Max)
+			if weapon is Weapon:
+				_merge_reach_band(reach, weapon, "close", "Close")
+				_merge_reach_band(reach, weapon, "far", "Far")
 	if natural:
 		reach.Min = mini(natural.min_reach, reach.Min)
 		reach.Max = maxi(natural.max_reach, reach.Max)
 	return reach
+
+
+func _merge_reach_band(reach: Dictionary, source, source_prefix: String, output_prefix: String) -> void:
+	var min_key := "%s_min_reach" % source_prefix
+	var max_key := "%s_max_reach" % source_prefix
+	if min_key not in source or max_key not in source:
+		return
+	var min_reach := int(source[min_key])
+	var max_reach := int(source[max_key])
+	if min_reach == 0 and max_reach == 0:
+		return
+	if min_reach == 0:
+		min_reach = max_reach
+	if max_reach == 0:
+		max_reach = min_reach
+	var output_min := "%sMin" % output_prefix
+	var output_max := "%sMax" % output_prefix
+	if int(reach[output_min]) == 0:
+		reach[output_min] = min_reach
+	else:
+		reach[output_min] = mini(int(reach[output_min]), min_reach)
+	reach[output_max] = maxi(int(reach[output_max]), max_reach)
 
 
 ##Returns reach = {"Max":int, "Min":int} of given skillId
@@ -1544,7 +1632,7 @@ func get_aug_reach(skill : Skill) -> Dictionary:
 		reach.Min = skill.min_reach
 		reach.Max = skill.max_reach
 	reach.Min += skill.bonus_min_range
-	reach.Max += skill.bonus_min_range
+	reach.Max += skill.bonus_max_range
 	return reach
 #endregion
 
@@ -1654,7 +1742,7 @@ func _update_natural(passive) -> void:
 func _get_natural_weapon(natId:String)->Natural:
 	var natRes : NaturalResource
 	var newNat : Natural
-	var natPath : String = "res://unit_resources/items/weapons/%s.tres"
+	var natPath : String = "res://unit_resources/items/weapons/natural/%s.tres"
 	if natId: natPath = natPath % [natId]
 	#print(natPath)
 	if ResourceLoader.exists(natPath):
@@ -1869,24 +1957,88 @@ func apply_heal(heal := 0):
 
 
 func apply_composure(comp := 0):
-	if comp>0 or comp<0: 
-		comp_changed = comp
-		current_comp -= comp
-		current_comp = clampi(current_comp, 0, active_stats.Comp)
-		stats_block.update_stats()
+	if comp == 0:
+		return
+	comp_changed = comp
+	_set_composure_value(current_comp - int(comp))
+
+
+func spend_composure(amount: int, _reason := "") -> void:
+	if amount <= 0:
+		return
+	if _reason != "":
+		print("[Comp] %s spent %d | reason: %s | %d -> %d" % [unit_id, amount, _reason, current_comp, max(0, current_comp - amount)])
+	apply_composure(amount)
+
+
+func restore_composure(amount: int, _reason := "") -> void:
+	if amount <= 0:
+		return
+	if _reason != "":
+		print("[Comp] %s restored %d | reason: %s | %d -> %d" % [unit_id, amount, _reason, current_comp, min(_get_composure_cap(), current_comp + amount)])
+	apply_composure(-amount)
+
+
+func set_composure(value: int, _reason := "") -> void:
+	comp_changed = int(value) - current_comp
+	_set_composure_value(int(value))
 
 func has_enough_comp(cost:int) -> bool:
-	var isValid := false
-	if cost <= current_comp: isValid = true
-	return isValid
+	return int(cost) <= current_comp
+
+
+func can_use_skill(skill: Skill) -> bool:
+	if skill == null:
+		return false
+	if not has_enough_comp(int(skill.cost)):
+		return false
+	if bool(skill.magical) and check_status("Silence"):
+		return false
+	return true
+
+
+func refresh_composure_break_state() -> void:
+	if buff_controller == null:
+		return
+	var has_break: bool = buff_controller.has_effect_id(COMP_BREAK_EFFECT_ID)
+	if current_comp <= 0:
+		if has_break:
+			return
+		var effect := _load_comp_break_effect()
+		if effect != null:
+			buff_controller.apply_effect(effect, Enums.EFFECT_SOURCE.BUFF)
+		return
+	if has_break:
+		buff_controller.remove_effect_by_id(COMP_BREAK_EFFECT_ID)
 
 func set_acted(actState: bool):
 	status["Acted"] = actState
+	if actState:
+		moved_hexes = 0
+		status_duration_tick(Enums.DURATION_TYPE.TURN)
 	status_controller.set_acted(actState)
+
+
+func _set_composure_value(new_value: int) -> void:
+	current_comp = clampi(new_value, 0, _get_composure_cap())
+	refresh_composure_break_state()
+	stats_block.update_stats()
+
+
+func _get_composure_cap() -> int:
+	return max(0, int(active_stats.get("Comp", total_stats.get("Comp", current_comp))))
+
+
+func _load_comp_break_effect() -> Effect:
+	if not ResourceLoader.exists(COMP_BREAK_EFFECT_PATH):
+		return null
+	var effect := load(COMP_BREAK_EFFECT_PATH)
+	if effect is Effect:
+		return effect.duplicate(true)
+	return null
 
 #Turn Signals
 func _on_turn_changed():
-	status_duration_tick(Enums.DURATION_TYPE.TURN)
 	update_stats()
 	
 	
@@ -1974,7 +2126,7 @@ func add_exp(action, _target = null): ##Adds exp if a unit is a place, as well a
 	if unit_exp <= 100:
 		expSteps.append(unit_exp) 
 		
-	if unit_exp >= 100 and unit_level < 20:
+	if unit_exp >= 100 and unit_level < Global.LEVEL_CAP:
 		var expBracket = unit_exp
 		while expBracket > 100:
 			expSteps.append(100)
@@ -1983,7 +2135,7 @@ func add_exp(action, _target = null): ##Adds exp if a unit is a place, as well a
 			if expBracket < 100:
 				expSteps.append(expBracket)
 		
-		while unit_exp > 100:	
+		while unit_exp >= 100 and unit_level + lvlLoops < Global.LEVEL_CAP:
 			unit_exp = unit_exp - 100
 			lvlLoops += 1
 			
@@ -1991,7 +2143,7 @@ func add_exp(action, _target = null): ##Adds exp if a unit is a place, as well a
 		levelUpReport["Results"] = results.StatGains
 		levelUpReport["NewSkills"]=results.NewSkills
 		levelUpReport["NewPassives"]=results.NewPassives
-		levelUpReport["Levels"] = lvlLoops
+		levelUpReport["Levels"] = results.LVL
 		levelUpReport["OldStats"] = oldStats
 		levelUpReport.OldStats["LVL"] = oldLevel
 #		print(unitData)

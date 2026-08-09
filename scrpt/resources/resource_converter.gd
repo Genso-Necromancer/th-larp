@@ -45,6 +45,12 @@ func inventory_to_resource(resources:Dictionary)->Array[Item]:
 			"Accessory":
 				item = Accessory.new(load(resources[stringified].Properties))
 				item.load_save_data(resources[stringified])
+			"Quiver":
+				item = Quiver.new(load(resources[stringified].Properties))
+				item.load_save_data(resources[stringified])
+			"BarrierAccessory":
+				item = BarrierAccessory.new(load(resources[stringified].Properties))
+				item.load_save_data(resources[stringified])
 		inv.append(item)
 		slot += 1
 	return inv

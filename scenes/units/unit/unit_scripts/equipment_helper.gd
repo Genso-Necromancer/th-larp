@@ -165,22 +165,29 @@ func _equip_weapon(weapon: Weapon, is_temp: bool=false) -> void:
 
 
 func _equip_accessory(acc: Accessory) -> void:
-	# You currently use a hard-coded limit of 2 accessories.
-	var limit := 2
-	var equipped := []
+	if acc.equipped:
+		return
 
-	# Collect equipped accessories
+	var target_slot := _get_accessory_slot(acc)
+	var equipped := []
 	for i in unit.inventory:
-		if i is Accessory and i.equipped:
+		if i is Accessory and i.equipped and _get_accessory_slot(i) == target_slot:
 			equipped.append(i)
 
-	# Remove old ones if exceeding the limit  
-	while equipped.size() >= limit:
+	while equipped.size() >= 1:
 		var removed = equipped.pop_back()
 		unequip(removed)
 
 	acc.equipped = true
 	_add_item_effects(acc)
+
+
+func _get_accessory_slot(acc: Accessory) -> String:
+	if acc is Quiver:
+		return "Quiver"
+	if acc is BarrierAccessory:
+		return "Barrier"
+	return "Accessory"
 
 
 
@@ -227,6 +234,12 @@ func check_valid_equip(item: Item) -> bool:
 	if item is Weapon or item is Consumable:
 		return is_proficient(iCat, subCat) and not item.is_broken
 
+	if item is Quiver:
+		return bool(unit.weapon_prof.get("Bow", false)) and is_rule_met(item.rule_type, item.sub_rule)
+
+	if item is BarrierAccessory:
+		return is_proficient(Enums.WEAPON_CATEGORY.ACC, Enums.WEAPON_SUB.BARRIER) and is_rule_met(item.rule_type, item.sub_rule)
+
 	if item is Accessory:
 		return is_rule_met(item.rule_type, item.sub_rule)
 
@@ -249,12 +262,12 @@ func is_proficient(i_cat: Enums.WEAPON_CATEGORY, sub_cat: Enums.WEAPON_SUB) -> b
 	# sub-group proficiency
 	if sub_cat != Enums.WEAPON_SUB.NONE:
 		var subName = subKeys[sub_cat].to_pascal_case()
-		if unit.weapon_prof[subName]:
+		if bool(unit.weapon_prof.get(subName, false)):
 			return true
 
 	# category proficiency
 	var catName = catKeys[i_cat].to_pascal_case()
-	return unit.weapon_prof[catName]
+	return bool(unit.weapon_prof.get(catName, false))
 
 
 func is_rule_met(rule_type: Enums.RULE_TYPE, sub_type: Enums.SUB_RULE) -> bool:

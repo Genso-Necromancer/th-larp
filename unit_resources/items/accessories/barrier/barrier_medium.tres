@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="BarrierResource" load_steps=5 format=3 uid="uid://dve1uvdvnybws"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_4ow27"]
+[ext_resource type="Resource" path="res://unit_resources/effects/barrier_item_medium_amt.tres" id="2_vq3ti"]
+[ext_resource type="Resource" path="res://unit_resources/effects/barrier_item_medium_chance.tres" id="3_6m7kt"]
+[ext_resource type="Script" uid="uid://cqnj8qdmyi7fv" path="res://unit_resources/items/accessories/barrier/barrier_resource.gd" id="4_wjtvo"]
+
+[resource]
+resource_name = "barrier_medium"
+script = ExtResource("4_wjtvo")
+personal = false
+level = 1
+use = false
+equippable = true
+breakable = false
+expendable = false
+trade = true
+max_dur = 1
+weight = 7
+category = 11
+sub_group = 3
+effects = Array[ExtResource("1_4ow27")]([ExtResource("2_vq3ti"), ExtResource("3_6m7kt")])
+id = "barrier_medium"
+rule_type = 0

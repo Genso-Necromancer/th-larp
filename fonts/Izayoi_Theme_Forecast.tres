@@ -51,5 +51,6 @@ MarginContainer/constants/margin_right = 15
 MarginContainer/constants/margin_top = 15
 Panel/styles/panel = SubResource("StyleBoxEmpty_y8ifr")
 PanelContainer/styles/panel = SubResource("StyleBoxEmpty_63pdl")
-RichTextLabel/font_sizes/normal_font_size = 24
+RichTextLabel/colors/default_color = Color(0.74902, 0.686275, 0.8, 1)
+RichTextLabel/font_sizes/normal_font_size = 20
 RichTextLabel/fonts/normal_font = ExtResource("2_kutao")

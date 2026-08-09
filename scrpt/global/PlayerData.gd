@@ -254,7 +254,7 @@ func level_up(unit:Unit, levelups:int): #consider reach bands for stat normaliza
 	var leveled_features :Dictionary = {"Skills":unit.leveled_skills, "Passives":unit.leveled_passives}
 	#print("Level Up Sequence[%s], Cycles:%d" % [unit.unit_id, levelups])
 	for level in levelups:
-		if unit.unit_level >= 20: break
+		if unit.unit_level >= Global.LEVEL_CAP: break
 		unit.unit_level += 1
 		results["LVL"] += 1
 		#print("Cycle %d" % [results["LVL"]])

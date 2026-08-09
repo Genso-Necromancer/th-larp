@@ -25,9 +25,9 @@ var metaSet := false
 
 var disabled := false :
 	set(value):
-		#var b = $ButtonLayer
 		disabled = value
-		#b.disabled = value
+		if is_node_ready():
+			button.disabled = value
 	get:
 		return disabled
 
@@ -44,6 +44,8 @@ var state : String = "Enabled" :
 func _ready():
 	button.focus_entered.connect(self._on_focus_entered)
 	button.focus_exited.connect(self._on_focus_exited)
+	button.disabled = disabled
+	_make_noninteractive_layers_ignore_mouse()
 	_set_button_meta()
 	if  get_meta("Item") and get_meta("Item") is String: pass
 	elif get_meta("Item") and get_meta("Item").id == "unarmed":
@@ -51,12 +53,13 @@ func _ready():
 
 
 func set_item_text(item : SlotWrapper):
-	var n = $ContentMargin/HBoxContainer/Name
-	var d = $ContentMargin/HBoxContainer/Durability
+	var n: Control = _get_name_label()
+	var d: Control = _get_detail_label()
+	if n == null:
+		return
 	var durString
 	var dur : int = item.dur
 	var mDur : int = item.max_dur
-	var cost : int
 	
 	if !item.breakable:
 		durString = str(" --")
@@ -64,18 +67,18 @@ func set_item_text(item : SlotWrapper):
 		durString = ""
 	else:
 		durString = (str(dur) + "/" + str(mDur))
-	#if item is Ofuda: 
-		#cost = item.cost
-		#durString = str(cost, " ") + durString
 	n.set_text(StringGetter.get_item_name(item))
-	d.set_text(durString)
+	if d:
+		d.set_text(durString)
 
 
 func set_blank_item():
-	var n = $ContentMargin/HBoxContainer/Name
-	var d = $ContentMargin/HBoxContainer/Durability
-	n.set_text("")
-	d.set_text("")
+	var n: Control = _get_name_label()
+	var d: Control = _get_detail_label()
+	if n:
+		n.set_text("")
+	if d:
+		d.set_text("")
 
 
 func set_item_icon(icon_path : String):
@@ -121,7 +124,13 @@ func _verify_state(value) -> String:
 
 func _font_state_change(value : String):
 	var fontColor : Color
-	var labels = [$ContentMargin/HBoxContainer/Name, $ContentMargin/HBoxContainer/Durability]
+	var labels := []
+	var name_label: Control = _get_name_label()
+	var detail_label: Control = _get_detail_label()
+	if name_label:
+		labels.append(name_label)
+	if detail_label:
+		labels.append(detail_label)
 	match value:
 		"Enabled": 
 			fontColor = Color(1,1,1)
@@ -133,6 +142,17 @@ func _font_state_change(value : String):
 		l.add_theme_color_override("font_hover_color", fontColor)
 		l.add_theme_color_override("font_focus_color", fontColor)
 		l.add_theme_color_override("font_hover_pressed_color", fontColor)
+
+
+func _get_name_label() -> Control:
+	return get_node_or_null("ContentMargin/HBoxContainer/Name")
+
+
+func _get_detail_label() -> Control:
+	var durability = get_node_or_null("ContentMargin/HBoxContainer/Durability")
+	if durability:
+		return durability
+	return get_node_or_null("ContentMargin/HBoxContainer/Cost")
 
 func set_meta_data(item, unit, index, canTrade:=false):
 	var isEquipped := false
@@ -174,6 +194,23 @@ func _on_focus_exited():
 	if useBorder:
 		var focusBorder := $FocusBorder
 		focusBorder.visible = false
+
+
+func _make_noninteractive_layers_ignore_mouse() -> void:
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var ignore_nodes := [
+		get_node_or_null("FocusBorder"),
+		get_node_or_null("ContentMargin"),
+		get_node_or_null("ContentMargin/HBoxContainer"),
+		get_node_or_null("ContentMargin/HBoxContainer/Icon"),
+		get_node_or_null("ContentMargin/HBoxContainer/Icon/Equpped"),
+		get_node_or_null("ContentMargin/HBoxContainer/Name"),
+		get_node_or_null("ContentMargin/HBoxContainer/Durability"),
+		get_node_or_null("ContentMargin/HBoxContainer/Cost"),
+	]
+	for node in ignore_nodes:
+		if node is Control:
+			node.mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 ##Inserts it's own data, only intended for use in focus viewer
 func fill_yourself(unit:Unit) ->void:

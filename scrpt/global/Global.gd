@@ -1,4 +1,4 @@
-@tool
+﻿@tool
 extends Node
 const validation:= "9808110206"
 #region persistant variables
@@ -63,10 +63,21 @@ var language
 
 const slamage := 5
 const spdGap := 4
+const LEVEL_CAP := 30
+const RANGE_BAND_HIT_PENALTY := 20
+const RESCUE_SEARCH_MAX_RADIUS := 6
 const critRange := [10, 20]
 const knifeCrit := [15, 25]
 const slayerMulti := 3
 const compCosts := {"Attack": 1, "WasHit":1, "Miss":1, "Dodge": 1, "NegEff": 1, "Healed":-1, "Move":0, "Crit": -1, "Kill": -1, "Break": 1}
+var composure_values:Dictionary[String, int] = {
+	"atk": 2,
+	"evade": 2,
+	"hit": 2,
+	"crit_loss": 2,
+	"crit_restore": 4,
+	"dmg_ratio": 3,
+}
 
 
 func _init():

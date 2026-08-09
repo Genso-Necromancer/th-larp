@@ -12,7 +12,7 @@ func fill_skills(unit:Unit) -> Array: #Needs a context check for if a skill is v
 		buttons.append(s.get_button())
 		s.get_button().add_to_group("SkillsTT")
 		s.set_meta_data(skill, unit, false)
-		if !_check_composure(unit, skill): s.state = "Disabled"
+		if !unit.can_use_skill(skill): s.state = "Disabled"
 		if skill.augment and !_check_aug(unit, skill): s.state = "Disabled"
 		add_child(s)
 	buttons[0].call_deferred("grab_focus")

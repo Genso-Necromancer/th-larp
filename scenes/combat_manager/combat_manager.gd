@@ -67,7 +67,7 @@ func get_forecast(attacker: Unit, defender: Unit, action: Dictionary) -> CombatR
 	var defender_sim := defender.to_sim()
 	attacker_sim.recompute_derived_state()
 	defender_sim.recompute_derived_state()
-	return forecast_service.get_forecast(attacker_sim, defender_sim, action)
+	return forecast_service.get_forecast(attacker_sim, defender_sim, _with_charge_context(attacker_sim, action))
 
 # Live combat: resolve + apply + return the same CombatResults
 func start_the_justice(attacker: Unit, defender: Unit, attacker_action: Dictionary) -> CombatResults:
@@ -75,7 +75,7 @@ func start_the_justice(attacker: Unit, defender: Unit, attacker_action: Dictiona
 	var defender_sim := defender.to_sim()
 	attacker_sim.recompute_derived_state()
 	defender_sim.recompute_derived_state()
-	var cr: CombatResults = resolver.resolve_live(attacker_sim, defender_sim, attacker_action)
+	var cr: CombatResults = resolver.resolve_live(attacker_sim, defender_sim, _with_charge_context(attacker_sim, attacker_action))
 	applier.apply_results(cr, {
 	String(cr.units["attacker_id"]): attacker,
 	String(cr.units["defender_id"]): defender
@@ -84,10 +84,10 @@ func start_the_justice(attacker: Unit, defender: Unit, attacker_action: Dictiona
 
 # AI sim branches: deterministic outcomes, no applier
 func simulate_combat_hit(attacker_sim: UnitSim, defender_sim: UnitSim, attacker_action: Dictionary) -> CombatResults:
-	return resolver.resolve_sim_hit_success(attacker_sim, defender_sim, attacker_action)
+	return resolver.resolve_sim_hit_success(attacker_sim, defender_sim, _with_charge_context(attacker_sim, attacker_action))
 
 func simulate_combat_miss(attacker_sim: UnitSim, defender_sim: UnitSim, attacker_action: Dictionary) -> CombatResults:
-	return resolver.resolve_sim_hit_failure(attacker_sim, defender_sim, attacker_action)
+	return resolver.resolve_sim_hit_failure(attacker_sim, defender_sim, _with_charge_context(attacker_sim, attacker_action))
 
 # Keep your old helper
 func apply_results(attacker: Unit, defender: Unit, cr: CombatResults) -> void:
@@ -95,3 +95,18 @@ func apply_results(attacker: Unit, defender: Unit, cr: CombatResults) -> void:
 		attacker.unit_id: attacker,
 		defender.unit_id: defender
 	})
+
+
+func start_relocation(actor: Unit, target: Unit, effect: Effect) -> void:
+	if applier == null:
+		return
+	applier.apply_relocation(actor, target, effect)
+	if gameBoard and gameBoard.has_signal("continue_queue"):
+		gameBoard.continue_queue.emit()
+
+
+func _with_charge_context(attacker: UnitSim, action: Dictionary) -> Dictionary:
+	var contextual_action := action.duplicate(true)
+	if bool(contextual_action.get("Weapon", false)) and not contextual_action.has("ChargeHexes"):
+		contextual_action["ChargeHexes"] = int(attacker.moved_hexes)
+	return contextual_action

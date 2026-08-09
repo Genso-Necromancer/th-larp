@@ -26,8 +26,17 @@
 			<entry id = "effect_template_time"><![CDATA[%s Time]]></entry>
 			<entry id = "effect_template_life_steal"><![CDATA[[color=#8C1717]Life Steal[/color]]]></entry>
 			<entry id = "effect_template_heal"><![CDATA[[color=#3CB371]Heal[/color]]]></entry>
+			<entry id = "effect_template_damage"><![CDATA[[color=#8C1717]Damage[/color] %s]]></entry>
 			<entry id = "effect_template_slayer"><![CDATA[[color=#3CB371]Slayer[/color]]]></entry>
+			<entry id = "effect_template_brace"><![CDATA[[color=#6495ED]Brace[/color]]]></entry>
+			<entry id = "effect_template_purge"><![CDATA[[color=#5F9EA0]Purge[/color] %s]]></entry>
+			<entry id = "effect_template_dot"><![CDATA[[color=#8C1717]Damage Over Time[/color] %s]]></entry>
+			<entry id = "effect_template_hot"><![CDATA[[color=#3CB371]Regrowth[/color] %s]]></entry>
+			<entry id = "effect_template_cure"><![CDATA[[color=#26ab96]Cures:[/color] %s]]></entry>
+			<entry id = "effect_template_status_buffer"><![CDATA[[color=#9370DB]Status Ward[/color]]]></entry>
+			<entry id = "effect_template_purity"><![CDATA[[color=#5F9EA0]Purify[/color] %s]]></entry>
 			<entry id = "effect_template_add_skill"><![CDATA[Grants Skill: {skill}]]></entry>
+			<entry id = "effect_template_add_passive"><![CDATA[Grants Passive: {passive}]]></entry>
 			<!-- Pop Up Text -->
 			<entry id = "pop_up_template_value"><![CDATA[%s %d]]></entry>
 			<entry id = "pop_up_template_buff"><![CDATA[%s %s]]></entry>
@@ -60,6 +69,9 @@
 			<!-- Effects -->
 			<entry id = "effect_sub_type_speed_up"><![CDATA[Speed Up]]></entry>
 			<entry id = "effect_sub_type_slow_down"><![CDATA[[color=#762114]Slow Down[/color]]]></entry>
+			<entry id = "effect_sub_type_phys"><![CDATA[Physical]]></entry>
+			<entry id = "effect_sub_type_true"><![CDATA[True]]></entry>
+			<entry id = "effect_sub_type_silence"><![CDATA[Silence]]></entry>
 			<entry id = "effect_sub_type_sleep"><![CDATA[[color=#5F9EA0]Sleep[/color]]]></entry>
 			<entry id = "effect_sub_type_move"><![CDATA[Move]]></entry>
 			<entry id = "effect_sub_type_life"><![CDATA[Life]]></entry>
@@ -80,6 +92,7 @@
 			<entry id = "effect_sub_type_effhit"><![CDATA[Effect Chance]]></entry>
 			<entry id = "effect_sub_type_def"><![CDATA[Defense]]></entry>
 			<entry id = "effect_sub_type_dres"><![CDATA[Damage Reduction]]></entry>
+			<entry id = "effect_sub_type_all"><![CDATA[All]]></entry>
 			<!-- Effect Rules -->
 			<entry id = "effect_target_spec"><![CDATA[vs {sub_rule}]]></entry>
 			<!-- Effect Pop Text -->
@@ -89,6 +102,7 @@
 			<entry id = "effect_pop_text_cure"><![CDATA[Cured!]]></entry>
 			<entry id = "effect_pop_text_resisted"><![CDATA[Resisted!]]></entry>
 			<entry id = "effect_pop_text_status_sleep"><![CDATA[Sleep!]]></entry>
+			<entry id = "effect_pop_text_status_silence"><![CDATA[Silence!]]></entry>
 			<entry id = "effect_pop_text_move"><![CDATA[Move]]></entry>
 			<entry id = "effect_pop_text_life"><![CDATA[Life]]></entry>
 			<entry id = "effect_pop_text_comp"><![CDATA[Composure]]></entry>
@@ -131,6 +145,8 @@
 			<entry id = "role_name_guard"><![CDATA[Gatekeeper]]></entry>
 			<entry id = "role_name_sorceress"><![CDATA[Sorceress]]></entry>
 			<entry id = "role_name_miko"><![CDATA[Miko]]></entry>
+			<entry id = "role_name_blade"><![CDATA[Blade]]></entry>
+			<entry id = "role_name_archer"><![CDATA[Archer]]></entry>
 			<!-- Weapon Types -->
 			<entry id = "type_blade"><![CDATA[Blade]]></entry>
 			<entry id = "type_blunt"><![CDATA[Blunt]]></entry>
@@ -165,6 +181,9 @@
 			<entry id = "passive_name_night_person"><![CDATA[Night Person]]></entry>
 			<entry id = "passive_name_plot_armor"><![CDATA[Plot Armor]]></entry>
 			<entry id = "passive_name_lockpick"><![CDATA[Knock-Knock]]></entry>
+			<entry id = "passive_name_canto"><![CDATA[Ride-By]]></entry>
+			<entry id = "passive_name_canto_night"><![CDATA[Night Waltz]]></entry>
+			<entry id = "passive_name_shade"><![CDATA[Shade]]></entry>
 			<!-- Skill Names -->
 			<!--Sakuya-->
 			<entry id = "skill_name_locked_corpse"><![CDATA[Locked Corpse]]></entry>
@@ -178,6 +197,30 @@
 			<!--Patchouli-->
 			<!--Spells-->
 			<entry id = "skill_name_spell_basic_fire"><![CDATA[Fire Ball]]></entry>
+			<entry id = "skill_name_spell_ember"><![CDATA[Ember]]></entry>
+			<entry id = "skill_name_spell_flare"><![CDATA[Flare]]></entry>
+			<entry id = "skill_name_spell_ignite"><![CDATA[Ignite]]></entry>
+			<entry id = "skill_name_spell_purge_the_body"><![CDATA[Purge The Body]]></entry>
+			<entry id = "skill_name_spell_purity_of_spirit"><![CDATA[Purity of Spirit]]></entry>
+			<entry id = "skill_name_spell_purity_of_voice"><![CDATA[Purity of Voice]]></entry>
+			<entry id = "skill_name_spell_acceptable_berry"><![CDATA[Acceptable Berry]]></entry>
+			<entry id = "skill_name_spell_wakeleaf"><![CDATA[Wakeleaf]]></entry>
+			<entry id = "skill_name_spell_uproot"><![CDATA[Uproot]]></entry>
+			<entry id = "skill_name_spell_iron_thorn"><![CDATA[Iron Thorn]]></entry>
+			<entry id = "skill_name_spell_metal_blade"><![CDATA[Metal Blade]]></entry>
+			<entry id = "skill_name_spell_iron_shard"><![CDATA[Iron Shard]]></entry>
+			<entry id = "skill_name_spell_stonebind"><![CDATA[Stonebind]]></entry>
+			<entry id = "skill_name_spell_stone_body"><![CDATA[Stone Body]]></entry>
+			<entry id = "skill_name_spell_celestial_spark"><![CDATA[Celestial Spark]]></entry>
+			<entry id = "skill_name_spell_solar_spark"><![CDATA[Solar Spark]]></entry>
+			<entry id = "skill_name_spell_moonveil"><![CDATA[Moonveil]]></entry>
+			<entry id = "skill_name_spell_selene_ward"><![CDATA[Selene's Ward]]></entry>
+			<entry id = "skill_name_spell_creeping_vine"><![CDATA[Creeping Vine]]></entry>
+			<entry id = "skill_name_spell_eclipse"><![CDATA[Eclipse]]></entry>
+			<entry id = "skill_name_spell_clear_voice"><![CDATA[Clear Voice]]></entry>
+			<entry id = "skill_name_spell_debug_life_shear"><![CDATA[Debug: Life Shear]]></entry>
+			<entry id = "skill_name_spell_debug_life_mend"><![CDATA[Debug: Life Mend]]></entry>
+			<entry id = "skill_name_spell_debug_eleg_break"><![CDATA[Debug: Eleg Break]]></entry>
 			
 			
 			<!-- Tool Tips:Rules-->
@@ -192,6 +235,9 @@
 			<entry id = "augment_skill"><![CDATA[Weapon Augment]]></entry>
 			<!-- Tool Tips: Status Conditions -->
 			<entry id = "status_sleep"><![CDATA[[color=#5F9EA0]Sleep[/color]]]></entry>
+			<entry id = "status_dazed"><![CDATA[[color=#B8860B]Dazed[/color]]]></entry>
+			<entry id = "status_silence"><![CDATA[[color=#5F9EA0]Silence[/color]]]></entry>
+			<entry id = "status_effect"><![CDATA[Effect]]></entry>
 			
 			<!-- Terrain -->
 			<!--Bases -->
@@ -272,13 +318,32 @@
 			<entry id = "weapon_knife_silver"><![CDATA[Silver Knife]]></entry>
 			<entry id = "weapon_knife_dagger"><![CDATA[Dagger]]></entry>
 			<entry id = "weapon_book_fire"><![CDATA[Fire Book]]></entry>
+			<entry id = "weapon_book_debug_effects"><![CDATA[Debug Effect Book]]></entry>
 			<entry id = "weapon_gohei_simple"><![CDATA[Simple Gohei]]></entry>
+			<entry id = "weapon_scissor_blade_basic"><![CDATA[Scissor Blade]]></entry>
+			<entry id = "weapon_blade_basic"><![CDATA[Basic Blade]]></entry>
+			<entry id = "weapon_blunt_basic"><![CDATA[Basic Blunt]]></entry>
+			<entry id = "weapon_polearm_charge_basic"><![CDATA[Charging Polearm]]></entry>
+			<entry id = "weapon_polearm_brace_basic"><![CDATA[Bracing Polearm]]></entry>
+			<entry id = "weapon_polearm_reach_basic"><![CDATA[Reach Polearm]]></entry>
+			<entry id = "weapon_hunter_bow_basic"><![CDATA[Hunter Bow]]></entry>
+			<entry id = "weapon_harrier_bow_basic"><![CDATA[Harrier Bow]]></entry>
 			<!-- Accessories -->
 			<entry id = "accesory_pwr_ring01"><![CDATA[Power Ring]]></entry>
+			<entry id = "accessory_pwr_ring01"><![CDATA[Power Ring]]></entry>
+			<entry id = "accessory_quiver_basic"><![CDATA[Basic Quiver]]></entry>
+			<entry id = "accessory_quiver_barbed"><![CDATA[Barbed Quiver]]></entry>
+			<entry id = "accessory_barrier_small"><![CDATA[Small Barrier]]></entry>
+			<entry id = "accessory_barrier_medium"><![CDATA[Medium Barrier]]></entry>
 			<!-- Consumables -->
 			<entry id = "consumable_pizza"><![CDATA[Pizza]]></entry>
 			<!-- Ofuda -->
 			<entry id = "ofuda_defense_prayer"><![CDATA[Defense Prayer]]></entry>
+			<entry id = "ofuda_ofuda_heal0"><![CDATA[Healing Ofuda]]></entry>
+			<entry id = "ofuda_ofuda_heal_basic"><![CDATA[Heal Ofuda]]></entry>
+			<entry id = "ofuda_ofuda_warp_basic"><![CDATA[Warp Ofuda]]></entry>
+			<entry id = "ofuda_ofuda_cure_sleep"><![CDATA[Cure Sleep Ofuda]]></entry>
+			<entry id = "ofuda_ofuda_sleep_basic"><![CDATA[Sleep Ofuda]]></entry>
 			
 			
 			<entry id = "lore_night_prot"><![CDATA[{rule_type}, negate {sub_rule} stat penalties at [color=#230f8c]Night[/color].]]></entry>

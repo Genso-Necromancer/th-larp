@@ -47,7 +47,13 @@ func _exit_tree() -> void:
 
 func changed(script: Script) -> void:
 	cse = EditorInterface.get_script_editor().get_current_editor()
+	if cse == null:
+		return
+	if cse.get_child_count() == 0:
+		return
 	se = cse.get_child(0).get_child(0).get_child(0)
+	if se == null:
+		return
 	var bg = TextureRect.new()
 	
 	if UserData["userBackground"]:
@@ -72,7 +78,7 @@ func changed(script: Script) -> void:
 
 
 func ResizeBackground() -> void:
-	if se.get_child_count() == 1:
+	if se != null and se.get_child_count() == 1:
 		se.get_child(0).size = se.size
 
 

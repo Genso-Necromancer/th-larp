@@ -1,0 +1,31 @@
+[gd_resource type="Resource" script_class="CompBreak" load_steps=2 format=3 uid="uid://duxiw5wikdmhg"]
+
+[ext_resource type="Script" uid="uid://ovm68vja55v4" path="res://unit_resources/effects/comp_break.gd" id="1_13gyt"]
+
+[resource]
+script = ExtResource("1_13gyt")
+hit_penalty = -10
+graze_penalty = -10
+crit_penalty = -5
+type = 4
+target = 1
+instant = false
+on_hit = false
+proc = 0
+duration = 0
+duration_type = 0
+stack = false
+permanent = false
+curable = false
+from_item = false
+hostile = false
+multi_swing = 0
+multi_round = 0
+crit_dmg = Array[int]([0, 0])
+crit_mult = false
+crit_rate = 0
+value = 0
+sub_type = 0
+id = "comp_break_default"
+rule_type = 0
+metadata/_custom_type_script = "uid://ovm68vja55v4"

@@ -1,0 +1,40 @@
+[gd_scene load_steps=3 format=3 uid="uid://jajopguvbr3a"]
+
+[ext_resource type="PackedScene" uid="uid://niqbht2w5xkr" path="res://scenes/GUI/hud/forecast/effect_scroll.tscn" id="1_tshrl"]
+[ext_resource type="Theme" uid="uid://cb07g0akruuvi" path="res://fonts/Izayoi_Theme_Forecast_Effects.tres" id="2_gkndi"]
+
+[node name="effect_scroll_flipped" instance=ExtResource("1_tshrl")]
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+grow_horizontal = 1
+grow_vertical = 1
+metadata/_edit_use_anchors_ = true
+
+[node name="scroll_top" parent="." index="0"]
+layout_mode = 0
+offset_left = -252.0
+offset_top = 2.0
+offset_right = 248.0
+offset_bottom = 236.0
+flip_h = true
+
+[node name="effect_margin" parent="scroll_top" index="1"]
+offset_left = 60.0
+offset_right = 392.0
+theme_override_constants/margin_left = 28
+
+[node name="test1" parent="scroll_top/effect_margin/effect_vbox" index="0"]
+theme = ExtResource("2_gkndi")
+
+[node name="test2" parent="scroll_top/effect_margin/effect_vbox" index="1"]
+theme = ExtResource("2_gkndi")
+
+[node name="scroll_skeleton" parent="." index="2"]
+position = Vector2(-129, 70)
+
+[node name="scroll_back" parent="scroll_skeleton" index="0"]
+rotation = 3.14159
+scale = Vector2(1, -1)

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Passive" load_steps=2 format=3 uid="uid://cjyhb0gepguhi"]
+
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="1_vsy8q"]
+
+[resource]
+resource_name = "canto_night"
+script = ExtResource("1_vsy8q")
+type = 11
+proc = 100
+sub_type = 0
+sub_weapon = 0
+day_id = ""
+night_id = ""
+value = 0
+string_value = &""
+is_time_sens = false
+feature_id = "canto_night"
+rule_type = 1
+sub_rule = 2
+metadata/_custom_type_script = "uid://c5hmv6tclm43r"

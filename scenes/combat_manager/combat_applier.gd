@@ -43,10 +43,12 @@ func _apply_swing(results: CombatResults, actor: Unit, target: Unit, swing: Dict
 	# Composure deltas if present
 	var comp_actor := int(swing.get("comp_actor", 0))
 	var comp_target := int(swing.get("comp_target", 0))
+	var comp_actor_reasons: Array = swing.get("comp_actor_reasons", [])
+	var comp_target_reasons: Array = swing.get("comp_target_reasons", [])
 	if comp_actor != 0:
-		_apply_composure_delta(actor, -abs(comp_actor))
+		_apply_composure_delta(actor, comp_actor, _join_composure_reasons(comp_actor_reasons))
 	if comp_target != 0:
-		_apply_composure_delta(target, -abs(comp_target))
+		_apply_composure_delta(target, comp_target, _join_composure_reasons(comp_target_reasons))
 
 	# Apply events in phase order.
 	# New format: events_pre then events_post
@@ -131,6 +133,24 @@ func _apply_event(results: CombatResults, event: Dictionary, unit_map: Dictionar
 			if target:
 				_apply_heal(target, amount, actor)
 
+		"comp_dmg":
+			var target_id := String(event.get("target_id", ""))
+			var amount := int(event.get("amount", 0))
+			if amount <= 0:
+				return
+			var target: Unit = _get_unit(unit_map, target_id)
+			if target:
+				_apply_composure_delta(target, abs(amount))
+
+		"comp_heal":
+			var target_id := String(event.get("target_id", ""))
+			var amount := int(event.get("amount", 0))
+			if amount <= 0:
+				return
+			var target: Unit = _get_unit(unit_map, target_id)
+			if target:
+				_apply_composure_delta(target, -abs(amount))
+
 		"buff":
 			var target_id := String(event.get("target_id", ""))
 			var effect = event.get("effect", null)
@@ -167,8 +187,67 @@ func _apply_event(results: CombatResults, event: Dictionary, unit_map: Dictionar
 			else:
 				push_warning("CombatApplier: missing StatusController on %s" % [target.name])
 
+		"cure":
+			var target_id := String(event.get("target_id", ""))
+			var effect = event.get("effect", null)
+			if effect == null:
+				return
+
+			var target: Unit = _get_unit(unit_map, target_id)
+			if target == null:
+				return
+
+			var sub_type := int(effect.sub_type) if typeof(effect.sub_type) == TYPE_INT else int(Enums.SUB_TYPE.ALL)
+			var sc: StatusController = _get_status_controller(target)
+			if sc:
+				sc.cure_status(sub_type, false)
+			var bc: BuffController = _get_buff_controller(target)
+			if bc:
+				bc.cure_curable_debuffs(sub_type, false)
+
+		"purge":
+			var target_id := String(event.get("target_id", ""))
+			var effect = event.get("effect", null)
+			if effect == null:
+				return
+
+			var target: Unit = _get_unit(unit_map, target_id)
+			if target == null:
+				return
+
+			var sub_type := int(effect.sub_type) if typeof(effect.sub_type) == TYPE_INT else int(Enums.SUB_TYPE.ALL)
+			var bc: BuffController = _get_buff_controller(target)
+			if bc:
+				bc.purge_curable_buffs(sub_type, false)
+
+		"purity":
+			var target_id := String(event.get("target_id", ""))
+			var effect = event.get("effect", null)
+			if effect == null:
+				return
+
+			var target: Unit = _get_unit(unit_map, target_id)
+			if target == null:
+				return
+
+			var sub_type := int(effect.sub_type) if typeof(effect.sub_type) == TYPE_INT else int(Enums.SUB_TYPE.ALL)
+			var bc: BuffController = _get_buff_controller(target)
+			if bc:
+				bc.cure_curable_debuffs(sub_type, false)
+
+		"reloc":
+			var actor_id := String(event.get("source_id", ""))
+			var target_id := String(event.get("target_id", ""))
+			var effect = event.get("effect", null)
+			if effect == null:
+				return
+			var actor: Unit = _get_unit(unit_map, actor_id)
+			var target: Unit = _get_unit(unit_map, target_id)
+			var destination = event.get("destination", null)
+			_apply_relocation(actor, target, effect, destination)
+
 		"durability":
-			# Pass A: owner_id means “reduce currently equipped weapon durability”
+			# owner_id means reduce durability from the action source.
 			var owner_id := String(event.get("owner_id", ""))
 			var delta := int(event.get("amount", 0)) # typically -1
 			if delta == 0:
@@ -177,9 +256,13 @@ func _apply_event(results: CombatResults, event: Dictionary, unit_map: Dictionar
 			if owner == null:
 				return
 
+			var item = event.get("item", null)
 			# We only support negative deltas for now
 			if delta < 0:
-				_reduce_actor_weapon_durability(owner, -delta)
+				if item is Item:
+					_reduce_item_durability(owner, item, -delta)
+				else:
+					_reduce_actor_weapon_durability(owner, -delta)
 			else:
 				# Optional: support repairing in future
 				_reduce_actor_weapon_durability(owner, -delta) # no-op if negative required
@@ -189,12 +272,153 @@ func _apply_event(results: CombatResults, event: Dictionary, unit_map: Dictionar
 			pass
 
 # -------------------------
+# Relocation
+# -------------------------
+
+func apply_relocation(actor: Unit, target: Unit, effect: Effect) -> void:
+	_apply_relocation(actor, target, effect)
+
+
+func _apply_relocation(actor: Unit, target: Unit, effect: Effect, destination = null) -> void:
+	if actor == null or target == null or effect == null or gameBoard == null:
+		return
+	var sub_type := int(effect.sub_type) if typeof(effect.sub_type) == TYPE_INT else Enums.SUB_TYPE.NONE
+	match sub_type:
+		Enums.SUB_TYPE.SHOVE:
+			_apply_shove(actor, target, effect)
+		Enums.SUB_TYPE.TOSS:
+			_apply_toss(actor, target, effect)
+		Enums.SUB_TYPE.WARP:
+			_apply_warp(actor, target, effect, destination)
+		Enums.SUB_TYPE.RESCUE:
+			_apply_rescue(actor, target, effect)
+
+
+func _apply_shove(actor: Unit, target: Unit, effect: Effect) -> void:
+	var distance := maxi(1, int(effect.value))
+	var hex := AHexGrid2D.new(gameBoard.current_map)
+	var result: Dictionary = hex.resolve_shove(actor.cell, target.cell, hex.get_BFS_nhbr(target.cell, true), distance)
+	var destination :Vector2i= result.get("Hex", target.cell)
+	if destination == target.cell:
+		return
+	target.shove_unit(destination)
+
+
+func _apply_toss(actor: Unit, target: Unit, effect: Effect) -> void:
+	var distance := maxi(1, int(effect.value))
+	var hex := AHexGrid2D.new(gameBoard.current_map)
+	var result: Dictionary = hex.resolve_shove(target.cell, actor.cell, hex.get_BFS_nhbr(actor.cell, true), distance)
+	var destination :Vector2i= result.get("Hex", target.cell)
+	if destination == target.cell:
+		return
+	target.toss_unit(destination)
+
+
+func _apply_warp(actor: Unit, target: Unit, effect: Effect, destination = null) -> void:
+	if destination is Vector2i:
+		if destination == target.cell:
+			return
+		target.relocate_unit(destination)
+		return
+	var radius := maxi(1, int(effect.value))
+	var fallback_destination := _find_warp_destination(actor, target, radius)
+	if fallback_destination == target.cell:
+		return
+	target.relocate_unit(fallback_destination)
+
+
+func _apply_rescue(actor: Unit, target: Unit, _effect: Effect) -> void:
+	if actor == null or target == null or gameBoard == null or gameBoard.current_map == null:
+		return
+	var destination := _find_rescue_destination(actor, target)
+	if destination == target.cell:
+		return
+	target.relocate_unit(destination)
+
+
+func _find_warp_destination(actor: Unit, target: Unit, radius: int) -> Vector2i:
+	if actor == null or target == null or gameBoard == null or gameBoard.current_map == null:
+		return target.cell
+	var hex := AHexGrid2D.new(gameBoard.current_map)
+	var cells: Array = hex.find_aura(actor.cell, radius)
+	var best := target.cell
+	var best_distance := -1
+	for cell in cells:
+		if cell == actor.cell or cell == target.cell:
+			continue
+		if gameBoard.units.has(cell):
+			continue
+		var distance: int = hex.axial_distance(hex.oddq_to_axial(actor.cell), hex.oddq_to_axial(cell))
+		if distance > best_distance:
+			best = cell
+			best_distance = distance
+	return best
+
+
+func _find_rescue_destination(actor: Unit, target: Unit) -> Vector2i:
+	if actor == null or target == null or gameBoard == null or gameBoard.current_map == null:
+		return target.cell
+	var hex := AHexGrid2D.new(gameBoard.current_map)
+	hex._sort_solids()
+	var max_radius := maxi(1, int(Global.RESCUE_SEARCH_MAX_RADIUS))
+	for radius in range(1, max_radius + 1):
+		var ring := _get_rescue_ring_clockwise(hex, actor.cell, target.cell, radius)
+		for cell in ring:
+			if _is_valid_rescue_destination(hex, cell):
+				return cell
+	return target.cell
+
+
+func _get_rescue_ring_clockwise(hex: AHexGrid2D, center: Vector2i, target_cell: Vector2i, radius: int) -> Array[Vector2i]:
+	var ring := _get_hex_ring_clockwise(hex, center, radius)
+	if ring.is_empty():
+		return ring
+	var target_axial := hex.oddq_to_axial(target_cell)
+	var best_index := 0
+	var best_distance := 100000
+	for i in range(ring.size()):
+		var distance := hex.axial_distance(target_axial, hex.oddq_to_axial(ring[i]))
+		if distance < best_distance:
+			best_distance = distance
+			best_index = i
+	var rotated: Array[Vector2i] = []
+	for offset in range(ring.size()):
+		rotated.append(ring[(best_index + offset) % ring.size()])
+	return rotated
+
+
+func _get_hex_ring_clockwise(hex: AHexGrid2D, center: Vector2i, radius: int) -> Array[Vector2i]:
+	var axial_dirs: Array[Vector2i] = [
+		Vector2i(1, 0),
+		Vector2i(1, -1),
+		Vector2i(0, -1),
+		Vector2i(-1, 0),
+		Vector2i(-1, 1),
+		Vector2i(0, 1),
+	]
+	var axial := hex.oddq_to_axial(center) + axial_dirs[4] * radius
+	var ring: Array[Vector2i] = []
+	for side in range(6):
+		for _step in range(radius):
+			ring.append(hex.axial_to_oddq(axial))
+			axial += axial_dirs[side]
+	return ring
+
+
+func _is_valid_rescue_destination(hex: AHexGrid2D, cell: Vector2i) -> bool:
+	if not hex.is_valid_position(cell):
+		return false
+	if hex._is_solid_check(cell):
+		return false
+	if gameBoard.units.has(cell):
+		return false
+	return true
+
+# -------------------------
 # Durability
 # -------------------------
 
 func _reduce_actor_weapon_durability(actor: Unit, cost: int) -> void:
-	# PASS A: this is intentionally conservative—only reduces if we can confidently find an equipped item.
-	# You track durability on Item.dur. :contentReference[oaicite:8]{index=8}
 	if actor == null or cost <= 0:
 		return
 
@@ -202,9 +426,35 @@ func _reduce_actor_weapon_durability(actor: Unit, cost: int) -> void:
 	if item == null:
 		return
 
-	if item is Item:
-		# setter clamps & emits durability_reduced(item) :contentReference[oaicite:9]{index=9}
+	cost += _get_extra_weapon_durability_cost(actor, item)
+	_reduce_item_durability(actor, item, cost)
+
+
+func _reduce_item_durability(actor: Unit, item: Item, cost: int) -> void:
+	if actor == null or item == null or cost <= 0:
+		return
+	if not item.breakable:
+		return
+	if actor.has_method("reduce_durability"):
+		actor.reduce_durability(item, cost)
+	else:
 		item.dur = item.dur - cost
+
+
+func _get_extra_weapon_durability_cost(actor: Unit, weapon: Weapon) -> int:
+	if actor == null or weapon == null:
+		return 0
+	if weapon.category != Enums.WEAPON_CATEGORY.BOW:
+		return 0
+
+	var extra := 0
+	for acc: Accessory in actor.get_equipped_accs():
+		if acc is not Quiver:
+			continue
+		for effect: Effect in acc.effects:
+			if effect.type == Enums.EFFECT_TYPE.DURABILITY_COST:
+				extra += max(0, int(effect.value))
+	return extra
 
 func _get_equipped_item(actor: Unit):
 	# Adapt this to your actual inventory/equipment layout.
@@ -248,14 +498,28 @@ func _get_status_controller(unit: Unit):
 # Composure + misc
 # -------------------------
 
-func _apply_composure_delta(unit: Unit, delta: int) -> void:
+func _apply_composure_delta(unit: Unit, delta: int, reason := "") -> void:
 	if unit == null or delta == 0:
+		return
+	if unit.has_method("spend_composure") and unit.has_method("restore_composure"):
+		if delta > 0:
+			unit.spend_composure(delta, reason)
+		else:
+			unit.restore_composure(abs(delta), reason)
 		return
 	if unit.has_method("apply_composure"):
 		unit.apply_composure(delta)
 		return
 	if unit.get("composure"):
 		unit.composure = max(0, int(unit.composure) + delta)
+
+
+func _join_composure_reasons(reasons: Array) -> String:
+	var parts: Array[String] = []
+	for entry in reasons:
+		if typeof(entry) == TYPE_STRING:
+			parts.append(String(entry))
+	return ", ".join(parts)
 
 func _is_dead(unit: Unit) -> bool:
 	if unit == null:

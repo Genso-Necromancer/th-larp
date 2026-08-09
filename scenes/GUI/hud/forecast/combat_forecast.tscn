@@ -1,10 +1,19 @@
-[gd_scene load_steps=6 format=3 uid="uid://ct2rsfnl7fi6u"]
+[gd_scene load_steps=13 format=3 uid="uid://ct2rsfnl7fi6u"]
 
-[ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_3ryf8"]
 [ext_resource type="Theme" uid="uid://codhrldeva37q" path="res://fonts/Izayoi_Theme_Forecast.tres" id="1_4jwcs"]
-[ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_jeq77"]
+[ext_resource type="Theme" uid="uid://duj8g3xb2u1km" path="res://fonts/Izayoi_Theme_Forecast_nameplate.tres" id="1_57ak4"]
 [ext_resource type="Script" uid="uid://bqrxnm8bi7no" path="res://scenes/GUI/hud/forecast/combat_forecast.gd" id="2_npc5x"]
+[ext_resource type="Texture2D" uid="uid://dhionpvn3xogs" path="res://sprites/UI/combat_forecast/uinameplateside.png" id="3_ixerh"]
 [ext_resource type="Script" uid="uid://c2e1stpb6yppa" path="res://scenes/GUI/hud/forecast/animation_handler.gd" id="5_knule"]
+[ext_resource type="Texture2D" uid="uid://yqvhylmpexhw" path="res://sprites/UI/combat_forecast/uitop1.png" id="6_cf1h6"]
+[ext_resource type="Texture2D" uid="uid://srwjbhej6ne0" path="res://sprites/UI/combat_forecast/uitop2.png" id="7_7pmed"]
+[ext_resource type="Texture2D" uid="uid://boengwjenj8lk" path="res://sprites/UI/combat_forecast/uiside.png" id="9_cf1h6"]
+[ext_resource type="PackedScene" uid="uid://dtvwls0anv781" path="res://scenes/GUI/hud/forecast/scroll_hbox.tscn" id="10_7pmed"]
+[ext_resource type="PackedScene" uid="uid://ws1f3jg0wotp" path="res://scenes/GUI/hud/inventory/inventory_panel.tscn" id="11_57ak4"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_ewvfe"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_rtgu5"]
 
 [node name="CombatForecast" type="PanelContainer"]
 anchors_preset = 15
@@ -12,61 +21,87 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_vertical = 0
 theme = ExtResource("1_4jwcs")
 script = ExtResource("2_npc5x")
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="Dimmer" type="ColorRect" parent="PanelContainer"]
+[node name="dimmer" type="ColorRect" parent="."]
+z_index = -1
 layout_mode = 2
 mouse_filter = 2
 color = Color(0, 0, 0, 0.545098)
 
-[node name="ForecastMargin" type="MarginContainer" parent="."]
+[node name="AnimationHandler" type="MarginContainer" parent="."]
 layout_mode = 2
-theme_override_constants/margin_top = 100
+theme_override_constants/margin_top = 68
+script = ExtResource("5_knule")
 
-[node name="ForecastBox" type="VBoxContainer" parent="ForecastMargin"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 0
-alignment = 1
-
-[node name="StatRow" type="HBoxContainer" parent="ForecastMargin/ForecastBox"]
-layout_mode = 2
-size_flags_horizontal = 4
-size_flags_vertical = 0
-alignment = 1
-
-[node name="AtkPanel" type="PanelContainer" parent="ForecastMargin/ForecastBox/StatRow"]
-custom_minimum_size = Vector2(167, 147)
-layout_mode = 2
-
-[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="AMa" type="MarginContainer" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 8
-
-[node name="AVB" type="VBoxContainer" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa"]
-layout_mode = 2
-theme_override_constants/separation = 2
-
-[node name="NAME" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
-custom_minimum_size = Vector2(80, 16)
+[node name="background_right" type="TextureRect" parent="AnimationHandler"]
+custom_minimum_size = Vector2(520, 0)
 layout_mode = 2
 size_flags_horizontal = 8
+texture = ExtResource("9_cf1h6")
+expand_mode = 1
+stretch_mode = 5
+flip_h = true
+
+[node name="background_left" type="TextureRect" parent="AnimationHandler"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("9_cf1h6")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InitiateNode" type="Control" parent="AnimationHandler"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="InitiatorNode" type="Control" parent="AnimationHandler"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+
+[node name="stat_margin" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="center_vbox" type="VBoxContainer" parent="stat_margin"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_constants/separation = -65
+alignment = 1
+
+[node name="stat_hbox" type="HBoxContainer" parent="stat_margin/center_vbox"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_constants/separation = 70
+alignment = 1
+
+[node name="left_name_margin" type="MarginContainer" parent="stat_margin/center_vbox/stat_hbox"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="background" type="TextureRect" parent="stat_margin/center_vbox/stat_hbox/left_name_margin"]
+custom_minimum_size = Vector2(300, 150)
+layout_mode = 2
+texture = ExtResource("3_ixerh")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="NAME" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/left_name_margin"]
+custom_minimum_size = Vector2(80, 16)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_57ak4")
 bbcode_enabled = true
 text = "Null
 "
@@ -74,10 +109,29 @@ fit_content = true
 scroll_active = false
 autowrap_mode = 0
 shortcut_keys_enabled = false
-horizontal_alignment = 2
+horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="LIFE" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+[node name="left_stat_box" type="PanelContainer" parent="stat_margin/center_vbox/stat_hbox"]
+custom_minimum_size = Vector2(167, 147)
+layout_mode = 2
+
+[node name="background" type="TextureRect" parent="stat_margin/center_vbox/stat_hbox/left_stat_box"]
+layout_mode = 2
+texture = ExtResource("6_cf1h6")
+expand_mode = 3
+stretch_mode = 5
+
+[node name="MarginContainer" type="MarginContainer" parent="stat_margin/center_vbox/stat_hbox/left_stat_box"]
+layout_mode = 2
+theme_override_constants/margin_left = 62
+theme_override_constants/margin_top = 70
+
+[node name="VBoxContainer" type="VBoxContainer" parent="stat_margin/center_vbox/stat_hbox/left_stat_box/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="LIFE" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/left_stat_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(24, 10)
 layout_mode = 2
 size_flags_horizontal = 9
@@ -93,7 +147,7 @@ hint_underlined = false
 deselect_on_focus_loss_enabled = false
 text_direction = 1
 
-[node name="ACC" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+[node name="ACC" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/left_stat_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 9
@@ -105,7 +159,7 @@ shortcut_keys_enabled = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DMG" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+[node name="DMG" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/left_stat_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 9
@@ -117,7 +171,7 @@ shortcut_keys_enabled = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CRIT" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+[node name="CRIT" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/left_stat_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 9
@@ -129,7 +183,7 @@ shortcut_keys_enabled = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Weapon" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/AtkPanel/AMa/AVB"]
+[node name="Weapon" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/left_stat_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 size_flags_horizontal = 9
@@ -141,47 +195,28 @@ shortcut_keys_enabled = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Labels" type="PanelContainer" parent="ForecastMargin/ForecastBox/StatRow"]
+[node name="label_box" type="PanelContainer" parent="stat_margin/center_vbox/stat_hbox"]
 custom_minimum_size = Vector2(100, 0)
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/StatRow/Labels"]
+[node name="background" type="TextureRect" parent="stat_margin/center_vbox/stat_hbox/label_box"]
 layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
+texture = ExtResource("7_7pmed")
+expand_mode = 3
+stretch_mode = 5
 
-[node name="Margin" type="MarginContainer" parent="ForecastMargin/ForecastBox/StatRow/Labels"]
+[node name="MarginContainer" type="MarginContainer" parent="stat_margin/center_vbox/stat_hbox/label_box"]
 layout_mode = 2
 theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 8
+theme_override_constants/margin_top = 70
 theme_override_constants/margin_right = 4
 theme_override_constants/margin_bottom = 4
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin"]
+[node name="VBoxContainer" type="VBoxContainer" parent="stat_margin/center_vbox/stat_hbox/label_box/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="HSeparator" type="HSeparator" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
-self_modulate = Color(1, 1, 1, 0)
-custom_minimum_size = Vector2(0, 38)
-layout_mode = 2
-
-[node name="BLANK" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
-visible = false
-custom_minimum_size = Vector2(50, 16)
-layout_mode = 2
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
-shortcut_keys_enabled = false
-horizontal_alignment = 1
-vertical_alignment = 1
-
-[node name="LIFELB" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+[node name="LIFELB" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/label_box/MarginContainer/VBoxContainer"]
 layout_mode = 2
 bbcode_enabled = true
 text = "Life"
@@ -189,7 +224,7 @@ fit_content = true
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="ACCLB" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+[node name="ACCLB" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/label_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 bbcode_enabled = true
@@ -200,7 +235,7 @@ shortcut_keys_enabled = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DMGLB" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+[node name="DMGLB" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/label_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 bbcode_enabled = true
@@ -211,7 +246,7 @@ shortcut_keys_enabled = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CRITLB" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+[node name="CRITLB" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/label_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 bbcode_enabled = true
@@ -222,7 +257,7 @@ shortcut_keys_enabled = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="WepLb" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/Labels/Margin/VBoxContainer"]
+[node name="WepLb" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/label_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 bbcode_enabled = true
@@ -233,40 +268,27 @@ shortcut_keys_enabled = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TargetPanel" type="PanelContainer" parent="ForecastMargin/ForecastBox/StatRow"]
+[node name="right_stat_box" type="PanelContainer" parent="stat_margin/center_vbox/stat_hbox"]
 custom_minimum_size = Vector2(167, 147)
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel"]
+[node name="background" type="TextureRect" parent="stat_margin/center_vbox/stat_hbox/right_stat_box"]
 layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
+texture = ExtResource("6_cf1h6")
+expand_mode = 3
+stretch_mode = 5
+flip_h = true
 
-[node name="TMa" type="MarginContainer" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="stat_margin/center_vbox/stat_hbox/right_stat_box"]
 layout_mode = 2
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_right = 8
+theme_override_constants/margin_top = 70
+theme_override_constants/margin_right = 57
 
-[node name="TVB" type="VBoxContainer" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa"]
+[node name="VBoxContainer" type="VBoxContainer" parent="stat_margin/center_vbox/stat_hbox/right_stat_box/MarginContainer"]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="NAME" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
-custom_minimum_size = Vector2(80, 16)
-layout_mode = 2
-size_flags_horizontal = 0
-bbcode_enabled = true
-text = "Null"
-fit_content = true
-scroll_active = false
-shortcut_keys_enabled = false
-vertical_alignment = 1
-
-[node name="LIFE" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+[node name="LIFE" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/right_stat_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(15, 10)
 layout_mode = 2
 bbcode_enabled = true
@@ -279,7 +301,7 @@ meta_underlined = false
 hint_underlined = false
 deselect_on_focus_loss_enabled = false
 
-[node name="ACC" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+[node name="ACC" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/right_stat_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 bbcode_enabled = true
@@ -290,7 +312,7 @@ shortcut_keys_enabled = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="DMG" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+[node name="DMG" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/right_stat_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 bbcode_enabled = true
@@ -301,7 +323,7 @@ shortcut_keys_enabled = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="CRIT" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+[node name="CRIT" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/right_stat_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 0)
 layout_mode = 2
 bbcode_enabled = true
@@ -312,7 +334,7 @@ shortcut_keys_enabled = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Weapon" type="RichTextLabel" parent="ForecastMargin/ForecastBox/StatRow/TargetPanel/TMa/TVB"]
+[node name="Weapon" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/right_stat_box/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(50, 16)
 layout_mode = 2
 bbcode_enabled = true
@@ -323,114 +345,58 @@ shortcut_keys_enabled = false
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="EffectRow" type="HBoxContainer" parent="ForecastMargin/ForecastBox"]
+[node name="right_name_margin" type="MarginContainer" parent="stat_margin/center_vbox/stat_hbox"]
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="background" type="TextureRect" parent="stat_margin/center_vbox/stat_hbox/right_name_margin"]
+custom_minimum_size = Vector2(300, 150)
+layout_mode = 2
+texture = ExtResource("3_ixerh")
+expand_mode = 2
+stretch_mode = 5
+
+[node name="NAME" type="RichTextLabel" parent="stat_margin/center_vbox/stat_hbox/right_name_margin"]
+custom_minimum_size = Vector2(80, 16)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme = ExtResource("1_57ak4")
+bbcode_enabled = true
+text = "Null"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
+shortcut_keys_enabled = false
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="HSeparator2" type="HSeparator" parent="stat_margin/center_vbox"]
+layout_mode = 2
+theme_override_constants/separation = 59
+theme_override_styles/separator = SubResource("StyleBoxEmpty_ewvfe")
+
+[node name="scroll_hbox" parent="stat_margin/center_vbox" instance=ExtResource("10_7pmed")]
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 0
-alignment = 1
+theme_override_constants/separation = 23
+alignment = 0
 
-[node name="AtkEfPanel" type="PanelContainer" parent="ForecastMargin/ForecastBox/EffectRow"]
-custom_minimum_size = Vector2(70, 0)
+[node name="VSeparator" parent="stat_margin/center_vbox/scroll_hbox" index="1"]
+theme_override_constants/separation = 800
+
+[node name="HSeparator" type="HSeparator" parent="stat_margin/center_vbox"]
+layout_mode = 2
+theme_override_constants/separation = 153
+theme_override_styles/separator = SubResource("StyleBoxEmpty_rtgu5")
+
+[node name="TradePnl" parent="stat_margin/center_vbox" instance=ExtResource("11_57ak4")]
+z_index = -1
 layout_mode = 2
 
-[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/EffectRow/AtkEfPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="AMa" type="MarginContainer" parent="ForecastMargin/ForecastBox/EffectRow/AtkEfPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 10
-
-[node name="AVB" type="VBoxContainer" parent="ForecastMargin/ForecastBox/EffectRow/AtkEfPanel/AMa"]
-layout_mode = 2
-theme_override_constants/separation = 2
-
-[node name="Labels2" type="PanelContainer" parent="ForecastMargin/ForecastBox/EffectRow"]
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-
-[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/EffectRow/Labels2"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="Margin" type="MarginContainer" parent="ForecastMargin/ForecastBox/EffectRow/Labels2"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 10
-
-[node name="VBoxContainer" type="VBoxContainer" parent="ForecastMargin/ForecastBox/EffectRow/Labels2/Margin"]
-layout_mode = 2
-theme_override_constants/separation = 2
-
-[node name="EFFLB" type="RichTextLabel" parent="ForecastMargin/ForecastBox/EffectRow/Labels2/Margin/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-mouse_filter = 1
-bbcode_enabled = true
-text = "[center]Effects[/center]"
-fit_content = true
-scroll_active = false
-
-[node name="TargetEfPanel" type="PanelContainer" parent="ForecastMargin/ForecastBox/EffectRow"]
-custom_minimum_size = Vector2(70, 0)
-layout_mode = 2
-
-[node name="BackgroundCenter2" type="NinePatchRect" parent="ForecastMargin/ForecastBox/EffectRow/TargetEfPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-texture = ExtResource("1_3ryf8")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="TMa" type="MarginContainer" parent="ForecastMargin/ForecastBox/EffectRow/TargetEfPanel"]
-layout_mode = 2
-theme = ExtResource("1_jeq77")
-theme_override_constants/margin_left = 4
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 4
-theme_override_constants/margin_bottom = 10
-
-[node name="TVB" type="VBoxContainer" parent="ForecastMargin/ForecastBox/EffectRow/TargetEfPanel/TMa"]
-layout_mode = 2
-theme_override_constants/separation = 2
-alignment = 2
-
-[node name="GridContainer" type="GridContainer" parent="ForecastMargin"]
-layout_mode = 2
-
-[node name="AnimationHandler" type="MarginContainer" parent="."]
-layout_mode = 2
-theme_override_constants/margin_left = 200
-theme_override_constants/margin_top = 200
-theme_override_constants/margin_right = 200
-theme_override_constants/margin_bottom = 200
-script = ExtResource("5_knule")
-
-[node name="InitiatorNode" type="Control" parent="AnimationHandler"]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 0
-
-[node name="InitiateNode" type="Control" parent="AnimationHandler"]
-layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 0
+[editable path="stat_margin/center_vbox/scroll_hbox"]

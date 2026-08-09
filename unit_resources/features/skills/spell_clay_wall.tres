@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="Skill" load_steps=5 format=3]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_cwall"]
+[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_cwall"]
+[ext_resource type="Resource" path="res://unit_resources/effects/buff_def_self03.tres" id="3_cwall"]
+[ext_resource type="Resource" path="res://unit_resources/effects/debuff_self_move02.tres" id="4_cwall"]
+
+[resource]
+script = ExtResource("2_cwall")
+augment = false
+magical = true
+element = 5
+target = 1
+can_miss = false
+can_crit = false
+can_dmg = false
+min_reach = 0
+max_reach = 0
+cost = 6
+weapon_category = 1
+sub_group = 0
+bonus_min_range = 0
+bonus_max_range = 0
+hit = 100
+dmg = 0
+crit = 0
+crit_min = 0
+crit_max = 0
+dmg_type = 0
+effects = Array[ExtResource("1_cwall")]([ExtResource("3_cwall"), ExtResource("4_cwall")])
+feature_id = "spell_stone_body"
+rule_type = 0
+metadata/_custom_type_script = "uid://cc71mceo7glas"

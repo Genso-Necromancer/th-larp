@@ -1,0 +1,198 @@
+[gd_scene load_steps=10 format=3 uid="uid://niqbht2w5xkr"]
+
+[ext_resource type="Theme" uid="uid://cb07g0akruuvi" path="res://fonts/Izayoi_Theme_Forecast_Effects.tres" id="1_76pr2"]
+[ext_resource type="Texture2D" uid="uid://dss8r2jmfxocs" path="res://sprites/UI/combat_forecast/uiscrolltop2.png" id="3_gbxbw"]
+[ext_resource type="Texture2D" uid="uid://83pnqglyo382" path="res://sprites/UI/combat_forecast/uiscrollback2.png" id="4_76pr2"]
+[ext_resource type="Script" uid="uid://cvctmy00ebiio" path="res://scenes/GUI/hud/forecast/effect_scroll.gd" id="5_80cte"]
+[ext_resource type="Texture2D" uid="uid://c6kg8vqiell6m" path="res://sprites/UI/combat_forecast/uiscrollbottom2.png" id="5_xxwln"]
+
+[sub_resource type="Animation" id="Animation_u7wk6"]
+resource_name = "CLOSE"
+length = 0.27
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("scroll_skeleton/scroll_back/scroll_bottom:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.27),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(0, 475), Vector2(0, 145)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("scroll_skeleton/scroll_back/scroll_bottom:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="Animation" id="Animation_gbxbw"]
+resource_name = "OPEN"
+length = 0.66
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("scroll_skeleton/scroll_back/scroll_bottom:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 145), Vector2(0, 485), Vector2(0, 465), Vector2(0, 475)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("scroll_skeleton/scroll_back/scroll_bottom:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [0.0, 0.0]
+}
+
+[sub_resource type="Animation" id="Animation_76pr2"]
+resource_name = "RESET"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("scroll_skeleton/scroll_back/scroll_bottom:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 475)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("scroll_skeleton/scroll_back:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("scroll_skeleton/scroll_back/scroll_bottom:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [0.0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_u7wk6"]
+_data = {
+&"CLOSE": SubResource("Animation_u7wk6"),
+&"OPEN": SubResource("Animation_gbxbw"),
+&"RESET": SubResource("Animation_76pr2")
+}
+
+[node name="effect_scroll" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("1_76pr2")
+script = ExtResource("5_80cte")
+
+[node name="scroll_top" type="TextureRect" parent="."]
+layout_mode = 1
+offset_right = 500.0
+offset_bottom = 234.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("3_gbxbw")
+metadata/_edit_use_anchors_ = true
+
+[node name="scroll_back" type="Polygon2D" parent="scroll_top"]
+show_behind_parent = true
+position = Vector2(68, 66)
+texture = ExtResource("4_76pr2")
+skeleton = NodePath("../../scroll_skeleton")
+polygon = PackedVector2Array(381, -16, 381, 560, -18.9999, 560, -18.9999, -16, -21, 128, 385, 130, -19, 522)
+uv = PackedVector2Array(381, -16, 381, 560, -18.9999, 560, -18.9999, -16, -21, 128, 385, 130, -19, 492)
+polygons = [PackedInt32Array(4, 0, 5), PackedInt32Array(1, 6, 4, 5)]
+bones = ["scroll_back", PackedFloat32Array(1, 0, 0, 1, 1, 1, 0), "scroll_back/scroll_bottom", PackedFloat32Array(0, 1, 0, 0, 0, 0, 1)]
+internal_vertex_count = 3
+
+[node name="scroll_bottom" type="Polygon2D" parent="scroll_top/scroll_back"]
+position = Vector2(-36, 480)
+texture = ExtResource("5_xxwln")
+skeleton = NodePath("../../../scroll_skeleton")
+polygon = PackedVector2Array(-3, -16, 445, -16, 445, 112, -3, 112)
+uv = PackedVector2Array(-3, -16, 445, -16, 445, 112, -3, 112)
+polygons = [PackedInt32Array(0, 3, 2, 1)]
+bones = ["scroll_back", PackedFloat32Array(0, 0, 0, 0), "scroll_back/scroll_bottom", PackedFloat32Array(1, 1, 1, 1)]
+
+[node name="effect_margin" type="MarginContainer" parent="scroll_top"]
+layout_mode = 0
+offset_left = 111.0
+offset_top = 202.0
+offset_right = 419.0
+offset_bottom = 302.0
+scale = Vector2(0.97067, 0.886492)
+theme_override_constants/margin_left = 4
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 10
+
+[node name="effect_vbox" type="VBoxContainer" parent="scroll_top/effect_margin"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="test1" type="RichTextLabel" parent="scroll_top/effect_margin/effect_vbox"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "On Hit: [color=#c50505]Kill[/color] Yasa"
+fit_content = true
+
+[node name="test2" type="RichTextLabel" parent="scroll_top/effect_margin/effect_vbox"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+bbcode_enabled = true
+text = "On Hit: [color=#c50505]Kill[/color] Yasa"
+fit_content = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_u7wk6")
+}
+playback_default_blend_time = 0.01
+
+[node name="scroll_skeleton" type="Skeleton2D" parent="."]
+position = Vector2(123, 68)
+scale = Vector2(0.5, 0.5)
+
+[node name="scroll_back" type="Bone2D" parent="scroll_skeleton"]
+rest = Transform2D(1, 0, 0, 1, 0, 0)
+
+[node name="scroll_bottom" type="Bone2D" parent="scroll_skeleton/scroll_back"]
+position = Vector2(0, 475)
+scale = Vector2(0.999999, 0.999999)
+rest = Transform2D(0.999999, 0, 0, 0.999999, 0, 475)

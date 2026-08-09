@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="QuiverResource" load_steps=4 format=3 uid="uid://dudp8pfuflveb"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_wavw6"]
+[ext_resource type="Resource" path="res://unit_resources/effects/durability_cost_plus01.tres" id="2_5h8al"]
+[ext_resource type="Script" uid="uid://b8m6qwwkj7p1t" path="res://unit_resources/items/accessories/quiver/quiver_resource.gd" id="3_e4v6j"]
+
+[resource]
+resource_name = "quiver_basic"
+script = ExtResource("3_e4v6j")
+personal = false
+level = 1
+use = false
+equippable = true
+breakable = false
+expendable = false
+trade = true
+max_dur = 1
+weight = 0
+category = 11
+sub_group = 0
+effects = Array[ExtResource("1_wavw6")]([ExtResource("2_5h8al")])
+id = "quiver_basic"
+rule_type = 0

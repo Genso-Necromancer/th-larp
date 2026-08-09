@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Passive" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="1_shade"]
+
+[resource]
+resource_name = "shade"
+script = ExtResource("1_shade")
+type = 14
+proc = 100
+sub_type = 0
+id = "shade"
+rule_type = 0
+metadata/_custom_type_script = "uid://c5hmv6tclm43r"
