@@ -1,0 +1,67 @@
+[gd_scene load_steps=4 format=3 uid="uid://p5bfq4mghjpy"]
+
+[ext_resource type="Script" uid="uid://deh415y1vqqlh" path="res://scenes/GUI/ui_panels/item_prompt.gd" id="1_1hwx7"]
+[ext_resource type="Texture2D" uid="uid://bxufrvbyoeegj" path="res://scenes/GUI/hud/focus_viewer/terrain_tracker_textbox.png" id="1_o70q7"]
+[ext_resource type="PackedScene" uid="uid://cpayroch3dxjg" path="res://scenes/GUI/item_button.tscn" id="2_1hwx7"]
+
+[node name="item_prompt" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+script = ExtResource("1_1hwx7")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -19.0
+offset_right = 20.0
+offset_bottom = 19.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="NinePatchRect" type="NinePatchRect" parent="PanelContainer"]
+layout_mode = 2
+mouse_filter = 1
+texture = ExtResource("1_o70q7")
+region_rect = Rect2(0, 0, 446, 153)
+patch_margin_left = 19
+patch_margin_top = 19
+patch_margin_right = 21
+patch_margin_bottom = 19
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+
+[node name="ItemButton" parent="PanelContainer/MarginContainer" instance=ExtResource("2_1hwx7")]
+layout_mode = 2
+mouse_filter = 1
+
+[node name="CurrencyHBox" type="HBoxContainer" parent="PanelContainer/MarginContainer"]
+visible = false
+layout_mode = 2
+
+[node name="CurrencyValueLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer/CurrencyHBox"]
+layout_mode = 2
+mouse_filter = 1
+bbcode_enabled = true
+text = "#"
+fit_content = true
+autowrap_mode = 0
+
+[node name="StaticLabel" type="RichTextLabel" parent="PanelContainer/MarginContainer/CurrencyHBox"]
+layout_mode = 2
+mouse_filter = 1
+bbcode_enabled = true
+text = "Mon"
+fit_content = true
+autowrap_mode = 0

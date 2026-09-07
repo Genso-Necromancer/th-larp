@@ -123,8 +123,10 @@ grow_vertical = 2
 [node name="MarginContainer" type="MarginContainer" parent="TradeContainer"]
 layout_mode = 2
 theme_override_constants/margin_top = 150
+theme_override_constants/margin_bottom = 200
 
 [node name="TradeScreenVBox" type="VBoxContainer" parent="TradeContainer/MarginContainer"]
+custom_minimum_size = Vector2(0, 1100)
 layout_mode = 2
 theme_override_constants/separation = 0
 
@@ -212,6 +214,7 @@ vertical_alignment = 1
 text_overrun_behavior = 1
 
 [node name="ConvoyPnl" parent="TradeContainer/MarginContainer/TradeScreenVBox/HBoxContainer" instance=ExtResource("9_fjgok")]
+visible = false
 layout_mode = 2
 _style = "Trade"
 

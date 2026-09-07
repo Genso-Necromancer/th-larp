@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://fintg3obgvjl"
-path="res://.godot/imported/th1.png-a50c9aafeab21045b88b528da2582b60.ctex"
+uid="uid://cavj6hcdnm10j"
+path="res://.godot/imported/th2.png-ebd77cde6bc427ce30e1533fe196dcc8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/th1.png"
-dest_files=["res://.godot/imported/th1.png-a50c9aafeab21045b88b528da2582b60.ctex"]
+source_file="res://sprites/character/patchouli/scene_sprites/th2.png"
+dest_files=["res://.godot/imported/th2.png-ebd77cde6bc427ce30e1533fe196dcc8.ctex"]
 
 [params]
 

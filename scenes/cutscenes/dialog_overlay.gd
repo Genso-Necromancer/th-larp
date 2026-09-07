@@ -18,6 +18,12 @@ signal _dialogue_fade_finished
 @onready var default_font_size = text_body.label_settings.font_size
 
 const EVENTS_DIR = "res://scenes/cutscenes/scene_events"
+const KNOWN_ANIMATIONS := ["slide", "shake", "hop", "double_hop", "interact", "toggle_fade", "question"]
+const KNOWN_EFFECTS := ["portrait-sil", "portrait-normal", "dim", "loud", "quiet", "zoom", "teleport", "sound"]
+const TARGETED_ANIMATIONS := ["slide", "shake", "hop", "double_hop", "interact", "toggle_fade", "question"]
+const TARGETED_EFFECTS := ["portrait-sil", "portrait-normal", "dim", "zoom", "teleport"]
+const POSITIONED_ANIMATIONS := ["slide"]
+const POSITIONED_EFFECTS := ["teleport"]
 
 var letter_time : float = 0.02
 var space_time : float = letter_time * 2.0
@@ -32,6 +38,7 @@ var dialogue_finished := false
 var speaker_portraits := {}  # Dictionary<String, PortraitRect>
 var textline_index := -1
 var current_event : Array[Dictionary] = []
+var last_scene_errors:Array[String] = []
 var example_dict : Array[Dictionary] = [
 	{
 		"active_speaker": "Remi",
@@ -92,12 +99,12 @@ var speaker_setup = [
 	{
 		"name": "Pakooli",
 		"title": "magical girl",
-		"portrait": "res://sprites/th2.png"
+		"portrait": "res://sprites/character/patchouli/scene_sprites/th2.png"
 	},
 	{
 		"name": "Remi",
 		"title": "fiary stomper",
-		"portrait": "res://sprites/th1.png"
+		"portrait": "res://sprites/character/remilia/scene_sprites/th1.png"
 	}
 ]
 
@@ -178,16 +185,107 @@ func _conclude_dialog() -> void:
 	dialog_finished.emit()
 
 
+func _abort_dialogue_start(reason:String) -> void:
+	push_error("[DialogueOverlay] " + reason)
+	dialogue_finished = true
+	dialog_finished.emit()
+
+
+func _get_known_speaker_names() -> Array[String]:
+	var names:Array[String] = []
+	for speaker in speaker_setup:
+		names.append(String(speaker.get("name", "")))
+	return names
+
+
+func _validate_scene_event(event:Array[Dictionary], source:String = "") -> bool:
+	last_scene_errors.clear()
+	var speaker_names := _get_known_speaker_names()
+	if event.is_empty():
+		last_scene_errors.append("Scene has no lines.")
+	for line_index in range(event.size()):
+		var line := event[line_index]
+		_validate_scene_line(line, line_index, speaker_names)
+	for error in last_scene_errors:
+		push_error("[DialogueOverlay] Scene validation error%s: %s" % [_source_suffix(source), error])
+	return last_scene_errors.is_empty()
+
+
+func _validate_scene_line(line:Dictionary, line_index:int, speaker_names:Array[String]) -> void:
+	var line_number := line_index + 1
+	var active_speaker := String(line.get("active_speaker", ""))
+	if active_speaker != "" and active_speaker != "none" and not speaker_names.has(active_speaker):
+		last_scene_errors.append("line %s uses unknown active_speaker '%s'." % [line_number, active_speaker])
+	var background := String(line.get("background", ""))
+	if background != "" and background != "null" and background != "none" and not ResourceLoader.exists(background):
+		last_scene_errors.append("line %s uses missing background '%s'." % [line_number, background])
+	_validate_scene_actions(line.get("animations", []), line_index, "animation", KNOWN_ANIMATIONS, TARGETED_ANIMATIONS, POSITIONED_ANIMATIONS, speaker_names)
+	_validate_scene_actions(line.get("effects", []), line_index, "effect", KNOWN_EFFECTS, TARGETED_EFFECTS, POSITIONED_EFFECTS, speaker_names)
+
+
+func _validate_scene_actions(actions, line_index:int, action_label:String, known_names:Array, targeted_names:Array, positioned_names:Array, speaker_names:Array[String]) -> void:
+	var line_number := line_index + 1
+	if actions == null:
+		return
+	if typeof(actions) != TYPE_ARRAY:
+		last_scene_errors.append("line %s '%ss' field must be an Array." % [line_number, action_label])
+		return
+	for action_index in range(actions.size()):
+		var action_number := action_index + 1
+		var action = actions[action_index]
+		if typeof(action) != TYPE_DICTIONARY:
+			last_scene_errors.append("line %s %s %s must be a Dictionary." % [line_number, action_label, action_number])
+			continue
+		var action_name := String(action.get("name", ""))
+		if action_name == "":
+			last_scene_errors.append("line %s %s %s is missing a name." % [line_number, action_label, action_number])
+			continue
+		if not known_names.has(action_name):
+			last_scene_errors.append("line %s %s %s has unknown name '%s'." % [line_number, action_label, action_number, action_name])
+			continue
+		if targeted_names.has(action_name):
+			var target := String(action.get("target", ""))
+			if target == "" or not speaker_names.has(target):
+				last_scene_errors.append("line %s %s '%s' uses unknown target '%s'." % [line_number, action_label, action_name, target])
+		if positioned_names.has(action_name) and not action.has("pos"):
+			last_scene_errors.append("line %s %s '%s' is missing 'pos'." % [line_number, action_label, action_name])
+		if action_name == "sound" and not action.has("sound"):
+			last_scene_errors.append("line %s effect 'sound' is missing 'sound'." % [line_number])
+
+
+func _source_suffix(source:String) -> String:
+	if source == "":
+		return ""
+	return " in %s" % [source]
+
+
+func _get_speaker_portrait(speaker_name:String, context:String = "") -> PortraitRect:
+	if speaker_portraits.has(speaker_name):
+		return speaker_portraits[speaker_name]
+	push_warning("[DialogueOverlay] Unknown speaker '%s'%s." % [speaker_name, _source_suffix(context)])
+	return null
+
+
 #Now called when a new map is loaded, right after the splash screen. See MapManager:_on_gui_splash_finished(). Will be called in more varied ways
 ##SceneScripts are stored on the map associated with them. There is to be a Start and End scene to each Chapter that daisy chains things together with a moment for saving/loading in-between last End and new Start
 func prepare_new_dialogue(new_event:String= ""):
 	dialogue_finished = false
 	var parser = JasonParser.new()
-	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE) #Used to avoid conflicting inputs. Currently only uses ACCEPT_PROMPT input script, could extend GenericScript to make a new one specifically for this scene. You'll know what to do when you look at existing ones.
 	if new_event: 
 		var eventDick : Array[Dictionary] = parser.parse_json(new_event)
+		if not parser.last_error.is_empty():
+			_abort_dialogue_start(parser.last_error)
+			return
+		if not _validate_scene_event(eventDick, new_event):
+			_abort_dialogue_start("Scene validation failed%s." % [_source_suffix(new_event)])
+			return
 		current_event = eventDick
-	else: current_event = example_dict #subverts variable typing to give a dictionary as default, normally only want to pass ScenScript Resource
+	else:
+		current_event = example_dict #subverts variable typing to give a dictionary as default, normally only want to pass ScenScript Resource
+		if not _validate_scene_event(current_event, "example_dict"):
+			_abort_dialogue_start("Example scene validation failed.")
+			return
+	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE) #Used to avoid conflicting inputs. Currently only uses ACCEPT_PROMPT input script, could extend GenericScript to make a new one specifically for this scene. You'll know what to do when you look at existing ones.
 	toggle_dialog()
 	for speaker in speaker_setup:
 		var new_portrait:PortraitRect= portrait.instantiate()
@@ -214,9 +312,13 @@ func prepare_new_dialogue(new_event:String= ""):
 
 func next_textline(scrub : bool = false):
 	textline_index += 1
+	if textline_index < 0 or textline_index >= current_event.size():
+		_conclude_dialog()
+		return
 	if !scrub:
 		debug_line_track.value = textline_index
 	anims_finished = 0
+	expected_anims = 0
 	skip_text = scrub
 	var speed = 1.0
 	if scrub: speed = 0.1
@@ -250,7 +352,11 @@ func next_textline(scrub : bool = false):
 	var has_active_speaker = true if cur_line.get("active_speaker","") != "" else false
 	if has_active_speaker:
 		if cur_line.active_speaker != "none":
-			var active_speaker = speaker_portraits[ cur_line.active_speaker ]
+			var active_speaker := _get_speaker_portrait(cur_line.active_speaker, "line %s" % [textline_index + 1])
+			if active_speaker == null:
+				bobber_check.emit("animations_complete")
+				bobber_check.emit("effects_complete")
+				return
 			name_label.text = active_speaker.speaker_name
 			title_label.text = active_speaker.speaker_title
 			active_speaker.visible = true
@@ -280,56 +386,78 @@ func next_textline(scrub : bool = false):
 	if has_effects: # TODO Add a default-to-Active_Speaker fallback if no Target is specified?
 		bobber_check.emit("effects_complete")
 		for eff in cur_line.effects:
-			match eff.name:
+			var effect_name := String(eff.get("name", ""))
+			if not KNOWN_EFFECTS.has(effect_name):
+				push_warning("[DialogueOverlay] Unknown effect '%s' on line %s." % [effect_name, textline_index + 1])
+				continue
+			var effect_target:PortraitRect = null
+			if TARGETED_EFFECTS.has(effect_name):
+				effect_target = _get_speaker_portrait(String(eff.get("target", "")), "line %s effect '%s'" % [textline_index + 1, effect_name])
+				if effect_target == null:
+					continue
+			match effect_name:
 				"portrait-sil":
-					speaker_portraits[eff.target].modulate = Color(0,0,0)
+					effect_target.modulate = Color(0,0,0)
 				"portrait-normal":
-					speaker_portraits[eff.target].modulate = Color(1,1,1)
+					effect_target.modulate = Color(1,1,1)
 				"dim":
-					speaker_portraits[eff.target].dim()
+					effect_target.dim()
 				"loud":
 					text_body.label_settings.font_size *= 1.8
 				"quiet":
 					text_body.label_settings.font_size *= 0.8
 				"zoom":
-					speaker_portraits[eff.target].zoom()
+					effect_target.zoom()
 				"teleport":
-					speaker_portraits[eff.target].teleport(eff.pos)
+					effect_target.teleport(eff.pos)
 				"sound":
 					if scrub: break
-					match eff.sound:
+					match String(eff.get("sound", "")):
 						"surprise":
 							$AudioStreamPlayer_surprise.play()
 						_:
 							pass
 				_:
-					break
+					continue
 	else:
 		bobber_check.emit("effects_complete")
 	
 	var has_animations = true if !cur_line.get("animations",[]).is_empty() else false
 	if has_animations:
+		var dispatched_animations := 0
 		for anim in cur_line.animations:
-			match anim.name:
+			var anim_name := String(anim.get("name", ""))
+			if not KNOWN_ANIMATIONS.has(anim_name):
+				push_warning("[DialogueOverlay] Unknown animation '%s' on line %s." % [anim_name, textline_index + 1])
+				continue
+			var anim_target := _get_speaker_portrait(String(anim.get("target", "")), "line %s animation '%s'" % [textline_index + 1, anim_name])
+			if anim_target == null:
+				continue
+			dispatched_animations += 1
+			match anim_name:
 				"slide":
-					speaker_portraits[anim.target].slide(anim.pos, speed)
+					anim_target.slide(anim.pos, speed)
 				"shake":
-					speaker_portraits[anim.target].shake(speed)
+					anim_target.shake(speed)
 				"hop":
-					speaker_portraits[anim.target].hop()
+					anim_target.hop()
 					if !scrub: $AudioStreamPlayer_fwip.play()
 				"double_hop":
-					speaker_portraits[anim.target].double_hop(speed)
+					anim_target.double_hop(speed)
 					if !scrub: $AudioStreamPlayer_fwip.play()
 				"interact":
-					speaker_portraits[anim.target].interact(speed)
+					anim_target.interact(speed)
 				"toggle_fade":
-					speaker_portraits[anim.target].toggle_fade(speed)
+					anim_target.toggle_fade(speed)
 				"question":
-					speaker_portraits[anim.target].show_question(speed)
+					anim_target.show_question(speed)
 				_:
-					break
+					continue
+		expected_anims = dispatched_animations
+		if dispatched_animations == 0:
+			bobber_check.emit("animations_complete")
 	else:
+		expected_anims = 0
 		bobber_check.emit("animations_complete")
 
 
@@ -355,14 +483,15 @@ func toggle_dialog():
 
 
 var anims_finished = 0
+var expected_anims = 0
 func _on_anim_finished():
 	if !current_event[textline_index].has("animations"): return
 	
 	anims_finished += 1
 	if Global.flags.DebugMode:
-		print("(Alon) Animation %s of %s finished." % [anims_finished, current_event[textline_index]["animations"].size()])
+		print("(Alon) Animation %s of %s finished." % [anims_finished, expected_anims])
 	
-	if anims_finished == current_event[textline_index]["animations"].size():
+	if anims_finished >= expected_anims:
 		if !current_event[textline_index].has("text"):
 			await get_tree().create_timer(0.6).timeout # Delay anim-only lines
 		bobber_check.emit("animations_complete")
@@ -484,7 +613,7 @@ func _on_text_changed(index:int):
 
 
 func _on_speaker_changed(selected_id:int, index:int):
-	current_event[index]["active_speaker"] = ("none" if selected_id < 0 else speaker_setup[selected_id-1].name)
+	current_event[index]["active_speaker"] = ("none" if selected_id <= 0 else speaker_setup[selected_id-1].name)
 
 
 func swap_lines(a:int, b:int):
@@ -611,8 +740,12 @@ func _on_load_scene_button_pressed():
 	var file_name = load_dropdown.get_item_text(idx)
 	var path = EVENTS_DIR + "/" + file_name
 	var parser = JasonParser.new()
-	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE)
 	var eventDick : Array[Dictionary] = parser.parse_json(path)
+	if not parser.last_error.is_empty():
+		return
+	if not _validate_scene_event(eventDick, path):
+		return
+	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE)
 	current_event = eventDick
 	
 	dialogue_finished = false

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cavj6hcdnm10j"
-path="res://.godot/imported/th2.png-4c127b1d1e4e8933cc1e35dc2d15549c.ctex"
+uid="uid://fintg3obgvjl"
+path="res://.godot/imported/th1.png-3e6b54e3cbbffb3d875d11322022a627.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/th2.png"
-dest_files=["res://.godot/imported/th2.png-4c127b1d1e4e8933cc1e35dc2d15549c.ctex"]
+source_file="res://sprites/character/remilia/scene_sprites/th1.png"
+dest_files=["res://.godot/imported/th1.png-3e6b54e3cbbffb3d875d11322022a627.ctex"]
 
 [params]
 

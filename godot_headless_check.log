@@ -1,0 +1,148 @@
+Godot Engine v4.4.stable.official.4c311cbee - https://godotengine.org
+TextServer: Added interface "Dummy"
+TextServer: Added interface "ICU / HarfBuzz / Graphite (Built-in)"
+Using "default" pen tablet driver...
+
+TextServer: Primary interface set to: "ICU / HarfBuzz / Graphite (Built-in)".
+Loading resource: res://fonts/Izayoi_Theme.tres
+Loading resource: res://fonts/JimNightshade/JimNightshade.otf
+Loading resource: res://.godot/imported/JimNightshade.otf-e0f2fd2b51e1a9b812f0847335b6cdb2.fontdata
+Loading resource: res://fonts/Marcellus/Marcellus.otf
+Loading resource: res://.godot/imported/Marcellus.otf-b0df47769a8ae297312cc253a406f835.fontdata
+Loading resource: res://default_bus_layout.tres
+CORE API HASH: 3954330213
+EDITOR API HASH: 1116905369
+Loading resource: res://scrpt/global/enums.gd
+Loading resource: res://scrpt/global/signal_tower.gd
+Loading resource: res://scenes/animations/combat/fx/gen/fx_pop_up.tscn
+Loading resource: res://scenes/animations/combat/fx/gen/fx_pop_up.gd
+Loading resource: res://scenes/turn_tracker.tscn
+Loading resource: res://scenes/TurnTracker.gd
+Loading resource: res://scenes/turn_token.tscn
+Loading resource: res://sprites/UI/turn_tokens.png
+Loading resource: res://.godot/imported/turn_tokens.png-8d878101a8394395151f115dacd51667.ctex
+Loading resource: res://scenes/turn_token.gd
+Loading resource: res://scenes/cutscenes/dialog_overlay.tscn
+Loading resource: res://scenes/cutscenes/dialog_overlay.gd
+Loading resource: res://scenes/cutscenes/speaker_portrait.tscn
+Loading resource: res://scenes/cutscenes/PortraitRect.gd
+Loading resource: res://scenes/cutscenes/questionMarkWobble.gdshader
+Loading resource: res://sprites/dialogue_particles/question_mark_particle.png
+Loading resource: res://.godot/imported/question_mark_particle.png-c2bc0d6d2950e418bd5c5af43117b3a7.ctex
+Loading resource: res://scenes/LineEditor.tscn
+Loading resource: res://fonts/IzayoiMonospaced-nwoY.ttf
+Loading resource: res://.godot/imported/IzayoiMonospaced-nwoY.ttf-baf28ca07e464a869dc852ab2389d303.fontdata
+Loading resource: res://scenes/animation_editor.tscn
+Loading resource: res://scenes/animation_editor.gd
+Loading resource: res://scenes/effect_editor.tscn
+Loading resource: res://scenes/effect_editor.gd
+Loading resource: res://sprites/testCursor.png
+Loading resource: res://.godot/imported/testCursor.png-4c89d1b4eab2ce05cbac2bff571bb209.ctex
+Loading resource: res://sounds/speech_blip.wav
+Loading resource: res://.godot/imported/speech_blip.wav-d25e13f727637b5bb9e484baafe5feed.sample
+Loading resource: res://sounds/fwip.wav
+Loading resource: res://.godot/imported/fwip.wav-9a9488f63d2d87ceff65244ba199926d.sample
+Loading resource: res://sounds/surprise.wav
+Loading resource: res://.godot/imported/surprise.wav-39110bf754f748d5d4aa4f3487756d32.sample
+Loading resource: res://scenes/GUI/ui_panels/item_prompt.tscn
+Loading resource: res://scenes/GUI/ui_panels/item_prompt.gd
+Loading resource: res://scenes/GUI/hud/focus_viewer/terrain_tracker_textbox.png
+Loading resource: res://.godot/imported/terrain_tracker_textbox.png-da62229e5bc55446f319cf6d7d398426.ctex
+Loading resource: res://scenes/GUI/item_button.tscn
+Loading resource: res://fonts/Izayoi_Theme_Items.tres
+Loading resource: res://sprites/UIPanel.png
+Loading resource: res://.godot/imported/UIPanel.png-3713a5c2dad28200551d429d7eaddba5.ctex
+Loading resource: res://fonts/Marcellus/Marcellus-sc.regular.otf
+Loading resource: res://.godot/imported/Marcellus-sc.regular.otf-67401121c9e670bd2d91a6c8af7b72a4.fontdata
+Loading resource: res://sprites/icons/items/missing_item.png
+Loading resource: res://.godot/imported/missing_item.png-1e1e4264a4fcdd07e0a4c98a03872a93.ctex
+Loading resource: res://scenes/GUI/unit_button.tscn
+Loading resource: res://fonts/Izayoi_Theme_Roster.tres
+Loading resource: res://fonts/VenomMincho-DOOyR.ttf
+Loading resource: res://.godot/imported/VenomMincho-DOOyR.ttf-c7bfd1f3d525fd22cb2ba9502286c04a.fontdata
+Loading resource: res://scenes/GUI/unit_button.gd
+Loading resource: res://sprites/UI/characterpfptop.png
+Loading resource: res://.godot/imported/characterpfptop.png-408e369834c8a25a6bd0ae61f852726b.ctex
+Loading resource: res://sprites/UI/characterpfpoutline.png
+Loading resource: res://.godot/imported/characterpfpoutline.png-4ce004b335432905c493feae99fae802.ctex
+Loading resource: res://sprites/UI/characterpfpportrait.png
+Loading resource: res://.godot/imported/characterpfpportrait.png-139aaa6fd653c555390bb0f7c428cca8.ctex
+Loading resource: res://sprites/character/fairy/trblr_portrait.png
+Loading resource: res://.godot/imported/trblr_portrait.png-47df508ab51ea546322ea869523898eb.ctex
+Loading resource: res://sprites/UI/characterpfpwinginner.png
+Loading resource: res://.godot/imported/characterpfpwinginner.png-8651ed3c31cc631b321e06d4ace46f9d.ctex
+Loading resource: res://scenes/GUI/unit_manager.tscn
+Loading resource: res://fonts/Izayoi_Theme_Trading.tres
+Loading resource: res://scenes/GUI/unit_manager.gd
+Loading resource: res://scenes/GUI/menu_cursor.tscn
+Loading resource: res://scenes/GUI/cursors/cursor1.png
+Loading resource: res://.godot/imported/cursor1.png-ee12bc40c0f9097bc27f39afc2200ded.ctex
+Loading resource: res://fonts/Izayoi_Theme_Chapter_Title.tres
+Loading resource: res://fonts/Rotunda/Rotunda.otf
+Loading resource: res://.godot/imported/Rotunda.otf-209625e04a66cd3eb540df91d4797cae.fontdata
+Loading resource: res://scenes/cutscenes/CutsceneManager.gd
+Loading resource: res://sprites/character/sakuya/maid_portrait.png
+Loading resource: res://.godot/imported/maid_portrait.png-448fa6ecc141d0972f123b5bb2ec1238.ctex
+Loading resource: res://sprites/character/patchouli/sorceress_portrait.png
+Loading resource: res://.godot/imported/sorceress_portrait.png-db23a43f0ef31d22ce181be978b0830c.ctex
+Loading resource: res://sprites/character/remilia/scene_sprites/th1.png
+Loading resource: res://.godot/imported/th1.png-3e6b54e3cbbffb3d875d11322022a627.ctex
+Loading resource: res://sprites/character/cirno/trblr_portrait.png
+Loading resource: res://.godot/imported/trblr_portrait.png-9aebde5641621b1e97077d184ae0e8d2.ctex
+ERROR: Failed to read the root certificate store.
+   at: get_system_ca_certificates (platform/windows/os_windows.cpp:2289)
+Loaded builtin CA certificates
+Loading resource: res://scenes/main.tscn
+Loading resource: res://Main.gd
+Loading resource: res://scenes/map_manager.tscn
+Loading resource: res://scenes/Gameboard.tscn
+Loading resource: res://scrpt/unit_path.tscn
+Loading resource: res://sprites/hexPathsTest.png
+Loading resource: res://.godot/imported/hexPathsTest.png-8b7169fc61da4500dd3444e075e83727.ctex
+Loading resource: res://scenes/cursor.tscn
+Loading resource: res://scenes/GUI/cursors/cursor2.png
+Loading resource: res://.godot/imported/cursor2.png-338dd8bce962147fcb8cf19337dfeaf3.ctex
+Loading resource: res://sprites/highlightBlue.png
+Loading resource: res://.godot/imported/highlightBlue.png-71501ab160daea25e7cc8c35a12c8bb9.ctex
+Loading resource: res://scenes/scene_camera.tscn
+Loading resource: res://scenes/unit_path.tres
+Loading resource: res://scenes/combat_manager/combat_manager.tscn
+Loading resource: res://scenes/GUIManager.tscn
+Loading resource: res://fonts/Izayoi_Theme_setup.tres
+Loading resource: res://fonts/debug_theme.tres
+Loading resource: res://scenes/Debug.gd
+Loading resource: res://scenes/FailScreen.gd
+Loading resource: res://audio/audio_hub.tscn
+Loading resource: res://audio/audio_hub.gd
+Loading resource: res://scenes/WinScreen.gd
+Loading resource: res://scenes/fader.tscn
+Loading resource: res://scenes/fader.gd
+Loading resource: res://audio/SFX/GUI/scrolling.ogg
+Loading resource: res://.godot/imported/scrolling.ogg-26f9a123ddb175f6dfcfad8517ceded1.oggvorbisstr
+Loading resource: res://audio/SFX/GUI/confirm.ogg
+Loading resource: res://.godot/imported/confirm.ogg-ae276491a8ad5a95f8f2e6a3cd94aa28.oggvorbisstr
+Loading resource: res://sprites/ERROR.png
+Loading resource: res://.godot/imported/ERROR.png-4b08b2a112bc0604eb5bb13737f32e03.ctex
+Loading resource: res://audio/SFX/GUI/deny.ogg
+Loading resource: res://.godot/imported/deny.ogg-99130c6409eec6553cbea1f3dd145d58.oggvorbisstr
+Loading resource: res://sprites/HPbarBack.png
+Loading resource: res://.godot/imported/HPbarBack.png-d0c4868c231a9608c55cae30d191a3e6.ctex
+Loading resource: res://sprites/HPbarUpper.png
+Loading resource: res://.godot/imported/HPbarUpper.png-23e74fa29402bb9ef43039d69c8f9fc5.ctex
+Loading resource: res://sprites/HPbarProg.png
+Loading resource: res://.godot/imported/HPbarProg.png-5715f8be27e1efd5f48d9b6253a3415e.ctex
+Loading resource: res://scrpt/resources/PlayerSupply.tres
+Loading resource: res://scenes/GUI/title/title_screen.tscn
+Loading resource: res://scenes/GUI/title/title_screen.gd
+Loading resource: res://fonts/Izayoi_Theme_Title.tres
+Loading resource: res://scenes/GUI/title/title_mock.png
+Loading resource: res://.godot/imported/title_mock.png-19235cdbcdf27af3618e083bb8fd4f1d.ctex
+Loading resource: res://scenes/GUI/textured_label_button.tscn
+Loading resource: res://scenes/start.tscn
+Loading resource: res://scenes/start.gd
+XR: Clearing primary interface
+XR: Removed interface "Native mobile"
+XR: Removed interface "OpenXR"
+ERROR: 1 RID allocations of type 'P12GodotShape2D' were leaked at exit.
+ERROR: Parameter "PhysicsServer2D::get_singleton()" is null.
+   at: ~Shape2D (scene/resources/2d/shape_2d.cpp:121)

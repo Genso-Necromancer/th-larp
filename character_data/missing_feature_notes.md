@@ -21,6 +21,20 @@ Remilia is intentionally missing a character feature during the initial baseline
 
 - AI needs to understand cycle charging: repositioning specifically to build future charge-polearm damage instead of only valuing immediate attacks.
 - Enemy-turn start/end lag: there is a noticeable pause after player turn completion and at enemy-turn startup. This is suspected to be AI evaluation inefficiency and is intentionally deferred until the AI optimization pass.
+- AI friendly item/support action presentation: enemy AI can use support Ofuda. AI item actions now bypass the forecast UI, but friendly skill actions still use the forecast route and should be retested once AI support skills are common.
+- Combat UI scroll polish: enemy combat UI scroll elements can hang open even when no effect entries are displayed.
+
+## Map And Sandbox Follow-Up Features
+
+- Objective/loss condition text: `BaseGameMap.get_objectives()` and `get_loss_conditions()` still return placeholder strings; recheck whether setup UI expects full strings or self-built fragments.
+- Chest overflow visual polish: chests can now route full inventories into a drop-only inventory prompt, but the chest item is currently shown as the first normal inventory entry. Revisit the old equipped/special slot concept later so the incoming chest item stands apart visually.
+- Game-over follow-up behavior: the old fail screen can be shown again on `GAME_OVER`, but accepting/closing it needs a real flow decision, such as retry, soft reset, title return, or save/load.
+- Focus viewer terrain sizing: terrain entries with a third displayed parameter can bleed past the focus viewer asset instead of resizing correctly.
+- Camera controls tuning: camera controls function, but need a later feel/usability pass.
+- Next-map transition regression: map transition worked in older tests, but needs a current verification pass after recent system changes.
+- Generic unit debug identity: runtime-generated generic IDs are useful, but duplicate generic units need readable debug labels in logs/crash reports, such as scene node name, level, role/species, or map fixture label.
+- Combat sandbox map: `scenes/maps/combat_sandbox.tscn` preserves the proven combat/encounter layout.
+- Feature workshop map pass: edit `scenes/maps/feature_workshop.tscn` with convenient placements for doors, breakable walls, chests, special terrain, and event triggers.
 
 ## Magic Follow-Up Features
 

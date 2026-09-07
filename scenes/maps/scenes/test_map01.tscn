@@ -9,7 +9,9 @@
 
 [sub_resource type="Resource" id="Resource_gdb2g"]
 script = ExtResource("3_pivsa")
-seize_count = 1
+seize_tile_layer = NodePath("")
+completion_type = 0
+condition_type = 0
 metadata/_custom_type_script = "uid://b7a6ss8luhslm"
 
 [sub_resource type="Resource" id="Resource_k3lsm"]
@@ -21,7 +23,7 @@ metadata/_custom_type_script = "uid://dshxl1mfpb0v0"
 metadata/__load_path__ = "res://scenes/cutscenes/scene_script/test_map_start.tres"
 
 [node name="GameMap" instance=ExtResource("1_1rkww")]
-forcedUnits = ["Remilia"]
+forcedUnits = ["remilia"]
 chapterNumber = 2
 win_conditions = Array[ExtResource("2_bns5h")]([SubResource("Resource_gdb2g")])
 dmkScript = SubResource("Resource_k3lsm")

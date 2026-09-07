@@ -16,6 +16,8 @@ func _process(_delta):
 
 
 func init_cell():
+	if map == null and get_parent() is GameMap:
+		map = get_parent()
 	if map: cell = map.local_to_map(position)
 	
 

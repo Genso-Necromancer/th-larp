@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=4 uid="uid://dv2xsgcjyj8ub"]
+[gd_scene load_steps=14 format=4 uid="uid://hag4r34igo30"]
 
 [ext_resource type="PackedScene" uid="uid://cl7ik2hxcwm08" path="res://scenes/maps/game_map.tscn" id="1_qpt4y"]
 [ext_resource type="Resource" uid="uid://dh630esqxwuhu" path="res://scrpt/ai/test_personality.tres" id="2_xc6ji"]
@@ -14,11 +14,11 @@
 [ext_resource type="PackedScene" uid="uid://bcug5vmv5c0k" path="res://scenes/units/generic_units/kuchisake_blade_lv_1.tscn" id="14_3blko"]
 [ext_resource type="PackedScene" uid="uid://bgq1asahykl5v" path="res://scenes/units/generic_units/human_miko_lv_1.tscn" id="15_mxfl7"]
 
-[node name="SeizeTest" instance=ExtResource("1_qpt4y")]
+[node name="CombatSandbox" instance=ExtResource("1_qpt4y")]
 ai_personality = ExtResource("2_xc6ji")
 next_map = "uid://dy7o507urgp83"
 chapterNumber = 1
-title = "Seize Test"
+title = "Combat Sandbox"
 objectives = Array[ExtResource("3_jfjoi")]([ExtResource("3_ub6hv"), ExtResource("4_xc6ji")])
 start_script = "res://scenes/cutscenes/scene_events/seize_test_start_event.json"
 end_script = "res://scenes/cutscenes/scene_events/seize_test_end_event.json"
@@ -53,6 +53,17 @@ map = NodePath("..")
 [node name="Fairy Cointaker lv1" parent="." index="12" instance=ExtResource("6_ub6hv")]
 position = Vector2(1344, 140)
 ai_role = 4
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.45,
+&"Cha": 0.4,
+&"Comp": 0.3,
+&"Def": 0.05,
+&"Eleg": 0.25,
+&"Life": 0.2,
+&"Mag": 0.1,
+&"Move": 0.0,
+&"Pwr": 0.15
+})
 
 [node name="Cirno" parent="." index="13" instance=ExtResource("4_cpkxf")]
 position = Vector2(1596, 252)
@@ -68,17 +79,52 @@ mod_stats = Dictionary[StringName, int]({
 &"Move": 0,
 &"Pwr": 0
 })
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.35,
+&"Cha": 0.15,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.35,
+&"Mag": 0.1,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 total_stats = Dictionary[StringName, int]({
-&"Cele": 4,
-&"Cha": 2,
+&"Cele": 8,
+&"Cha": 3,
 &"Comp": 100,
-&"Def": 4,
-&"Eleg": 3,
-&"Life": 20,
+&"Def": 2,
+&"Eleg": 5,
+&"Life": 25,
 &"Mag": 1,
 &"Move": 4,
-&"Pwr": 6
+&"Pwr": 8
 })
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": true,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
 
 [node name="Oni Troublemaker lv1" parent="." index="14" instance=ExtResource("5_5odpd")]
 position = Vector2(462, 336)
@@ -86,124 +132,505 @@ ai_role = 4
 simulate_leveling = false
 unit_level = 7
 total_growth = Dictionary[StringName, float]({
-&"Cele": 0.0,
-&"Cha": 0.0,
-&"Comp": 0.3,
-&"Def": 0.3,
+&"Cele": 0.25,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.15,
 &"Eleg": 0.1,
-&"Life": 0.6,
+&"Life": 0.45,
 &"Mag": 0.0,
 &"Move": 0.0,
-&"Pwr": 0.55
+&"Pwr": 0.5
 })
+total_stats = Dictionary[StringName, int]({
+&"Cele": 6,
+&"Cha": 1,
+&"Comp": 90,
+&"Def": 3,
+&"Eleg": 8,
+&"Life": 29,
+&"Mag": 0,
+&"Move": 4,
+&"Pwr": 10
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": true,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
 
 [node name="Oni Troublemaker lv2" parent="." index="15" instance=ExtResource("5_5odpd")]
 position = Vector2(462, 840)
 ai_role = 2
 total_growth = Dictionary[StringName, float]({
-&"Cele": 0.0,
-&"Cha": 0.0,
-&"Comp": 0.3,
-&"Def": 0.3,
+&"Cele": 0.25,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.15,
 &"Eleg": 0.1,
-&"Life": 0.6,
+&"Life": 0.45,
 &"Mag": 0.0,
 &"Move": 0.0,
-&"Pwr": 0.55
+&"Pwr": 0.5
 })
+total_stats = Dictionary[StringName, int]({
+&"Cele": 6,
+&"Cha": 1,
+&"Comp": 90,
+&"Def": 3,
+&"Eleg": 8,
+&"Life": 29,
+&"Mag": 0,
+&"Move": 4,
+&"Pwr": 10
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": true,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
 
 [node name="Oni Troublemaker lv3" parent="." index="16" instance=ExtResource("5_5odpd")]
 position = Vector2(462, 784)
 ai_role = 2
 total_growth = Dictionary[StringName, float]({
-&"Cele": 0.0,
-&"Cha": 0.0,
-&"Comp": 0.3,
-&"Def": 0.3,
+&"Cele": 0.25,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.15,
 &"Eleg": 0.1,
-&"Life": 0.6,
+&"Life": 0.45,
 &"Mag": 0.0,
 &"Move": 0.0,
-&"Pwr": 0.55
+&"Pwr": 0.5
 })
+total_stats = Dictionary[StringName, int]({
+&"Cele": 6,
+&"Cha": 1,
+&"Comp": 90,
+&"Def": 3,
+&"Eleg": 8,
+&"Life": 29,
+&"Mag": 0,
+&"Move": 4,
+&"Pwr": 10
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": true,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
 
 [node name="Oni Troublemaker lv4" parent="." index="17" instance=ExtResource("5_5odpd")]
 position = Vector2(840, 364)
 ai_role = 2
 total_growth = Dictionary[StringName, float]({
-&"Cele": 0.0,
-&"Cha": 0.0,
-&"Comp": 0.3,
-&"Def": 0.3,
+&"Cele": 0.25,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.15,
 &"Eleg": 0.1,
-&"Life": 0.6,
+&"Life": 0.45,
 &"Mag": 0.0,
 &"Move": 0.0,
-&"Pwr": 0.55
+&"Pwr": 0.5
 })
+total_stats = Dictionary[StringName, int]({
+&"Cele": 6,
+&"Cha": 1,
+&"Comp": 90,
+&"Def": 3,
+&"Eleg": 8,
+&"Life": 29,
+&"Mag": 0,
+&"Move": 4,
+&"Pwr": 10
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": true,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
 
 [node name="Fairy Cointaker lv2" parent="." index="18" instance=ExtResource("6_ub6hv")]
 position = Vector2(714, 112)
 ai_role = 4
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.45,
+&"Cha": 0.4,
+&"Comp": 0.3,
+&"Def": 0.05,
+&"Eleg": 0.25,
+&"Life": 0.2,
+&"Mag": 0.1,
+&"Move": 0.0,
+&"Pwr": 0.15
+})
 
 [node name="Fairy Cointaker lv3" parent="." index="19" instance=ExtResource("6_ub6hv")]
 position = Vector2(1218, 616)
 ai_role = 4
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.45,
+&"Cha": 0.4,
+&"Comp": 0.3,
+&"Def": 0.05,
+&"Eleg": 0.25,
+&"Life": 0.2,
+&"Mag": 0.1,
+&"Move": 0.0,
+&"Pwr": 0.15
+})
 
 [node name="Oni Troublemaker lv5" parent="." index="20" instance=ExtResource("5_5odpd")]
 position = Vector2(840, 812)
 ai_role = 1
 total_growth = Dictionary[StringName, float]({
-&"Cele": 0.0,
-&"Cha": 0.0,
-&"Comp": 0.3,
-&"Def": 0.3,
+&"Cele": 0.25,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.15,
 &"Eleg": 0.1,
-&"Life": 0.6,
+&"Life": 0.45,
 &"Mag": 0.0,
 &"Move": 0.0,
-&"Pwr": 0.55
+&"Pwr": 0.5
 })
+total_stats = Dictionary[StringName, int]({
+&"Cele": 6,
+&"Cha": 1,
+&"Comp": 90,
+&"Def": 3,
+&"Eleg": 8,
+&"Life": 29,
+&"Mag": 0,
+&"Move": 4,
+&"Pwr": 10
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": true,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
 
 [node name="Oni Troublemaker lv6" parent="." index="21" instance=ExtResource("5_5odpd")]
 position = Vector2(840, 924)
 ai_role = 1
 total_growth = Dictionary[StringName, float]({
-&"Cele": 0.0,
-&"Cha": 0.0,
-&"Comp": 0.3,
-&"Def": 0.3,
+&"Cele": 0.25,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.15,
 &"Eleg": 0.1,
-&"Life": 0.6,
+&"Life": 0.45,
 &"Mag": 0.0,
 &"Move": 0.0,
-&"Pwr": 0.55
+&"Pwr": 0.5
 })
+total_stats = Dictionary[StringName, int]({
+&"Cele": 6,
+&"Cha": 1,
+&"Comp": 90,
+&"Def": 3,
+&"Eleg": 8,
+&"Life": 29,
+&"Mag": 0,
+&"Move": 4,
+&"Pwr": 10
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": true,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
 
 [node name="Fairy Cointaker lv4" parent="." index="22" instance=ExtResource("6_ub6hv")]
 position = Vector2(210, 560)
 ai_role = 2
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.45,
+&"Cha": 0.4,
+&"Comp": 0.3,
+&"Def": 0.05,
+&"Eleg": 0.25,
+&"Life": 0.2,
+&"Mag": 0.1,
+&"Move": 0.0,
+&"Pwr": 0.15
+})
 
 [node name="Fairy Cointaker lv5" parent="." index="23" instance=ExtResource("6_ub6hv")]
 position = Vector2(336, 532)
 ai_role = 2
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.45,
+&"Cha": 0.4,
+&"Comp": 0.3,
+&"Def": 0.05,
+&"Eleg": 0.25,
+&"Life": 0.2,
+&"Mag": 0.1,
+&"Move": 0.0,
+&"Pwr": 0.15
+})
 
 [node name="kuchisake_blade_lv1" parent="." index="24" instance=ExtResource("14_3blko")]
 position = Vector2(966, 896)
 total_growth = Dictionary[StringName, float]({
 &"Cele": 0.6,
-&"Cha": 0.1,
+&"Cha": 0.05,
 &"Comp": 0.3,
-&"Def": 0.2,
-&"Eleg": 0.4,
-&"Life": 0.4,
-&"Mag": 0.0,
+&"Def": 0.25,
+&"Eleg": 0.3,
+&"Life": 0.45,
+&"Mag": -0.05,
 &"Move": 0.0,
-&"Pwr": 0.3
+&"Pwr": 0.25
 })
+total_stats = Dictionary[StringName, int]({
+&"Cele": 6,
+&"Cha": -1,
+&"Comp": 100,
+&"Def": 1,
+&"Eleg": 4,
+&"Life": 24,
+&"Mag": 1,
+&"Move": 5,
+&"Pwr": 5
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": true,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": true,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
 
 [node name="human_miko_lv1" parent="." index="25" instance=ExtResource("15_mxfl7")]
 position = Vector2(588, 812)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.2,
+&"Cha": 0.3,
+&"Comp": 0.35,
+&"Def": 0.1,
+&"Eleg": 0.3,
+&"Life": 0.25,
+&"Mag": 0.2,
+&"Move": 0.0,
+&"Pwr": 0.2
+})
+total_stats = Dictionary[StringName, int]({
+&"Cele": 8,
+&"Cha": 9,
+&"Comp": 105,
+&"Def": 5,
+&"Eleg": 9,
+&"Life": 21,
+&"Mag": 5,
+&"Move": 4,
+&"Pwr": 6
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": true,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": true,
+"Stick": false
+}
 
 [node name="human_miko_lv2" parent="." index="26" instance=ExtResource("15_mxfl7")]
 position = Vector2(462, 224)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.2,
+&"Cha": 0.3,
+&"Comp": 0.35,
+&"Def": 0.1,
+&"Eleg": 0.3,
+&"Life": 0.25,
+&"Mag": 0.2,
+&"Move": 0.0,
+&"Pwr": 0.2
+})
+total_stats = Dictionary[StringName, int]({
+&"Cele": 8,
+&"Cha": 9,
+&"Comp": 105,
+&"Def": 5,
+&"Eleg": 9,
+&"Life": 21,
+&"Mag": 5,
+&"Move": 4,
+&"Pwr": 6
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": true,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": true,
+"Stick": false
+}

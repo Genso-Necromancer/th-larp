@@ -6,6 +6,7 @@ signal item_selected
 signal new_btn_added
 signal trade_closed(is_action:bool)
 signal trd_focus_changed
+signal chest_overflow_resolved(chest_item_taken:bool)
 
 
 
@@ -33,6 +34,8 @@ var list_snap : Array = []
 var firstBtn : ItemButton
 var firstUnit : Unit
 var secondUnit : Unit
+var chestOverflowItem : Item
+var itemOptionReturnState = null
 
 #cursorTracking
 var lastClicked : BaseButton
@@ -44,6 +47,7 @@ enum tStates {
 	TRADE,
 	SUPPLY,
 	MANAGE,
+	CHEST_OVERFLOW,
 	ITEMOP,}
 	
 var tState := tStates.DEFAULT:
@@ -198,7 +202,8 @@ func open_supply_menu(unit): #HERE
 	box1.visible = true
 	supplyPanel.visible = true
 	
-	_reparent_info(1)
+	# Keep InfoPanel in its scene-tree default position for now.
+	# _reparent_info(1)
 	tState = tStates.SUPPLY
 	list1.set_meta("Unit", unit)
 	_change_tab(tab)
@@ -222,11 +227,27 @@ func open_manage_menu(unit:Unit, is_setup_action:bool=true):
 	firstUnit = unit
 	box1.visible = true
 	toggle_visible()
-	_reparent_info(1)
+	# Keep InfoPanel in its scene-tree default position for now.
+	# _reparent_info(1)
 	tState = tStates.MANAGE
 	is_setup = is_setup_action
 	list1.set_meta("Unit", unit)
 	#_refresh_list()
+	call_deferred("_refresh_list")
+
+
+func open_chest_overflow_menu(unit:Unit, chest_item:Item):
+	_load_names([unit])
+	_load_sprites([unit])
+	firstUnit = unit
+	chestOverflowItem = chest_item
+	box1.visible = true
+	toggle_visible()
+	# Keep InfoPanel in its scene-tree default position for now.
+	# _reparent_info(1)
+	tState = tStates.CHEST_OVERFLOW
+	is_setup = false
+	list1.set_meta("Unit", unit)
 	call_deferred("_refresh_list")
 
 
@@ -237,6 +258,17 @@ func close_manage_menu(emit:=true):
 	_clear_item_list(list1)
 	tState = tStates.DEFAULT
 	if emit:trade_closed.emit()
+
+
+func close_chest_overflow_menu():
+	firstUnit = null
+	chestOverflowItem = null
+	firstBtn = null
+	box1.visible = false
+	_hide_sprites()
+	toggle_visible()
+	_clear_item_list(list1)
+	tState = tStates.DEFAULT
 
 
 #Sprite Functions
@@ -288,6 +320,7 @@ func get_buttons() -> Array:
 		tStates.TRADE: children = list1.itemList.get_children() + list2.itemList.get_children()
 		tStates.SUPPLY: children = list1.itemList.get_children() + list2.itemList.get_children() + supplyPanel.itemList.get_children() + supplyPanel.tabs
 		tStates.MANAGE:  children = list1.itemList.get_children()
+		tStates.CHEST_OVERFLOW: children = list1.items
 		
 	
 	for child in children:
@@ -307,7 +340,11 @@ func _fill_item_list(list):
 	var isTrade = false
 	if tState == tStates.TRADE:
 		isTrade = true
-	var items = list.fill_items(isTrade)
+	var items
+	if tState == tStates.CHEST_OVERFLOW:
+		items = list.fill_chest_overflow_items(chestOverflowItem, firstUnit)
+	else:
+		items = list.fill_items(isTrade)
 	for b in items:
 		_connect_item(b.get_button())
 	
@@ -381,7 +418,7 @@ func _assign_neighbors():
 func _assign_vertical_neighbors(list, isConvoy = false):
 	var i = 0
 	var n = 0
-	var btns : Array = list.itemList.get_children()
+	var btns : Array = list.items if tState == tStates.CHEST_OVERFLOW and list == list1 else list.itemList.get_children()
 	var size1 = btns.size()
 	var iMax1 = size1 - 1
 	
@@ -558,6 +595,10 @@ func _item_pressed(b):
 			_open_item_options(b)
 			b.state = "Selected"
 			firstBtn = b
+		tStates.CHEST_OVERFLOW:
+			_open_item_options(b, true)
+			b.state = "Selected"
+			firstBtn = b
 			
 
 
@@ -565,11 +606,12 @@ func _supply_item_pressed(b):
 	_take_select(b)
 
 
-func _open_item_options(b) -> void:
+func _open_item_options(b, drop_only := false) -> void:
 	var list = optionsPop.list
 	list_snap = list1.items
+	itemOptionReturnState = tState
 	optionsPop.deploy_pop(b)
-	optionsPop.validate_buttons(b)
+	optionsPop.validate_buttons(b, drop_only)
 	tState = tStates.ITEMOP
 	optionsPop.connect_signal(self)
 	emit_signal("trd_focus_changed", list)
@@ -577,7 +619,8 @@ func _open_item_options(b) -> void:
 
 func _close_item_options(hard_close:=false):
 	var useLast := false
-	tState = tStates.MANAGE
+	var returnState = itemOptionReturnState
+	tState = returnState
 	optionsPop.hide_pop()
 	if hard_close: useLast = false
 	elif list_snap == list1.items: useLast = true
@@ -595,6 +638,9 @@ func _close_item_options(hard_close:=false):
 
 
 func _on_selection_made(selection:String, item:Item):
+	if selection == "Drop" and itemOptionReturnState == tStates.CHEST_OVERFLOW:
+		_resolve_chest_overflow_drop()
+		return
 	_close_item_options(!is_setup)
 	match selection:
 		"Use":
@@ -605,6 +651,28 @@ func _on_selection_made(selection:String, item:Item):
 			SignalTower.item_equipped.emit(item,true)
 		"Unequip":
 			SignalTower.item_equipped.emit(item,false)
+
+
+func _resolve_chest_overflow_drop() -> void:
+	if firstUnit == null or chestOverflowItem == null or firstBtn == null:
+		_close_item_options()
+		close_chest_overflow_menu()
+		chest_overflow_resolved.emit(false)
+		return
+	var drop_index:int = firstBtn.get_meta("Index")
+	var chest_item_taken := false
+	if drop_index > 0:
+		var inv_index := drop_index - 1
+		if inv_index >= 0 and inv_index < firstUnit.inventory.size():
+			var dropped_item: Item = firstUnit.inventory[inv_index]
+			if dropped_item != null:
+				dropped_item.equipped = false
+			firstUnit.inventory[inv_index] = chestOverflowItem
+			firstUnit.set_equipped()
+			chest_item_taken = true
+	optionsPop.hide_pop()
+	close_chest_overflow_menu()
+	chest_overflow_resolved.emit(chest_item_taken)
 
 
 func _play_item_anim(item) -> void:
@@ -716,6 +784,8 @@ func regress_trade():
 				_close_trade_menu()
 		tStates.SUPPLY: _close_supply_menu()
 		tStates.MANAGE: close_manage_menu()
+		tStates.CHEST_OVERFLOW:
+			pass
 		tStates.ITEMOP: _close_item_options()
 
 

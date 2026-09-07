@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=4 uid="uid://dv2xsgcjyj8ub"]
+[gd_scene load_steps=14 format=4 uid="uid://dh85xdwxc5hf1"]
 
 [ext_resource type="PackedScene" uid="uid://cl7ik2hxcwm08" path="res://scenes/maps/game_map.tscn" id="1_qpt4y"]
 [ext_resource type="Resource" uid="uid://dh630esqxwuhu" path="res://scrpt/ai/test_personality.tres" id="2_xc6ji"]
@@ -14,11 +14,11 @@
 [ext_resource type="PackedScene" uid="uid://bcug5vmv5c0k" path="res://scenes/units/generic_units/kuchisake_blade_lv_1.tscn" id="14_3blko"]
 [ext_resource type="PackedScene" uid="uid://bgq1asahykl5v" path="res://scenes/units/generic_units/human_miko_lv_1.tscn" id="15_mxfl7"]
 
-[node name="SeizeTest" instance=ExtResource("1_qpt4y")]
+[node name="CombatSandbox" instance=ExtResource("1_qpt4y")]
 ai_personality = ExtResource("2_xc6ji")
 next_map = "uid://dy7o507urgp83"
 chapterNumber = 1
-title = "Seize Test"
+title = "Combat Sandbox"
 objectives = Array[ExtResource("3_jfjoi")]([ExtResource("3_ub6hv"), ExtResource("4_xc6ji")])
 start_script = "res://scenes/cutscenes/scene_events/seize_test_start_event.json"
 end_script = "res://scenes/cutscenes/scene_events/seize_test_end_event.json"

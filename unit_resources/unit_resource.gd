@@ -18,7 +18,6 @@ var sub_rule
 #region property list shit
 func _get_property_list():
 	var properties = []
-	
 	match rule_type:
 		Enums.RULE_TYPE.TIME: 
 			properties.append({
@@ -58,6 +57,15 @@ func get_property_names() -> Array[String]:
 			propNames.append(prop.name)
 	return propNames
 
+func _format_to_id() -> String:
+	var path = get_path()
+	var new_id : String
+	var count : int = path.get_slice_count("/")
+	var slice :String = path.get_slice("/",count)
+	new_id = slice.trim_suffix(".tres")
+	print(id)
+	print(new_id)
+	return new_id
 
 func get_resource_path()->String:
 	var path:String = ""

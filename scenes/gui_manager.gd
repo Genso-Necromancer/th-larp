@@ -15,8 +15,10 @@ signal ui_skill_selected(skill)
 signal ui_item_selected(unit)
 signal ui_trade_selected(unit)
 signal ui_wait_selected
+signal ui_end_round_selected
 signal ui_ofuda_selected(unit, ofuda)
 signal ui_door_selected
+signal ui_chest_selected(unit)
 signal ui_seize_selected(cell)
 signal ui_suspend_requested
 signal ui_action_menu_canceled
@@ -382,10 +384,14 @@ func _connect_action_menu_signals():
 		actMenu.trade_selected.connect(_on_action_menu_trade_selected_relay)
 	if not actMenu.wait_selected.is_connected(_on_action_menu_wait_selected):
 		actMenu.wait_selected.connect(_on_action_menu_wait_selected)
+	if not actMenu.end_round_selected.is_connected(_on_action_menu_end_round_selected):
+		actMenu.end_round_selected.connect(_on_action_menu_end_round_selected)
 	if not actMenu.ofuda_selected.is_connected(_on_action_menu_ofuda_selected):
 		actMenu.ofuda_selected.connect(_on_action_menu_ofuda_selected)
 	if not actMenu.door_selected.is_connected(_on_action_menu_door_selected):
 		actMenu.door_selected.connect(_on_action_menu_door_selected)
+	if not actMenu.chest_selected.is_connected(_on_action_menu_chest_selected):
+		actMenu.chest_selected.connect(_on_action_menu_chest_selected)
 	if not actMenu.seize_selected.is_connected(_on_action_menu_seize_selected):
 		actMenu.seize_selected.connect(_on_action_menu_seize_selected)
 	if not actMenu.suspend_requested.is_connected(_on_action_menu_suspend_requested):
@@ -413,9 +419,13 @@ func _on_action_menu_trade_selected_relay(unit) -> void:
 
 func _on_action_menu_wait_selected() -> void: ui_wait_selected.emit()
 
+func _on_action_menu_end_round_selected() -> void: ui_end_round_selected.emit()
+
 func _on_action_menu_ofuda_selected(unit, ofuda) -> void: ui_ofuda_selected.emit(unit, ofuda)
 
 func _on_action_menu_door_selected() -> void: ui_door_selected.emit()
+
+func _on_action_menu_chest_selected(unit) -> void: ui_chest_selected.emit(unit)
 
 func _on_action_menu_seize_selected(cell) -> void: ui_seize_selected.emit(cell)
 
@@ -736,6 +746,22 @@ func _on_action_item_pressed(unit:Unit):
 	sState = sStates.MANAGE
 	actMenu.suspend_menu()
 	tradeScreen.open_manage_menu(unit,false)
+
+
+func start_chest_overflow(unit:Unit, chest_item:Item) -> bool:
+	GameState.change_state(self,GameState.gState.GB_SETUP)
+	sState = sStates.MANAGE
+	if actMenu:
+		actMenu.suspend_menu()
+	tradeScreen.open_chest_overflow_menu(unit, chest_item)
+	var overflow_result = await tradeScreen.chest_overflow_resolved
+	var chest_item_taken := bool(overflow_result)
+	if overflow_result is Array:
+		chest_item_taken = overflow_result.size() > 0 and bool(overflow_result[0])
+	sState = sStates.BEGIN
+	_show_hud()
+	GameState.change_state(self, GameState.gState.LOADING)
+	return chest_item_taken
 
 
 #func _on_item_equipped(item:Item,_equipped:bool):

@@ -8,7 +8,7 @@ static var screen_shot_folder := "screen_shots"
 
 var gameBoard: GameBoard
 var map_manager: MapManager
-var first_map:String = "res://scenes/maps/scenes/seize_test.tscn"
+var first_map:String = "res://scenes/maps/scenes/feature_workshop.tscn"
 var manager_preload:= preload("res://scenes/map_manager.tscn")
 var file_selected:bool = false
 var pending_save_file:String = ""
@@ -74,8 +74,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _check_directory():
 	if not DirAccess.dir_exists_absolute(root):
-		var dir = DirAccess.open(root)
-		dir.make_dir(root)
+		DirAccess.make_dir_absolute(root)
 
 
 func _create_director(newDir : String) -> String:

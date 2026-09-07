@@ -23,7 +23,7 @@ var ActorData: Dictionary = {
 	2: {
 		"name": "Remilia",
 		"title": "Head Lady",
-		"portrait": preload("res://sprites/th1.png")
+		"portrait": preload("res://sprites/character/remilia/scene_sprites/th1.png")
 	},
 	3: {
 		"name": "Cirno",

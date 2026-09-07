@@ -1095,6 +1095,8 @@ static func get_terrain_data():
 			"HotSpring":{
 				"GrzBonus": 0,
 				"DefBonus": 0,
+				"CompRegen": 5,
+				"Price": -100,
 				Enums.MOVE_TYPE.FOOT: 1,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER: 1,

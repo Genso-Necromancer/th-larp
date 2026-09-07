@@ -87,7 +87,7 @@ func refresh_data():
 	var r := $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2/Role
 	var c := $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer/CompCurrent
 	var cap := $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer/CompCap
-	var texture := $PortraitMargin/TextureRect
+	var texture := $GreenTemplate/PortraitMargin/UnitPortrait
 	var unitName :String= unitLink.unit_name
 	var spec :String= Enums.SPEC_ID.keys()[unitLink.SPEC_ID]
 	var role :String= Enums.ROLE_ID.keys()[unitLink.ROLE_ID]

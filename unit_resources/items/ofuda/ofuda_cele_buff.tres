@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_qmsrj"]
 [ext_resource type="Script" uid="uid://be7mkkw1sweve" path="res://unit_resources/items/ofuda/ofuda_resource.gd" id="2_c47rb"]
-[ext_resource type="Resource" uid="uid://byjs7jgphak7n" path="res://unit_resources/effects/buff_def3.tres" id="2_no76d"]
+[ext_resource type="Resource" path="res://unit_resources/effects/buff_cele03.tres" id="2_tdffg"]
 
 [resource]
 script = ExtResource("2_c47rb")
@@ -13,7 +13,7 @@ can_dmg = false
 hit = 0
 dmg = 0
 crit = 0
-dmg_type = 0
+damage_type = 0
 target = 2
 min_reach = 1
 max_reach = 1
@@ -25,9 +25,10 @@ breakable = true
 expendable = true
 trade = true
 max_dur = 10
+weight = 0
 category = 10
 sub_group = 0
-effects = Array[ExtResource("1_qmsrj")]([ExtResource("2_no76d")])
+effects = Array[ExtResource("1_qmsrj")]([ExtResource("2_tdffg")])
 id = "defense_prayer"
 rule_type = 0
 metadata/_custom_type_script = "uid://be7mkkw1sweve"

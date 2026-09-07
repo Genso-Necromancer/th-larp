@@ -41,6 +41,43 @@ func flip_text():
 func set_value(value):
 	v = value
 
+
+func set_direct_effect_text(display_text: String, style_type: int) -> void:
+	var text = $fxText
+	var fColor
+	var lColor
+	match style_type:
+		Enums.EFFECT_TYPE.LIFE_STEAL, Enums.EFFECT_TYPE.HEAL, Enums.EFFECT_TYPE.HOT:
+			fColor = _healColor
+			lColor = _healOutline
+		Enums.EFFECT_TYPE.STATUS:
+			fColor = _statusColor
+			lColor = _statusOutline
+		Enums.EFFECT_TYPE.BUFF, Enums.EFFECT_TYPE.STATUS_BUFFER:
+			fColor = _buffColor
+			lColor = _buffOutline
+		Enums.EFFECT_TYPE.DAMAGE, Enums.EFFECT_TYPE.DOT:
+			fColor = _damageColor
+			lColor = _damageOutline
+		Enums.EFFECT_TYPE.DEBUFF:
+			fColor = _debuffColor
+			lColor = _debuffOutline
+		Enums.EFFECT_TYPE.COMP_HEAL:
+			fColor = _compHealColor
+			lColor = _compHealOutline
+		Enums.EFFECT_TYPE.COMP_DMG:
+			fColor = _compDmgColor
+			lColor = _compDmgOutline
+		Enums.EFFECT_TYPE.CURE, Enums.EFFECT_TYPE.PURITY, Enums.EFFECT_TYPE.PURGE:
+			fColor = _cureColor
+			lColor = _cureOutline
+		_:
+			fColor = _resistColor
+			lColor = _resistOutline
+	text.set_text(display_text)
+	text.add_theme_color_override("font_color", fColor)
+	text.add_theme_color_override("font_outline_color", lColor)
+
 func set_stylized_string(s = "damage"):
 	var text = $fxText
 	var getter = StringGetter

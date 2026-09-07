@@ -109,7 +109,7 @@ text = "Open"
 
 [node name="OpenChestBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
 layout_mode = 2
-text = "Open"
+text = "Chest"
 
 [node name="StealBtn" type="Button" parent="ScreenMargin/ActionBackgroundMargin/ActionMargin/ActionBox"]
 layout_mode = 2

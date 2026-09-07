@@ -17,15 +17,15 @@ signal inventory_weapon_changed(button : ItemButton)
 signal action_weapon_selected(button : ItemButton)
 signal action_skill_confirmed()
 signal action_seize(cell:Vector2i)
-signal chest_opened(cell:Vector2i, contents:Array[Item], unit:Unit)
-signal chest_stolen(cell:Vector2i, contents:Array[Item], unit:Unit)
+signal chest_opened(cell:Vector2i, contents:Array[Item], currency:int, unit:Unit)
+signal chest_stolen(cell:Vector2i, contents:Array[Item], currency:int, unit:Unit)
 signal door_unlocked(cell:Vector2i)
 signal item_used(item:Item)
 signal item_equipped(item:Item,is_equipping:bool)
 
 ##Map Event Signals
 signal seize_event(cell:Vector2i)
-signal unit_death(unit_id:String)
+signal unit_death(unit)
 
 ##Combat Animation Signals
 signal forecast_predicted(fc_data)

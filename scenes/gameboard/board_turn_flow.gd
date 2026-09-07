@@ -199,6 +199,9 @@ func check_end_of_round_events() -> void:
 		GameBoard.ROUND_STEPS.CHECK:
 			board.round_step = GameBoard.ROUND_STEPS.DANMAKU
 		GameBoard.ROUND_STEPS.DANMAKU:
+			board.round_step = GameBoard.ROUND_STEPS.SPECIAL_TERRAIN
+		GameBoard.ROUND_STEPS.SPECIAL_TERRAIN:
+			await board.apply_round_passive_special_terrain()
 			board.round_step = GameBoard.ROUND_STEPS.SCENE
 		GameBoard.ROUND_STEPS.SCENE:
 			board.round_step = GameBoard.ROUND_STEPS.REINFORCE

@@ -14,7 +14,7 @@ func _ready(): pass
 func _on_time_changed(_time:float): pass
 
 
-func _on_unit_death(_unit_id:String): pass
+func _on_unit_death(_unit): pass
 
 
 func _on_seize(_cell:Vector2i): pass

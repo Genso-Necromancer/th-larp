@@ -9,18 +9,36 @@ var hit_list : Dictionary[String,bool] = {}
 
 func _ready():
 	super()
-	SignalTower.unit_death.connect(self._on_unit_death)
+	_connect_unit_death_signal()
 	fill_list()
 
 
+func ready_tracker():
+	_connect_unit_death_signal()
+	fill_list()
+
+
+func _connect_unit_death_signal() -> void:
+	if !SignalTower.unit_death.is_connected(self._on_unit_death):
+		SignalTower.unit_death.connect(self._on_unit_death)
+
+
 func fill_list():
+	hit_list.clear()
 	for id in hit_list_unit_ids:
 		hit_list[id.to_snake_case()] = false
 	emit_changed()
 
 
-func _on_unit_death(unit_id:String):
+func _on_unit_death(unit):
+	var unit_id := _get_unit_id(unit)
 	if hit_list.has(unit_id):
 		hit_list[unit_id] = true
 		emit_changed()
 	_check_complete(hit_list,completion_type)
+
+
+func _get_unit_id(unit) -> String:
+	if unit is Unit:
+		return String(unit.unit_id).to_snake_case()
+	return String(unit).to_snake_case()

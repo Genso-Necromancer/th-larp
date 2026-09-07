@@ -71,7 +71,7 @@ var seizeLayers :Array[SeizeLayer]=[]
 var ai : AiManager
 ##Object Storage
 var doors:Dictionary[Vector2i,DoorTile] = {}
-var chests:Dictionary[Vector2i,DoorTile] = {}
+var chests:Dictionary[Vector2i,ChestTile] = {}
 
 
 #region unit organization
@@ -127,7 +127,7 @@ func _ready_objectives():
 	for objective in objectives:
 		objective.completed.connect(self._on_objective_completed)
 		if objective is Seize: _ready_seize(objective)
-		#elif objective is KillUnit: _ready_kills(objective)
+		elif objective is KillUnit: _ready_kills(objective)
 	
 	
 func _ready_seize(objective:Seize):
@@ -153,13 +153,13 @@ func check_map_completion()->bool:
 	else:verdict = false
 	return verdict
 
-#func _ready_kills(objective:KillUnit):
-	#pass
+func _ready_kills(objective:KillUnit):
+	objective.ready_tracker()
 #endregion
 
 
 #region special tile handling
-func chest_activated(cell:Vector2i, _contents:Array[Item],_covered_by:Unit):
+func chest_activated(cell:Vector2i, _contents:Array[Item], _currency:int, _covered_by:Unit):
 	chests.erase(cell)
 	swap_tile_to(cell,"open")
 

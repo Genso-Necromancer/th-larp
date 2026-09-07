@@ -37,7 +37,7 @@ layout_mode = 2
 [node name="EquipBtn" type="Button" parent="OptionsPanel/MarginContainer/OptionsList"]
 layout_mode = 2
 focus_neighbor_left = NodePath(".")
-focus_neighbor_top = NodePath("../UseBtn")
+focus_neighbor_top = NodePath("../DropBtn")
 focus_neighbor_right = NodePath(".")
 focus_neighbor_bottom = NodePath("../UnequipBtn")
 text = "Equip"
@@ -55,9 +55,19 @@ layout_mode = 2
 focus_neighbor_left = NodePath(".")
 focus_neighbor_top = NodePath("../UnequipBtn")
 focus_neighbor_right = NodePath(".")
-focus_neighbor_bottom = NodePath("../EquipBtn")
+focus_neighbor_bottom = NodePath("../DropBtn")
 text = "Use"
+
+[node name="DropBtn" type="Button" parent="OptionsPanel/MarginContainer/OptionsList"]
+visible = false
+layout_mode = 2
+focus_neighbor_left = NodePath(".")
+focus_neighbor_top = NodePath("../UseBtn")
+focus_neighbor_right = NodePath(".")
+focus_neighbor_bottom = NodePath("../EquipBtn")
+text = "Drop"
 
 [connection signal="pressed" from="OptionsPanel/MarginContainer/OptionsList/EquipBtn" to="." method="_on_equip_btn_pressed"]
 [connection signal="pressed" from="OptionsPanel/MarginContainer/OptionsList/UnequipBtn" to="." method="_on_unequip_btn_pressed"]
 [connection signal="pressed" from="OptionsPanel/MarginContainer/OptionsList/UseBtn" to="." method="_on_use_btn_pressed"]
+[connection signal="pressed" from="OptionsPanel/MarginContainer/OptionsList/DropBtn" to="." method="_on_drop_btn_pressed"]

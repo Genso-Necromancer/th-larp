@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://bn4l14oxi8vt8"]
+[gd_scene load_steps=28 format=3 uid="uid://bn4l14oxi8vt8"]
 
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_ckdua"]
 [ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="1_oay4f"]
@@ -19,6 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://blvpb535tjm7u" path="res://sprites/UI/focus_viewer/scarlet_border/scarlet_border_green.png" id="13_kcadj"]
 [ext_resource type="Script" uid="uid://1x1m002ekv0q" path="res://scenes/GUI/danmaku_profile.gd" id="14_covod"]
 [ext_resource type="Texture2D" uid="uid://bepkdoq83pisw" path="res://sprites/UI/focus_viewer/scarlet_border/scarlet_border_red.png" id="14_j6hjd"]
+[ext_resource type="Texture2D" uid="uid://c6a3jura2nil6" path="res://sprites/character/fairy/trblr_portrait.png" id="15_kcadj"]
 [ext_resource type="Texture2D" uid="uid://dg4l4ad07gls3" path="res://sprites/UI/focus_viewer/scarlet_border/scarlet_border.png" id="16_eb0jm"]
 [ext_resource type="PackedScene" uid="uid://cpayroch3dxjg" path="res://scenes/GUI/item_button.tscn" id="16_m2ebb"]
 [ext_resource type="FontFile" uid="uid://cuuir1uibmfis" path="res://fonts/Marcellus/Marcellus.otf" id="17_n6bnq"]
@@ -355,15 +356,14 @@ layout_mode = 2
 script = ExtResource("6_3ynxl")
 metadata/_custom_type_script = "uid://cfiddycs16e6q"
 
-[node name="UnitPanel" type="AspectRatioContainer" parent="PanelViewer/ViewerVBox" node_paths=PackedStringArray("statusTray", "portrait")]
+[node name="UnitPanel" type="AspectRatioContainer" parent="PanelViewer/ViewerVBox" node_paths=PackedStringArray("portrait")]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
 mouse_filter = 2
 script = ExtResource("5_nxk8q")
-statusTray = NodePath("UnitMargin/UnitHBox/TexturePanel/TextureMargin/StatusTrayMargin")
 isPreview = true
-portrait = NodePath("UnitMargin/UnitHBox/PanelContainer/PortraitMargin/UnitTextureRect")
+portrait = NodePath("UnitMargin/UnitHBox/PanelContainer/ScarletBorderGreen/PortraitMargin/UnitTextureRect")
 
 [node name="UnitMargin" type="MarginContainer" parent="PanelViewer/ViewerVBox/UnitPanel"]
 layout_mode = 2
@@ -385,11 +385,28 @@ layout_mode = 2
 texture = ExtResource("12_86obr")
 
 [node name="ScarletBorderGreen" type="TextureRect" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/PanelContainer"]
+clip_children = 1
 custom_minimum_size = Vector2(176, 136)
 layout_mode = 2
 size_flags_horizontal = 0
 texture = ExtResource("13_kcadj")
 expand_mode = 1
+
+[node name="PortraitMargin" type="MarginContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/PanelContainer/ScarletBorderGreen"]
+layout_mode = 2
+offset_right = 149.0
+offset_bottom = 136.0
+size_flags_horizontal = 0
+size_flags_vertical = 4
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 18
+
+[node name="UnitTextureRect" type="TextureRect" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/PanelContainer/ScarletBorderGreen/PortraitMargin"]
+custom_minimum_size = Vector2(115, 112)
+layout_mode = 2
+texture = ExtResource("15_kcadj")
+expand_mode = 2
+stretch_mode = 4
 
 [node name="ScarletBorderRed" type="TextureRect" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/PanelContainer"]
 custom_minimum_size = Vector2(176, 136)
@@ -398,57 +415,9 @@ size_flags_horizontal = 0
 texture = ExtResource("14_j6hjd")
 expand_mode = 1
 
-[node name="PortraitMargin" type="MarginContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/PanelContainer"]
-layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 4
-theme_override_constants/margin_left = 30
-theme_override_constants/margin_top = 20
-
-[node name="UnitTextureRect" type="TextureRect" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/PanelContainer/PortraitMargin"]
-custom_minimum_size = Vector2(115, 112)
-layout_mode = 2
-texture = ExtResource("5_k63fk")
-expand_mode = 2
-stretch_mode = 4
-
 [node name="ScarletBorder" type="NinePatchRect" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/PanelContainer"]
 layout_mode = 2
 texture = ExtResource("16_eb0jm")
-
-[node name="TexturePanel" type="PanelContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox"]
-visible = false
-custom_minimum_size = Vector2(110, 110)
-layout_mode = 2
-size_flags_vertical = 0
-mouse_filter = 2
-
-[node name="BackgroundCenter" type="NinePatchRect" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/TexturePanel"]
-layout_mode = 2
-texture = ExtResource("1_ckdua")
-patch_margin_left = 16
-patch_margin_top = 16
-patch_margin_right = 16
-patch_margin_bottom = 16
-
-[node name="TextureMargin" type="MarginContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/TexturePanel"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/margin_left = 6
-theme_override_constants/margin_top = 5
-theme_override_constants/margin_right = 5
-theme_override_constants/margin_bottom = 5
-
-[node name="UnitTextureRect" type="TextureRect" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/TexturePanel/TextureMargin"]
-custom_minimum_size = Vector2(80, 80)
-layout_mode = 2
-texture = ExtResource("5_k63fk")
-expand_mode = 1
-stretch_mode = 5
-
-[node name="StatusTrayMargin" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/TexturePanel/TextureMargin" instance=ExtResource("7_u1j3q")]
-visible = false
-layout_mode = 2
 
 [node name="InfoPanel" type="PanelContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox"]
 layout_mode = 2

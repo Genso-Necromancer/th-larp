@@ -4,12 +4,14 @@ class_name MapManager
 @onready var gameBoard :GameBoard = %Gameboard
 @onready var guiManager :GUIManager = %GUIManager
 var dialogue_overlay := preload("res://scenes/cutscenes/dialog_overlay.tscn")
+const ITEM_PROMPT_SCENE := preload("res://scenes/GUI/ui_panels/item_prompt.tscn")
 var dOverlay : DialogueOverlay
 var current_map:String
 var next_map:String
 var is_suspended_load:=false
 var load_initiated:= false
 var soft_reset_in_progress := false
+var end_state_screen_shown := false
 
 func _ready():
 	if gameBoard and guiManager: 
@@ -103,6 +105,7 @@ func _connect_signals()-> void:
 	gameBoard.formation_closed.connect(guiManager._on_gameboard_formation_closed)
 	gameBoard.ui_returned.connect(guiManager._on_gameboard_ui_return)
 	gameBoard.state_changed.connect(guiManager.DEBUG._on_gb_state_changed)
+	gameBoard.state_changed.connect(self._on_gameboard_state_changed)
 	gameBoard.step_changed.connect(guiManager.DEBUG._on_gb_step_changed)
 	gameBoard.player_flow_changed.connect(guiManager._on_gameboard_player_flow_changed)
 	gameBoard.target_focused.connect(guiManager._on_gameboard_target_focused)
@@ -121,7 +124,7 @@ func _on_win_screen_win_finished() -> void:
 	#await SignalTower.fade_out_complete
 	GameState.change_state(self, GameState.gState.LOADING)
 	load_cutscene()
-	if gameBoard.current_map.end_script != null:
+	if gameBoard.current_map.end_script:
 		#end_load_screen(0.1)
 		dOverlay.prepare_new_dialogue(gameBoard.current_map.end_script)
 		await dOverlay.dialog_finished
@@ -135,6 +138,7 @@ func _on_win_screen_win_finished() -> void:
 
 
 func _on_map_added(map:GameMap):
+	end_state_screen_shown = false
 	current_map = map.get_scene_file_path()
 	PlayerData.chapter_title = map.title
 	next_map = map.next_map
@@ -227,6 +231,18 @@ func _on_returning_to_title():
 	self.queue_free()
 
 
+func _on_gameboard_state_changed(_state_keys:Array, state_index:int) -> void:
+	if end_state_screen_shown:
+		return
+	match state_index:
+		GameBoard.STATES.GAME_OVER:
+			end_state_screen_shown = true
+			guiManager._on_gameboard_player_lost()
+		GameBoard.STATES.VICTORY:
+			end_state_screen_shown = true
+			guiManager._on_gameboard_player_win()
+
+
 func trade_seeking(unit:Unit = Global.activeUnit):
 	gameBoard.seek_trade(unit)
 
@@ -240,15 +256,73 @@ func _on_cursor_moved(cell):
 #endregion
 
 
-func _on_chest_opened(cell:Vector2i, contents:Array[Item], unit:Unit):
-	#Unlock animation + SFX
-	#Cycle Contents and add to unit inv
-	#If inv full, send to storage and inform player
-	pass
+func _on_chest_opened(_cell:Vector2i, contents:Array[Item], currency:int, unit:Unit):
+	if currency > 0:
+		PlayerData.playerMon += currency
+		await _show_chest_currency_prompt(currency)
+	for item: Item in contents:
+		var had_space := unit != null and unit.inventory.size() < unit.max_inv
+		var granted_item: Item = await _grant_chest_item_to_unit(item, unit)
+		if had_space and granted_item != null:
+			await _show_chest_item_prompt(granted_item)
+	_finish_player_chest_action(unit)
 
-func _on_chest_stolen(cell:Vector2i, contents:Array[Item], unit:Unit):
-	#Unlock animation + SFX
-	#Stolen Sfx + prompt player what was stolen
-	#add to unit inv
-	#if inv full, check the fucking AI, they shouldn't be stealing with full inventories
-	pass
+
+func _on_chest_stolen(_cell:Vector2i, contents:Array[Item], _currency:int, unit:Unit):
+	for item: Item in contents:
+		await _grant_chest_item_to_unit(item, unit)
+
+
+func _grant_chest_item_to_unit(item: Item, unit: Unit) -> Item:
+	if item == null or unit == null:
+		return null
+	var granted_item: Item = item.duplicate()
+	if unit.inventory.size() >= unit.max_inv:
+		if guiManager == null:
+			push_warning("Chest item not granted because %s's inventory is full and no GuiManager was available." % [unit.unit_id])
+			return null
+		var chest_item_taken: bool = await guiManager.start_chest_overflow(unit, granted_item)
+		return granted_item if chest_item_taken else null
+	unit.inventory.append(granted_item)
+	return granted_item
+
+
+func _show_chest_item_prompt(item: Item) -> void:
+	if item == null or guiManager == null:
+		return
+	var prompt: item_prompt = ITEM_PROMPT_SCENE.instantiate()
+	guiManager.add_child(prompt)
+	prompt.prompt_item(item)
+	await _wait_for_item_prompt(prompt)
+
+
+func _show_chest_currency_prompt(count:int) -> void:
+	if count <= 0 or guiManager == null:
+		return
+	var prompt: item_prompt = ITEM_PROMPT_SCENE.instantiate()
+	guiManager.add_child(prompt)
+	prompt.prompt_currency(count)
+	await _wait_for_item_prompt(prompt)
+
+
+func _wait_for_item_prompt(prompt:item_prompt) -> void:
+	if prompt == null:
+		return
+	var complete_callable := Callable(prompt, "_complete_signal")
+	if not SignalTower.prompt_accepted.is_connected(complete_callable):
+		SignalTower.prompt_accepted.connect(complete_callable, CONNECT_ONE_SHOT)
+	GameState.change_state(prompt, GameState.gState.ACCEPT_PROMPT)
+	await prompt.item_prompt_complete
+	if SignalTower.prompt_accepted.is_connected(complete_callable):
+		SignalTower.prompt_accepted.disconnect(complete_callable)
+	prompt.queue_free()
+	GameState.change_state(self, GameState.gState.LOADING)
+
+
+func _finish_player_chest_action(unit:Unit) -> void:
+	if unit != null:
+		unit.on_chest = false
+	if gameBoard == null:
+		return
+	if gameBoard.state == GameBoard.STATES.PLAYER_PHASE:
+		gameBoard.turn_step = GameBoard.TURN_STEPS.END_PHASE

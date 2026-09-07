@@ -62,10 +62,29 @@ func on_animation_handler_sequence_complete() -> void:
 
 func update_unit_bars() -> void:
 	board.turn_step = GameBoard.TURN_STEPS.BAR_ANIM
-	board.bar_queue.append(board.activeUnit)
-	board.bar_queue.append(board.targetUnit)
-	board.activeUnit.update_life_bar()
-	board.targetUnit.update_life_bar()
+	board.bar_queue.clear()
+
+	var units_to_update: Array[Unit] = []
+	_add_bar_update_unit(units_to_update, board.activeUnit)
+	_add_bar_update_unit(units_to_update, board.targetUnit)
+	_add_bar_update_unit(units_to_update, board.action_context.get("Actor", null))
+	_add_bar_update_unit(units_to_update, board.action_context.get("Target", null))
+
+	if units_to_update.is_empty():
+		board.turn_step = GameBoard.TURN_STEPS.EVENT_QUEUE
+		return
+
+	for unit in units_to_update:
+		board.bar_queue.append(unit)
+		unit.update_life_bar()
+
+
+func _add_bar_update_unit(units_to_update: Array[Unit], unit) -> void:
+	if unit == null or not (unit is Unit):
+		return
+	if units_to_update.has(unit):
+		return
+	units_to_update.append(unit)
 
 
 func on_bars_updated(unit: Unit) -> void:

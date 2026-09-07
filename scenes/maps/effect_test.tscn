@@ -13,7 +13,7 @@
 [ext_resource type="Script" uid="uid://dtxt6i4bhoqpo" path="res://unit_resources/items/ofuda/ofuda.gd" id="12_wcikf"]
 [ext_resource type="PackedScene" uid="uid://bgq1asahykl5v" path="res://scenes/units/generic_units/human_miko_lv_1.tscn" id="13_4swnn"]
 [ext_resource type="Resource" uid="uid://i6gxwkej1jxe" path="res://unit_resources/items/ofuda/ofuda_heal0.tres" id="13_43qy2"]
-[ext_resource type="Resource" uid="uid://d17h2pq3fv73i" path="res://unit_resources/items/ofuda/ofuda_def_buff.tres" id="14_ebyka"]
+[ext_resource type="Resource" uid="uid://d17h2pq3fv73i" path="res://unit_resources/items/ofuda/ofuda_cele_buff.tres" id="14_ebyka"]
 
 [sub_resource type="Resource" id="Resource_uv3gg"]
 script = ExtResource("12_wcikf")

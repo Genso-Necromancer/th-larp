@@ -1,10 +1,8 @@
 extends PanelContainer
 class_name ItemButton
 
-@onready var button = $ButtonLayer
+
 @export var type :String = "Item"
-var useBorder := false
-var metaSet := false
 @export var isIconMode := false
 @export_category("FontColors")
 @export_group("Enabled")
@@ -22,6 +20,11 @@ var metaSet := false
 @export var sfFont : Color
 @export var shFont : Color
 @export var spFont : Color
+
+@onready var button = $ButtonLayer
+
+var useBorder := false
+var metaSet := false
 
 var disabled := false :
 	set(value):
@@ -104,6 +107,7 @@ func get_button():
 func _verify_state(value) -> String:
 	var s : String
 	var default : String
+	var panel := $Selected
 	if disabled:
 		default = "Disabled"
 	else:
@@ -119,11 +123,12 @@ func _verify_state(value) -> String:
 			s = value
 		_:
 			s = default
+	panel.visible = true if s == "Selected" else false
 	return s
 
 
 func _font_state_change(value : String):
-	var fontColor : Color
+	var font_colors := {}
 	var labels := []
 	var name_label: Control = _get_name_label()
 	var detail_label: Control = _get_detail_label()
@@ -133,15 +138,25 @@ func _font_state_change(value : String):
 		labels.append(detail_label)
 	match value:
 		"Enabled": 
-			fontColor = Color(1,1,1)
-		"Disabled": fontColor = Color(0.278, 0.278, 0.278)
-		"Selected": fontColor = Color(0.84, 0.84, 0)
+			font_colors = _get_font_color_set(eFont, efFont, ehFont, epFont)
+		"Disabled":
+			font_colors = _get_font_color_set(dFont, dfFont, dhFont, dpFont)
+		"Selected": 
+			font_colors = _get_font_color_set(sFont, sfFont, shFont, spFont)
+			
 	for l in labels:
-		l.add_theme_color_override("font_color", fontColor)
-		l.add_theme_color_override("font_pressed_color", fontColor)
-		l.add_theme_color_override("font_hover_color", fontColor)
-		l.add_theme_color_override("font_focus_color", fontColor)
-		l.add_theme_color_override("font_hover_pressed_color", fontColor)
+		for color_key in font_colors:
+			l.add_theme_color_override(color_key, font_colors[color_key])
+
+
+func _get_font_color_set(base: Color, focus: Color, hover: Color, pressed: Color) -> Dictionary:
+	return {
+		"font_color": base,
+		"font_focus_color": focus,
+		"font_hover_color": hover,
+		"font_pressed_color": pressed,
+		"font_hover_pressed_color": pressed,
+	}
 
 
 func _get_name_label() -> Control:

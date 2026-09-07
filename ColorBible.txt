@@ -7,3 +7,11 @@ Testing Value Color: Color(0.428, 0.473, 0.886)
 Negative Value: Red: Color(0.804, 0.0, 0.139)
 
 Forecast GUI: lilac: bfafcc 
+
+# Item Fonts
+Enabled:
+- 515767
+Disabled:
+- 1e2129
+Selected:
+- c3c8d4

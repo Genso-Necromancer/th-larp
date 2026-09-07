@@ -271,7 +271,7 @@ var focusDanmaku:Danmaku:
 enum TURN_STEPS {STAND_BY,PROCESSING,START,END_PHASE,END,OPTIONS,ACTIONS,MOVE_SEEK,UNIT_MOVING,AI_ACT,ITEM_QUEUED,ITEM_ANIMATION,ITEM_TARGET,ATTACK_TARGET,DOOR_TARGET,TRADE_TARGET,SKILL_TARGET,FORECAST_ATTACK,COMBAT_DISPLAY,EFFECT_QUEUE,BAR_ANIM,EVENT_QUEUE,EXP_GRANT,CANTO,WARP_TARGET}
 enum PLAYER_FLOW {IDLE,UNIT_SELECTED,MOVE_PREVIEW,POST_MOVE_MENU,TARGETING,FORECAST,RESOLVING}
 enum AI_STEPS {STAND_BY,PROCESSING,START,EVALUATE,PROCESS_TURN,SELECT_UNIT,MOVE_UNIT}
-enum ROUND_STEPS {CHECK,DANMAKU,SCENE,REINFORCE,END,}
+enum ROUND_STEPS {CHECK,DANMAKU,SPECIAL_TERRAIN,SCENE,REINFORCE,END,}
 var last_step:TURN_STEPS
 var turn_step:TURN_STEPS = TURN_STEPS.STAND_BY:
 	set(value):
@@ -288,6 +288,7 @@ var round_step:ROUND_STEPS = ROUND_STEPS.CHECK:
 	set(value):
 		round_step = value
 		step_changed.emit(ROUND_STEPS.keys(),value)
+var round_step_busy:bool = false
 var pending_item_action:Dictionary={"Item":false,"Results":false,}
 var turn_order:Array[StringName]
 var turn_counter:int = 0
@@ -427,10 +428,14 @@ func _connect_gui_signals():
 		guiManager.ui_trade_selected.connect(_on_gui_trade_selected)
 	if not guiManager.ui_wait_selected.is_connected(_on_gui_wait_selected):
 		guiManager.ui_wait_selected.connect(_on_gui_wait_selected)
+	if not guiManager.ui_end_round_selected.is_connected(_on_gui_end_round_selected):
+		guiManager.ui_end_round_selected.connect(_on_gui_end_round_selected)
 	if not guiManager.ui_ofuda_selected.is_connected(_on_gui_ofuda_selected):
 		guiManager.ui_ofuda_selected.connect(_on_gui_ofuda_selected)
 	if not guiManager.ui_door_selected.is_connected(_on_gui_door_selected):
 		guiManager.ui_door_selected.connect(_on_gui_door_selected)
+	if not guiManager.ui_chest_selected.is_connected(_on_gui_chest_selected):
+		guiManager.ui_chest_selected.connect(_on_gui_chest_selected)
 	if not guiManager.ui_seize_selected.is_connected(_on_gui_seize_selected):
 		guiManager.ui_seize_selected.connect(_on_gui_seize_selected)
 	if not guiManager.ui_suspend_requested.is_connected(_on_gui_suspend_requested):
@@ -527,6 +532,62 @@ func check_passives():
 
 func _update_unit_terrain(unit:Unit):
 	unit.update_terrain_data()
+
+
+func apply_unit_passive_special_terrain(unit:Unit) -> void:
+	if unit == null or current_map == null:
+		return
+	if unit.FACTION_ID != Enums.FACTION_ID.PLAYER:
+		return
+	var terrain_values := _get_passive_special_terrain_values(unit.cell)
+	var life_restore := int(terrain_values.get("HpRegen", 0))
+	var comp_restore := int(terrain_values.get("CompRegen", 0))
+	if life_restore <= 0 and comp_restore <= 0:
+		return
+	var missing_life:int = max(0, int(unit.active_stats.get("Life", unit.current_life)) - unit.current_life)
+	var missing_comp:int = max(0, int(unit.active_stats.get("Comp", unit.current_comp)) - unit.current_comp)
+	var will_restore_life:bool = life_restore > 0 and missing_life > 0
+	var will_restore_comp:bool = comp_restore > 0 and missing_comp > 0
+	if not will_restore_life and not will_restore_comp:
+		return
+	var price:int = abs(int(terrain_values.get("Price", 0)))
+	if price > 0:
+		if PlayerData.playerMon < price:
+			return
+		PlayerData.playerMon -= price
+	if will_restore_life:
+		unit.apply_heal(life_restore)
+	if will_restore_comp:
+		unit.restore_composure(comp_restore, "SpecialTerrain")
+	if will_restore_life:
+		unit.update_life_bar()
+		await unit.bars_updated
+	elif will_restore_comp:
+		unit.update_composure_bar()
+		await unit.bars_updated
+
+
+func apply_round_passive_special_terrain() -> void:
+	var units_to_check:Array[Unit] = []
+	for unit in units.values():
+		if unit is Unit:
+			units_to_check.append(unit)
+	for unit:Unit in units_to_check:
+		await apply_unit_passive_special_terrain(unit)
+
+
+func _get_passive_special_terrain_values(cell:Vector2i) -> Dictionary:
+	var tags := current_map.get_terrain_tags(cell)
+	var values := {"HpRegen": 0, "CompRegen": 0, "Price": 0}
+	for tag_key in ["BaseType", "ModType"]:
+		var terrain_key := String(tags.get(tag_key, ""))
+		if terrain_key == "" or not PlayerData.terrainData.has(terrain_key):
+			continue
+		var terrain_data: Dictionary = PlayerData.terrainData[terrain_key]
+		values.HpRegen += int(terrain_data.get("HpRegen", 0))
+		values.CompRegen += int(terrain_data.get("CompRegen", 0))
+		values.Price += int(terrain_data.get("Price", 0))
+	return values
 
 
 func _move_active_unit(new_cell: Vector2i, set_path:Array[Vector2i]= []) -> void: #pathing related
@@ -703,7 +764,8 @@ func _continue_ai_action_after_move() -> void:
 				turn_step = TURN_STEPS.END
 				return
 			_set_active_action(false, null, live_item)
-			_begin_ai_forecast_sequence(item_target)
+			_set_action_target(item_target)
+			resolve_item_without_forecast(live_item)
 		Action.ACTION_TYPE.DOOR:
 			if current_map != null and current_map.doors.has(action.target_cell):
 				turn_step = TURN_STEPS.PROCESSING
@@ -1329,6 +1391,33 @@ func _door_zoom_complete(cell:Vector2i):
 	activeUnit.pick_door(current_map.doors[cell])
 
 
+func open_active_chest() -> void:
+	if activeUnit == null or current_map == null:
+		return
+	var chest: ChestTile = current_map.chests.get(activeUnit.cell, null)
+	if chest == null:
+		chest = _get_chest_covered_by_active_unit()
+	if chest == null:
+		return
+	if not chest.is_locked:
+		return
+	turn_step = TURN_STEPS.PROCESSING
+	apply_scene_control_state()
+	if guiManager != null:
+		guiManager._hide_hud()
+	action_confirmed.emit()
+	await activeUnit.pick_chest(chest)
+
+
+func _get_chest_covered_by_active_unit() -> ChestTile:
+	if activeUnit == null or current_map == null:
+		return null
+	for chest: ChestTile in current_map.chests.values():
+		if chest != null and chest.covered_by == activeUnit:
+			return chest
+	return null
+
+
 func _select_unit(cell: Vector2i) -> void:
 	var occupied :bool= is_occupied(cell)
 	if !occupied:
@@ -1473,6 +1562,9 @@ func _on_gui_skill_selected(skill) -> void:
 func _on_gui_wait_selected() -> void:
 	player_action_controller.on_gui_wait_selected()
 
+func _on_gui_end_round_selected() -> void:
+	player_action_controller.on_gui_end_round_selected()
+
 func _on_gui_item_selected(unit) -> void:
 	player_action_controller.on_gui_item_selected(unit)
 
@@ -1488,6 +1580,9 @@ func _on_gui_ofuda_selected(unit, ofuda) -> void:
 
 func _on_gui_door_selected() -> void:
 	player_action_controller.on_gui_door_selected()
+
+func _on_gui_chest_selected(unit) -> void:
+	player_action_controller.on_gui_chest_selected(unit)
 
 func _on_gui_seize_selected(cell) -> void:
 	player_action_controller.on_gui_seize_selected(cell)
@@ -1640,7 +1735,7 @@ func _set_active_action(uses_weapon: bool, skill = null, item = null) -> void:
 	action_context.Action = active_action.duplicate()
 
 
-func _resolve_item_action(actor: Unit, target: Unit, item: Consumable, warp_destination := Vector2i(-999999, -999999)) -> CombatResults:
+func _resolve_item_action(actor: Unit, target: Unit, item: Consumable, warp_destination := Vector2i(-999999, -999999), show_map_feedback := false) -> CombatResults:
 	if actor == null or target == null or item == null:
 		return null
 	_set_active_action(false, null, item)
@@ -1650,7 +1745,7 @@ func _resolve_item_action(actor: Unit, target: Unit, item: Consumable, warp_dest
 	var results: CombatResults = combatManager.start_the_justice(actor, target, active_action)
 	turn_step = TURN_STEPS.ITEM_QUEUED
 	actor.use_item(item)
-	target.receive_item(item)
+	target.receive_item(item, show_map_feedback)
 	_set_action_results(results)
 	return results
 
@@ -1680,7 +1775,7 @@ func is_warp_item(item: Consumable) -> bool:
 func resolve_item_without_forecast(item: Consumable) -> void:
 	if activeUnit == null or targetUnit == null or item == null:
 		return
-	var results: CombatResults = _resolve_item_action(activeUnit, targetUnit, item)
+	var results: CombatResults = _resolve_item_action(activeUnit, targetUnit, item, Vector2i(-999999, -999999), true)
 	pending_item_action["Item"] = item
 	pending_item_action["Results"] = results
 
@@ -1688,7 +1783,7 @@ func resolve_item_without_forecast(item: Consumable) -> void:
 func resolve_warp_without_forecast(item: Consumable, target: Unit, destination: Vector2i) -> void:
 	if activeUnit == null or target == null or item == null:
 		return
-	var results: CombatResults = _resolve_item_action(activeUnit, target, item, destination)
+	var results: CombatResults = _resolve_item_action(activeUnit, target, item, destination, false)
 	pending_item_action["Item"] = item
 	pending_item_action["Results"] = results
 #endregion
@@ -1823,7 +1918,11 @@ func round_duration_tick():
 
 
 func _check_eor_events()->void:
-	board_turn_flow.check_end_of_round_events()
+	if round_step_busy:
+		return
+	round_step_busy = true
+	await board_turn_flow.check_end_of_round_events()
+	round_step_busy = false
 #endregion
 
 

@@ -4,8 +4,15 @@
 [ext_resource type="Theme" uid="uid://du12ka2217r4x" path="res://fonts/Izayoi_Theme.tres" id="1_ofp1p"]
 [ext_resource type="Script" uid="uid://dga6degdfd1pu" path="res://scenes/GUI/item_button.gd" id="2_oouan"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_pqruf"]
-[ext_resource type="FontFile" uid="uid://dia8fvtnbbel2" path="res://fonts/Kalam/Kalam-Light.otf" id="4_h4p4o"]
 [ext_resource type="Texture2D" uid="uid://334jwhhfyadm" path="res://sprites/icons/items/missing_item.png" id="4_t4ocv"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_t4ocv"]
+bg_color = Color(0.749, 0.686, 0.8, 1)
+corner_radius_top_left = 19
+corner_radius_top_right = 19
+corner_radius_bottom_right = 19
+corner_radius_bottom_left = 19
+corner_detail = 10
 
 [node name="ItemButton" type="PanelContainer"]
 offset_right = 282.0
@@ -14,6 +21,18 @@ size_flags_horizontal = 0
 size_flags_vertical = 4
 theme = ExtResource("1_dvsi0")
 script = ExtResource("2_oouan")
+eFont = Color(0.315846, 0.339568, 0.402645, 1)
+efFont = Color(0.317647, 0.341176, 0.403922, 1)
+ehFont = Color(0.317647, 0.341176, 0.403922, 1)
+epFont = Color(0.317647, 0.341176, 0.403922, 1)
+dFont = Color(0.117647, 0.129412, 0.160784, 1)
+dfFont = Color(0.117647, 0.129412, 0.160784, 1)
+dhFont = Color(0.117647, 0.129412, 0.160784, 1)
+dpFont = Color(0.117647, 0.129412, 0.160784, 1)
+sFont = Color(0.117647, 0.129412, 0.160784, 1)
+sfFont = Color(0.117647, 0.129412, 0.160784, 1)
+shFont = Color(0.117647, 0.129412, 0.160784, 1)
+spFont = Color(0.117647, 0.129412, 0.160784, 1)
 
 [node name="FocusBorder" type="NinePatchRect" parent="."]
 visible = false
@@ -25,6 +44,11 @@ patch_margin_left = 5
 patch_margin_top = 5
 patch_margin_right = 5
 patch_margin_bottom = 5
+
+[node name="Selected" type="Panel" parent="."]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_t4ocv")
 
 [node name="ContentMargin" type="MarginContainer" parent="."]
 layout_mode = 2
@@ -69,17 +93,19 @@ layout_mode = 2
 size_flags_vertical = 8
 bbcode_enabled = true
 text = "Item Name"
+fit_content = true
 scroll_active = false
-vertical_alignment = 1
+vertical_alignment = 2
 
-[node name="Durability" type="Label" parent="ContentMargin/HBoxContainer"]
-custom_minimum_size = Vector2(54, 26)
+[node name="Durability" type="RichTextLabel" parent="ContentMargin/HBoxContainer"]
+custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 8
-theme_override_fonts/font = ExtResource("4_h4p4o")
-theme_override_font_sizes/font_size = 25
 text = "00/00"
+fit_content = true
+scroll_active = false
+autowrap_mode = 0
 horizontal_alignment = 2
 vertical_alignment = 2
 

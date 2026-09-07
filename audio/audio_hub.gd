@@ -10,4 +10,5 @@ func _ready():
 
 
 func _on_audio_called(type:String):
-	audio_players[type].play(0.0)
+	if audio_players.has(type): audio_players[type].play(0.0)
+	else: printerr(self, "Missing: ", type)

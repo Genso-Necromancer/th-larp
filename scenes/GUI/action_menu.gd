@@ -10,8 +10,10 @@ signal skill_selected(skill)
 signal item_selected(unit)
 signal trade_selected(unit)
 signal wait_selected
+signal end_round_selected
 signal ofuda_selected(unit, ofuda)
 signal door_selected
+signal chest_selected(unit)
 signal seize_selected(cell)
 signal suspend_requested
 signal menu_canceled
@@ -243,7 +245,10 @@ func _on_button_pressed(bName):
 		"OpenDoorBtn":
 			door_selected.emit()
 			_change_state(MENU_STATES.DOOR)
-		"OpenChestBtn": pass
+		"OpenChestBtn":
+			var unit := currentUnit
+			_clear_states(true)
+			chest_selected.emit(unit)
 		"StealBtn": pass
 		"OfudaBtn":
 			_change_state(MENU_STATES.OFUDA_OPEN)
@@ -256,7 +261,9 @@ func _on_button_pressed(bName):
 		"WaitBtn":
 			_clear_states(true)
 			wait_selected.emit()
-		"EndBtn": pass
+		"EndBtn":
+			_clear_states(true)
+			end_round_selected.emit()
 		"StatBtn": pass
 		"OpBtn": pass
 		"SusBtn":

@@ -65,8 +65,11 @@ func _ready_style():
 
 func fill_items(isTrade : = false, reach := [0,0], useBorder := false) -> Array:
 	var unit :Unit = get_meta("Unit")
-	var inv = unit.inventory
-	var i := 0
+	return fill_item_array(unit.inventory, unit, isTrade, reach, useBorder)
+
+
+func fill_item_array(inv:Array, unit:Unit, isTrade : = false, reach := [0,0], useBorder := false, start_index := 0) -> Array:
+	var i := start_index
 	var bPath = load("res://scenes/GUI/item_button.tscn")
 	var equipped = unit.get_equipped_weapon()
 	var b
@@ -88,6 +91,18 @@ func fill_items(isTrade : = false, reach := [0,0], useBorder := false) -> Array:
 		b = _generate_item_button(bPath, item, i, unit, isTrade)
 		_add_item(b)
 		i += 1
+	return items
+
+
+func fill_chest_overflow_items(chest_item:Item, unit:Unit) -> Array:
+	var bPath = load("res://scenes/GUI/item_button.tscn")
+	if chest_item != null:
+		var chest_button := _generate_item_button(bPath, chest_item, 0, unit, false)
+		chest_button.useBorder = true
+		_display_weapon(chest_button)
+	var overflow_inventory: Array = []
+	overflow_inventory.append_array(unit.inventory)
+	fill_item_array(overflow_inventory, unit, false, [0,0], false, 1)
 	return items
 
 
@@ -131,6 +146,7 @@ func _check_display() -> bool:
 
 
 func _display_weapon(button : ItemButton):
+	equipContainer.visible = true
 	items.append(button)
 	equipContainer.add_child(button)
 
@@ -165,6 +181,8 @@ func clear_items():
 	if equipContainer and equipContainer.get_children().size() > 0:
 		for kid in equipContainer.get_children():
 			kid.queue_free()
+	if equipContainer:
+		equipContainer.visible = false
 	for b in itemList.get_children():
 		itemList.remove_child(b)
 		b.queue_free()

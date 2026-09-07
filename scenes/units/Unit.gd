@@ -18,6 +18,8 @@ signal bars_updated(unit:Unit)
 
 const COMP_BREAK_EFFECT_ID := "comp_break_default"
 const COMP_BREAK_EFFECT_PATH := "res://unit_resources/effects/comp_break_default.tres"
+const MAP_POP_TEXT_PATH := preload("res://scenes/animations/combat/fx/gen/fx_pop_up.tscn")
+const MAP_POP_TEXT_SCALE := Vector2(0.35, 0.35)
 
 
 
@@ -1667,10 +1669,118 @@ func use_item(_item : Item) -> void:
 
 
 
-func receive_item(item:Item)->void:
+func receive_item(item:Item, show_map_feedback := false)->void:
 	var id :String = item.get_main_effect_id()
 	_sprite_fx.play_item_fx(id)
+	if show_map_feedback:
+		_show_forecastless_item_effect_text(item)
 	update_life_bar()
+
+
+func _show_forecastless_item_effect_text(item: Item) -> void:
+	if item == null or item.effects.is_empty():
+		return
+	var offset_index := 0
+	for effect: Effect in item.effects:
+		if effect == null:
+			continue
+		var display_text := _get_forecastless_effect_text(effect)
+		if display_text == "":
+			continue
+		_spawn_map_pop_text(display_text, effect.type, offset_index)
+		offset_index += 1
+
+
+func _spawn_map_pop_text(display_text: String, style_type: int, offset_index: int) -> void:
+	if _sprite_fx == null:
+		return
+	var pop_text: PopText = MAP_POP_TEXT_PATH.instantiate()
+	pop_text.scale = MAP_POP_TEXT_SCALE
+	pop_text.position = Vector2(0, -24 - (offset_index * 18))
+	pop_text.set_direct_effect_text(display_text, style_type)
+	_sprite_fx.add_child(pop_text)
+	pop_text.play_action()
+	var player := pop_text.get_node_or_null("AnimationPlayer") as AnimationPlayer
+	if player != null:
+		player.animation_finished.connect(pop_text.queue_free.unbind(1), CONNECT_ONE_SHOT)
+
+
+func _get_forecastless_effect_text(effect: Effect) -> String:
+	var sub_label := _get_short_effect_sub_type(effect.sub_type)
+	var effect_value := int(effect.value) if effect.value != null else 0
+	match effect.type:
+		Enums.EFFECT_TYPE.BUFF, Enums.EFFECT_TYPE.DEBUFF:
+			var sign := "+" if effect_value >= 0 else ""
+			return "%s%d %s" % [sign, effect_value, sub_label]
+		Enums.EFFECT_TYPE.HEAL, Enums.EFFECT_TYPE.HOT, Enums.EFFECT_TYPE.LIFE_STEAL:
+			return "+%d Life" % effect_value
+		Enums.EFFECT_TYPE.DAMAGE, Enums.EFFECT_TYPE.DOT:
+			return "-%d Life" % abs(effect_value)
+		Enums.EFFECT_TYPE.COMP_HEAL:
+			return "+%d Comp" % effect_value
+		Enums.EFFECT_TYPE.COMP_DMG:
+			return "-%d Comp" % abs(effect_value)
+		Enums.EFFECT_TYPE.CURE:
+			return "Cure %s" % sub_label
+		Enums.EFFECT_TYPE.PURITY:
+			return "Purify"
+		Enums.EFFECT_TYPE.PURGE:
+			return "Purge"
+		Enums.EFFECT_TYPE.STATUS:
+			return "%s!" % sub_label
+		Enums.EFFECT_TYPE.STATUS_BUFFER:
+			return "Status Ward"
+		_:
+			return ""
+
+
+func _get_short_effect_sub_type(sub_type) -> String:
+	var sub_type_value := int(sub_type) if sub_type != null else int(Enums.SUB_TYPE.NONE)
+	match sub_type_value:
+		Enums.SUB_TYPE.PWR:
+			return "Pwr"
+		Enums.SUB_TYPE.MAG:
+			return "Mag"
+		Enums.SUB_TYPE.ELEG:
+			return "Eleg"
+		Enums.SUB_TYPE.CELE:
+			return "Cele"
+		Enums.SUB_TYPE.DEF:
+			return "Def"
+		Enums.SUB_TYPE.CHA:
+			return "Cha"
+		Enums.SUB_TYPE.MOVE:
+			return "Move"
+		Enums.SUB_TYPE.LIFE:
+			return "Life"
+		Enums.SUB_TYPE.COMP:
+			return "Comp"
+		Enums.SUB_TYPE.HIT:
+			return "Hit"
+		Enums.SUB_TYPE.DMG:
+			return "Dmg"
+		Enums.SUB_TYPE.GRAZE:
+			return "Graze"
+		Enums.SUB_TYPE.BARRIER:
+			return "Barrier"
+		Enums.SUB_TYPE.BARPRC:
+			return "Bar%"
+		Enums.SUB_TYPE.CRIT:
+			return "Crit"
+		Enums.SUB_TYPE.EFFHIT:
+			return "Eff%"
+		Enums.SUB_TYPE.DRES:
+			return "DRes"
+		Enums.SUB_TYPE.ALL:
+			return "All"
+		Enums.SUB_TYPE.SLEEP:
+			return "Sleep"
+		Enums.SUB_TYPE.DAZED:
+			return "Daze"
+		Enums.SUB_TYPE.SILENCE:
+			return "Silence"
+		_:
+			return Enums.SUB_TYPE.keys()[sub_type_value].capitalize()
 
 
 
@@ -1931,6 +2041,12 @@ func pick_door(door:DoorTile):
 	_anim_player.play("pick")
 	await animation_complete
 	door.unlock()
+
+
+func pick_chest(chest:ChestTile):
+	_anim_player.play("pick")
+	await animation_complete
+	chest.unlock()
 
 
 func apply_dmg(dmg : int, source : Unit = null):

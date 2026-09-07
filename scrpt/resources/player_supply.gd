@@ -11,7 +11,7 @@ class_name PlayerSupply
 @export var GUN :Array[Item] = []
 @export var ACC :Array[Item] = []
 @export var ITEM :Array[Item] = []
-@export var player_mon:int=0
+@export var player_mon:int=100
 var BLADE_DEFAULT :Array[Item] = []
 var BLUNT_DEFAULT :Array[Item] = []
 var STICK_DEFAULT :Array[Item] = []

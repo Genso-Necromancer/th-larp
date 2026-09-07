@@ -96,6 +96,10 @@ func on_gui_skill_selected(skill) -> void:
 func on_gui_wait_selected() -> void:
 	commit_wait_action()
 
+func on_gui_end_round_selected() -> void:
+	board.early_end = true
+	board._advance_to_end_phase()
+
 
 func on_gui_action_menu_canceled() -> void:
 	cancel_action_menu_flow()
@@ -113,6 +117,14 @@ func on_gui_trade_selected(unit) -> void:
 
 func on_gui_door_selected() -> void:
 	board.door_targeting()
+
+
+func on_gui_chest_selected(unit) -> void:
+	if unit == null:
+		return
+	board.activeUnit = unit
+	board._set_action_actor(unit)
+	board.open_active_chest()
 
 
 func on_gui_seize_selected(cell) -> void:

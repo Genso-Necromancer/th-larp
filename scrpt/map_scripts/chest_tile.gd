@@ -6,19 +6,20 @@ class_name ChestTile
 		is_locked = value
 		_is_locked = is_locked
 @export var contents:Array[Item]=[]
+@export var currency:int = 0
 var is_covered:= false
 var covered_by:Unit
 
 
 func unlock():
 	super()
-	SignalTower.chest_opened.emit(cell, contents, covered_by)
+	SignalTower.chest_opened.emit(cell, contents, currency, covered_by)
 
 
 func stolen():
 	if !is_locked: return
 	is_locked = false
-	SignalTower.chest_stolen.emit(cell, contents, covered_by)
+	SignalTower.chest_stolen.emit(cell, contents, currency, covered_by)
 
 
 func _on_tile_area_area_entered(area:AreaUnit):
@@ -39,9 +40,11 @@ func _on_tile_area_area_exited(area:AreaUnit):
 func get_save_data()->Dictionary:
 	var data :Dictionary= super()
 	data["contents"] = contents
+	data["currency"] = currency
 	return data
 
 
 func load_save_data(data:Dictionary):
 	super(data)
 	contents = data.contents
+	currency = int(data.get("currency", 0))

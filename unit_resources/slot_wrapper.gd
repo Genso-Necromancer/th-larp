@@ -14,6 +14,7 @@ var id : String
 func _init(resource : UnitResource = load("res://unit_resources/items/weapons/unarmed_resource.tres")) -> void:
 	if resource == null: return
 	else: properties = resource
+	#The fuck am I doing here? format_to_id gets an id from the file name itself. Except that one is grabbing the slotwrapper's filename. Why don't I use that within the Unit Resource to get it's id and stop having to fill it in?
 	id = properties.id
 	print(_format_to_id())
 
