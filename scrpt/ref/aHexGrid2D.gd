@@ -4,6 +4,74 @@ class_name AHexGrid2D
 ##Initialize with a map, assign unit & units, sort how to handle obstacles both units and terrain.
 ##running find_unit_paths searches all paths up to the unit's movement, based on terrain cost, blocking solid objects.
 ##Active Unit is used in places, but never actually assigned??? Assess this.
+
+## TileSet custom data layer: WallDirection
+## Bitmask order starts from the top edge and proceeds clockwise.
+const WALL_UP := 1
+const WALL_UP_RIGHT := 2
+const WALL_DOWN_RIGHT := 4
+const WALL_DOWN := 8
+const WALL_DOWN_LEFT := 16
+const WALL_UP_LEFT := 32
+
+const WALL_DIRECTION_NAMES := {
+	WALL_UP: "UP",
+	WALL_UP_RIGHT: "UP_RIGHT",
+	WALL_DOWN_RIGHT: "DOWN_RIGHT",
+	WALL_DOWN: "DOWN",
+	WALL_DOWN_LEFT: "DOWN_LEFT",
+	WALL_UP_LEFT: "UP_LEFT",
+}
+
+const WALL_BITS_BY_OFFSET_INDEX := [
+	WALL_UP_RIGHT,
+	WALL_DOWN_RIGHT,
+	WALL_DOWN,
+	WALL_DOWN_LEFT,
+	WALL_UP_LEFT,
+	WALL_UP,
+]
+
+const WALL_EDGE_POINTS := {
+	WALL_UP: [Vector2(-42, -25), Vector2(42, -25)],
+	WALL_UP_RIGHT: [Vector2(42, -25), Vector2(84, 0)],
+	WALL_DOWN_RIGHT: [Vector2(84, 0), Vector2(42, 25)],
+	WALL_DOWN: [Vector2(42, 25), Vector2(-42, 25)],
+	WALL_DOWN_LEFT: [Vector2(-42, 25), Vector2(-84, 0)],
+	WALL_UP_LEFT: [Vector2(-84, 0), Vector2(-42, -25)],
+}
+
+const WALL_CORNER_BITS := {
+	"UP_LEFT": [WALL_UP_LEFT, WALL_UP],
+	"UP_RIGHT": [WALL_UP, WALL_UP_RIGHT],
+	"RIGHT": [WALL_UP_RIGHT, WALL_DOWN_RIGHT],
+	"DOWN_RIGHT": [WALL_DOWN_RIGHT, WALL_DOWN],
+	"DOWN_LEFT": [WALL_DOWN, WALL_DOWN_LEFT],
+	"LEFT": [WALL_DOWN_LEFT, WALL_UP_LEFT],
+}
+
+const WALL_CORNER_POINTS := {
+	"UP_LEFT": Vector2(-42, -25),
+	"UP_RIGHT": Vector2(42, -25),
+	"RIGHT": Vector2(84, 0),
+	"DOWN_RIGHT": Vector2(42, 25),
+	"DOWN_LEFT": Vector2(-42, 25),
+	"LEFT": Vector2(-84, 0),
+}
+
+const WALL_OPPOSITES := {
+	WALL_UP: WALL_DOWN,
+	WALL_UP_RIGHT: WALL_DOWN_LEFT,
+	WALL_DOWN_RIGHT: WALL_UP_LEFT,
+	WALL_DOWN: WALL_UP,
+	WALL_DOWN_LEFT: WALL_UP_RIGHT,
+	WALL_UP_LEFT: WALL_DOWN_RIGHT,
+}
+
+const WALL_TYPE_BLOCK_ALL := &"Wall"
+const WALL_TYPE_FLY_PASS := &"WallFly"
+const WALL_TYPE_SHOOT_PASS := &"WallShoot"
+
 var mapSize
 var mapRect
 var mapCells :Array[Vector2i]
@@ -206,7 +274,7 @@ func find_all_paths(start: Vector2i, maxCost: int, unit = false) -> Array:
 		if currentCost >= maxCost:
 			continue
 			
-		for neighbor in get_BFS_nhbr(currentNode):
+		for neighbor in get_BFS_nhbr(currentNode, false, unit):
 			var neighborInfo = get_visited_info(visited, neighbor)
 			var neighborCost = currentCost + compute_cost(currentNode, neighbor, unit)
 			if neighborCost > maxCost:
@@ -230,7 +298,7 @@ func find_all_paths(start: Vector2i, maxCost: int, unit = false) -> Array:
 	return result
 
 
-func get_BFS_nhbr(hex: Vector2i, justNhbrs = false) -> Array:
+func get_BFS_nhbr(hex: Vector2i, justNhbrs = false, unit = null) -> Array:
 #	print("??")
 	var neighbors = []
 	var q = hex.x
@@ -252,13 +320,13 @@ func get_BFS_nhbr(hex: Vector2i, justNhbrs = false) -> Array:
 			neighbor += offsetH
 			
 		# Check if the neighbor is valid
-			if _check_valid_nhbr(neighbor):
+			if _check_valid_step(hex, neighbor, unit):
 				neighbors.append(neighbor)
 				
 		return neighbors
 
 
-func get_neighbor_nodes(hex: Dictionary) -> Array:
+func get_neighbor_nodes(hex: Dictionary, unit = null) -> Array:
 	var neighbors = []
 	var q = hex.node.x
 	var _r = hex.node.y
@@ -270,7 +338,7 @@ func get_neighbor_nodes(hex: Dictionary) -> Array:
 		neighbor.node += offsetH
 #		print("hex ", hex.node, " nhbr ", neighbor.node)
 		# Check if the neighbor is valid
-		if _check_valid_nhbr(neighbor.node):
+		if _check_valid_step(hex.node, neighbor.node, unit):
 			neighbors.append(neighbor)
 		#if !attack:
 			#if is_valid_position(neighbor.node) and !_is_solid_check(neighbor.node):
@@ -287,6 +355,14 @@ func _check_valid_nhbr(hex) -> bool:
 			return true
 		else:
 			return false
+
+
+func _check_valid_step(from_cell: Vector2i, to_cell: Vector2i, unit = null) -> bool:
+	if !_check_valid_nhbr(to_cell):
+		return false
+	if is_movement_blocked_by_directional_wall(from_cell, to_cell, unit):
+		return false
+	return true
 
 
 func _slam_check(hex):
@@ -373,7 +449,7 @@ func find_path(start: Vector2i, end: Vector2i, unit = false,) -> Array[Vector2i]
 #			print("PathTest: ", reconstruct_path(currentNode))
 			return reconstruct_path(currentNode)
 
-		var neighbors = get_neighbor_nodes(currentNode)
+		var neighbors = get_neighbor_nodes(currentNode, unit)
 		for neighbor in neighbors:
 			if neighbor in closed_list:
 				continue
@@ -426,6 +502,177 @@ func _get_offsets(x) -> Array:
 			Vector2i(0, -1)   
 		]
 	return offsets
+
+
+func get_wall_bit_between(from_cell: Vector2i, to_cell: Vector2i) -> int:
+	var delta := to_cell - from_cell
+	var offsets := _get_offsets(from_cell.x)
+	for index in offsets.size():
+		if offsets[index] == delta:
+			return int(WALL_BITS_BY_OFFSET_INDEX[index])
+	return 0
+
+
+func get_opposite_wall_bit(wall_bit: int) -> int:
+	return int(WALL_OPPOSITES.get(wall_bit, 0))
+
+
+func get_wall_mask(cell: Vector2i) -> int:
+	if tileMap != null and tileMap.has_method("get_wall_direction"):
+		return int(tileMap.get_wall_direction(cell))
+	return 0
+
+
+func get_wall_type(cell: Vector2i) -> StringName:
+	if tileMap != null and tileMap.has_method("get_wall_type"):
+		return StringName(tileMap.get_wall_type(cell))
+	return &""
+
+
+func has_directional_wall_between(from_cell: Vector2i, to_cell: Vector2i) -> bool:
+	var from_wall_bit := get_wall_bit_between(from_cell, to_cell)
+	if from_wall_bit == 0:
+		return false
+	var to_wall_bit := get_opposite_wall_bit(from_wall_bit)
+	var from_wall_mask := get_wall_mask(from_cell)
+	var to_wall_mask := get_wall_mask(to_cell)
+	return (from_wall_mask & from_wall_bit) != 0 or (to_wall_mask & to_wall_bit) != 0
+
+
+func _get_directional_wall_types_between(from_cell: Vector2i, to_cell: Vector2i) -> Array[StringName]:
+	var wall_types: Array[StringName] = []
+	var from_wall_bit := get_wall_bit_between(from_cell, to_cell)
+	if from_wall_bit == 0:
+		return wall_types
+	var to_wall_bit := get_opposite_wall_bit(from_wall_bit)
+	if (get_wall_mask(from_cell) & from_wall_bit) != 0:
+		var from_type := get_wall_type(from_cell)
+		if from_type != &"":
+			wall_types.append(from_type)
+	if (get_wall_mask(to_cell) & to_wall_bit) != 0:
+		var to_type := get_wall_type(to_cell)
+		if to_type != &"":
+			wall_types.append(to_type)
+	return wall_types
+
+
+func is_movement_blocked_by_directional_wall(from_cell: Vector2i, to_cell: Vector2i, unit = null) -> bool:
+	var wall_types := _get_directional_wall_types_between(from_cell, to_cell)
+	if wall_types.is_empty():
+		return false
+	var can_fly: bool = unit != null and unit is Unit and unit.move_type == Enums.MOVE_TYPE.FLY
+	for wall_type in wall_types:
+		match wall_type:
+			WALL_TYPE_FLY_PASS:
+				if !can_fly:
+					return true
+			WALL_TYPE_BLOCK_ALL, WALL_TYPE_SHOOT_PASS:
+				return true
+			_:
+				return true
+	return false
+
+
+func is_targeting_blocked_by_directional_wall(from_cell: Vector2i, to_cell: Vector2i) -> bool:
+	var wall_types := _get_directional_wall_types_between(from_cell, to_cell)
+	if wall_types.is_empty():
+		return false
+	return wall_types.has(WALL_TYPE_BLOCK_ALL)
+
+
+func is_target_line_blocked(from_cell: Vector2i, to_cell: Vector2i) -> bool:
+	if from_cell == to_cell:
+		return false
+	var line_start := _cell_center(from_cell)
+	var line_end := _cell_center(to_cell)
+	if _line_exits_or_enters_blocked_corner(line_start, line_end, from_cell):
+		return true
+	if _line_exits_or_enters_blocked_corner(line_start, line_end, to_cell):
+		return true
+	for wall_cell in mapCells:
+		if get_wall_type(wall_cell) != WALL_TYPE_BLOCK_ALL:
+			continue
+		var wall_mask := get_wall_mask(wall_cell)
+		if wall_mask == 0:
+			continue
+		if wall_cell != from_cell and wall_cell != to_cell and _line_touches_sealed_wall_corner(line_start, line_end, wall_cell, wall_mask):
+			return true
+		var wall_center := _cell_center(wall_cell)
+		for wall_bit in WALL_EDGE_POINTS:
+			if (wall_mask & int(wall_bit)) == 0:
+				continue
+			var points: Array = WALL_EDGE_POINTS[wall_bit]
+			var edge_start: Vector2 = wall_center + points[0]
+			var edge_end: Vector2 = wall_center + points[1]
+			if _segments_cross(line_start, line_end, edge_start, edge_end):
+				return true
+	return false
+
+
+func _line_exits_or_enters_blocked_corner(line_start: Vector2, line_end: Vector2, cell: Vector2i) -> bool:
+	if get_wall_type(cell) != WALL_TYPE_BLOCK_ALL:
+		return false
+	var wall_mask := get_wall_mask(cell)
+	if wall_mask == 0:
+		return false
+	var cell_center := _cell_center(cell)
+	for corner_name in WALL_CORNER_POINTS:
+		var corner_point: Vector2 = cell_center + WALL_CORNER_POINTS[corner_name]
+		if !_point_on_segment(line_start, line_end, corner_point):
+			continue
+		var blocked_edges := 0
+		for wall_bit in WALL_CORNER_BITS[corner_name]:
+			if (wall_mask & int(wall_bit)) != 0:
+				blocked_edges += 1
+		if blocked_edges >= 2:
+			return true
+	return false
+
+
+func _line_touches_sealed_wall_corner(line_start: Vector2, line_end: Vector2, cell: Vector2i, wall_mask: int) -> bool:
+	var cell_center := _cell_center(cell)
+	for corner_name in WALL_CORNER_POINTS:
+		var corner_point: Vector2 = cell_center + WALL_CORNER_POINTS[corner_name]
+		if !_point_on_segment(line_start, line_end, corner_point):
+			continue
+		var blocked_edges := 0
+		for wall_bit in WALL_CORNER_BITS[corner_name]:
+			if (wall_mask & int(wall_bit)) != 0:
+				blocked_edges += 1
+		if blocked_edges >= 2:
+			return true
+	return false
+
+
+func _cell_center(cell: Vector2i) -> Vector2:
+	if tileMap != null and tileMap.has_method("map_to_local"):
+		return tileMap.map_to_local(cell)
+	return Vector2(cell)
+
+
+func _point_on_segment(a: Vector2, b: Vector2, point: Vector2) -> bool:
+	var orientation := absf(_segment_orientation(a, b, point))
+	if orientation > 0.001:
+		return false
+	var min_x := minf(a.x, b.x) - 0.001
+	var max_x := maxf(a.x, b.x) + 0.001
+	var min_y := minf(a.y, b.y) - 0.001
+	var max_y := maxf(a.y, b.y) + 0.001
+	return point.x >= min_x and point.x <= max_x and point.y >= min_y and point.y <= max_y
+
+
+func _segments_cross(a: Vector2, b: Vector2, c: Vector2, d: Vector2) -> bool:
+	var o1 := _segment_orientation(a, b, c)
+	var o2 := _segment_orientation(a, b, d)
+	var o3 := _segment_orientation(c, d, a)
+	var o4 := _segment_orientation(c, d, b)
+	# Only a proper crossing blocks targeting. Touching a corner or riding along
+	# a wall edge is allowed, which preserves corner-shot lines.
+	return o1 * o2 < 0.0 and o3 * o4 < 0.0
+
+
+func _segment_orientation(a: Vector2, b: Vector2, c: Vector2) -> float:
+	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
 
 
 func axial_substract(a: Vector2i, b: Vector2i) -> Vector2i:
@@ -543,6 +790,35 @@ func find_aura(start: Vector2i, max_cost: int) -> Array: #HERE
 
 	result = dict_strip(result)
 	return result
+
+
+func find_target_paths(start: Vector2i, max_cost: int) -> Array:
+	var result: Array = []
+	for cell in mapCells:
+		if find_target_distance(start, cell) > max_cost:
+			continue
+		if is_target_line_blocked(start, cell):
+			continue
+		result.append(cell)
+	return result
+
+
+func get_target_nhbr(hex: Vector2i) -> Array:
+	var neighbors := []
+	for offsetH in _get_offsets(hex.x):
+		var neighbor: Vector2i = hex + offsetH
+		if !is_valid_position(neighbor):
+			continue
+		if is_targeting_blocked_by_directional_wall(hex, neighbor):
+			continue
+		neighbors.append(neighbor)
+	return neighbors
+
+
+func find_target_distance(start: Vector2i, target: Vector2i) -> int:
+	var ac = oddq_to_axial(start)
+	var bc = oddq_to_axial(target)
+	return axial_distance(ac, bc)
 
 	
 

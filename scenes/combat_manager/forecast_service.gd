@@ -388,7 +388,7 @@ func _reach_check(unit: UnitSim, target: UnitSim) -> bool:
 	var maxR := int(wep.max_reach)
 
 	if _hex == null: _hex = AHexGrid2D.new(Global.map_ref)
-	var distance := _hex.find_distance(unit.cell, target.cell)
+	var distance := _hex.find_target_distance(unit.cell, target.cell)
 	if distance >= minR and distance <= maxR:
 		return true
 	return _is_distance_in_range_band(wep, distance, "close") or _is_distance_in_range_band(wep, distance, "far")
@@ -402,7 +402,7 @@ func _get_action_range_band_penalty(actor: UnitSim, target: UnitSim, action: Dic
 		return 0
 	if _hex == null:
 		_hex = AHexGrid2D.new(Global.map_ref)
-	var distance := _hex.find_distance(actor.cell, target.cell)
+	var distance := _hex.find_target_distance(actor.cell, target.cell)
 	return _range_band_hit_penalty(source, distance)
 
 

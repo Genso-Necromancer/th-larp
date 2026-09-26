@@ -44,11 +44,11 @@ project/assembly_name="The Crypt"
 [editor]
 
 movie_writer/mjpeg_quality=0.5
-movie_writer/movie_file="C:/Users/Necromancer/Documents/game_clips/toss_em.avi"
+movie_writer/movie_file="C:/Users/Necromancer/Documents/Godot/clips/clip.avi"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/CodeEditorBackground/plugin.cfg")
+enabled=PackedStringArray("res://addons/CodeEditorBackground/plugin.cfg", "res://addons/CutsceneAuthoring/plugin.cfg")
 
 [global_group]
 

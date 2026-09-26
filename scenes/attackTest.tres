@@ -8,7 +8,7 @@ texture = ExtResource("1_areco")
 texture_region_size = Vector2i(48, 16)
 use_texture_padding = false
 0:0/0 = 0
-0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-40, -24, -80, 0, -40, 24, 40, 24, 80, 0, 40, -24)
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-42, -25, -84, 0, -42, 25, 42, 25, 84, 0, 42, -25)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jtw8t"]
 texture = ExtResource("2_ojpyl")
@@ -18,7 +18,7 @@ texture_region_size = Vector2i(48, 16)
 [resource]
 tile_shape = 3
 tile_offset_axis = 1
-tile_size = Vector2i(168, 56)
+tile_size = Vector2i(168, 50)
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_imj64")
 sources/1 = SubResource("TileSetAtlasSource_jtw8t")

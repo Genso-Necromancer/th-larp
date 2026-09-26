@@ -31,8 +31,8 @@ enum PASSIVE_TYPE {NONE, VANTAGE, STAT_CHANGE, AURA, RESPONSE, FATED, SUB_WEAPON
 enum UNIT_ID {NONE, Remilia, Sakuya, Patchy, China,}
 enum FACTION_ID {NONE, ENEMY, PLAYER, NPC,}
 enum DEPLOYMENT {NONE,FORCED,DEPLOYED,UNDEPLOYED,GRAVEYARD}
-enum MOVE_TYPE {FOOT, RANGER, FLY, MOUNT, ARMOR} #Note to self, when combining role+spec compare move_type and pick which ever is higher
-enum SPEC_ID {NONE,FAIRY,HUMAN,VAMPIRE,DRAGON,MAGICIAN,YOUKAI,ONI}
+enum MOVE_TYPE {FOOT, RANGER, FLY, MOUNT, ARMOR, SWIM} #Note to self, when combining role+spec compare move_type and pick which ever is higher
+enum SPEC_ID {NONE,FAIRY,HUMAN,VAMPIRE,DRAGON,MAGICIAN,YOUKAI,ONI,SAZAE_ONI}
 #, Human, Kappa, Lunarian, Oni, Doll, Devil, Yukionna, Zombie, Hermit, Magician, Spirit
 enum ROLE_ID {NONE,TRBLR,THIEF,LADY,MAID,SORCERESS,MIKO,GUARD,WITCH,BLADE,OUTRIDER,ARCHER,}
 enum ACTION_TYPE {WEAPON, FRIENDLY_SKILL, HOSTILE_SKILL}

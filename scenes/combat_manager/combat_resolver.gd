@@ -686,7 +686,7 @@ func _get_action_range_band_penalty(actor: UnitSim, target: UnitSim, action: Dic
 	var source = actor.get_equipped_weapon()
 	if source == null:
 		return 0
-	var distance := _hex.find_distance(actor.cell, target.cell)
+	var distance := _hex.find_target_distance(actor.cell, target.cell)
 	return _range_band_hit_penalty(source, distance)
 
 
@@ -964,7 +964,7 @@ func _get_reach(unit: UnitSim) -> Dictionary:
 
 func _can_reach(attacker: UnitSim, defender: UnitSim) -> bool:
 	var r := _get_reach(attacker)
-	var distance := _hex.find_distance(attacker.cell, defender.cell)
+	var distance := _hex.find_target_distance(attacker.cell, defender.cell)
 	if distance >= int(r["Min"]) and distance <= int(r["Max"]):
 		return true
 	if _is_distance_in_reach_band(r, distance, "Close") or _is_distance_in_reach_band(r, distance, "Far"):

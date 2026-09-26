@@ -24,6 +24,7 @@ const TARGETED_ANIMATIONS := ["slide", "shake", "hop", "double_hop", "interact",
 const TARGETED_EFFECTS := ["portrait-sil", "portrait-normal", "dim", "zoom", "teleport"]
 const POSITIONED_ANIMATIONS := ["slide"]
 const POSITIONED_EFFECTS := ["teleport"]
+const DEFAULT_PORTRAIT_PATH := "res://sprites/character/debug/portrait_full.png"
 
 var letter_time : float = 0.02
 var space_time : float = letter_time * 2.0
@@ -39,6 +40,32 @@ var speaker_portraits := {}  # Dictionary<String, PortraitRect>
 var textline_index := -1
 var current_event : Array[Dictionary] = []
 var last_scene_errors:Array[String] = []
+var default_speaker_setup = [
+	{
+		"name": "Sirno",
+		"display_name": "Sirno",
+		"title": "honto no baka",
+		"portrait": "res://sprites/Fairy TroublemakerPrt.png",
+	},
+	{
+		"name": "Sakula",
+		"display_name": "Sakula",
+		"title": "medio",
+		"portrait": "res://sprites/SakuyaPrt.png",
+	},
+	{
+		"name": "Pakooli",
+		"display_name": "Pakooli",
+		"title": "magical girl",
+		"portrait": "res://sprites/character/patchouli/scene_sprites/th2.png"
+	},
+	{
+		"name": "Remi",
+		"display_name": "Remi",
+		"title": "fiary stomper",
+		"portrait": "res://sprites/character/remilia/scene_sprites/th1.png"
+	}
+]
 var example_dict : Array[Dictionary] = [
 	{
 		"active_speaker": "Remi",
@@ -85,33 +112,13 @@ var example_dict : Array[Dictionary] = [
 		"animations": [{"name": "hop", "target": "Remi"}]
 	},
 ]
-var speaker_setup = [
-	{
-		"name": "Sirno",
-		"title": "honto no baka",
-		"portrait": "res://sprites/Fairy TroublemakerPrt.png",
-	},
-	{
-		"name": "Sakula",
-		"title": "medio",
-		"portrait": "res://sprites/SakuyaPrt.png",
-	},
-	{
-		"name": "Pakooli",
-		"title": "magical girl",
-		"portrait": "res://sprites/character/patchouli/scene_sprites/th2.png"
-	},
-	{
-		"name": "Remi",
-		"title": "fiary stomper",
-		"portrait": "res://sprites/character/remilia/scene_sprites/th1.png"
-	}
-]
+var speaker_setup = default_speaker_setup.duplicate(true)
 
 
 func _ready():
 	self.visible = false
 	foreground_elements.visible = false
+	_set_debug_loader_visible(false)
 	set_physics_process(false)
 	_reset()
 	# TODO Kill all children in PortaitsNode?
@@ -133,8 +140,8 @@ func _ready():
 
 
 func _unhandled_input(event) -> void:
-	if event.is_action_released("debug_dialogue") and Global.flags.DebugMode and !is_physics_processing(): #For solo testing, intend to simply call this below function when ready to play scene 
-		prepare_new_dialogue()
+	if event.is_action_released("debug_dialogue") and Global.flags.DebugMode and !is_physics_processing():
+		_open_debug_loader()
 	elif GameState.state != GameState.gState.DIALOGUE_SCENE: return
 	elif event.is_action_released("ui_return"): toggle_dialog()
 	elif not visible and is_physics_processing(): return
@@ -153,10 +160,7 @@ func gui_accept():
 	elif !current_event[textline_index].has("text"): return
 	
 	if dialogue_finished && Global.flags.DebugMode:
-		prepare_new_dialogue()
-		debug_line_track.visible = Global.flags.DebugMode
-		$HBoxContainer.visible = debug_line_track.visible
-		$ScrollContainer.visible = debug_line_track.visible
+		_open_debug_loader()
 	
 	elif !$TextStopper/AnimationPlayer.is_playing():
 		skip_text = true
@@ -176,13 +180,72 @@ func _reset() -> void:
 
 func _conclude_dialog() -> void:
 	_reset()
-	speaker_portraits = {}
-	for child in $PortraitsNode.get_children():
-		child.queue_free()
+	_clear_speaker_portraits()
 	dialogue_finished = true
 	toggle_dialog()
 	await _dialogue_fade_finished
 	dialog_finished.emit()
+
+
+func _set_debug_loader_visible(enabled:bool) -> void:
+	debug_line_track.visible = enabled
+	$HBoxContainer.visible = enabled
+	$ScrollContainer.visible = enabled
+
+
+func _open_debug_loader() -> void:
+	_populate_load_dropdown()
+	self.visible = true
+	modulate = Color(1,1,1,1)
+	foreground_elements.visible = false
+	_set_debug_loader_visible(true)
+
+
+func _clear_speaker_portraits() -> void:
+	speaker_portraits = {}
+	for child in $PortraitsNode.get_children():
+		$PortraitsNode.remove_child(child)
+		child.queue_free()
+
+
+func _build_speaker_portraits() -> void:
+	_clear_speaker_portraits()
+	for speaker in speaker_setup:
+		var new_portrait:PortraitRect= portrait.instantiate()
+		var speaker_key := String(speaker.get("name", ""))
+		new_portrait.name = speaker_key
+		new_portrait.speaker_name = String(speaker.get("display_name", speaker_key))
+		new_portrait.speaker_title = String(speaker.get("title", ""))
+		var portrait_path := String(speaker.get("portrait", DEFAULT_PORTRAIT_PATH))
+		if not ResourceLoader.exists(portrait_path):
+			push_warning("[DialogueOverlay] Portrait path '%s' for speaker '%s' is missing; using default portrait." % [portrait_path, speaker_key])
+			portrait_path = DEFAULT_PORTRAIT_PATH
+		new_portrait.texture = load(portrait_path)
+		new_portrait.visible = false
+		new_portrait.anim_finished.connect(_on_anim_finished)
+		$PortraitsNode.add_child(new_portrait)
+		speaker_portraits[speaker_key] = new_portrait
+
+
+func _begin_dialogue_playback(event_lines:Array[Dictionary], keep_debug_loader:bool = false, fade_in:bool = true) -> void:
+	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE)
+	current_event = event_lines
+	dialogue_finished = false
+	_reset()
+	_build_speaker_portraits()
+	_set_debug_loader_visible(keep_debug_loader and Global.flags.DebugMode)
+	debug_line_track.min_value = 0
+	debug_line_track.max_value = current_event.size()-1
+	debug_line_track.value = 0
+	textline_index = -1
+	if fade_in and not visible:
+		toggle_dialog()
+	else:
+		self.visible = true
+		modulate = Color(1,1,1,1)
+		set_physics_process(true)
+	next_textline()
+	_rebuild_editor_list()
 
 
 func _abort_dialogue_start(reason:String) -> void:
@@ -221,6 +284,8 @@ func _validate_scene_line(line:Dictionary, line_index:int, speaker_names:Array[S
 		last_scene_errors.append("line %s uses missing background '%s'." % [line_number, background])
 	_validate_scene_actions(line.get("animations", []), line_index, "animation", KNOWN_ANIMATIONS, TARGETED_ANIMATIONS, POSITIONED_ANIMATIONS, speaker_names)
 	_validate_scene_actions(line.get("effects", []), line_index, "effect", KNOWN_EFFECTS, TARGETED_EFFECTS, POSITIONED_EFFECTS, speaker_names)
+	_validate_portrait_visibility(line.get("portrait_visibility", []), line_index, speaker_names)
+	_validate_portrait_swaps(line.get("portrait_swaps", []), line_index, speaker_names)
 
 
 func _validate_scene_actions(actions, line_index:int, action_label:String, known_names:Array, targeted_names:Array, positioned_names:Array, speaker_names:Array[String]) -> void:
@@ -253,6 +318,47 @@ func _validate_scene_actions(actions, line_index:int, action_label:String, known
 			last_scene_errors.append("line %s effect 'sound' is missing 'sound'." % [line_number])
 
 
+func _validate_portrait_swaps(swaps, line_index:int, speaker_names:Array[String]) -> void:
+	var line_number := line_index + 1
+	if swaps == null:
+		return
+	if typeof(swaps) != TYPE_ARRAY:
+		last_scene_errors.append("line %s 'portrait_swaps' field must be an Array." % [line_number])
+		return
+	for swap_index in range(swaps.size()):
+		var swap = swaps[swap_index]
+		if typeof(swap) != TYPE_DICTIONARY:
+			last_scene_errors.append("line %s portrait swap %s must be a Dictionary." % [line_number, swap_index + 1])
+			continue
+		var target := String(swap.get("target", ""))
+		if target == "" or not speaker_names.has(target):
+			last_scene_errors.append("line %s portrait swap uses unknown target '%s'." % [line_number, target])
+		var path := String(swap.get("path", ""))
+		if path == "":
+			last_scene_errors.append("line %s portrait swap for '%s' is missing 'path'." % [line_number, target])
+		elif not ResourceLoader.exists(path):
+			last_scene_errors.append("line %s portrait swap path is missing: %s" % [line_number, path])
+
+
+func _validate_portrait_visibility(entries, line_index:int, speaker_names:Array[String]) -> void:
+	var line_number := line_index + 1
+	if entries == null:
+		return
+	if typeof(entries) != TYPE_ARRAY:
+		last_scene_errors.append("line %s 'portrait_visibility' field must be an Array." % [line_number])
+		return
+	for entry_index in range(entries.size()):
+		var entry = entries[entry_index]
+		if typeof(entry) != TYPE_DICTIONARY:
+			last_scene_errors.append("line %s portrait visibility %s must be a Dictionary." % [line_number, entry_index + 1])
+			continue
+		var target := String(entry.get("target", ""))
+		if target == "" or not speaker_names.has(target):
+			last_scene_errors.append("line %s portrait visibility uses unknown target '%s'." % [line_number, target])
+		if not entry.has("visible") or typeof(entry.visible) != TYPE_BOOL:
+			last_scene_errors.append("line %s portrait visibility for '%s' must include a bool 'visible'." % [line_number, target])
+
+
 func _source_suffix(source:String) -> String:
 	if source == "":
 		return ""
@@ -266,48 +372,68 @@ func _get_speaker_portrait(speaker_name:String, context:String = "") -> Portrait
 	return null
 
 
+func _load_scene_data(path:String) -> Dictionary:
+	if path.ends_with(".cutscene"):
+		var compiler := CutsceneCompiler.new()
+		var compiled := compiler.compile_file(path)
+		return {
+			"event": compiled.get("event", []),
+			"speakers": compiled.get("speakers", []),
+			"errors": compiled.get("errors", []),
+			"warnings": compiled.get("warnings", []),
+		}
+	var parser = JasonParser.new()
+	var parsed_event : Array[Dictionary] = parser.parse_json(path)
+	var errors:Array[String] = []
+	if not parser.last_error.is_empty():
+		errors.append(parser.last_error)
+	return {
+		"event": parsed_event,
+		"speakers": [],
+		"errors": errors,
+		"warnings": [],
+	}
+
+
+func _report_scene_load_messages(data:Dictionary, source:String) -> void:
+	for warning in data.get("warnings", []):
+		push_warning("[DialogueOverlay] %s%s." % [warning, _source_suffix(source)])
+	for error in data.get("errors", []):
+		push_error("[DialogueOverlay] %s%s." % [error, _source_suffix(source)])
+
+
+func _apply_speaker_setup(new_speakers:Array) -> void:
+	if new_speakers.is_empty():
+		speaker_setup = default_speaker_setup.duplicate(true)
+	else:
+		speaker_setup = new_speakers.duplicate(true)
+
+
 #Now called when a new map is loaded, right after the splash screen. See MapManager:_on_gui_splash_finished(). Will be called in more varied ways
 ##SceneScripts are stored on the map associated with them. There is to be a Start and End scene to each Chapter that daisy chains things together with a moment for saving/loading in-between last End and new Start
 func prepare_new_dialogue(new_event:String= ""):
 	dialogue_finished = false
-	var parser = JasonParser.new()
 	if new_event: 
-		var eventDick : Array[Dictionary] = parser.parse_json(new_event)
-		if not parser.last_error.is_empty():
-			_abort_dialogue_start(parser.last_error)
+		var scene_data := _load_scene_data(new_event)
+		_report_scene_load_messages(scene_data, new_event)
+		if not scene_data.get("errors", []).is_empty():
+			_abort_dialogue_start("Scene load failed%s." % [_source_suffix(new_event)])
 			return
+		_apply_speaker_setup(scene_data.get("speakers", []))
+		var eventDick : Array[Dictionary] = []
+		for event_line in scene_data.get("event", []):
+			eventDick.append(event_line)
 		if not _validate_scene_event(eventDick, new_event):
 			_abort_dialogue_start("Scene validation failed%s." % [_source_suffix(new_event)])
 			return
 		current_event = eventDick
 	else:
+		_apply_speaker_setup([])
 		current_event = example_dict #subverts variable typing to give a dictionary as default, normally only want to pass ScenScript Resource
 		if not _validate_scene_event(current_event, "example_dict"):
 			_abort_dialogue_start("Example scene validation failed.")
 			return
-	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE) #Used to avoid conflicting inputs. Currently only uses ACCEPT_PROMPT input script, could extend GenericScript to make a new one specifically for this scene. You'll know what to do when you look at existing ones.
-	toggle_dialog()
-	for speaker in speaker_setup:
-		var new_portrait:PortraitRect= portrait.instantiate()
-		new_portrait.name = speaker.name
-		new_portrait.speaker_name = speaker.name
-		new_portrait.speaker_title = speaker.title
-		new_portrait.texture = load(speaker.portrait)
-		new_portrait.visible = false
-		new_portrait.anim_finished.connect(_on_anim_finished)
-		$PortraitsNode.add_child(new_portrait)
-	for pr in $PortraitsNode.get_children():
-		speaker_portraits[ pr.name ] = pr
-	
-	debug_line_track.min_value = 0
-	debug_line_track.max_value = current_event.size()-1
-	debug_line_track.value = 0
-	
-	# await _dialogue_fade_finished # works, but doesn't look good atm
-	textline_index = -1
-	next_textline()
-	
-	_rebuild_editor_list()
+	_begin_dialogue_playback(current_event, false, true)
 
 
 func next_textline(scrub : bool = false):
@@ -363,6 +489,28 @@ func next_textline(scrub : bool = false):
 		else:
 			name_label.text = ""
 			title_label.text = ""
+
+	var has_portrait_visibility = true if !cur_line.get("portrait_visibility",[]).is_empty() else false
+	if has_portrait_visibility:
+		for entry in cur_line.portrait_visibility:
+			var visible_target := _get_speaker_portrait(String(entry.get("target", "")), "line %s portrait visibility" % [textline_index + 1])
+			if visible_target == null:
+				continue
+			visible_target.visible = bool(entry.get("visible", false))
+			if visible_target.visible:
+				visible_target.modulate = Color(1,1,1,1)
+
+	var has_portrait_swaps = true if !cur_line.get("portrait_swaps",[]).is_empty() else false
+	if has_portrait_swaps:
+		for swap in cur_line.portrait_swaps:
+			var swap_target := _get_speaker_portrait(String(swap.get("target", "")), "line %s portrait swap" % [textline_index + 1])
+			if swap_target == null:
+				continue
+			var swap_path := String(swap.get("path", DEFAULT_PORTRAIT_PATH))
+			if not ResourceLoader.exists(swap_path):
+				push_warning("[DialogueOverlay] Portrait swap path '%s' is missing; using default portrait." % [swap_path])
+				swap_path = DEFAULT_PORTRAIT_PATH
+			swap_target.texture = load(swap_path)
 	
 	#if cur_line.has("speaker"):
 		#if cur_line["speaker"] is int:
@@ -724,7 +872,7 @@ func _populate_load_dropdown():
 	dir.list_dir_begin()
 	var fname = dir.get_next()
 	while fname != "":
-		if not dir.current_is_dir() and fname.ends_with(".json"):
+		if not dir.current_is_dir() and (fname.ends_with(".json") or fname.ends_with(".cutscene")):
 			load_dropdown.add_item(fname)
 		fname = dir.get_next()
 	dir.list_dir_end()
@@ -739,37 +887,30 @@ func _on_load_scene_button_pressed():
 	
 	var file_name = load_dropdown.get_item_text(idx)
 	var path = EVENTS_DIR + "/" + file_name
-	var parser = JasonParser.new()
-	var eventDick : Array[Dictionary] = parser.parse_json(path)
-	if not parser.last_error.is_empty():
+	var scene_data := _load_scene_data(path)
+	_report_scene_load_messages(scene_data, path)
+	if not scene_data.get("errors", []).is_empty():
 		return
+	_apply_speaker_setup(scene_data.get("speakers", []))
+	var eventDick : Array[Dictionary] = []
+	for event_line in scene_data.get("event", []):
+		eventDick.append(event_line)
 	if not _validate_scene_event(eventDick, path):
 		return
-	GameState.change_state(self,GameState.gState.DIALOGUE_SCENE)
-	current_event = eventDick
-	
-	dialogue_finished = false
-	debug_line_track.min_value = 0
-	debug_line_track.max_value = current_event.size()-1
-	debug_line_track.value = 0
-	textline_index = -1
-	_reset()
-	next_textline()
-	_rebuild_editor_list()
+	_begin_dialogue_playback(eventDick, true, false)
 
 
 func _on_save_scene_button_pressed():
-	var load_dropdown = $HBoxContainer/LoadOptionButton
-	var name = $HBoxContainer/SaveTextEdit.text.strip_edges()
-	if name == "":
+	
+	var script_name = $HBoxContainer/SaveTextEdit.text.strip_edges()
+	if script_name == "":
 		push_error("(Alon) Please enter a name before saving.")
 		return
-	if not name.ends_with(".json"):
-		name += ".json"
-	var path = EVENTS_DIR + "/" + name
+	if not script_name.ends_with(".json"):
+		script_name += ".json"
+	var path = EVENTS_DIR + "/" + script_name
 	
-	var json = JSON.new()
-	json = json.stringify(current_event, "\t")
+	var json = JSON.stringify(current_event, "\t")
 	var file = FileAccess.open(path, FileAccess.WRITE)
 	if not file:
 		push_error("(Alon) Cannot write to: " + path)

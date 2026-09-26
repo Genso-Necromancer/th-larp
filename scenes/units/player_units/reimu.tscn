@@ -72,10 +72,10 @@ total_growth = Dictionary[StringName, float]({
 })
 total_stats = Dictionary[StringName, int]({
 &"Cele": 10,
-&"Cha": 7,
+&"Cha": 8,
 &"Comp": 112,
 &"Def": 4,
-&"Eleg": 9,
+&"Eleg": 10,
 &"Life": 25,
 &"Mag": 4,
 &"Move": 4,

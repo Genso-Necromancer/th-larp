@@ -1,0 +1,95 @@
+# Copy this file when starting a new dialogue scene.
+#
+# Quick rules:
+# - Comments start with #.
+# - Blank lines are ignored.
+# - Use lowercase cast keys in dialogue and commands.
+# - none: writes narration with no speaker name.
+# - Sprite paths resolve as:
+#   res://sprites/character/[folder]/scene_sprites/[file].png
+# - Missing sprites warn and fall back to the default portrait.
+# - Full manual:
+#   res://notes/cutscene_authoring_manual.md
+
+@cast
+# key = Display Name | Title | Folder | alias:file, alias:file
+# Title, folder, and aliases may be omitted.
+remilia = Remilia Scarlet | Tepes' Strongest Soldier | remilia | neutral:th1
+patchouli = Patchouli Knowledge | Pizzamancer | patchouli | neutral:th2
+
+@scene
+# Portrait commands:
+# enter speaker position
+# show speaker at position
+# exit speaker left/right
+# hide speaker
+# swap speaker sprite_alias
+#
+# Animation commands:
+# anim speaker slide position
+# anim speaker shake/hop/double_hop/interact/toggle_fade/question
+#
+# Focus/effect shortcuts:
+# dim speaker
+# normal speaker
+# focus speaker
+# effect speaker portrait-sil/portrait-normal/dim/zoom/teleport position
+# effect all portrait-sil/portrait-normal/dim/zoom/teleport position
+# effect loud/quiet
+#
+# Other commands:
+# sfx surprise
+# bg none
+# bg res://path/to/background.png
+#
+# with/end:
+# - Put dialogue inside the block to attach commands to that dialogue beat.
+# - Leave dialogue outside the block to make the block happen first.
+
+with
+	enter patchouli left 0.5
+	effect patchouli loud
+	patchouli: Good news everyone.
+end
+
+with
+	slide patchouli 0.25
+	enter remilia 0.75
+end
+
+with
+	focus remilia
+	anim remilia question
+	remilia: :pregnant_mandrew:
+end
+
+with
+	focus patchouli
+	patchouli: No, no. Far too early for that.
+end
+	patchouli: As you can see, the cutscene scripting has been polished up quite a bit.
+	patchouli: It's incredibly fluid now to conduct and write them.
+
+with
+	focus remilia
+	remilia: It does feel easier to speak and act on our 2 dimensional existence.
+end
+
+with
+	focus patchouli
+	anim patchouli hop
+	patchouli: Mukyuu
+end
+
+patchouli: So thanks for comin' folks.
+exit patchouli left
+
+none:
+
+with
+	focus remilia
+	slide remilia 0.5
+end
+
+remilia: It's another wonderful Sakuya Sunday.
+anim remilia toggle_fade

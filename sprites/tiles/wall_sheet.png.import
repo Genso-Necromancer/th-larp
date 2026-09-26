@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dwlnwcdgwc6de"
-path="res://.godot/imported/PlaceHolderModTiles.png-28b7a0cd00b5439e141b9325857a5606.ctex"
+uid="uid://bs14tqosa2q12"
+path="res://.godot/imported/wall_sheet.png-dfd7abba5476b9224ee0bc7ce467d9a6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://sprites/tiles/PlaceHolderModTiles.png"
-dest_files=["res://.godot/imported/PlaceHolderModTiles.png-28b7a0cd00b5439e141b9325857a5606.ctex"]
+source_file="res://sprites/tiles/wall_sheet.png"
+dest_files=["res://.godot/imported/wall_sheet.png-dfd7abba5476b9224ee0bc7ce467d9a6.ctex"]
 
 [params]
 

@@ -19,17 +19,20 @@ func update_yourself_now(type1: StringName, type2: StringName) -> void:
 		_set_parent_visible()
 		return
 	
-	if !tData[type1]:
-		print("TerrainValueLabel: update_yourself_now: Invalid type1 or missing Terrain Data")
+	if type1 == &"" or not tData.has(type1):
+		if type1 != &"":
+			print("TerrainValueLabel: update_yourself_now: Invalid type1 or missing Terrain Data")
 		_set_parent_visible()
 		return
-	elif type2 and !tData[type2]:
+	elif type2 and not tData.has(type2):
 		print("TerrainValueLabel: update_yourself_now: Invalid type2, or missing Terrain Data")
 		_set_parent_visible()
 		return
 		
-	if type2: value += tData[type2][key]
-	if type2 != "Bridge": value += tData[type1][key]
+	if type2:
+		value += int(tData.get(type2, {}).get(key, 0))
+	if type2 != "Bridge":
+		value += int(tData.get(type1, {}).get(key, 0))
 	
 	
 	_set_parent_visible(value)

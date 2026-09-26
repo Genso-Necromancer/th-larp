@@ -84,7 +84,7 @@ mod_growth = Dictionary[StringName, float]({
 &"Life": 0.25,
 &"Mag": 0.1,
 &"Move": 0.0,
-&"Pwr": -0.75
+&"Pwr": 0.25
 })
 mod_stats = Dictionary[StringName, int]({
 &"Cele": 3,
@@ -110,10 +110,10 @@ total_growth = Dictionary[StringName, float]({
 })
 total_stats = Dictionary[StringName, int]({
 &"Cele": 10,
-&"Cha": 8,
+&"Cha": 9,
 &"Comp": 110,
 &"Def": 3,
-&"Eleg": 12,
+&"Eleg": 13,
 &"Life": 29,
 &"Mag": 3,
 &"Move": 5,

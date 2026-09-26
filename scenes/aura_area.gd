@@ -3,7 +3,7 @@ class_name AuraArea
 
 var master : Unit
 var aura : Aura
-@export var polygon : PackedVector2Array = [Vector2(-40,-24), Vector2(-80,0), Vector2(-40,24), Vector2(40,24), Vector2(80,0), Vector2(40,-24)]
+@export var polygon : PackedVector2Array = [Vector2(-42,-25), Vector2(-84,0), Vector2(-42,25), Vector2(42,25), Vector2(84,0), Vector2(42,-25)]
 	
 	
 func set_aura(unit: Unit, auraData: Aura):

@@ -5,7 +5,7 @@
 [ext_resource type="Script" uid="uid://duoms4relhrfy" path="res://scenes/maps/objectives/objective.gd" id="3_wcikf"]
 [ext_resource type="Resource" uid="uid://d2dx18fsw0jpm" path="res://scenes/maps/objectives/seize_test.tres" id="4_43qy2"]
 [ext_resource type="Resource" uid="uid://7t8iqbg5bicy" path="res://scenes/maps/objectives/remi_saku_death_loss.tres" id="5_ebyka"]
-[ext_resource type="TileSet" uid="uid://baebtkker7qwb" path="res://TileSets/deployments.tres" id="6_xqfm6"]
+[ext_resource type="TileSet" uid="uid://baebtkker7qwb" path="res://TileSets/dev/deployments.tres" id="6_xqfm6"]
 [ext_resource type="PackedScene" uid="uid://d1lptkdo512fn" path="res://scenes/maps/MapObjects/door.tscn" id="7_b52bk"]
 [ext_resource type="PackedScene" uid="uid://chqu2dkt7ofqi" path="res://scenes/maps/MapObjects/breakable_wall.tscn" id="8_hggx1"]
 [ext_resource type="PackedScene" uid="uid://bokxjbvpfnkqp" path="res://scenes/units/unique_units/cirno.tscn" id="10_1lclt"]

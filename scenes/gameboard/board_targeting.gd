@@ -25,10 +25,10 @@ func draw_range(unit: Unit, max_range: int, min_range := 0, reach: Dictionary = 
 
 func get_cells_in_range(cell: Vector2i, max_range: int, min_range: int) -> Array:
 	var hex_star := AHexGrid2D.new(board.current_map)
-	var path: Array = hex_star.find_all_paths(cell, max_range)
+	var path: Array = hex_star.find_target_paths(cell, max_range)
 	if path.size() != 1 and min_range > 0:
 		min_range = clampi(min_range - 1, 0, 1000)
-		var invalid := hex_star.find_all_paths(cell, min_range)
+		var invalid := hex_star.find_target_paths(cell, min_range)
 		path = hex_star.trim_path(path, invalid)
 	return path
 
@@ -192,6 +192,8 @@ func trade_target_selected() -> void:
 func feature_target_selected(feature: SlotWrapper) -> void:
 	if board.targeting_input_blocked:
 		return
+	if not board.snap_path.has(board.cursor.cell):
+		return
 	if not board.is_occupied(board.cursor.cell):
 		return
 	if not feature:
@@ -236,6 +238,8 @@ func feature_target_selected(feature: SlotWrapper) -> void:
 
 func attack_target_selected() -> void:
 	if board.targeting_input_blocked:
+		return
+	if not board.snap_path.has(board.cursor.cell):
 		return
 	if board.is_occupied(board.cursor.cell) and not board._check_friendly(board.activeUnit, board.focusUnit):
 		board.turn_step = GameBoard.TURN_STEPS.FORECAST_ATTACK
@@ -288,7 +292,7 @@ func grab_target(cell: Vector2i) -> void:
 		return
 
 	board._set_action_target(board.units[cell])
-	var distance := hex_star.find_distance(board.activeUnit.cell, board.targetUnit.cell)
+	var distance := hex_star.find_target_distance(board.activeUnit.cell, board.targetUnit.cell)
 	var reach := [distance, distance]
 
 	board._set_action_forecast(board.combatManager.get_forecast(board.activeUnit, board.targetUnit, board.active_action))

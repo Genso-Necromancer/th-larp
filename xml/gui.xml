@@ -49,6 +49,7 @@
 			<entry id = "void_value"><![CDATA[--]]></entry>
 			<!-- GUI -->
 			<entry id = "move_cost_title"><![CDATA[[u]Movement Cost[/u]]]></entry>
+			<entry id = "lore_move_type_swim"><![CDATA[Swim]]></entry>
 			<entry id = "target_self"><![CDATA[Self:]]></entry>
 			<entry id = "target_target"><![CDATA[Target:]]></entry>
 			<entry id = "target_global"><![CDATA[Time:]]></entry>
@@ -137,6 +138,7 @@
 			<entry id = "species_name_dragon"><![CDATA[Dragon]]></entry>
 			<entry id = "species_name_youkai"><![CDATA[Youkai]]></entry>
 			<entry id = "species_name_oni"><![CDATA[Oni]]></entry>
+			<entry id = "species_name_sazae_oni"><![CDATA[Sazae-Oni]]></entry>
 			<!-- character roles -->
 			<entry id = "role_name_trblr"><![CDATA[Troublemaker]]></entry>
 			<entry id = "role_name_thief"><![CDATA[Cointaker]]></entry>
@@ -258,6 +260,7 @@
 			<entry id = "terrain_name_fort"><![CDATA[Fort]]></entry>
 			<entry id = "terrain_name_woodland"><![CDATA[Woods]]></entry>
 			<entry id = "terrain_name_hill"><![CDATA[Hills]]></entry>
+			<entry id = "terrain_name_mountain"><![CDATA[Mountain]]></entry>
 			<entry id = "terrain_name_shrine"><![CDATA[Shrine]]></entry>
 			<entry id = "terrain_name_house"><![CDATA[Home]]></entry>
 			<entry id = "terrain_name_bridge"><![CDATA[Bridge]]></entry>
@@ -278,6 +281,7 @@
 			<entry id = "terrain_adjective_hellsand"><![CDATA[Hellish]]></entry>
 			<entry id = "terrain_adjective_stone"><![CDATA[Paved]]></entry>
 			<entry id = "terrain_adjective_water"><![CDATA[Wet]]></entry>
+			<entry id = "terrain_adjective_mountain"><![CDATA[Mountain]]></entry>
 			
 			<!-- Terrain Stats -->
 			<entry id = "terrain_label_life"><![CDATA[Life]]></entry>

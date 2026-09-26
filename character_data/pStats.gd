@@ -53,7 +53,7 @@ static func get_spec(specInd):
 			"LeveledSkills": {0:""},
 			"MoveType": MOVE_TYPE.RANGER
 				}
-		SPEC_ID.FAIRY: 
+		SPEC_ID.FAIRY:
 			return {
 			"Spec": SPEC_ID.FAIRY,
 			"StatGroups":{
@@ -105,11 +105,11 @@ static func get_spec(specInd):
 					"Move": 0,
 					"Life": 1,
 					"Comp": 0,
-					"Pwr": 1,
-					"Mag": 1,
+					"Pwr": 0,
+					"Mag": -1,
 					"Eleg": 0,
 					"Cele": 0,
-					"Def": 1,
+					"Def": 0,
 					"Cha": -1
 					},
 				"Growths": {
@@ -150,10 +150,10 @@ static func get_spec(specInd):
 					"Comp": 0,
 					"Pwr": 0,
 					"Mag": 0,
-					"Eleg": 1,
+					"Eleg": 2,
 					"Cele": 0,
 					"Def": 0,
-					"Cha": 1
+					"Cha": 2
 					},
 				"Growths": {
 					"Move": 0,
@@ -225,7 +225,7 @@ static func get_spec(specInd):
 			"LeveledPassives": {0:""},
 			"Skills":["res://unit_resources/features/skills/life_steal_rem.tres"],
 			"LeveledSkills": {0:""},
-			"MoveType": MOVE_TYPE.FOOT
+			"MoveType": MOVE_TYPE.FLY
 				}
 		SPEC_ID.MAGICIAN:
 			return {
@@ -320,11 +320,11 @@ static func get_spec(specInd):
 					"Move": 0,
 					"Life": 4,
 					"Comp": -10,
-					"Pwr": 2,
-					"Mag": 0,
+					"Pwr": 1,
+					"Mag": -3,
 					"Eleg": -2,
 					"Cele": 0,
-					"Def": 1,
+					"Def": 0,
 					"Cha": 0
 					},
 				"Growths": {
@@ -355,6 +355,50 @@ static func get_spec(specInd):
 			"Skills":[],
 			"LeveledSkills": {0:""},
 			"MoveType": MOVE_TYPE.FOOT
+				}
+		SPEC_ID.SAZAE_ONI:
+			return {
+			"Spec": SPEC_ID.SAZAE_ONI,
+			"StatGroups":{
+				"Stats": {
+					"Move": 0,
+					"Life": 2,
+					"Comp": 0,
+					"Pwr": -1,
+					"Mag": -1,
+					"Eleg": 0,
+					"Cele": 1,
+					"Def": 1,
+					"Cha": 0
+					},
+				"Growths": {
+					"Move": 0,
+					"Life": 0.05,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.0,
+					"Cele": 0.05,
+					"Def": 0.0,
+					"Cha": 0.0
+					},
+				"Caps": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+					}
+					},
+			"Passives":[],
+			"LeveledPassives": {0:""},
+			"Skills":[],
+			"LeveledSkills": {0:""},
+			"MoveType": MOVE_TYPE.SWIM
 				}
 
 
@@ -472,7 +516,7 @@ static func get_job(jobInd):
 				"Natural": false,
 				"Barrier": false,
 				},
-			"MoveType": MOVE_TYPE.FLY
+			"MoveType": MOVE_TYPE.FOOT
 				}
 		ROLE_ID.MAID: return {
 			"Role": "Maid",
@@ -492,7 +536,7 @@ static func get_job(jobInd):
 					"Move": 0.0,
 					"Life": 0.0,
 					"Comp": 0.0,
-					"Pwr": 1.0,
+					"Pwr": 0.0,
 					"Mag": 0.0,
 					"Eleg": 0.0,
 					"Cele": 0.0,
@@ -702,7 +746,7 @@ static func get_job(jobInd):
 				},
 			"MoveType": MOVE_TYPE.FOOT
 				}
-		ROLE_ID.TRBLR: 
+		ROLE_ID.TRBLR:
 			return {
 			"Role": "Troublemaker",
 			"StatGroups":{
@@ -1053,10 +1097,10 @@ static func get_art(unit):
 		"FullPrt":("res://sprites/character/%s/FullPrt.png" % [unit])
 		}
 	return p
-	
 
-	
-	
+
+
+
 static func get_terrain_data():
 	var terrainData : Dictionary = {
 			"Flat":{
@@ -1073,24 +1117,27 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 2,
 				Enums.MOVE_TYPE.MOUNT: 10,
 				Enums.MOVE_TYPE.ARMOR: 10,
+				Enums.MOVE_TYPE.SWIM: 2,
 				},
 			"Water":{
 				"GrzBonus": 20,
 				"DefBonus": 0,
-				Enums.MOVE_TYPE.FOOT: 5,
+				Enums.MOVE_TYPE.FOOT: 20,
 				Enums.MOVE_TYPE.FLY: 0,
-				Enums.MOVE_TYPE.RANGER: 5,
+				Enums.MOVE_TYPE.RANGER: 20,
 				Enums.MOVE_TYPE.MOUNT: 20,
 				Enums.MOVE_TYPE.ARMOR: 20,
+				Enums.MOVE_TYPE.SWIM: 3,
 				},
 			"Sanzu":{
 				"GrzBonus": 20,
 				"DefBonus": 0,
-				Enums.MOVE_TYPE.FOOT: 5,
+				Enums.MOVE_TYPE.FOOT: 20,
 				Enums.MOVE_TYPE.FLY: 0,
-				Enums.MOVE_TYPE.RANGER: 5,
+				Enums.MOVE_TYPE.RANGER: 20,
 				Enums.MOVE_TYPE.MOUNT: 20,
 				Enums.MOVE_TYPE.ARMOR: 20,
+				Enums.MOVE_TYPE.SWIM: 3,
 				},
 			"HotSpring":{
 				"GrzBonus": 0,
@@ -1102,6 +1149,7 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 1,
 				Enums.MOVE_TYPE.MOUNT: 2,
 				Enums.MOVE_TYPE.ARMOR: 2,
+				Enums.MOVE_TYPE.SWIM: 1,
 				},
 			"Rough":{
 				"GrzBonus": 5,
@@ -1111,6 +1159,7 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 0.5,
 				Enums.MOVE_TYPE.MOUNT: 3,
 				Enums.MOVE_TYPE.ARMOR: 3,
+				Enums.MOVE_TYPE.SWIM: 1,
 				},
 			"OpenRough":{
 				"GrzBonus": -3,
@@ -1120,6 +1169,7 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 0.5,
 				Enums.MOVE_TYPE.MOUNT: 3,
 				Enums.MOVE_TYPE.ARMOR: 3,
+				Enums.MOVE_TYPE.SWIM: 1,
 				},
 			"HellSand":{
 				"GrzBonus": 3,
@@ -1129,6 +1179,7 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 2,
 				Enums.MOVE_TYPE.MOUNT: 4,
 				Enums.MOVE_TYPE.ARMOR: 4,
+				Enums.MOVE_TYPE.SWIM: 2,
 				},
 			"Fort":{
 				"GrzBonus": 20,
@@ -1139,6 +1190,7 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 2,
 				Enums.MOVE_TYPE.MOUNT: 2,
 				Enums.MOVE_TYPE.ARMOR: 2,
+				Enums.MOVE_TYPE.SWIM: 2,
 			},
 			"Bridge":{
 				"GrzBonus": -5,
@@ -1152,6 +1204,18 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 1,
 				Enums.MOVE_TYPE.MOUNT: 3,
 				Enums.MOVE_TYPE.ARMOR: 3,
+				Enums.MOVE_TYPE.SWIM: 2,
+				},
+			"Mountain":{
+				"GrzBonus": 15,
+				"DefBonus": 1,
+				"HitBonus": 5,
+				Enums.MOVE_TYPE.FOOT: 3,
+				Enums.MOVE_TYPE.FLY: 0,
+				Enums.MOVE_TYPE.RANGER: 2,
+				Enums.MOVE_TYPE.MOUNT: 5,
+				Enums.MOVE_TYPE.ARMOR: 5,
+				Enums.MOVE_TYPE.SWIM: 3,
 				},
 			"Woodland":{
 				"GrzBonus": 15,
@@ -1161,6 +1225,7 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 0.5,
 				Enums.MOVE_TYPE.MOUNT: 3,
 				Enums.MOVE_TYPE.ARMOR: 3,
+				Enums.MOVE_TYPE.SWIM: 1,
 				},
 			"House":{
 				"GrzBonus": 10,
@@ -1169,6 +1234,7 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 1,
 				Enums.MOVE_TYPE.MOUNT: 2,
 				Enums.MOVE_TYPE.ARMOR: 2,
+				Enums.MOVE_TYPE.SWIM: 1,
 				},
 			"Shrine":{
 				"GrzBonus": 10,
@@ -1180,6 +1246,7 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 1,
 				Enums.MOVE_TYPE.MOUNT: 2,
 				Enums.MOVE_TYPE.ARMOR: 2,
+				Enums.MOVE_TYPE.SWIM: 1,
 				},
 			"Shop":{
 				"GrzBonus": 10,
@@ -1188,6 +1255,7 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 1,
 				Enums.MOVE_TYPE.MOUNT: 2,
 				Enums.MOVE_TYPE.ARMOR: 2,
+				Enums.MOVE_TYPE.SWIM: 1,
 				},
 			"Wall":{
 				Enums.MOVE_TYPE.FOOT: 99,
@@ -1195,7 +1263,8 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 99,
 				Enums.MOVE_TYPE.MOUNT: 99,
 				Enums.MOVE_TYPE.ARMOR: 99,
-				
+				Enums.MOVE_TYPE.SWIM: 99,
+
 				},
 			"WallShoot":{
 				Enums.MOVE_TYPE.FOOT: 99,
@@ -1203,6 +1272,7 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 99,
 				Enums.MOVE_TYPE.MOUNT: 99,
 				Enums.MOVE_TYPE.ARMOR: 99,
+				Enums.MOVE_TYPE.SWIM: 99,
 				},
 			"WallFly":{
 				Enums.MOVE_TYPE.FOOT: 99,
@@ -1210,6 +1280,7 @@ static func get_terrain_data():
 				Enums.MOVE_TYPE.RANGER: 99,
 				Enums.MOVE_TYPE.MOUNT: 99,
 				Enums.MOVE_TYPE.ARMOR: 99,
+				Enums.MOVE_TYPE.SWIM: 99,
 				},
 }
 	return terrainData
@@ -1249,7 +1320,7 @@ static func get_items():
 				"Equip":true,
 				"SubGroup": false,
 				},
-				
+
 				"SLVKNF":{
 				"Name":"Silver Knife",
 				"Icon": "res://sprites/gungnir.png",
@@ -1266,7 +1337,7 @@ static func get_items():
 				"Equip":true,
 				"SubGroup": "KNIVES",
 				},
-				
+
 				"CLB": {
 				"Name":"Club",
 				"Icon": "res://sprites/gungnir.png",
@@ -1283,7 +1354,7 @@ static func get_items():
 				"Equip":true,
 				"SubGroup": false,
 				},
-				
+
 				"DGR": {
 				"Name":"Dagger",
 				"Icon": "res://sprites/gungnir.png",
@@ -1361,7 +1432,7 @@ static func get_items():
 				"MaxDur": 3,
 				"Use": true,
 				"Effects": ["Pizza01"] },
-				
+
 				"PWRELIX":{
 				"Name":"Power Elixir",
 				"Icon": "res://sprites/gungnir.png",
@@ -1376,32 +1447,32 @@ static func get_items():
 				"Category": "ACC",
 				"Equip": true,
 				"Effects": ["PwrAcc01"] },
-				
-				
+
+
 				}
 	return iData
-	
-	
+
+
 static func get_effects():
 	var skillEffects : Dictionary
 	skillEffects = {
 			"ChaHit":{
 				"Type": Enums.EFFECT_TYPE.BUFF,
-				"SubType": Enums.SUB_TYPE.HIT, 
-				"Target": Enums.EFFECT_TARGET.EQUIPPED, 
+				"SubType": Enums.SUB_TYPE.HIT,
+				"Target": Enums.EFFECT_TARGET.EQUIPPED,
 				"Value": 10,
 			},
 			"Ter":{
 				"Type": Enums.EFFECT_TYPE.DEBUFF,
-				"SubType": Enums.SUB_TYPE.GRAZE, 
-				"Target": Enums.EFFECT_TARGET.EQUIPPED, 
+				"SubType": Enums.SUB_TYPE.GRAZE,
+				"Target": Enums.EFFECT_TARGET.EQUIPPED,
 				"Value": -10,
 			},
 			"Thirst50":{
 				"Type": Enums.EFFECT_TYPE.LIFE_STEAL,
-				"Target": Enums.EFFECT_TARGET.SELF, 
-				"OnHit": true, 
-				"Value": 0.5, 
+				"Target": Enums.EFFECT_TARGET.SELF,
+				"OnHit": true,
+				"Value": 0.5,
 			},
 			"MultiStrike2":{
 				"Type": Enums.EFFECT_TYPE.MULTI_SWING,
@@ -1417,7 +1488,7 @@ static func get_effects():
 			},
 			"Toss1":{
 				"Type": Enums.EFFECT_TYPE.RELOC,
-				"SubType": Enums.SUB_TYPE.TOSS, 
+				"SubType": Enums.SUB_TYPE.TOSS,
 				"Target": Enums.EFFECT_TARGET.TARGET,
 				"Hostile": true,
 			},
@@ -1431,18 +1502,18 @@ static func get_effects():
 			"Heal2" :{
 				"Type": Enums.EFFECT_TYPE.HEAL,
 				"Target": Enums.EFFECT_TARGET.SELF,
-				"Value": 2, 
+				"Value": 2,
 			},
 			"Graze5":{
 				"Type": Enums.EFFECT_TYPE.BUFF,
-				"SubType": Enums.SUB_TYPE.GRAZE, 
+				"SubType": Enums.SUB_TYPE.GRAZE,
 				"Target": Enums.EFFECT_TARGET.EQUIPPED,
-				"Stack": true, 
+				"Stack": true,
 				"Value": 5,
 			},
 			"FairySlayer":{
 				"Type": Enums.EFFECT_TYPE.SLAYER,
-				"SubType": false, 
+				"SubType": false,
 				"Instant": true,
 				"Target": Enums.EFFECT_TARGET.TARGET,
 				"RuleType": Enums.RULE_TYPE.TARGET_SPEC,
@@ -1450,7 +1521,7 @@ static func get_effects():
 			},
 			"Buff":{
 				"Type": Enums.EFFECT_TYPE.BUFF,
-				"SubType": Enums.SUB_TYPE.GRAZE, 
+				"SubType": Enums.SUB_TYPE.GRAZE,
 				"Target": Enums.EFFECT_TARGET.SELF,
 				"Value": 5,
 				"Duration": 2,
@@ -1459,7 +1530,7 @@ static func get_effects():
 			},
 			"DebuffMove04":{
 				"Type": Enums.EFFECT_TYPE.DEBUFF,
-				"SubType": Enums.SUB_TYPE.MOVE, 
+				"SubType": Enums.SUB_TYPE.MOVE,
 				"Target": Enums.EFFECT_TARGET.TARGET,
 				"Value": -4,
 				"Duration": 1,
@@ -1479,21 +1550,21 @@ static func get_effects():
 			"Pizza01": {
 				"Type": Enums.EFFECT_TYPE.HEAL,
 				"Target": Enums.EFFECT_TARGET.SELF,
-				"Value": 8, 
+				"Value": 8,
 			},
 			"PwrBuff01":{
 				"Type": Enums.EFFECT_TYPE.BUFF,
-				"SubType": Enums.SUB_TYPE.PWR, 
+				"SubType": Enums.SUB_TYPE.PWR,
 				"Target": Enums.EFFECT_TARGET.SELF,
 				"DurationType": Enums.DURATION_TYPE.PERMANENT,
-				"Stack": true, 
+				"Stack": true,
 				"Value": 1,
 			},
 			"PwrAcc01":{
 				"Type": Enums.EFFECT_TYPE.BUFF,
-				"SubType": Enums.SUB_TYPE.PWR, 
+				"SubType": Enums.SUB_TYPE.PWR,
 				"Target": Enums.EFFECT_TARGET.EQUIPPED,
-				"Stack": true, 
+				"Stack": true,
 				"Value": 1,
 			},
 			"GrantFire1":{
@@ -1506,7 +1577,7 @@ static func get_effects():
 			}
 	}
 	return skillEffects
-	
+
 static func get_skills():
 	var skills : Dictionary
 	skills = {
@@ -1534,7 +1605,7 @@ static func get_skills():
 			"CanDmg": false,
 			"Hit": 95,
 			"Cost": 4,
-			"Effects": ["Shove1"], 
+			"Effects": ["Shove1"],
 		},
 		"EnemyToss1":{
 			"SkillName": "Toss",
@@ -1544,13 +1615,13 @@ static func get_skills():
 			"Hit": 65,
 			"Dmg": 5,
 			"Cost": 5,
-			"Effects": ["Toss1"], 
+			"Effects": ["Toss1"],
 		},
 		"Rest": {
 			"SkillName": "Rest",
 			"Icon": "res://sprites/icons/features/yuugi.ability.two.png",
 			"Target": "Self",
-			"CanMiss": false, 
+			"CanMiss": false,
 			"CanCrit": false,
 			"CanDmg": false,
 			##Used regardless of Augment
@@ -1581,7 +1652,7 @@ static func get_skills():
 			"MaxRange": 2,
 			"Cost": 3,
 			"Effects": ["Buff"], #any attacking effects for an augment skill must be set to instant.
-			
+
 		},
 		"ST05": {
 			"SkillId": "ST05",
@@ -1653,7 +1724,7 @@ static func get_passives():
 		},
 	}
 	return passives
-	
+
 static func get_auras():
 	var auras = {
 		"Charisma":{
@@ -1678,10 +1749,10 @@ static func get_time_mods():
 	var timeMods = {
 		SPEC_ID.NONE:{
 			Enums.TIME.DAY:{
-				
+
 			},
 			Enums.TIME.NIGHT:{
-				
+
 			}
 		},
 		SPEC_ID.VAMPIRE:{
@@ -1695,15 +1766,15 @@ static func get_time_mods():
 							"Cele": 0,
 							"Def": -2,
 							"Cha": 0,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 							"MoveType": Enums.MOVE_TYPE.FOOT,
 						},
@@ -1717,17 +1788,17 @@ static func get_time_mods():
 							"Cele": 0,
 							"Def": 0,
 							"Cha": 0,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
-							"MoveType": Enums.MOVE_TYPE.FLY,
+							"MoveType": false,
 						}
 		},
 		Enums.SPEC_ID.HUMAN:{
@@ -1737,19 +1808,19 @@ static func get_time_mods():
 							"Comp": 0,
 							"Pwr": 0,
 							"Mag": 0,
-							"Eleg": 1,
+							"Eleg": 0,
 							"Cele": 0,
 							"Def": 0,
-							"Cha": 1,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Cha": 0,
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 						},
 						Enums.TIME.NIGHT:{
@@ -1758,19 +1829,19 @@ static func get_time_mods():
 							"Comp": 0,
 							"Pwr": 0,
 							"Mag": 0,
-							"Eleg": 0,
+							"Eleg": -1,
 							"Cele": -1,
 							"Def": 0,
-							"Cha": -1,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Cha": -2,
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 						}
 		},
@@ -1785,15 +1856,15 @@ static func get_time_mods():
 							"Cele": 0,
 							"Def": 0,
 							"Cha": 0,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 						},
 						Enums.TIME.NIGHT:{
@@ -1806,15 +1877,15 @@ static func get_time_mods():
 							"Cele": 0,
 							"Def": 0,
 							"Cha": 0,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 						}
 		},
@@ -1829,15 +1900,15 @@ static func get_time_mods():
 							"Cele": 0,
 							"Def": 0,
 							"Cha": 0,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 						},
 						Enums.TIME.NIGHT:{
@@ -1850,15 +1921,15 @@ static func get_time_mods():
 							"Cele": 0,
 							"Def": 0,
 							"Cha": 0,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 						}
 		},
@@ -1873,15 +1944,15 @@ static func get_time_mods():
 							"Cele": 0,
 							"Def": 0,
 							"Cha": 0,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 						},
 						Enums.TIME.NIGHT:{
@@ -1894,15 +1965,15 @@ static func get_time_mods():
 							"Cele": 0,
 							"Def": 0,
 							"Cha": 0,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 						}
 		},
@@ -1911,42 +1982,42 @@ static func get_time_mods():
 							"Move": 0,
 							"Life": 0,
 							"Comp": 0,
-							"Pwr": -1,
-							"Mag": -1,
+							"Pwr": 0,
+							"Mag": 0,
 							"Eleg": 0,
 							"Cele": 0,
-							"Def": -1,
+							"Def": 0,
 							"Cha": 0,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 						},
 						Enums.TIME.NIGHT:{
 							"Move": 0,
 							"Life": 0,
 							"Comp": 0,
-							"Pwr": 1,
-							"Mag": 1,
+							"Pwr": 2,
+							"Mag": 4,
 							"Eleg": 0,
 							"Cele": 1,
-							"Def": 0,
+							"Def": 1,
 							"Cha": 0,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 						}
 		},
@@ -1961,18 +2032,41 @@ static func get_time_mods():
 							"Cele": 0,
 							"Def": 0,
 							"Cha": 0,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 						},
 						Enums.TIME.NIGHT:{
+							"Move": 0,
+							"Life": 0,
+							"Comp": 0,
+							"Pwr": 2,
+							"Mag": 6,
+							"Eleg": 0,
+							"Cele": 1,
+							"Def": 1,
+							"Cha": 0,
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
+							"DRes": 0,
+						}
+		},
+		Enums.SPEC_ID.SAZAE_ONI:{
+						Enums.TIME.DAY:{
 							"Move": 0,
 							"Life": 0,
 							"Comp": 0,
@@ -1982,15 +2076,36 @@ static func get_time_mods():
 							"Cele": 0,
 							"Def": 0,
 							"Cha": 0,
-							"Dmg": 0, 
-							"Hit": 0, 
-							"": 0, 
-							"Barrier": 0, 
-							"BarPrc": 0, 
-							"Crit": 0, 
-							"Luck": 0, 
-							"Resist": 0, 
-							"EffHit":0, 
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
+							"DRes": 0,
+						},
+						Enums.TIME.NIGHT:{
+							"Move": 0,
+							"Life": 0,
+							"Comp": 0,
+							"Pwr": 1,
+							"Mag": 2,
+							"Eleg": 1,
+							"Cele": 1,
+							"Def": 1,
+							"Cha": 0,
+							"Dmg": 0,
+							"Hit": 0,
+							"": 0,
+							"Barrier": 0,
+							"BarPrc": 0,
+							"Crit": 0,
+							"Luck": 0,
+							"Resist": 0,
+							"EffHit":0,
 							"DRes": 0,
 						}
 		}

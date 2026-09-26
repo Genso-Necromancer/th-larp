@@ -1,13 +1,17 @@
-[gd_scene load_steps=10 format=3 uid="uid://cl7ik2hxcwm08"]
+[gd_scene load_steps=14 format=3 uid="uid://cl7ik2hxcwm08"]
 
 [ext_resource type="Script" uid="uid://2hx5flk7mcr3" path="res://scenes/maps/BaseGameMap.gd" id="1_ak6bi"]
-[ext_resource type="TileSet" uid="uid://dae0fl1fnuwvk" path="res://TileSets/TestTileSet2.tres" id="2_1xy5d"]
+[ext_resource type="TileSet" uid="uid://qcj6cnbrhw7s" path="res://TileSets/ground/GroundSet.tres" id="2_8do3e"]
 [ext_resource type="TileSet" uid="uid://csbjmhaysou6f" path="res://TileSets/ObjectSet.tres" id="3_6ts4f"]
+[ext_resource type="TileSet" uid="uid://dvpgfwf212a4i" path="res://TileSets/wall/WallSet.tres" id="3_ds6an"]
 [ext_resource type="TileSet" uid="uid://d0jkuu7oqmw7d" path="res://TileSets/region_tiles.tres" id="4_ds6an"]
+[ext_resource type="TileSet" uid="uid://i7673arf7jvt" path="res://TileSets/modifier/ModTileSet.tres" id="4_lbo8e"]
 [ext_resource type="Script" uid="uid://bw7nqqrsribgq" path="res://scenes/maps/context.gd" id="5_1xy5d"]
 [ext_resource type="TileSet" uid="uid://dc86d54yrw68y" path="res://TileSets/EventSet.tres" id="5_8do3e"]
+[ext_resource type="TileSet" uid="uid://baebtkker7qwb" path="res://TileSets/dev/deployments.tres" id="6_77vj4"]
 [ext_resource type="Script" uid="uid://d2s883a3vismr" path="res://scenes/maps/narrativeLayer.gd" id="6_lbo8e"]
-[ext_resource type="TileSet" uid="uid://bphorhxlrllt2" path="res://TileSets/dev_set.tres" id="7_1xy5d"]
+[ext_resource type="TileSet" uid="uid://bphorhxlrllt2" path="res://TileSets/dev/dev_set.tres" id="7_1xy5d"]
+[ext_resource type="TileSet" uid="uid://eblukikefhi1" path="res://TileSets/ranges/AttackThreatMoveSet.tres" id="7_ds6an"]
 [ext_resource type="PackedScene" uid="uid://d2cjx6gleg5wq" path="res://scenes/maps/Layers/seize_layer.tscn" id="10_6ts4f"]
 
 [node name="GameMap" type="Node2D" groups=["Persist"]]
@@ -22,11 +26,16 @@ minutes = 0
 
 [node name="Ground" type="TileMapLayer" parent="."]
 use_parent_material = true
-tile_set = ExtResource("2_1xy5d")
+tile_set = ExtResource("2_8do3e")
+
+[node name="Wall" type="TileMapLayer" parent="."]
+use_parent_material = true
+tile_set = ExtResource("3_ds6an")
+y_sort_origin = 1
 
 [node name="Modifier" type="TileMapLayer" parent="."]
 use_parent_material = true
-tile_set = ExtResource("2_1xy5d")
+tile_set = ExtResource("4_lbo8e")
 y_sort_origin = 1
 
 [node name="Object" type="TileMapLayer" parent="."]
@@ -35,7 +44,7 @@ tile_set = ExtResource("3_6ts4f")
 
 [node name="Deployments" type="TileMapLayer" parent="."]
 use_parent_material = true
-tile_set = ExtResource("2_1xy5d")
+tile_set = ExtResource("6_77vj4")
 
 [node name="Context" type="TileMapLayer" parent="."]
 self_modulate = Color(1, 1, 1, 0.658824)
@@ -45,7 +54,7 @@ script = ExtResource("5_1xy5d")
 
 [node name="PathAttack" type="TileMapLayer" parent="."]
 use_parent_material = true
-tile_set = ExtResource("2_1xy5d")
+tile_set = ExtResource("7_ds6an")
 y_sort_origin = 2
 
 [node name="Narrative" type="TileMapLayer" parent="."]

@@ -16,6 +16,7 @@ func update_stats():
 	
 	# 2. mod groups
 	var time_mods  = _compute_time_modifiers()
+	_apply_time_move_type(time_mods)
 	var aura_mods  = _compute_aura_modifiers()
 	var buff_mods  = _compute_buff_modifiers()
 	var ui_buff_mods = _compute_buff_modifiers_for_ui()
@@ -83,12 +84,23 @@ func _compute_time_modifiers() -> Dictionary:
 	var immune = unit.check_time_prot()
 
 	for key in data.keys():
+		if key == "MoveType":
+			mods[key] = false if immune else data[key]
+			continue
 		if immune:
 			mods[key] = max(0, data[key])
 		else:
 			mods[key] = data[key]
 	
 	return mods
+
+func _apply_time_move_type(time_mods: Dictionary) -> void:
+	var base_move_type := PlayerData.get_unit_stats(unit.SPEC_ID, unit.ROLE_ID).MoveType
+	var timed_move_type = time_mods.get("MoveType", false)
+	if timed_move_type is int:
+		unit.move_type = int(timed_move_type)
+	else:
+		unit.move_type = int(base_move_type)
 
 func _compute_aura_modifiers() -> Dictionary:
 	return unit.aura_controller.get_stat_modifiers()

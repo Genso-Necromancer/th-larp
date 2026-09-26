@@ -209,6 +209,9 @@ func _load_terrain_data():
 				Enums.MOVE_TYPE.FOOT: 0,
 				Enums.MOVE_TYPE.FLY: 0,
 				Enums.MOVE_TYPE.RANGER:0,
+				Enums.MOVE_TYPE.MOUNT: 0,
+				Enums.MOVE_TYPE.ARMOR: 0,
+				Enums.MOVE_TYPE.SWIM: 0,
 			}
 			var innerKeys = rawData[key].keys()
 			for iKey in innerKeys:

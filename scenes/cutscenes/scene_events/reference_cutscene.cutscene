@@ -1,0 +1,25 @@
+# Minimal compiler smoke-test scene.
+
+@cast
+remilia = Remilia Scarlet | Head Lady | remilia | neutral:th1
+patchouli = Patchouli Knowledge | Librarian | patchouli | neutral:th2
+
+@scene
+with
+  enter remilia left 0.75
+  enter patchouli right 0.25
+  focus remilia
+  remilia: The new script format appears to be behaving.
+end
+
+swap patchouli neutral
+with
+  focus patchouli
+  slide remilia 0.85
+  anim remilia hop
+  patchouli: It is at least easier to read.
+end
+
+none: The test scene ends.
+exit remilia right
+exit patchouli left

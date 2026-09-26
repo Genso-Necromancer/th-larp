@@ -8,7 +8,7 @@
 [ext_resource type="Resource" uid="uid://7t8iqbg5bicy" path="res://scenes/maps/objectives/remi_saku_death_loss.tres" id="4_xc6ji"]
 [ext_resource type="PackedScene" uid="uid://d0864tysvp4bv" path="res://scenes/units/generic_units/oni_troublemaker_lv_1.tscn" id="5_5odpd"]
 [ext_resource type="PackedScene" uid="uid://dffu0k0v5tou1" path="res://scenes/units/generic_units/fairy_cointaker_lv_1.tscn" id="6_ub6hv"]
-[ext_resource type="TileSet" uid="uid://baebtkker7qwb" path="res://TileSets/deployments.tres" id="6_uk5sw"]
+[ext_resource type="TileSet" uid="uid://baebtkker7qwb" path="res://TileSets/dev/deployments.tres" id="6_uk5sw"]
 [ext_resource type="PackedScene" uid="uid://d1lptkdo512fn" path="res://scenes/maps/MapObjects/door.tscn" id="7_5odpd"]
 [ext_resource type="PackedScene" uid="uid://chqu2dkt7ofqi" path="res://scenes/maps/MapObjects/breakable_wall.tscn" id="8_ub6hv"]
 [ext_resource type="PackedScene" uid="uid://bcug5vmv5c0k" path="res://scenes/units/generic_units/kuchisake_blade_lv_1.tscn" id="14_3blko"]

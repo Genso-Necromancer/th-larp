@@ -1,0 +1,19 @@
+# Minimal compiler test scene.
+
+@cast
+remilia = Remilia Scarlet | Head Lady | remilia | neutral:th1
+patchouli = Patchouli Knowledge | Librarian | patchouli | neutral:th2
+
+@scene
+with
+  show remilia at 0.75
+  show patchouli at 0.25
+end
+focus remilia
+remilia: Tiny is a dork.
+
+swap patchouli neutral
+focus patchouli
+patchouli: Reply to this post or your mother will die in her sleep tonight.
+
+none: Tiny is still a dork.

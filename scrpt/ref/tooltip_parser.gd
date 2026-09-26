@@ -248,10 +248,10 @@ func _generate_stat_tt(unit:Unit, key_stat: String,base:int,bonus:int) -> String
 		"DRes": pass
 		"move_type":
 			var tData : Dictionary = PlayerData.terrainData
-			var moveCosts :Dictionary
+			var moveCosts :Dictionary = {}
 			var count := 0
 			for t in tData:
-				var cost :int = tData[t][unit.move_type]
+				var cost := float(tData[t].get(unit.move_type, 0.0))
 				if cost >= 99:
 						moveCosts[t] = " " + StringGetter.get_string("terrain_cannot_pass")
 				elif cost != 0:

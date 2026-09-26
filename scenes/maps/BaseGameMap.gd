@@ -9,6 +9,9 @@ signal danmaku_progressed
 
 enum MAP_EVENT{NONE, TIME, DEATH, SEIZE}
 enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
+
+const TERRAIN_VOID := &"Void"
+
 ##WARNING: a Personality script must be attached to all maps for correct functionality
 @export var ai_personality:Personality
 @export_category("Map Values")
@@ -50,11 +53,12 @@ enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
 @export var dmkScript : DanmakuScript
 @export var dmkMaster : Unit
 @export_category("Cute Scene Scripts")
-@export_file("res://scenes/cutscenes/scene_events/*_event.json") var start_script = ""
-@export_file("res://scenes/cutscenes/scene_events/*_event.json") var end_script = ""
-@export_file("res://scenes/cutscenes/scene_events/*_event.json") var event_scripts : Array[String]
+@export_file("res://scenes/cutscenes/scene_events/*") var start_script = ""
+@export_file("res://scenes/cutscenes/scene_events/*") var end_script = ""
+@export_file("res://scenes/cutscenes/scene_events/*") var event_scripts : Array[String]
 ##ALL THE FUCKING LAYERS
 @onready var ground :TileMapLayer= $Ground
+@onready var wall :TileMapLayer= $Wall
 @onready var modifier :TileMapLayer= $Modifier
 @onready var object :TileMapLayer= $Object
 @onready var deploy :TileMapLayer= $Deployments
@@ -391,15 +395,15 @@ func hex_centered(grid_position: Vector2i) -> Vector2i:
 func get_movement_cost(cell, moveType):
 	var base :TileData = ground.get_cell_tile_data(cell)
 	var mod :TileData = modifier.get_cell_tile_data(cell)
-	var baseTile : String = ""
-	var modTile : String = ""
+	var baseTile : StringName = &""
+	var modTile : StringName = &""
 	var costData :Dictionary = PlayerData.terrainData
 	var cost := 0.0
 	
 	if base:
-		baseTile = String(base.get_custom_data("TerrainType"))
+		baseTile = _normalize_terrain_key(base.get_custom_data("TerrainType"))
 	if mod:
-		modTile = String(mod.get_custom_data("TerrainType"))
+		modTile = _normalize_terrain_key(mod.get_custom_data("TerrainType"))
 
 	if baseTile != "" and costData.has(baseTile):
 		cost += float(costData[baseTile].get(moveType, 0.0))
@@ -441,13 +445,13 @@ func get_terrain_values(cell:Vector2i)-> Dictionary:
 	var values:={"GrzBonus": 0, "DefBonus": 0, "PwrBonus": 0, "MagBonus": 0, "HitBonus": 0,}
 	var terrainData = PlayerData.terrainData
 	
-	if tags.BaseType:
+	if tags.BaseType and terrainData.has(tags.BaseType):
 		for bonus in values:
-			values[bonus] += terrainData[tags.BaseType][bonus]
+			values[bonus] += int(terrainData[tags.BaseType].get(bonus, 0))
 			
-	if tags.ModType:
+	if tags.ModType and terrainData.has(tags.ModType):
 		for bonus in values:
-			values[bonus] += terrainData[tags.ModType][bonus]
+			values[bonus] += int(terrainData[tags.ModType].get(bonus, 0))
 	return values
 
 
@@ -456,24 +460,62 @@ func get_terrain_tags(cell:Vector2i) -> Dictionary:
 	var base = ground.get_cell_tile_data(cell)
 	var mod = modifier.get_cell_tile_data(cell)
 	if base: 
-		terrainTags.BaseType = base.get_custom_data("TerrainType")
-		terrainTags.BaseId = base.get_custom_data("TerrainId")
+		terrainTags.BaseType = _normalize_terrain_key(base.get_custom_data("TerrainType"))
+		terrainTags.BaseId = _normalize_terrain_key(base.get_custom_data("TerrainId"))
 	if mod:
-		terrainTags.ModType = mod.get_custom_data("TerrainType")
-		terrainTags.ModId = mod.get_custom_data("TerrainId")
+		terrainTags.ModType = _normalize_terrain_key(mod.get_custom_data("TerrainType"))
+		terrainTags.ModId = _normalize_terrain_key(mod.get_custom_data("TerrainId"))
 		terrainTags.Locked = mod.get_custom_data("Locked")
 	return terrainTags
+
+
+func _normalize_terrain_key(value) -> StringName:
+	if value == null:
+		return &""
+	var key := StringName(value)
+	if key == TERRAIN_VOID:
+		return &""
+	return key
+
+
+func get_wall_direction(cell: Vector2i) -> int:
+	if wall == null:
+		return 0
+	var tile_data := wall.get_cell_tile_data(cell)
+	if tile_data == null:
+		return 0
+	var wall_type := _normalize_terrain_key(tile_data.get_custom_data("TerrainType"))
+	if wall_type == &"":
+		return 0
+	var wall_value = tile_data.get_custom_data("WallBit")
+	if wall_value == null:
+		wall_value = tile_data.get_custom_data("WallDirection")
+	if wall_value == null:
+		return 0
+	return int(wall_value)
+
+
+func get_wall_type(cell: Vector2i) -> StringName:
+	if wall == null:
+		return &""
+	var tile_data := wall.get_cell_tile_data(cell)
+	if tile_data == null:
+		return &""
+	return _normalize_terrain_key(tile_data.get_custom_data("TerrainType"))
 
 
 func get_bonus(cell:Vector2i) -> Dictionary:
 	var tags : Dictionary =  get_terrain_tags(cell)
 	var cellParams : Dictionary
 	var tData : Dictionary = PlayerData.terrainData
+	if not tags.BaseType or not tData.has(tags.BaseType):
+		return {}
 	cellParams = tData[tags.BaseType].duplicate()
-	if tags.ModType == "Bridge": cellParams = tData[tags.ModType]
-	elif tags.ModType:
+	if tags.ModType == "Bridge" and tData.has(tags.ModType):
+		cellParams = tData[tags.ModType]
+	elif tags.ModType and tData.has(tags.ModType):
 		for param in cellParams:
-			cellParams[param] += tData[tags.ModType][param]
+			cellParams[param] += tData[tags.ModType].get(param, 0)
 	return cellParams
 
 

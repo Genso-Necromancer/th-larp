@@ -63,3 +63,5 @@ Remilia is intentionally missing a character feature during the initial baseline
 ## Species
 
 - Potential for Yamanba Species/Role which Mix Physical and some Magic. They're mountain hags and witches. In Touhou the character Nemuno Sakata is a butcher knife wielding Yamanba giving inspiration to this.
+- Supernatural species Mag audit: initial demon-oriented pass expresses Mag through day/night only. Youkai-style species use day as neutral and gain supernatural force at night; Vampire uses night as neutral and loses force during day. Revisit future supernatural species with this pattern in mind before adding base Mag or Mag growth.
+- Kuchisake-onna species pass: `Blade` exists as the intended specialist role, but the associated Kuchisake-onna species still needs implementation.

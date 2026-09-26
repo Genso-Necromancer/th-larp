@@ -1,0 +1,33 @@
+[gd_resource type="TileSet" load_steps=5 format=3 uid="uid://eblukikefhi1"]
+
+[ext_resource type="Texture2D" uid="uid://wegqw3w8dxe1" path="res://sprites/tiles/movement_tile.png" id="1_7lspa"]
+[ext_resource type="Texture2D" uid="uid://dl5k64jih1qno" path="res://sprites/tiles/attack_target.png" id="6_roy5d"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_mbyn6"]
+texture = ExtResource("1_7lspa")
+texture_region_size = Vector2i(168, 56)
+0:0/0 = 0
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_t45qg"]
+resource_name = "targeting"
+texture = ExtResource("6_roy5d")
+texture_region_size = Vector2i(168, 56)
+0:0/0 = 0
+
+[resource]
+tile_shape = 3
+tile_offset_axis = 1
+tile_size = Vector2i(168, 50)
+navigation_layer_0/layers = 1
+custom_data_layer_0/name = "TerrainType"
+custom_data_layer_0/type = 21
+custom_data_layer_1/name = "TerrainId"
+custom_data_layer_1/type = 21
+custom_data_layer_2/name = "Trigger"
+custom_data_layer_2/type = 21
+custom_data_layer_3/name = "Locked"
+custom_data_layer_3/type = 1
+custom_data_layer_4/name = "Team"
+custom_data_layer_4/type = 21
+sources/10 = SubResource("TileSetAtlasSource_mbyn6")
+sources/9 = SubResource("TileSetAtlasSource_t45qg")

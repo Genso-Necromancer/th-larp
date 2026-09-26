@@ -62,7 +62,7 @@ These systems are at least partly usable, but `feature_workshop.tscn` does not c
 
 `feature_workshop.tscn` can test almost everything currently usable. The next step is not to create a new sandbox from scratch, but to formalize what this map covers and add focused fixtures for systems that are usable but not currently represented.
 
-First-pass checklist: `character_data/feature_workshop_checklist.md`
+First-pass checklist: `notes/feature_workshop_checklist.md`
 
 The current map split is:
 
