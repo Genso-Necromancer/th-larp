@@ -6,7 +6,7 @@
 [ext_resource type="TileSet" uid="uid://dvpgfwf212a4i" path="res://TileSets/wall/WallSet.tres" id="3_ds6an"]
 [ext_resource type="TileSet" uid="uid://d0jkuu7oqmw7d" path="res://TileSets/region_tiles.tres" id="4_ds6an"]
 [ext_resource type="TileSet" uid="uid://i7673arf7jvt" path="res://TileSets/modifier/ModTileSet.tres" id="4_lbo8e"]
-[ext_resource type="Script" uid="uid://bw7nqqrsribgq" path="res://scenes/maps/context.gd" id="5_1xy5d"]
+[ext_resource type="Script" path="res://scenes/maps/context.gd" id="5_1xy5d"]
 [ext_resource type="TileSet" uid="uid://dc86d54yrw68y" path="res://TileSets/EventSet.tres" id="5_8do3e"]
 [ext_resource type="TileSet" uid="uid://baebtkker7qwb" path="res://TileSets/dev/deployments.tres" id="6_77vj4"]
 [ext_resource type="Script" uid="uid://d2s883a3vismr" path="res://scenes/maps/narrativeLayer.gd" id="6_lbo8e"]
@@ -19,7 +19,7 @@ z_index = -2
 script = ExtResource("1_ak6bi")
 forcedUnits = ["remilia", "sakuya"]
 title = "Testing My Fucking Patience"
-start_script = null
+start_script = "<null>"
 end_script = null
 hours = 0
 minutes = 0

@@ -23,6 +23,7 @@ const UNIT_CONTAINER_NAMES := {
 ##WARNING: a Personality script must be attached to all maps for correct functionality
 @export var ai_personality:Personality
 @export_category("Map Values")
+
 ##Units required to participate in this chapter.[br]
 ##WARNING: Do not use units which can die and arrive prior to this map]
 ##WARNING: unit_id is case sensitive.

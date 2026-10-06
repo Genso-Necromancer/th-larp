@@ -33,7 +33,7 @@ condition_type = 1
 display_text = ""
 metadata/_custom_type_script = "uid://b7a6ss8luhslm"
 
-[node name="map_pack_1" instance=ExtResource("1_a0u66")]
+[node name="MapPack1" instance=ExtResource("1_a0u66")]
 ai_personality = ExtResource("2_7bd6c")
 chapterRosterAdditions = Array[String](["flandre"])
 next_map = "uid://bkc85u306ugro"
