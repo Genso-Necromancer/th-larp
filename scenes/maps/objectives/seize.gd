@@ -28,3 +28,23 @@ func _on_seize(cell:Vector2i):
 		seize_tracker[cell] = true
 		emit_changed()
 	_check_complete(seize_tracker,completion_type)
+
+
+func get_display_text(map = null) -> String:
+	var custom_text := super.get_display_text(map)
+	if not custom_text.is_empty():
+		return custom_text
+	var seize_count := _get_seize_count(map)
+	if seize_count == 1:
+		return "Seize the Objective"
+	if completion_type == COMPLETION_TYPE.ANY:
+		return "Seize an objective"
+	return "Seize all objectives"
+
+
+func _get_seize_count(map = null) -> int:
+	if map != null and seize_tile_layer != NodePath(""):
+		var layer = map.get_node_or_null(seize_tile_layer)
+		if layer != null and layer.has_method("get_used_cells"):
+			return layer.get_used_cells().size()
+	return seize_tracker.size()

@@ -1,26 +1,20 @@
-[gd_scene load_steps=24 format=3 uid="uid://ly80b5bj1iom"]
+[gd_scene load_steps=10 format=3 uid="uid://ly80b5bj1iom"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_w0yue"]
-[ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_6jg85"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_apnrh"]
-[ext_resource type="Resource" path="res://unit_resources/features/skills/spell_sunburst.tres" id="3_1owia"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="3_skgj4"]
-[ext_resource type="Resource" path="res://unit_resources/features/skills/spell_debug_life_shear.tres" id="4_tpi15"]
 [ext_resource type="Script" uid="uid://y8vspyvvdgjj" path="res://unit_resources/items/consumables/consumable.gd" id="5_arr5s"]
-[ext_resource type="Resource" path="res://unit_resources/features/skills/spell_debug_life_mend.tres" id="5_t1140"]
-[ext_resource type="Resource" uid="uid://c7ddju7ix30a4" path="res://unit_resources/features/skills/spell_moonveil.tres" id="6_ma8hh"]
 [ext_resource type="Resource" uid="uid://cmoym4xuhijeg" path="res://unit_resources/items/consumables/pizza.tres" id="6_nwauq"]
-[ext_resource type="Resource" path="res://unit_resources/features/skills/spell_debug_eleg_break.tres" id="7_58q5g"]
 [ext_resource type="Texture2D" uid="uid://dw3rv77oi2rjo" path="res://sprites/character/patchouli/sorceress_sprite.png" id="7_nwauq"]
-[ext_resource type="Resource" uid="uid://bpkkgfsik2j4o" path="res://unit_resources/features/skills/spell_water_veil.tres" id="8_o4isk"]
-[ext_resource type="Resource" path="res://unit_resources/features/skills/spell_silent_rain.tres" id="9_yjehs"]
-[ext_resource type="Resource" path="res://unit_resources/features/skills/spell_stonebind.tres" id="10_ejuvy"]
-[ext_resource type="Resource" path="res://unit_resources/features/skills/spell_sprout.tres" id="11_f7ltj"]
-[ext_resource type="Resource" uid="uid://bsylbrl8ub6sm" path="res://unit_resources/features/skills/spell_iron_thorn.tres" id="12_8h735"]
-[ext_resource type="Resource" path="res://unit_resources/features/skills/spell_selene_ward.tres" id="13_c47oa"]
-[ext_resource type="Resource" path="res://unit_resources/features/skills/spell_uproot.tres" id="14_16h6q"]
-[ext_resource type="Resource" path="res://unit_resources/features/skills/spell_clear_voice.tres" id="15_gu1bo"]
 [ext_resource type="Resource" uid="uid://dj5vw8cxl8bm2" path="res://unit_resources/items/weapons/book/book_basic_fire.tres" id="20_6jg85"]
+
+[sub_resource type="Resource" id="Resource_ujwcq"]
+script = ExtResource("3_skgj4")
+stats = ExtResource("20_6jg85")
+equipped = true
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
 
 [sub_resource type="Resource" id="Resource_tpymx"]
 script = ExtResource("5_arr5s")
@@ -29,14 +23,6 @@ equipped = false
 dropped = false
 is_broken = false
 metadata/_custom_type_script = "uid://y8vspyvvdgjj"
-
-[sub_resource type="Resource" id="Resource_ujwcq"]
-script = ExtResource("3_skgj4")
-stats = ExtResource("20_6jg85")
-equipped = false
-dropped = false
-is_broken = false
-metadata/_custom_type_script = "uid://bas4mbl00uet6"
 
 [node name="Patchouli" instance=ExtResource("1_w0yue")]
 unit_id = "patchouli"
@@ -101,7 +87,6 @@ total_caps = Dictionary[StringName, int]({
 &"Move": 10,
 &"Pwr": 30
 })
-skills = Array[ExtResource("2_6jg85")]([ExtResource("3_1owia"), ExtResource("4_tpi15"), ExtResource("5_t1140"), ExtResource("6_ma8hh"), ExtResource("7_58q5g"), ExtResource("8_o4isk"), ExtResource("9_yjehs"), ExtResource("10_ejuvy"), ExtResource("11_f7ltj"), ExtResource("12_8h735"), ExtResource("13_c47oa"), ExtResource("14_16h6q"), ExtResource("15_gu1bo")])
 weapon_prof = {
 "Barrier": false,
 "Blade": false,
@@ -115,8 +100,7 @@ weapon_prof = {
 "Ofuda": false,
 "Stick": false
 }
-max_inv = 6
-inventory = Array[ExtResource("2_apnrh")]([SubResource("Resource_tpymx"), SubResource("Resource_ujwcq")])
+inventory = Array[ExtResource("2_apnrh")]([SubResource("Resource_ujwcq"), SubResource("Resource_tpymx")])
 
 [node name="Sprite" parent="PathFollow2D" index="0"]
 texture = ExtResource("7_nwauq")

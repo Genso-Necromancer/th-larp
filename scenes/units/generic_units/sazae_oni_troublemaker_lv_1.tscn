@@ -51,20 +51,6 @@ total_caps = Dictionary[StringName, int]({
 &"Move": 10,
 &"Pwr": 30
 })
-weapon_prof = {
-"Barrier": false,
-"Blade": false,
-"Blunt": true,
-"Book": false,
-"Bow": false,
-"Gohei": false,
-"Gun": false,
-"Knife": false,
-"Natural": false,
-"Ofuda": false,
-"Stick": false
-}
-max_inv = 6
 inventory = Array[ExtResource("2_86ac6")]([SubResource("Resource_8a7qi")])
 
 [node name="Sprite" parent="PathFollow2D" index="0"]

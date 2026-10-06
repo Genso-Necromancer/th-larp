@@ -8,7 +8,10 @@ signal danmaku_progressed
 
 
 enum MAP_EVENT{NONE, TIME, DEATH, SEIZE}
-enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
+enum OBJECTIVE_STYLE{
+	SEQUENTIAL, ##Each objective in win_conidtions occurs one after the other.
+	SIMULTANEOUS ##Every objective in win_conditions is active at the same time.
+	}
 
 const TERRAIN_VOID := &"Void"
 const UNIT_CONTAINER_NAMES := {
@@ -46,8 +49,6 @@ const UNIT_CONTAINER_NAMES := {
 @export_group("Conditions")
 
 @export_subgroup("Win Conditions")
-##Sequential: each objective in win_conidtions occurs one after the other. [br]
-##Simultaneous: Every objective in win_conditions is active at the same time.
 
 @export var win_style : OBJECTIVE_STYLE = OBJECTIVE_STYLE.SEQUENTIAL
 ##Objective of the map.[br]
@@ -66,9 +67,9 @@ const UNIT_CONTAINER_NAMES := {
 @export var dmkScript : DanmakuScript
 @export var dmkMaster : Unit
 @export_category("Cute Scene Scripts")
-@export_file("*.cutscene","*.json") var start_script = ""
-@export_file("*.cutscene","*.json") var end_script = ""
-@export_file("*.cutscene","*.json") var event_scripts : Array[String]
+@export_file("*.cutscene","*.json") var start_script = "" ##Scene that plays before chapter start
+@export_file("*.cutscene","*.json") var end_script = "" ##Scene that plays upon chapter completion
+@export_file("*.cutscene","*.json") var event_scripts : Array[String] ##Meant to store scenes which are triggered during the chapter. Not functional.
 ##ALL THE FUCKING LAYERS
 @onready var ground :TileMapLayer= $Ground
 @onready var wall :TileMapLayer= $Wall
@@ -95,8 +96,8 @@ var chests:Dictionary[Vector2i,ChestTile] = {}
 var units_loading:int =0
 var graveyard:Array[StringName] = []
 #endregion
-var hours : int = 0
-var minutes : int = 0
+var hours : int = 0 ##24 hour clock, decides what time the map begins on. Day/Night shifts at 06:00/18:00.
+var minutes : int = 0 ##You put the minutes here.
 var mapSize
 var eventQue := []
 #var dmkScene = preload("res://scenes/danmaku.tscn")
@@ -441,13 +442,28 @@ func _initialize_danmaku_cells():
 
 
 func get_objectives() -> Array:
-	var objectText: Array = ["This is a Test", "Of The Emergency Broadcast", "System."]
-	return objectText
+	return _get_condition_text(Objective.CONDITION_TYPES.WINNING)
 
 
 func get_loss_conditions() -> Array:
-	var loss: Array = ["Do NOT Be Alarmed."]
-	return loss
+	return _get_condition_text(Objective.CONDITION_TYPES.LOSING)
+
+
+func _get_condition_text(condition_type: int) -> Array[String]:
+	var condition_text: Array[String] = []
+	for objective in objectives:
+		if objective == null or objective.condition_type != condition_type:
+			continue
+		var text := objective.get_display_text(self)
+		if not text.is_empty():
+			condition_text.append(text)
+	if condition_text.is_empty():
+		match condition_type:
+			Objective.CONDITION_TYPES.WINNING:
+				condition_text.append("Win condition missing.")
+			Objective.CONDITION_TYPES.LOSING:
+				condition_text.append("Loss condition missing.")
+	return condition_text
 
 
 func cell_clamp(grid_position: Vector2i) -> Vector2i:

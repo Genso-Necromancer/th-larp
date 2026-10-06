@@ -14,6 +14,7 @@ script = ExtResource("3_7bd6c")
 seize_tile_layer = NodePath("SeizeLayer")
 completion_type = 0
 condition_type = 1
+display_text = ""
 metadata/_custom_type_script = "uid://b7a6ss8luhslm"
 
 [sub_resource type="Resource" id="Resource_vfxsu"]
@@ -21,6 +22,7 @@ script = ExtResource("4_e2lrh")
 completion_type = 1
 hit_list_unit_ids = Array[String](["remilia", "sakuya"])
 condition_type = 0
+display_text = ""
 metadata/_custom_type_script = "uid://c7tvc3aqd1v3r"
 
 [sub_resource type="Resource" id="Resource_5vibb"]
@@ -28,6 +30,7 @@ script = ExtResource("3_7bd6c")
 seize_tile_layer = NodePath("SeizeLayer")
 completion_type = 0
 condition_type = 1
+display_text = ""
 metadata/_custom_type_script = "uid://b7a6ss8luhslm"
 
 [node name="map_pack_1" instance=ExtResource("1_a0u66")]
@@ -62,39 +65,171 @@ position = Vector2(-2, 0)
 
 [node name="SazaeOni" parent="EnemyUnits" index="0" instance=ExtResource("6_e2lrh")]
 position = Vector2(840, 125)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 
 [node name="SazaeOni2" parent="EnemyUnits" index="1" instance=ExtResource("6_e2lrh")]
 position = Vector2(966, 150)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 
 [node name="SazaeOni3" parent="EnemyUnits" index="2" instance=ExtResource("6_e2lrh")]
 position = Vector2(1092, 175)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 
 [node name="SazaeOni4" parent="EnemyUnits" index="3" instance=ExtResource("6_e2lrh")]
 position = Vector2(714, 150)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 
 [node name="SazaeOni5" parent="EnemyUnits" index="4" instance=ExtResource("6_e2lrh")]
 position = Vector2(840, 325)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 
 [node name="SazaeOni6" parent="EnemyUnits" index="5" instance=ExtResource("6_e2lrh")]
 position = Vector2(336, 275)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 
 [node name="SazaeOni7" parent="EnemyUnits" index="6" instance=ExtResource("6_e2lrh")]
 position = Vector2(462, 350)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 
 [node name="SazaeOni8" parent="EnemyUnits" index="7" instance=ExtResource("6_e2lrh")]
 position = Vector2(588, 375)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 
 [node name="SazaeOni9" parent="EnemyUnits" index="8" instance=ExtResource("6_e2lrh")]
 position = Vector2(336, 475)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 
 [node name="SazaeOni10" parent="EnemyUnits" index="9" instance=ExtResource("6_e2lrh")]
 position = Vector2(1218, 600)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 
 [node name="SazaeOni11" parent="EnemyUnits" index="10" instance=ExtResource("6_e2lrh")]
 position = Vector2(1470, 650)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 
 [node name="SazaeOni12" parent="EnemyUnits" index="11" instance=ExtResource("6_e2lrh")]
 position = Vector2(1722, 450)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
 
 [node name="Human Archer Lv1" parent="EnemyUnits" index="12" instance=ExtResource("7_s8mma")]
 position = Vector2(588, 425)
@@ -113,15 +248,14 @@ total_growth = Dictionary[StringName, float]({
 [node name="AraseanailFoidspite" parent="EnemyUnits" index="13" instance=ExtResource("8_vfxsu")]
 position = Vector2(588, 275)
 leash = 0
-simulate_leveling = true
-total_stats = Dictionary[StringName, int]({
-&"Cele": 7,
-&"Cha": 1,
-&"Comp": 100,
-&"Def": 3,
-&"Eleg": 6,
-&"Life": 27,
-&"Mag": -1,
-&"Move": 4,
-&"Pwr": 7
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
 })

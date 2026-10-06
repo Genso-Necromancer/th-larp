@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://ehgcslevf08n"]
+[gd_scene load_steps=14 format=3 uid="uid://ehgcslevf08n"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_i0qm2"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_mx3tg"]
@@ -79,17 +79,6 @@ total_stats = Dictionary[StringName, int]({
 &"Move": 4,
 &"Pwr": 7
 })
-total_caps = Dictionary[StringName, int]({
-&"Cele": 30,
-&"Cha": 30,
-&"Comp": 130,
-&"Def": 30,
-&"Eleg": 30,
-&"Life": 60,
-&"Mag": 30,
-&"Move": 10,
-&"Pwr": 30
-})
 personal_skills = Array[ExtResource("2_mx3tg")]([ExtResource("3_rrfyl")])
 personal_passives = Array[ExtResource("4_634dn")]([ExtResource("5_nnev5")])
 skills = Array[ExtResource("2_mx3tg")]([ExtResource("3_rrfyl")])
@@ -107,7 +96,6 @@ weapon_prof = {
 "Ofuda": true,
 "Stick": false
 }
-max_inv = 6
 inventory = Array[ExtResource("6_bmyf1")]([SubResource("Resource_tpcp1"), SubResource("Resource_bmyf1")])
 
 [node name="Sprite" parent="PathFollow2D" index="0"]

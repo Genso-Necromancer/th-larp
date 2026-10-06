@@ -395,12 +395,15 @@ var isSelected := false:
 	set(value): #Buggy, causes idling when hovering unit after selecting and choosing movement
 		isSelected = value
 		if isSelected:
+			_set_sprite_disabled_visual(false)
 			_anim_player.play("selected")
 			#print(unit_id,":", _anim_player.current_animation,":","Selected")
 		elif not check_status("Acted"):
+			_set_sprite_disabled_visual(false)
 			_anim_player.play("idle")
 			#print(unit_id,":", _anim_player.current_animation,"Selected")
 		elif check_status("Acted"):
+			_set_sprite_disabled_visual(true)
 			_anim_player.play("disabled")
 			#print(unit_id,":", _anim_player.current_animation,"Selected")
 #Animation Variables
@@ -630,6 +633,7 @@ func _ready() -> void:
 		curve = Curve2D.new()
 		_set_unit_name()
 	_set_faction_group(FACTION_ID)
+	_set_sprite_disabled_visual(disabled or check_status("Sleep") or check_status("Acted"))
 	unit_ready.emit(self)
 
 
@@ -1126,6 +1130,7 @@ func revert_animation():
 	if _sprite:
 		_sprite.self_modulate = Color(1, 1, 1, 1)
 	_anim_player.play(lastAnim)
+	_set_sprite_disabled_visual(lastAnim == "disabled")
 	#print(unit_id,":", _anim_player.current_animation,"Revert")
 
 
@@ -1969,10 +1974,12 @@ func _turn_complete():
 func update_sprite() -> void:
 	if !_anim_player: return
 	if check_status("Sleep") or check_status("Acted"):
+		_set_sprite_disabled_visual(true)
 		_anim_player.play("disabled")
 		#print(unit_id,":", _anim_player.current_animation,"Update Sprite")
 		return
 	if !isWalking and !isShoved and !needDeath and !isSelected:
+		_set_sprite_disabled_visual(false)
 		_anim_player.play("idle")
 		#print(unit_id,":", _anim_player.current_animation,"Update Sprite")
 
@@ -1989,6 +1996,7 @@ func refresh_state_visual() -> void:
 		if _sprite:
 			_sprite.frame = 0
 			_sprite.self_modulate = Color(1, 1, 1, 1)
+			_set_sprite_disabled_visual(false)
 		
 		
 func check_death():
@@ -2286,6 +2294,17 @@ func _set_faction_group(faction:Enums.FACTION_ID)->void:
 		Enums.FACTION_ID.NPC: 
 			fString = "NPC"
 	add_to_group(fString)
+	_apply_sprite_faction_visual()
+
+
+func _apply_sprite_faction_visual() -> void:
+	if _sprite and _sprite.has_method("apply_faction_visual"):
+		_sprite.apply_faction_visual()
+
+
+func _set_sprite_disabled_visual(is_disabled: bool) -> void:
+	if _sprite and _sprite.has_method("set_disabled_visual"):
+		_sprite.set_disabled_visual(is_disabled)
 
 #region self signals
 func _on_unit_relocated(_old_cell = null, _new_cell = null, _unit = null):

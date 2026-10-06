@@ -1,9 +1,10 @@
-[gd_scene load_steps=16 format=3 uid="uid://x6dmleipd452"]
+[gd_scene load_steps=18 format=3 uid="uid://x6dmleipd452"]
 
 [ext_resource type="Script" uid="uid://ctodvlhm5amph" path="res://scenes/units/Unit.gd" id="1_me1b5"]
-[ext_resource type="Texture2D" uid="uid://wnmi00k2g1y6" path="res://sprites/character/fairy/thief_sprite.png" id="2_3vwvo"]
 [ext_resource type="Script" uid="uid://ctblbjqcv65a5" path="res://scenes/unit_sprite.gd" id="2_me1b5"]
 [ext_resource type="AnimationLibrary" uid="uid://d4f2xcrr7c15q" path="res://scenes/unit_anim.tres" id="3_3vwvo"]
+[ext_resource type="Texture2D" uid="uid://bix6u63iahalq" path="res://sprites/character/fairy/trblr_sprite.png" id="3_eo5f0"]
+[ext_resource type="Shader" uid="uid://depy5bu6535do" path="res://scenes/units/unit_palette_shift.gdshader" id="4_30vxy"]
 [ext_resource type="Script" uid="uid://bv74dylssenec" path="res://scenes/area_unit.gd" id="4_xr077"]
 [ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="5_4067k"]
 [ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="6_eo5f0"]
@@ -15,6 +16,14 @@
 [ext_resource type="Script" uid="uid://coggcm4fwji6g" path="res://scenes/units/debug_v_box.gd" id="12_4067k"]
 [ext_resource type="Script" uid="uid://kebmbksg66af" path="res://scenes/units/debug_name.gd" id="12_xr077"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wsvxn"]
+shader = ExtResource("4_30vxy")
+shader_parameter/target_dark = Color(0.54902, 0.12549, 0.12549, 1)
+shader_parameter/target_mid = Color(0.878431, 0.219608, 0.219608, 1)
+shader_parameter/target_light = Color(1, 0.541176, 0.415686, 1)
+shader_parameter/palette_strength = 1.0
+shader_parameter/grayscale_amount = 0.0
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_51pth"]
 size = Vector2(84, 37.5)
 
@@ -22,16 +31,33 @@ size = Vector2(84, 37.5)
 z_index = 2
 y_sort_enabled = true
 script = ExtResource("1_me1b5")
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": true,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
+max_inv = 6
 
 [node name="PathFollow2D" type="PathFollow2D" parent="."]
+position = Vector2(0, -13)
 rotates = false
 loop = false
 
 [node name="Sprite" type="Sprite2D" parent="PathFollow2D"]
+material = SubResource("ShaderMaterial_wsvxn")
 position = Vector2(-1, -36)
 scale = Vector2(4, 4)
-texture = ExtResource("2_3vwvo")
-hframes = 12
+texture = ExtResource("3_eo5f0")
+hframes = 2
+vframes = 15
 region_rect = Rect2(0.0799732, -0.0518999, 17.0268, 24.8617)
 script = ExtResource("2_me1b5")
 
@@ -43,7 +69,7 @@ libraries = {
 }
 
 [node name="UnitArea" type="Area2D" parent="PathFollow2D/Sprite"]
-position = Vector2(0, 8)
+position = Vector2(0, 11.25)
 scale = Vector2(0.25, 0.25)
 collision_layer = 2
 script = ExtResource("4_xr077")
@@ -58,10 +84,10 @@ z_index = 1
 anchors_preset = -1
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -10.0
-offset_top = -11.75
-offset_right = -1.5
-offset_bottom = -29.75
+offset_left = -12.0
+offset_top = -6.25
+offset_right = -4.0
+offset_bottom = -32.25
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
@@ -90,23 +116,26 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -62.0
-offset_top = -31.0
+offset_top = 6.0
 offset_right = 62.0
-offset_bottom = 31.0
+offset_bottom = 68.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
 theme = ExtResource("11_xr077")
+alignment = 1
 script = ExtResource("12_4067k")
 
 [node name="DebugName" type="Label" parent="PathFollow2D/DebugVBox"]
 layout_mode = 2
 text = "Name Test"
+horizontal_alignment = 1
 script = ExtResource("12_xr077")
 
 [node name="Cell" type="Label" parent="PathFollow2D/DebugVBox"]
 layout_mode = 2
 text = "(0, 0)"
+horizontal_alignment = 1
 script = ExtResource("10_30vxy")
 
 [connection signal="animation_finished" from="PathFollow2D/Sprite/AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
