@@ -10,7 +10,7 @@
 [ext_resource type="Resource" uid="uid://cjyhb0gepguhi" path="res://unit_resources/features/passives/canto_night.tres" id="5_bmjv5"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="7_u1nol"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="8_vtdhj"]
-[ext_resource type="Resource" path="res://unit_resources/items/weapons/polearm/gungnir.tres" id="9_1tx70"]
+[ext_resource type="Resource" path="res://unit_resources/items/weapons/polearm/polearm_charge_basic.tres" id="9_1tx70"]
 
 [sub_resource type="Resource" id="Resource_5ej2j"]
 script = ExtResource("8_vtdhj")
@@ -29,26 +29,26 @@ simulate_leveling = false
 SPEC_ID = 3
 ROLE_ID = 3
 mod_growth = Dictionary[StringName, float]({
-&"Cele": 0.25,
+&"Cele": 0.15,
 &"Cha": 0.25,
 &"Comp": 0.35,
 &"Def": 0.05,
 &"Eleg": 0.25,
 &"Life": 0.3,
-&"Mag": 0.2,
+&"Mag": 0.1,
 &"Move": 0.0,
-&"Pwr": 0.3
+&"Pwr": 0.25
 })
 mod_stats = Dictionary[StringName, int]({
-&"Cele": -1,
-&"Cha": 1,
+&"Cele": -2,
+&"Cha": -1,
 &"Comp": 10,
 &"Def": 1,
 &"Eleg": 2,
 &"Life": 6,
-&"Mag": 1,
+&"Mag": 0,
 &"Move": 0,
-&"Pwr": 2
+&"Pwr": 1
 })
 total_growth = Dictionary[StringName, float]({
 &"Cele": 0.25,
@@ -85,8 +85,9 @@ total_caps = Dictionary[StringName, int]({
 })
 personal_passives = Array[ExtResource("2_ou00g")]([ExtResource("3_bmjv5"), ExtResource("4_302o8")])
 skills = Array[ExtResource("2_2l8tf")]([ExtResource("3_ushyw")])
-passives = Array[ExtResource("2_ou00g")]([ExtResource("3_bmjv5"), ExtResource("4_302o8"), ExtResource("5_bmjv5")])
+passives = Array[ExtResource("2_ou00g")]([ExtResource("5_bmjv5"), ExtResource("3_bmjv5"), ExtResource("4_302o8")])
 weapon_prof = {
+"Barrier": false,
 "Blade": false,
 "Blunt": false,
 "Book": false,

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="Effect" load_steps=2 format=3]
+[gd_resource type="Resource" script_class="Effect" load_steps=2 format=3 uid="uid://dxwgbe1ixur6l"]
 
 [ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_buffm"]
 

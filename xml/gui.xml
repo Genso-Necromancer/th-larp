@@ -129,6 +129,7 @@
 			<entry id = "unit_name_patchouli"><![CDATA[Patchouli Knowledge]]></entry>
 			<entry id = "unit_name_meiling"><![CDATA[Hong Meiling]]></entry>
 			<entry id = "unit_name_reimu"><![CDATA[Reimu Hakuri]]></entry>
+			<entry id = "unit_name_flandre"><![CDATA[Flandre Scarlet]]></entry>
 			<entry id = "unit_name_cirno"><![CDATA[Cirno]]></entry>
 			<!-- species -->
 			<entry id = "species_name_fairy"><![CDATA[Fairy]]></entry>

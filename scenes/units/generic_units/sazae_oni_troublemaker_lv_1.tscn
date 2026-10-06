@@ -1,0 +1,71 @@
+[gd_scene load_steps=7 format=3 uid="uid://odwaabgki807"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_vsynj"]
+[ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_86ac6"]
+[ext_resource type="Texture2D" uid="uid://p1on7tv8hinr" path="res://sprites/character/sazae_oni/trblr_sprite.png" id="2_gywyd"]
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="3_kxb8b"]
+[ext_resource type="Resource" path="res://unit_resources/items/weapons/blunt/blunt_basic.tres" id="4_86ac6"]
+
+[sub_resource type="Resource" id="Resource_8a7qi"]
+script = ExtResource("3_kxb8b")
+stats = ExtResource("4_86ac6")
+equipped = true
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[node name="SazaeOni" instance=ExtResource("1_vsynj")]
+ai_role = 1
+SPEC_ID = 8
+ROLE_ID = 1
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.3,
+&"Cha": 0.05,
+&"Comp": 0.25,
+&"Def": 0.05,
+&"Eleg": 0.2,
+&"Life": 0.4,
+&"Mag": 0.0,
+&"Move": 0.0,
+&"Pwr": 0.4
+})
+total_stats = Dictionary[StringName, int]({
+&"Cele": 7,
+&"Cha": 1,
+&"Comp": 100,
+&"Def": 3,
+&"Eleg": 6,
+&"Life": 27,
+&"Mag": -1,
+&"Move": 4,
+&"Pwr": 7
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": true,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
+max_inv = 6
+inventory = Array[ExtResource("2_86ac6")]([SubResource("Resource_8a7qi")])
+
+[node name="Sprite" parent="PathFollow2D" index="0"]
+texture = ExtResource("2_gywyd")

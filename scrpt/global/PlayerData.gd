@@ -355,11 +355,23 @@ func init_roster():
 	
 
 
-func add_to_roster(unit_id:String):
+func add_to_roster(unit_id:String) -> bool:
+	unit_id = unit_id.to_snake_case()
+	if rosterData.has(unit_id):
+		return false
 	var resourcePath := "res://scenes/units/player_units/%s.tscn" % [unit_id]
+	if not ResourceLoader.exists(resourcePath):
+		var playerPath := "res://scenes/units/player_units/%s_player.tscn" % [unit_id]
+		if ResourceLoader.exists(playerPath):
+			resourcePath = playerPath
+	if not ResourceLoader.exists(resourcePath):
+		push_warning("Cannot add missing player unit to roster: %s" % [resourcePath])
+		return false
 	var rosterDataEntry : Dictionary = {"Path": resourcePath, "deployment":Enums.DEPLOYMENT.NONE, "hidden":false,}
 	rosterData[unit_id] = rosterDataEntry
-	roster_order[Enums.DEPLOYMENT.UNDEPLOYED].append(unit_id)
+	if not roster_order[Enums.DEPLOYMENT.UNDEPLOYED].has(unit_id):
+		roster_order[Enums.DEPLOYMENT.UNDEPLOYED].append(unit_id)
+	return true
 
 
 func order_in_roster(unit_id:String, new_roster_status:Enums.DEPLOYMENT, old_roster_status:Enums.DEPLOYMENT = Enums.DEPLOYMENT.NONE)->void:

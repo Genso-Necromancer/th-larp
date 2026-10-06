@@ -25,6 +25,7 @@ metadata/_custom_type_script = "uid://bas4mbl00uet6"
 
 [node name="FeatureWorkshop" instance=ExtResource("1_qpt4y")]
 ai_personality = ExtResource("2_xc6ji")
+chapterRosterAdditions = Array[String](["flandre"])
 next_map = "uid://dy7o507urgp83"
 chapterNumber = 1
 title = "Feature Workshop"
@@ -155,10 +156,10 @@ total_growth = Dictionary[StringName, float]({
 })
 total_stats = Dictionary[StringName, int]({
 &"Cele": 8,
-&"Cha": 9,
+&"Cha": 10,
 &"Comp": 105,
 &"Def": 5,
-&"Eleg": 9,
+&"Eleg": 10,
 &"Life": 21,
 &"Mag": 5,
 &"Move": 4,

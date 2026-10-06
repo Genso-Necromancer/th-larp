@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_6v0ax"]
 [ext_resource type="Texture2D" uid="uid://cgjo8gjm150ig" path="res://sprites/character/human/archer_sprite.png" id="2_p3avv"]
 
-[node name="Human Archer Lv1" instance=ExtResource("1_6v0ax")]
+[node name="HumanArcherLv1" instance=ExtResource("1_6v0ax")]
 archetype = 1
 ai_role = 4
 SPEC_ID = 2
@@ -21,10 +21,10 @@ total_growth = Dictionary[StringName, float]({
 })
 total_stats = Dictionary[StringName, int]({
 &"Cele": 7,
-&"Cha": 6,
+&"Cha": 7,
 &"Comp": 100,
 &"Def": 2,
-&"Eleg": 10,
+&"Eleg": 11,
 &"Life": 21,
 &"Mag": 0,
 &"Move": 4,

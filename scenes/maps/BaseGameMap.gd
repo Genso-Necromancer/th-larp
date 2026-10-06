@@ -11,6 +11,11 @@ enum MAP_EVENT{NONE, TIME, DEATH, SEIZE}
 enum OBJECTIVE_STYLE{SEQUENTIAL, SIMULTANEOUS}
 
 const TERRAIN_VOID := &"Void"
+const UNIT_CONTAINER_NAMES := {
+	Enums.FACTION_ID.ENEMY: "EnemyUnits",
+	Enums.FACTION_ID.NPC: "NPCUnits",
+	Enums.FACTION_ID.PLAYER: "PlayerUnits",
+}
 
 ##WARNING: a Personality script must be attached to all maps for correct functionality
 @export var ai_personality:Personality
@@ -23,6 +28,14 @@ const TERRAIN_VOID := &"Void"
 		forcedUnits.clear()
 		for id in value:
 			forcedUnits.append(id.to_snake_case())
+##Player unit ids added to the roster when this chapter loads.
+##Use the unit_id, e.g. "flandre". PlayerData will first look for
+##res://scenes/units/player_units/flandre.tscn, then flandre_player.tscn.
+@export var chapterRosterAdditions: Array[String] = []:
+	set(value):
+		chapterRosterAdditions.clear()
+		for id in value:
+			chapterRosterAdditions.append(id.to_snake_case())
 @export_file("*.tscn") var next_map : String
 @export var chapterNumber: int = 0
 @export var title: String = ""
@@ -53,9 +66,9 @@ const TERRAIN_VOID := &"Void"
 @export var dmkScript : DanmakuScript
 @export var dmkMaster : Unit
 @export_category("Cute Scene Scripts")
-@export_file("res://scenes/cutscenes/scene_events/*") var start_script = ""
-@export_file("res://scenes/cutscenes/scene_events/*") var end_script = ""
-@export_file("res://scenes/cutscenes/scene_events/*") var event_scripts : Array[String]
+@export_file("*.cutscene","*.json") var start_script = ""
+@export_file("*.cutscene","*.json") var end_script = ""
+@export_file("*.cutscene","*.json") var event_scripts : Array[String]
 ##ALL THE FUCKING LAYERS
 @onready var ground :TileMapLayer= $Ground
 @onready var wall :TileMapLayer= $Wall
@@ -99,6 +112,7 @@ var completed_conditions:Dictionary[String,Array] = {"Loss":[],"Victory":[]}
 
 
 func _ready():
+	_ensure_unit_containers()
 	_ensure_ai_manager()
 	if not Engine.is_editor_hint():
 		_load_danmaku_scripts()
@@ -231,7 +245,7 @@ func _load_unit_group(unit_data:Dictionary):
 		newUnit.unit_ready.connect(self._on_new_unit_ready)
 		units_loading += 1
 		newUnit.pre_load(unitData)
-		add_child(newUnit)
+		add_unit_child(newUnit)
 
 
 func _on_new_unit_ready(unit:Unit):
@@ -251,6 +265,38 @@ func _unload_map_units():
 	var units : Array[Unit] = get_map_units()
 	for unit in units:
 		unit.queue_free()
+
+
+func apply_chapter_roster_additions() -> void:
+	for unit_id in chapterRosterAdditions:
+		PlayerData.add_to_roster(unit_id)
+
+
+func _ensure_unit_containers() -> void:
+	for container_name in UNIT_CONTAINER_NAMES.values():
+		if has_node(container_name):
+			continue
+		var container := Node2D.new()
+		container.name = container_name
+		add_child(container)
+
+
+func get_unit_container_for_faction(faction_id: int) -> Node:
+	var container_name: String = UNIT_CONTAINER_NAMES.get(faction_id, "")
+	if container_name == "":
+		return self
+	var container := get_node_or_null(container_name)
+	if container == null:
+		container = Node2D.new()
+		container.name = container_name
+		add_child(container)
+	return container
+
+
+func add_unit_child(unit: Unit) -> void:
+	if unit == null:
+		return
+	get_unit_container_for_faction(unit.FACTION_ID).add_child(unit)
 
 
 func _get_interactive_states()->Dictionary[Vector2i,Dictionary]:
@@ -319,21 +365,45 @@ func _array_to_string(arr: Array, seperator = ",") -> String:
 
 func get_active_units() -> Dictionary:
 	var unitList := {}
-	for child in get_children():
-		var unit := child as Unit
-		if not unit:
-			continue
-		elif unit.is_active:
+	for unit in get_map_units():
+		if unit.is_active:
 			unitList[unit.cell] = unit
 	return unitList
 
 
 func get_map_units() -> Array[Unit]:
 	var unitList :Array[Unit]= []
+	_collect_units_from_node(self, unitList)
+	for container_name in UNIT_CONTAINER_NAMES.values():
+		var container := get_node_or_null(container_name)
+		if container != null:
+			_collect_units_from_node(container, unitList)
+	return unitList
+
+
+func _collect_units_from_node(root: Node, unit_list: Array[Unit]) -> void:
+	for child in root.get_children():
+		if root == self and UNIT_CONTAINER_NAMES.values().has(child.name):
+			continue
+		var unit := child as Unit
+		if unit != null:
+			if not unit.is_queued_for_deletion() and not unit_list.has(unit):
+				unit_list.append(unit)
+			continue
+		_collect_units_from_node(child, unit_list)
+
+
+func get_map_units_for_faction(faction_id: int) -> Array[Unit]:
+	var unitList :Array[Unit]= []
+	var container := get_node_or_null(UNIT_CONTAINER_NAMES.get(faction_id, ""))
+	if container != null:
+		_collect_units_from_node(container, unitList)
 	for child in get_children():
 		var unit := child as Unit
-		if not unit or unit.is_queued_for_deletion(): continue
-		unitList.append(unit)
+		if unit == null or unit.is_queued_for_deletion():
+			continue
+		if unit.FACTION_ID == faction_id and not unitList.has(unit):
+			unitList.append(unit)
 	return unitList
 
 

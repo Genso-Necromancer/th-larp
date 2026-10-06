@@ -475,6 +475,7 @@ func free_map(emit_freed := true)->void:
 
 func _on_map_loaded():
 	map_loader.queue_free()
+	current_map.apply_chapter_roster_additions()
 	_load_units()
 
 

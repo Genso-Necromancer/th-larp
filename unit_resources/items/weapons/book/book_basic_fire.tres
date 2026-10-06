@@ -1,0 +1,64 @@
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=5 format=3 uid="uid://dj5vw8cxl8bm2"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_4q1jv"]
+[ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="2_2vnxh"]
+[ext_resource type="Resource" uid="uid://binppbkfhhpui" path="res://unit_resources/features/skills/spell_ember.tres" id="2_n5luf"]
+
+[sub_resource type="Resource" id="Resource_0421e"]
+script = ExtResource("1_4q1jv")
+type = 12
+target = 1
+instant = false
+on_hit = false
+proc = 0
+duration = 0
+duration_type = 0
+stack = false
+permanent = false
+curable = true
+from_item = false
+hostile = false
+skill = ExtResource("2_n5luf")
+multi_swing = 0
+multi_round = 0
+crit_dmg = Array[int]([0, 0])
+crit_mult = false
+crit_rate = 0
+value = null
+sub_type = null
+id = ""
+rule_type = 0
+metadata/_custom_type_script = "uid://bu76i50vv08ad"
+
+[resource]
+script = ExtResource("2_2vnxh")
+dmg = 1
+charge_value = 0
+hit = 50
+crit = 0
+crit_min = 10
+crit_max = 20
+barrier = 0
+barrier_chance = 0
+min_reach = 1
+max_reach = 1
+close_min_reach = 0
+close_max_reach = 0
+far_min_reach = 0
+far_max_reach = 0
+damage_type = 1
+personal = false
+level = 0
+use = false
+equippable = true
+breakable = true
+expendable = true
+trade = true
+max_dur = 20
+weight = 6
+category = 9
+sub_group = 0
+effects = Array[ExtResource("1_4q1jv")]([SubResource("Resource_0421e")])
+id = "book_basic_fire"
+rule_type = 0
+metadata/_custom_type_script = "uid://b7y6ry7pkb23i"

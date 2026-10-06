@@ -69,3 +69,9 @@ tile_set = ExtResource("7_1xy5d")
 [node name="SeizeLayer" parent="." instance=ExtResource("10_6ts4f")]
 
 [node name="DanmakuManager" type="Node2D" parent="."]
+
+[node name="EnemyUnits" type="Node2D" parent="."]
+
+[node name="NPCUnits" type="Node2D" parent="."]
+
+[node name="PlayerUnits" type="Node2D" parent="."]
