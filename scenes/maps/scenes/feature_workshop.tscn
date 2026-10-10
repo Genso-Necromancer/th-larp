@@ -1,10 +1,10 @@
-[gd_scene load_steps=16 format=4 uid="uid://dv2xsgcjyj8ub"]
+[gd_scene load_steps=17 format=4 uid="uid://dv2xsgcjyj8ub"]
 
 [ext_resource type="PackedScene" uid="uid://cl7ik2hxcwm08" path="res://scenes/maps/game_map.tscn" id="1_qpt4y"]
 [ext_resource type="Resource" uid="uid://dh630esqxwuhu" path="res://scrpt/ai/test_personality.tres" id="2_xc6ji"]
 [ext_resource type="Script" uid="uid://duoms4relhrfy" path="res://scenes/maps/objectives/objective.gd" id="3_jfjoi"]
 [ext_resource type="Resource" uid="uid://d2dx18fsw0jpm" path="res://scenes/maps/objectives/seize_test.tres" id="3_ub6hv"]
-[ext_resource type="PackedScene" uid="uid://bokxjbvpfnkqp" path="res://scenes/units/unique_units/cirno.tscn" id="4_cpkxf"]
+[ext_resource type="PackedScene" uid="uid://bokxjbvpfnkqp" path="res://scenes/units/unique_units/Boss/cirno.tscn" id="4_cpkxf"]
 [ext_resource type="Resource" uid="uid://7t8iqbg5bicy" path="res://scenes/maps/objectives/remi_saku_death_loss.tres" id="4_xc6ji"]
 [ext_resource type="PackedScene" uid="uid://dffu0k0v5tou1" path="res://scenes/units/generic_units/fairy_cointaker_lv_1.tscn" id="6_ub6hv"]
 [ext_resource type="PackedScene" uid="uid://d1lptkdo512fn" path="res://scenes/maps/MapObjects/door.tscn" id="7_5odpd"]
@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" uid="uid://d1q5o01qlp0kd" path="res://scenes/maps/MapObjects/chest.tscn" id="12_xccwv"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="13_5gwkt"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="14_oyhg1"]
+[ext_resource type="PackedScene" uid="uid://dxkyqwosd7e05" path="res://scenes/units/unique_units/Boss/lil_dai.tscn" id="15_5gwkt"]
 [ext_resource type="PackedScene" uid="uid://bgq1asahykl5v" path="res://scenes/units/generic_units/human_miko_lv_1.tscn" id="15_mxfl7"]
 [ext_resource type="Resource" path="res://unit_resources/items/weapons/blade/blade_basic.tres" id="15_u8tfc"]
 
@@ -25,13 +26,15 @@ metadata/_custom_type_script = "uid://bas4mbl00uet6"
 
 [node name="FeatureWorkshop" instance=ExtResource("1_qpt4y")]
 ai_personality = ExtResource("2_xc6ji")
+chapterRosterAdditions = Array[String](["flandre"])
 next_map = "uid://dy7o507urgp83"
 chapterNumber = 1
 title = "Feature Workshop"
-objectives = Array[ExtResource("3_jfjoi")]([ExtResource("3_ub6hv"), ExtResource("4_xc6ji")])
+win_conditions = Array[ExtResource("3_jfjoi")]([ExtResource("3_ub6hv")])
+loss_conditions = Array[ExtResource("3_jfjoi")]([ExtResource("4_xc6ji")])
 start_script = "res://scenes/cutscenes/scene_events/seize_test_start_event.json"
 end_script = "res://scenes/cutscenes/scene_events/seize_test_end_event.json"
-hours = 7
+hours = 19
 
 [node name="Ground" parent="." index="0"]
 position = Vector2(1, 0)
@@ -61,7 +64,13 @@ position = Vector2(964, 698)
 _hp = 5
 map = NodePath("..")
 
-[node name="Cirno" parent="." index="12" instance=ExtResource("4_cpkxf")]
+[node name="chest" parent="." index="12" instance=ExtResource("12_xccwv")]
+position = Vector2(1467, 749)
+_is_locked = true
+contents = Array[ExtResource("13_5gwkt")]([SubResource("Resource_wr5e2")])
+
+[node name="Cirno" parent="EnemyUnits" index="0" instance=ExtResource("4_cpkxf")]
+z_index = 103
 position = Vector2(1470, 200)
 isBoss = true
 leash = 1
@@ -123,23 +132,14 @@ weapon_prof = {
 "Stick": false
 }
 
-[node name="Fairy Cointaker lv5" parent="." index="13" instance=ExtResource("6_ub6hv")]
+[node name="Fairy Cointaker lv5" parent="EnemyUnits" index="1" instance=ExtResource("6_ub6hv")]
+z_index = 113
 position = Vector2(1722, 700)
 leash = 1
 ai_role = 2
-total_growth = Dictionary[StringName, float]({
-&"Cele": 0.45,
-&"Cha": 0.4,
-&"Comp": 0.3,
-&"Def": 0.05,
-&"Eleg": 0.25,
-&"Life": 0.2,
-&"Mag": 0.1,
-&"Move": 0.0,
-&"Pwr": 0.15
-})
 
-[node name="human_miko_lv2" parent="." index="14" instance=ExtResource("15_mxfl7")]
+[node name="human_miko_lv2" parent="EnemyUnits" index="2" instance=ExtResource("15_mxfl7")]
+z_index = 112
 position = Vector2(1470, 650)
 leash = 1
 total_growth = Dictionary[StringName, float]({
@@ -155,10 +155,10 @@ total_growth = Dictionary[StringName, float]({
 })
 total_stats = Dictionary[StringName, int]({
 &"Cele": 8,
-&"Cha": 9,
+&"Cha": 10,
 &"Comp": 105,
 &"Def": 5,
-&"Eleg": 9,
+&"Eleg": 10,
 &"Life": 21,
 &"Mag": 5,
 &"Move": 4,
@@ -189,7 +189,56 @@ weapon_prof = {
 "Stick": false
 }
 
-[node name="chest" parent="." index="15" instance=ExtResource("12_xccwv")]
-position = Vector2(1467, 749)
-_is_locked = true
-contents = Array[ExtResource("13_5gwkt")]([SubResource("Resource_wr5e2")])
+[node name="LilDai" parent="EnemyUnits" index="3" instance=ExtResource("15_5gwkt")]
+z_index = 106
+position = Vector2(840, 325)
+
+[node name="human_miko_lv1" parent="EnemyUnits" index="4" instance=ExtResource("15_mxfl7")]
+z_index = 107
+position = Vector2(714, 400)
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.2,
+&"Cha": 0.3,
+&"Comp": 0.35,
+&"Def": 0.1,
+&"Eleg": 0.3,
+&"Life": 0.25,
+&"Mag": 0.2,
+&"Move": 0.0,
+&"Pwr": 0.2
+})
+total_stats = Dictionary[StringName, int]({
+&"Cele": 8,
+&"Cha": 10,
+&"Comp": 105,
+&"Def": 5,
+&"Eleg": 10,
+&"Life": 21,
+&"Mag": 5,
+&"Move": 4,
+&"Pwr": 6
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+weapon_prof = {
+"Barrier": false,
+"Blade": false,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": true,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": true,
+"Stick": false
+}

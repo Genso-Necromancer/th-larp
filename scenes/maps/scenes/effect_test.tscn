@@ -8,7 +8,7 @@
 [ext_resource type="TileSet" uid="uid://baebtkker7qwb" path="res://TileSets/dev/deployments.tres" id="6_xqfm6"]
 [ext_resource type="PackedScene" uid="uid://d1lptkdo512fn" path="res://scenes/maps/MapObjects/door.tscn" id="7_b52bk"]
 [ext_resource type="PackedScene" uid="uid://chqu2dkt7ofqi" path="res://scenes/maps/MapObjects/breakable_wall.tscn" id="8_hggx1"]
-[ext_resource type="PackedScene" uid="uid://bokxjbvpfnkqp" path="res://scenes/units/unique_units/cirno.tscn" id="10_1lclt"]
+[ext_resource type="PackedScene" uid="uid://bokxjbvpfnkqp" path="res://scenes/units/unique_units/Boss/cirno.tscn" id="10_1lclt"]
 [ext_resource type="PackedScene" uid="uid://bgq1asahykl5v" path="res://scenes/units/generic_units/human_miko_lv_1.tscn" id="13_4swnn"]
 
 [node name="SeizeTest" instance=ExtResource("1_0u8dk")]
@@ -16,7 +16,8 @@ ai_personality = ExtResource("2_8q5cl")
 next_map = "uid://dy7o507urgp83"
 chapterNumber = 1
 title = "Seize Test"
-objectives = Array[ExtResource("3_wcikf")]([ExtResource("4_43qy2"), ExtResource("5_ebyka")])
+win_conditions = Array[ExtResource("3_wcikf")]([ExtResource("4_43qy2")])
+loss_conditions = Array[ExtResource("3_wcikf")]([ExtResource("5_ebyka")])
 start_script = "res://scenes/cutscenes/scene_events/seize_test_start_event.json"
 end_script = "res://scenes/cutscenes/scene_events/seize_test_end_event.json"
 hours = 7

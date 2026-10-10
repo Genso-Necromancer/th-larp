@@ -38,7 +38,7 @@ func _init(source_units:Dictionary[Vector2i,Unit], source_turn:Enums.FACTION_ID,
 	turn = source_turn
 	turn_order = source_turn_order.duplicate()
 	map = source_map
-	terminal_conditions = map.objectives if map else []
+	terminal_conditions = map.get_runtime_objectives() if map else []
 	for cell in source_units.keys():
 		var source_unit = source_units[cell]
 		if source_unit == null:
@@ -487,7 +487,9 @@ func _is_skill_augment_valid(actor: UnitSim, skill) -> bool:
 	var skill_sub := int(skill.get("sub_group", Enums.WEAPON_SUB.NONE))
 	var weapon_cat := int(wep.get("category", Enums.WEAPON_CATEGORY.NONE))
 	var weapon_sub := int(wep.get("sub_group", Enums.WEAPON_SUB.NONE))
-	if skill_cat != Enums.WEAPON_CATEGORY.ANY and weapon_cat != skill_cat and weapon_sub != skill_sub:
+	var category_matches := skill_cat == Enums.WEAPON_CATEGORY.ANY or weapon_cat == skill_cat
+	var sub_group_matches := skill_sub == Enums.WEAPON_SUB.NONE or weapon_sub == skill_sub
+	if not category_matches or not sub_group_matches:
 		return false
 	var min_reach := int(skill.get("min_reach", 0))
 	var max_reach := int(skill.get("max_reach", 0))
@@ -495,7 +497,7 @@ func _is_skill_augment_valid(actor: UnitSim, skill) -> bool:
 		return true
 	var weapon_min := int(wep.get("min_reach", 0))
 	var weapon_max := int(wep.get("max_reach", 0))
-	return range(min_reach, max_reach + 1).has(weapon_min) or range(min_reach, max_reach + 1).has(weapon_max)
+	return weapon_max >= min_reach and weapon_min <= max_reach
 
 
 func _get_skill_reach_for_sim(actor: UnitSim, skill) -> Dictionary:

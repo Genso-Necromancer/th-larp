@@ -381,11 +381,17 @@ func _collect_effect_modifiers(effects: Array) -> Dictionary:
 			mods["Graze"] = mods.get("Graze", 0) + int(effect_data.get("graze_penalty", 0))
 			mods["Crit"] = mods.get("Crit", 0) + int(effect_data.get("crit_penalty", 0))
 			continue
+		var effect_type := int(effect_data.get("type", Enums.EFFECT_TYPE.NONE))
+		if effect_type != Enums.EFFECT_TYPE.BUFF and effect_type != Enums.EFFECT_TYPE.DEBUFF:
+			continue
+		var value = effect_data.get("value", null)
+		if value == null:
+			continue
 		var sub_type = int(effect_data.get("sub_type", -1))
 		if sub_type < 0 or sub_type >= sub_keys.size():
 			continue
 		var stat_name = sub_keys[sub_type].to_pascal_case()
-		mods[stat_name] = mods.get(stat_name, 0) + int(effect_data.get("value", 0))
+		mods[stat_name] = mods.get(stat_name, 0) + int(value)
 	return mods
 
 

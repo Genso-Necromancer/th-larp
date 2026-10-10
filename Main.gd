@@ -3,12 +3,14 @@ class_name MainNode
 
 static var root := "user://"
 static var screen_shot_folder := "screen_shots"
+const MAP_PACK_1 := "res://scenes/maps/map_pack_preview/map_pack_1.tscn"
+const FEATURE_WORKSHOP_MAP := "res://scenes/maps/scenes/feature_workshop.tscn"
 
 #enum SAVE_TYPE {TRANSITION, SET_UP, SUSPENDED,}
 
 var gameBoard: GameBoard
 var map_manager: MapManager
-var first_map:String = "res://scenes/maps/scenes/feature_workshop.tscn"
+var first_map:String = MAP_PACK_1
 var manager_preload:= preload("res://scenes/map_manager.tscn")
 var file_selected:bool = false
 var pending_save_file:String = ""
@@ -148,12 +150,13 @@ func game_exit():
 
 
 #region title screen buttons
-func new_game_start():
+func new_game_start(start_map:String = ""):
 	var rng = RngTool.new()
 	rng.random()
 	SaveHub.reset_globals()
 	#_load_opening_scene()
-	_load_first() #Temporary until opening scene is set-up
+	var map_path := first_map if start_map.is_empty() else start_map
+	_load_first(map_path) #Temporary until opening scene is set-up
 
 
 func begin_file_select():
@@ -187,9 +190,10 @@ func _start_file_load(save_file:String):
 	_load_file(data)
 
 
-func _load_first():
+func _load_first(map_path:String = ""):
 	var manager := _load_map_manager()
-	manager.load_map(first_map)
+	var first_map_path := first_map if map_path.is_empty() else map_path
+	manager.load_map(first_map_path)
 
 
 #region save data loading

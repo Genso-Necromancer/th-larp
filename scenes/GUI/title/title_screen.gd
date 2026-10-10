@@ -7,7 +7,9 @@ signal unload_me
 
 func _ready():
 	var main :MainNode= get_parent()
+	var debug_enabled := bool(Global.flags.get("DebugMode", false))
 	GameState.change_state(self, GameState.gState.START)
+	debug_menu.visible = debug_enabled
 	debug_menu.loadMapManager.connect(main.on_load_map_manager)
 	debug_menu.map_picked.connect(self._unload_scene)
 

@@ -9,10 +9,9 @@
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="7_hh3fq"]
 [ext_resource type="Resource" uid="uid://crihx615imauw" path="res://unit_resources/items/weapons/gohei/gohei_simple.tres" id="8_fqquk"]
 [ext_resource type="Script" uid="uid://dtxt6i4bhoqpo" path="res://unit_resources/items/ofuda/ofuda.gd" id="9_634dn"]
-[ext_resource type="Resource" uid="uid://i6gxwkej1jxe" path="res://unit_resources/items/ofuda/ofuda_heal0.tres" id="10_nnev5"]
+[ext_resource type="Resource" uid="uid://d17h2pq3fv73i" path="res://unit_resources/items/ofuda/ofuda_cele_buff.tres" id="10_nnev5"]
 [ext_resource type="Texture2D" uid="uid://c83g6bwvib3xh" path="res://sprites/character/reimu/miko_sprite.png" id="11_634dn"]
-[ext_resource type="Resource" uid="uid://cbwafn336efoc" path="res://unit_resources/items/ofuda/ofuda.tres" id="11_nnev5"]
-[ext_resource type="Resource" path="res://unit_resources/items/ofuda/ofuda_rescue_debug_item.tres" id="12_rescue"]
+[ext_resource type="Shader" uid="uid://depy5bu6535do" path="res://scenes/units/unit_palette_shift.gdshader" id="11_nnev5"]
 
 [sub_resource type="Resource" id="Resource_tpcp1"]
 script = ExtResource("7_hh3fq")
@@ -29,6 +28,15 @@ equipped = false
 dropped = false
 is_broken = false
 metadata/_custom_type_script = "uid://dtxt6i4bhoqpo"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nnev5"]
+resource_local_to_scene = true
+shader = ExtResource("11_nnev5")
+shader_parameter/target_dark = Color(0.219608, 0.219608, 0.564706, 1)
+shader_parameter/target_mid = Color(0.156863, 0.627451, 0.972549, 1)
+shader_parameter/target_light = Color(0.0941176, 0.941176, 0.972549, 1)
+shader_parameter/palette_strength = 0.0
+shader_parameter/grayscale_amount = 0.0
 
 [node name="Reimu" instance=ExtResource("1_i0qm2")]
 unit_id = "reimu"
@@ -109,10 +117,10 @@ weapon_prof = {
 "Ofuda": true,
 "Stick": false
 }
-max_inv = 6
-inventory = Array[ExtResource("6_bmyf1")]([SubResource("Resource_tpcp1"), SubResource("Resource_bmyf1"), ExtResource("11_nnev5"), ExtResource("12_rescue")])
+inventory = Array[ExtResource("6_bmyf1")]([SubResource("Resource_tpcp1"), SubResource("Resource_bmyf1")])
 
 [node name="Sprite" parent="PathFollow2D" index="0"]
+material = SubResource("ShaderMaterial_nnev5")
 texture = ExtResource("11_634dn")
 
 [node name="HPbar" parent="PathFollow2D/Sprite" index="2"]

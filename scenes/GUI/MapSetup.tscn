@@ -87,15 +87,18 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="ObjLabel" type="Label" parent="PanelContainer/MarginContainer/SetUpVbox/ConditionsBox/ObjectiveVBox"]
+custom_minimum_size = Vector2(246, 26)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.694118, 0.690196, 0.658824, 1)
 text = "Clear Condition:"
+autowrap_mode = 2
 
 [node name="LossBox" type="VBoxContainer" parent="PanelContainer/MarginContainer/SetUpVbox/ConditionsBox"]
 custom_minimum_size = Vector2(0, 125)
 layout_mode = 2
 
 [node name="ObjLabel" type="Label" parent="PanelContainer/MarginContainer/SetUpVbox/ConditionsBox/LossBox"]
+custom_minimum_size = Vector2(246, 26)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.694118, 0.690196, 0.658824, 1)
 text = "Loss Condition:"

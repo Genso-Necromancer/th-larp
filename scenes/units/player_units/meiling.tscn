@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://dta0332r0wl83"]
+[gd_scene load_steps=21 format=3 uid="uid://dta0332r0wl83"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_ys274"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_042v0"]
@@ -8,8 +8,15 @@
 [ext_resource type="Resource" uid="uid://bsclg2utruovi" path="res://unit_resources/features/skills/toss_enemy.tres" id="3_wxqng"]
 [ext_resource type="Resource" uid="uid://dhlpeampaptvh" path="res://unit_resources/features/skills/shove_enemy01.tres" id="4_grm3a"]
 [ext_resource type="Texture2D" uid="uid://c5g43x2xyqqmh" path="res://sprites/character/meiling/guard_sprite.png" id="5_ni6na"]
+[ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="6_item"]
 [ext_resource type="Script" uid="uid://tkxohry12rc3" path="res://unit_resources/items/weapons/natural.gd" id="7_ni6na"]
 [ext_resource type="Resource" uid="uid://bxn1enbnerbpf" path="res://unit_resources/items/weapons/natural/martial_fist.tres" id="8_qauq2"]
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="9_weapon"]
+[ext_resource type="Resource" path="res://unit_resources/items/weapons/polearm/polearm_charge_basic.tres" id="10_polearm"]
+[ext_resource type="Script" uid="uid://y8vspyvvdgjj" path="res://unit_resources/items/consumables/consumable.gd" id="11_consumable"]
+[ext_resource type="Resource" uid="uid://cmoym4xuhijeg" path="res://unit_resources/items/consumables/pizza.tres" id="12_pizza"]
+[ext_resource type="Script" path="res://unit_resources/items/accessories/barrier/barrier_accessory.gd" id="13_barrier_item"]
+[ext_resource type="Resource" path="res://unit_resources/items/accessories/barrier/barrier_small.tres" id="14_barrier_small"]
 
 [sub_resource type="Resource" id="Resource_rd4ga"]
 script = ExtResource("7_ni6na")
@@ -17,6 +24,30 @@ stats = ExtResource("8_qauq2")
 equipped = true
 dropped = false
 is_broken = false
+
+[sub_resource type="Resource" id="Resource_polearm"]
+script = ExtResource("9_weapon")
+stats = ExtResource("10_polearm")
+equipped = true
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[sub_resource type="Resource" id="Resource_barrier"]
+script = ExtResource("13_barrier_item")
+stats = ExtResource("14_barrier_small")
+equipped = true
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "res://unit_resources/items/accessories/barrier/barrier_accessory.gd"
+
+[sub_resource type="Resource" id="Resource_pizza"]
+script = ExtResource("11_consumable")
+stats = ExtResource("12_pizza")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://y8vspyvvdgjj"
 
 [node name="Meiling" instance=ExtResource("1_ys274")]
 unit_id = "meiling"
@@ -87,6 +118,7 @@ personal_passives = Array[ExtResource("2_grm3a")]([ExtResource("3_ni6na")])
 skills = Array[ExtResource("2_042v0")]([ExtResource("3_wxqng"), ExtResource("4_grm3a"), ExtResource("3_rd4ga")])
 passives = Array[ExtResource("2_grm3a")]([ExtResource("3_ni6na")])
 weapon_prof = {
+"Barrier": true,
 "Blade": false,
 "Blunt": false,
 "Book": false,
@@ -100,6 +132,7 @@ weapon_prof = {
 }
 max_inv = 6
 natural = SubResource("Resource_rd4ga")
+inventory = Array[ExtResource("6_item")]([SubResource("Resource_polearm"), SubResource("Resource_barrier"), SubResource("Resource_pizza")])
 
 [node name="Sprite" parent="PathFollow2D" index="0"]
 texture = ExtResource("5_ni6na")

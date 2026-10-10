@@ -7,7 +7,10 @@ class_name Cursor
 signal cursor_path_complete
 signal cursor_moved(cell)
 
+const CURSOR_OVERLAY_Z := 1000
+
 @onready var cursorSprite: Sprite2D = $anchor/Sprite2D
+@onready var cell_label: Label = $Cell
 @onready var anim_player:AnimationPlayer = $AnimationPlayer
 #do I even need this?
 var canter = false
@@ -29,6 +32,10 @@ var originPoint := Vector2i.ZERO
 var tween : Tween
 	
 func _ready():
+	cursorSprite.z_as_relative = false
+	cursorSprite.z_index = CURSOR_OVERLAY_Z
+	cell_label.z_as_relative = false
+	cell_label.z_index = CURSOR_OVERLAY_Z
 	anim_player.play("idle")
 
 
@@ -154,6 +161,8 @@ func _region_clamp(gridPosition: Vector2i) -> Vector2i:
 
 #region cursor manipulation funcs
 func bump_cursor():
+	if snap_path.is_empty():
+		return
 	var seek = false
 	var bumpTo
 	var shortest = INF
@@ -162,10 +171,10 @@ func bump_cursor():
 	if !snap_path.has(cell):
 		seek = true
 	if seek:
-		for cell in snap_path:
-			var distance = hexStar.find_distance(cell, cell)
-			if get_parent().units.has(cell) and distance < shortest:
-				bumpTo = cell
+		for target_cell in snap_path:
+			var distance = hexStar.find_distance(cell, target_cell)
+			if get_parent().units.has(target_cell) and distance < shortest:
+				bumpTo = target_cell
 				shortest = distance
 				bumpFound = true
 				

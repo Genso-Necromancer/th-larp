@@ -95,7 +95,7 @@ func _compute_time_modifiers() -> Dictionary:
 	return mods
 
 func _apply_time_move_type(time_mods: Dictionary) -> void:
-	var base_move_type := PlayerData.get_unit_stats(unit.SPEC_ID, unit.ROLE_ID).MoveType
+	var base_move_type :int= PlayerData.get_unit_stats(unit.SPEC_ID, unit.ROLE_ID).MoveType
 	var timed_move_type = time_mods.get("MoveType", false)
 	if timed_move_type is int:
 		unit.move_type = int(timed_move_type)

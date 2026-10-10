@@ -1,13 +1,13 @@
-[gd_resource type="Resource" script_class="Skill" load_steps=3 format=3 uid="uid://binppbkfhhpui"]
+[gd_resource type="Resource" script_class="Skill" load_steps=4 format=3 uid="uid://binppbkfhhpui"]
 
 [ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_vqber"]
+[ext_resource type="Resource" uid="uid://b26gmk3c6ypnk" path="res://unit_resources/effects/self_cele_buff01.tres" id="2_0ltqc"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_qc1hp"]
 
 [resource]
 script = ExtResource("2_qc1hp")
 augment = false
 magical = true
-element = 1
 target = 3
 can_miss = true
 can_crit = true
@@ -25,7 +25,8 @@ crit = 0
 crit_min = 0
 crit_max = 0
 dmg_type = 2
-effects = Array[ExtResource("1_vqber")]([])
+effects = Array[ExtResource("1_vqber")]([ExtResource("2_0ltqc")])
+element = 1
 feature_id = "spell_ember"
 rule_type = 0
 metadata/_custom_type_script = "uid://cc71mceo7glas"

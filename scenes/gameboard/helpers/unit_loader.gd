@@ -36,9 +36,9 @@ func _initialize_units(units:Dictionary[Vector2i,Unit],map:GameMap,refs: Diction
 
 
 func _store_enemy_units(units:Dictionary[Vector2i,Unit], map:GameMap, refs: Dictionary[String, Unit]):
-	for child in map.get_children():
-		var unit := child as Unit
-		if not unit or unit.FACTION_ID == Enums.FACTION_ID.PLAYER or unit.is_queued_for_deletion(): continue
+	for unit in map.get_map_units():
+		if unit.FACTION_ID == Enums.FACTION_ID.PLAYER or unit.is_queued_for_deletion():
+			continue
 		units[unit.cell] = unit
 		refs[unit.unit_id] = unit
 		_connect_unit_signals(unit)
@@ -100,7 +100,7 @@ func _load_player_unit(path:String) -> Unit:
 		playerUnit.pre_load(unitData.PLAYER[playerUnit.unit_id])
 	#unitObjs[playerUnit.unit_id] = playerUnit
 	_connect_unit_signals(playerUnit)
-	map.add_child(playerUnit)
+	map.add_unit_child(playerUnit)
 	return playerUnit
 
 

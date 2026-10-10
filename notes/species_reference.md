@@ -11,7 +11,7 @@ Species values are added on top of Role values. Stat and growth entries only lis
 | `Fairy` | `FLY` | Mag +1, Eleg -1, Cele +2, Cha +2 | Mag +0.10, Cele +0.10, Cha +0.10 | None |
 | `Youkai` | `FOOT` | Life +1, Mag -1, Cha -1 | Life +0.05, Pwr +0.05, Mag +0.05, Def +0.05, Cha -0.05 | None |
 | `Human` | `FOOT` | Eleg +2, Cha +2 | Eleg +0.05, Cha +0.05 | None |
-| `Vampire` | `FLY` | None | None | `canto_night`, `life_steal_rem` |
+| `Vampire` | `FLY` | Pwr +1, Mag +1, Cele +1, Cha +2 | Pwr +0.05, Mag +0.10, Cele +0.10 | `canto_night`, `life_steal_rem` |
 | `Magician` | `FOOT` | Mag +4 | None | None |
 | `Dragon` | `FOOT` | Life +4, Mag +1, Def +2 | Life +0.10, Cele -0.05, Def +0.05 | None |
 | `Oni` | `FOOT` | Life +4, Comp -10, Pwr +1, Mag -3, Eleg -2 | Life +0.10, Pwr +0.10, Eleg -0.10, Def +0.10 | None |
@@ -23,7 +23,7 @@ Only species with non-zero day/night changes are listed here.
 
 | Species | Day | Night |
 | --- | --- | --- |
-| `Human` | None | Eleg -1, Cele -1, Cha -2 |
+| `Human` | None | Eleg -1, Cele -1 |
 | `Youkai` | None | Pwr +2, Mag +4, Cele +1, Def +1 |
 | `Oni` | None | Pwr +2, Mag +6, Cele +1, Def +1 |
 | `Sazae-Oni` | None | Pwr +1, Mag +2, Eleg +1, Cele +1, Def +1 |

@@ -5,6 +5,7 @@ signal completed(objective:Objective)
 enum CONDITION_TYPES {LOSING, WINNING}
 enum COMPLETION_TYPE {ALL,ANY}
 @export var condition_type : CONDITION_TYPES = CONDITION_TYPES.LOSING ##Decides if meeting it's conditions completes the objective or loses the game.
+@export_multiline var display_text := ""
 var complete := false
 var active := false
 
@@ -31,3 +32,7 @@ func _check_complete(list:Dictionary, completion_type:COMPLETION_TYPE):
 	if complete:
 		emit_changed()
 		completed.emit(self)
+
+
+func get_display_text(_map = null) -> String:
+	return display_text.strip_edges()

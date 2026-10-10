@@ -15,6 +15,18 @@ mouse_filter = 1
 theme = ExtResource("1_7k1kd")
 script = ExtResource("2_fcxm4")
 type = "Skill"
+eFont = Color(0.317647, 0.341176, 0.403922, 1)
+efFont = Color(0.317647, 0.341176, 0.403922, 1)
+ehFont = Color(0.317647, 0.341176, 0.403922, 1)
+epFont = Color(0.317647, 0.341176, 0.403922, 1)
+dFont = Color(0.117647, 0.129412, 0.160784, 1)
+dfFont = Color(0.117647, 0.129412, 0.160784, 1)
+dhFont = Color(0.117647, 0.129412, 0.160784, 1)
+dpFont = Color(0.117647, 0.129412, 0.160784, 1)
+sFont = Color(0.117647, 0.129412, 0.160784, 1)
+sfFont = Color(0.117647, 0.129412, 0.160784, 1)
+shFont = Color(0.117647, 0.129412, 0.160784, 1)
+spFont = Color(0.117647, 0.129412, 0.160784, 1)
 
 [node name="ContentMargin" type="MarginContainer" parent="."]
 layout_mode = 2

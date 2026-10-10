@@ -7,7 +7,6 @@
 script = ExtResource("2_duuri")
 augment = false
 magical = true
-element = 1
 target = 3
 can_miss = true
 can_crit = true
@@ -26,6 +25,7 @@ crit_min = 0
 crit_max = 0
 dmg_type = 2
 effects = Array[ExtResource("1_nq045")]([])
+element = 1
 feature_id = "spell_flare"
 rule_type = 0
 metadata/_custom_type_script = "uid://cc71mceo7glas"

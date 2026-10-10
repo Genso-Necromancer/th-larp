@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="Effect" load_steps=2 format=3 uid="uid://b26gmk3c6ypnk"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_sr60x"]
+
+[resource]
+script = ExtResource("1_sr60x")
+type = 3
+target = 1
+instant = false
+on_hit = false
+proc = -1
+duration = 2
+duration_type = 1
+stack = true
+permanent = false
+curable = true
+from_item = false
+hostile = false
+multi_swing = 0
+multi_round = 0
+crit_dmg = Array[int]([0, 0])
+crit_mult = false
+crit_rate = 0
+value = 1
+sub_type = 12
+id = "self_cele_buff01"
+rule_type = 0
+metadata/_custom_type_script = "uid://bu76i50vv08ad"

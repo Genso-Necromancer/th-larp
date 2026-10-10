@@ -475,6 +475,7 @@ func free_map(emit_freed := true)->void:
 
 func _on_map_loaded():
 	map_loader.queue_free()
+	current_map.apply_chapter_roster_additions()
 	_load_units()
 
 
@@ -1111,7 +1112,7 @@ func start_attack_targeting():
 
 
 func start_skill_targeting(skill = null):
-	if activeUnit and skill and not activeUnit.has_enough_comp(int(skill.cost)):
+	if activeUnit and skill and not activeUnit.can_use_skill(skill):
 		return
 	board_targeting.start_skill_targeting(skill)
 
@@ -1499,17 +1500,23 @@ func is_occupied(cell: Vector2i) -> bool:
 
 func select_formation_cell():
 	var deploymentCells :Array[Vector2i] = current_map.get_deployment_cells()
-	if deploymentCells.has(cursor.cell) and is_occupied(cursor.cell) and stored_unit == null:
+	if not deploymentCells.has(cursor.cell):
+		return
+	if stored_unit == null:
+		if not is_occupied(cursor.cell):
+			return
 		stored_unit = units[cursor.cell]
 		stored_cell = cursor.cell
 		stored_unit.isSelected = true
-	elif deploymentCells.has(cursor.cell) and is_occupied(cursor.cell):
-		_deploy_swap(stored_unit, units[cursor.cell])
-	elif deploymentCells.has(cursor.cell) and stored_cell != Vector2i(-1,-1):
-		stored_cell = cursor.cell
-	elif deploymentCells.has(cursor.cell):
-		_deploy_swap(stored_unit, stored_cell)
-		#swap function
+		return
+	if is_occupied(cursor.cell):
+		var target_unit: Unit = units[cursor.cell]
+		if target_unit == stored_unit:
+			deselect_formation_cell()
+		else:
+			_deploy_swap(stored_unit, target_unit)
+	else:
+		_deploy_swap(stored_unit, cursor.cell)
 
 
 func _deploy_swap(start, end):

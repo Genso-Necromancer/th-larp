@@ -50,6 +50,7 @@ func _ready():
 	button.disabled = disabled
 	_make_noninteractive_layers_ignore_mouse()
 	_set_button_meta()
+	_font_state_change(state)
 	if  get_meta("Item") and get_meta("Item") is String: pass
 	elif get_meta("Item") and get_meta("Item").id == "unarmed":
 		toggle_icon()
@@ -107,7 +108,7 @@ func get_button():
 func _verify_state(value) -> String:
 	var s : String
 	var default : String
-	var panel := $Selected
+	var panel := get_node_or_null("Selected")
 	if disabled:
 		default = "Disabled"
 	else:
@@ -123,7 +124,8 @@ func _verify_state(value) -> String:
 			s = value
 		_:
 			s = default
-	panel.visible = true if s == "Selected" else false
+	if panel:
+		panel.visible = true if s == "Selected" else false
 	return s
 
 
@@ -145,8 +147,14 @@ func _font_state_change(value : String):
 			font_colors = _get_font_color_set(sFont, sfFont, shFont, spFont)
 			
 	for l in labels:
-		for color_key in font_colors:
-			l.add_theme_color_override(color_key, font_colors[color_key])
+		_apply_label_color_overrides(l, font_colors)
+
+
+func _apply_label_color_overrides(label: Control, font_colors: Dictionary) -> void:
+	for color_key in font_colors:
+		label.add_theme_color_override(color_key, font_colors[color_key])
+	if label is RichTextLabel and font_colors.has("font_color"):
+		label.add_theme_color_override("default_color", font_colors["font_color"])
 
 
 func _get_font_color_set(base: Color, focus: Color, hover: Color, pressed: Color) -> Dictionary:

@@ -21,8 +21,8 @@ Move type priority currently follows enum order: `FOOT < RANGER < FLY < MOUNT < 
 | Character | Source | Move | Life | Comp | Pwr | Mag | Eleg | Cele | Def | Cha |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Remilia | Role `Lady` | 5 | 20 | 100 | 5 | 4 | 7 | 10 | 1 | 8 |
-| Remilia | Species `Vampire` | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| Remilia | Character Mods | 0 | 6 | 10 | 2 | 1 | 2 | -1 | 1 | 1 |
+| Remilia | Species `Vampire` | 0 | 0 | 0 | 1 | 1 | 0 | 1 | 0 | 2 |
+| Remilia | Character Mods | 0 | 6 | 10 | 1 | 0 | 2 | -2 | 1 | -1 |
 | Remilia | Final Combination | 5 | 26 | 110 | 7 | 5 | 9 | 9 | 2 | 9 |
 | Sakuya | Role `Maid` | 5 | 20 | 100 | 6 | 3 | 11 | 7 | 2 | 7 |
 | Sakuya | Species `Human` | 0 | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 2 |
@@ -46,8 +46,8 @@ Move type priority currently follows enum order: `FOOT < RANGER < FLY < MOUNT < 
 | Character | Source | Move | Life | Comp | Pwr | Mag | Eleg | Cele | Def | Cha |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | Remilia | Role `Lady` | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
-| Remilia | Species `Vampire` | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
-| Remilia | Character Mods | 0.00 | 0.30 | 0.35 | 0.30 | 0.20 | 0.25 | 0.25 | 0.05 | 0.25 |
+| Remilia | Species `Vampire` | 0.00 | 0.00 | 0.00 | 0.05 | 0.10 | 0.00 | 0.10 | 0.00 | 0.00 |
+| Remilia | Character Mods | 0.00 | 0.30 | 0.35 | 0.25 | 0.10 | 0.25 | 0.15 | 0.05 | 0.25 |
 | Remilia | Final Combination | 0.00 | 0.30 | 0.35 | 0.30 | 0.20 | 0.25 | 0.25 | 0.05 | 0.25 |
 | Sakuya | Role `Maid` | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
 | Sakuya | Species `Human` | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 | 0.05 | 0.00 | 0.00 | 0.05 |
