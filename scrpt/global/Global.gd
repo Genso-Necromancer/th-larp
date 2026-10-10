@@ -40,7 +40,7 @@ var time_of_day := Enums.TIME.DAY
 var game_time :Dictionary[String,int]={"Minutes":0,"Hours":0,"Seconds":0}:
 	set(value):
 		value = normalize_game_time(value)
-		if value.Hours >= 6 and value.Hours <= 18:
+		if value.Hours >= 6 and value.Hours < 18:
 			time_of_day = Enums.TIME.DAY
 		else:
 			time_of_day = Enums.TIME.NIGHT

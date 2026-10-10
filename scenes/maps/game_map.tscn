@@ -17,7 +17,7 @@
 [node name="GameMap" type="Node2D" groups=["Persist"]]
 z_index = -2
 script = ExtResource("1_ak6bi")
-forcedUnits = ["remilia", "sakuya"]
+forcedUnits = Array[String](["remilia", "sakuya"])
 title = "Testing My Fucking Patience"
 start_script = "<null>"
 end_script = null

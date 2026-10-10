@@ -1,14 +1,13 @@
-[gd_scene load_steps=14 format=4 uid="uid://bo7t2moe8opyl"]
+[gd_scene load_steps=13 format=4 uid="uid://clkxcione1a6v"]
 
 [ext_resource type="PackedScene" uid="uid://cl7ik2hxcwm08" path="res://scenes/maps/game_map.tscn" id="1_qpt4y"]
 [ext_resource type="Resource" uid="uid://dh630esqxwuhu" path="res://scrpt/ai/test_personality.tres" id="2_xc6ji"]
 [ext_resource type="Script" uid="uid://duoms4relhrfy" path="res://scenes/maps/objectives/objective.gd" id="3_jfjoi"]
 [ext_resource type="Resource" uid="uid://d2dx18fsw0jpm" path="res://scenes/maps/objectives/seize_test.tres" id="3_ub6hv"]
-[ext_resource type="PackedScene" uid="uid://bokxjbvpfnkqp" path="res://scenes/units/unique_units/cirno.tscn" id="4_cpkxf"]
+[ext_resource type="PackedScene" uid="uid://bokxjbvpfnkqp" path="res://scenes/units/unique_units/Boss/cirno.tscn" id="4_cpkxf"]
 [ext_resource type="Resource" uid="uid://7t8iqbg5bicy" path="res://scenes/maps/objectives/remi_saku_death_loss.tres" id="4_xc6ji"]
 [ext_resource type="PackedScene" uid="uid://d0864tysvp4bv" path="res://scenes/units/generic_units/oni_troublemaker_lv_1.tscn" id="5_5odpd"]
 [ext_resource type="PackedScene" uid="uid://dffu0k0v5tou1" path="res://scenes/units/generic_units/fairy_cointaker_lv_1.tscn" id="6_ub6hv"]
-[ext_resource type="TileSet" uid="uid://baebtkker7qwb" path="res://TileSets/dev/deployments.tres" id="6_uk5sw"]
 [ext_resource type="PackedScene" uid="uid://d1lptkdo512fn" path="res://scenes/maps/MapObjects/door.tscn" id="7_5odpd"]
 [ext_resource type="PackedScene" uid="uid://chqu2dkt7ofqi" path="res://scenes/maps/MapObjects/breakable_wall.tscn" id="8_ub6hv"]
 [ext_resource type="PackedScene" uid="uid://bcug5vmv5c0k" path="res://scenes/units/generic_units/kuchisake_blade_lv_1.tscn" id="14_3blko"]
@@ -19,7 +18,8 @@ ai_personality = ExtResource("2_xc6ji")
 next_map = "uid://dy7o507urgp83"
 chapterNumber = 1
 title = "Feature Workshop"
-objectives = Array[ExtResource("3_jfjoi")]([ExtResource("3_ub6hv"), ExtResource("4_xc6ji")])
+win_conditions = Array[ExtResource("3_jfjoi")]([ExtResource("3_ub6hv")])
+loss_conditions = Array[ExtResource("3_jfjoi")]([ExtResource("4_xc6ji")])
 start_script = "res://scenes/cutscenes/scene_events/seize_test_start_event.json"
 end_script = "res://scenes/cutscenes/scene_events/seize_test_end_event.json"
 hours = 7
@@ -28,17 +28,16 @@ hours = 7
 position = Vector2(1, 0)
 tile_map_data = PackedByteArray("AAACAAkABwABAAAAAAADAAkABwAAAAAAAAACAAoABwABAAAAAAADAAoABwAAAAAAAAADAAsABwAAAAEAAAAEAAsABwAAAAEAAAAFAAoABwABAAAAAAAFAAkABwABAAAAAAAFAAgABwABAAAAAAAFAAcABwABAAAAAAAEAAcABwAAAAAAAAADAAcABwAAAAAAAAADAAgABwAAAAAAAAAEAAkABwABAAAAAAAEAAgABwABAAAAAAAEAAoABwABAAAAAAAGAAgABwABAAAAAAAGAAkABwABAAAAAAAGAAoABwABAAAAAAAGAAcABwABAAAAAAAFAAYABwAAAAAAAAAEAAYABwAAAAMAAAACAAsABwAAAAEAAAAGAAsABwAAAAEAAAAFAAsABwAAAAEAAAAEAAwABwABAAEAAAABAAgABwAAAAMAAAABAAYABwAAAAMAAAABAAUABwABAAAAAAACAAUABwAAAAMAAAADAAQABwAAAAMAAAAEAAUABwAAAAMAAAAFAAQABwABAAAAAAAGAAUABwABAAAAAAAFAAUABwABAAAAAAADAAUABwAAAAMAAAACAAYABwAAAAMAAAAGAAYABwAAAAAAAAAHAAYABwAAAAAAAAAIAAcABwABAAAAAAAHAAcABwABAAAAAAAIAAgABwABAAAAAAAHAAgABwABAAAAAAAHAAkABwABAAAAAAAHAAUABwABAAAAAAAHAAQABwABAAAAAAAGAAQABwABAAAAAAAEAAQABwABAAAAAAACAAQABwABAAAAAAABAAQABwABAAAAAAADAAMABwABAAAAAAABAAMABwABAAAAAAABAAIABwABAAAAAAACAAMABwABAAAAAAACAAIABwABAAAAAAADAAIABwABAAAAAAAEAAIABwABAAAAAAAEAAMABwABAAAAAAAFAAIABwABAAAAAAAFAAMABwABAAAAAAAGAAIABwAAAAMAAAAGAAMABwABAAAAAAAHAAIABwAAAAMAAAAHAAMABwABAAAAAAAHAAEABwAAAAMAAAAHAAAABwAAAAMAAAAGAAEABwAAAAMAAAAFAAAABwAAAAMAAAAEAAEABwAAAAMAAAADAAAABwAAAAMAAAACAAEABwAAAAMAAAABAAAABwABAAAAAAABAAEABwABAAAAAAADAAEABwABAAAAAAAFAAEABwAAAAMAAAAIAAEABwAAAAMAAAAIAAIABwAAAAMAAAAIAAMABwAAAAMAAAAIAAQABwAAAAQAAAAIAAUABwAAAAQAAAAIAAYABwAAAAAAAAAJAAYABwAAAAQAAAAKAAYABwAAAAQAAAAJAAcABwABAAAAAAAJAAgABwABAAAAAAAIAAkABwABAAAAAAAIAAoABwAAAAEAAAAHAAoABwAAAAEAAAAHAAsABwABAAEAAAAIAAsABwABAAEAAAAJAAoABwABAAEAAAAJAAkABwAAAAEAAAAJAAUABwAAAAAAAAAJAAQABwABAAYAAAAJAAMABwABAAYAAAAJAAIABwABAAYAAAAJAAEABwABAAYAAAAJAAAABwAAAAMAAAAKAAEABwABAAYAAAAKAAIABwABAAYAAAAKAAMABwABAAYAAAAKAAQABwABAAYAAAAKAAUABwABAAYAAAAKAAcABwAAAAQAAAAKAAgABwABAAAAAAAKAAkABwAAAAEAAAALAAkABwAAAAEAAAAKAAsABwABAAEAAAAJAAsABwABAAEAAAAMAAsABwABAAEAAAANAAsABwABAAEAAAAOAAsABwABAAEAAAANAAoABwABAAEAAAANAAkABwAAAAEAAAANAAgABwAAAAMAAAANAAcABwAAAAMAAAANAAYABwAAAAMAAAANAAUABwABAAYAAAANAAQABwABAAYAAAANAAMABwABAAYAAAANAAIABwABAAYAAAANAAEABwABAAYAAAAMAAEABwABAAYAAAALAAEABwABAAYAAAALAAAABwABAAYAAAAMAAIABwABAAYAAAAMAAMABwABAAYAAAAMAAQABwABAAYAAAAMAAUABwABAAYAAAAMAAYABwABAAYAAAAMAAcABwAAAAMAAAAMAAgABwAAAAMAAAAMAAkABwAAAAEAAAAMAAoABwABAAEAAAALAAgABwABAAAAAAALAAcABwABAAAAAAALAAYABwAAAAMAAAALAAUABwABAAYAAAALAAQABwABAAYAAAALAAMABwABAAYAAAALAAIABwABAAYAAAAOAAoABwAAAAEAAAAOAAkABwAAAAMAAAAOAAgABwAAAAMAAAAOAAcABwAAAAMAAAAOAAYABwAAAAMAAAAOAAUABwAAAAMAAAAOAAQABwAAAAMAAAAOAAMABwAAAAMAAAAOAAIABwAAAAMAAAAOAAEABwAAAAMAAAAOAAAABwAAAAMAAAANAAAABwAAAAMAAAAMAAAABwAAAAMAAAAKAAAABwAAAAMAAAAIAAAABwAAAAMAAAAGAAAABwAAAAMAAAAEAAAABwAAAAMAAAACAAAABwAAAAMAAAAAAAAABwABAAAAAAAAAAEABwABAAAAAAAAAAIABwABAAAAAAAAAAMABwABAAAAAAAAAAQABwABAAAAAAAAAAUABwABAAAAAAAAAAYABwAAAAMAAAAAAAcABwAAAAMAAAAAAAgABwAAAAMAAAAAAAkABwABAAAAAAAAAAoABwABAAAAAAAAAAsABwABAAAAAAAAAAwABwAAAAEAAAABAAoABwABAAAAAAABAAkABwABAAAAAAABAAsABwAAAAEAAAABAAwABwABAAEAAAAAAA0ABwABAAEAAAAAAA4ABwABAAEAAAABABEABwAAAAEAAAACABAABwAAAAQAAAACABEABwAAAAQAAAACABIABwAAAAQAAAACAAwABwABAAEAAAADAAwABwAAAAEAAAADAA4ABwAAAAAAAAADAA8ABwABAAAAAAADABAABwABAAAAAAADABEABwAAAAMAAAAEAA0ABwAAAAEAAAAEAA4ABwAAAAAAAAAEAA8ABwAAAAAAAAAEABAABwAAAAMAAAAEABEABwAAAAMAAAAFABEABwAAAAMAAAAEABIABwAAAAMAAAAGABEABwAAAAMAAAAGABIABwAAAAMAAAAHABEABwAAAAMAAAAHABAABwABAAAAAAAGABAABwABAAAAAAAFAA8ABwABAAAAAAAFAA4ABwAAAAQAAAAFAA0ABwAAAAQAAAAFAAwABwAAAAEAAAAGAAwABwABAAEAAAAGAA0ABwAAAAEAAAAFABAABwABAAAAAAAGAA8ABwAAAAQAAAAGAA4ABwABAAAAAAAHAA0ABwAAAAEAAAAHAA4ABwAAAAMAAAAHAAwABwAAAAEAAAAIAA0ABwAAAAEAAAAIAA4ABwABAAAAAAAHAA8ABwAAAAAAAAAIAAwABwABAAEAAAAJAAwABwAAAAEAAAAJAA0ABwAAAAQAAAAJAA4ABwABAAAAAAAJAA8ABwAAAAQAAAAJABAABwABAAAAAAAIABEABwAAAAMAAAAJABEABwAAAAMAAAAKABEABwAAAAMAAAAKABIABwAAAAMAAAAIABIABwAAAAMAAAALABEABwAAAAMAAAAMABIABwAAAAMAAAANABEABwABAAAAAAAOABEABwAAAAAAAAAOABAABwAAAAAAAAAOAA8ABwABAAAAAAAOAA4ABwABAAAAAAAOAA0ABwAAAAEAAAAOAAwABwABAAEAAAAOABIABwABAAAAAAANABAABwAAAAAAAAANAA8ABwAAAAAAAAANAA4ABwAAAAQAAAANAA0ABwABAAAAAAANAAwABwAAAAEAAAAMAAwABwAAAAEAAAALAAsABwABAAEAAAAKAAwABwAAAAEAAAALAAwABwAAAAEAAAAKAA0ABwAAAAEAAAAKAA4ABwABAAAAAAAKAA8ABwAAAAQAAAAKABAABwABAAAAAAALAA8ABwAAAAAAAAALAA4ABwABAAAAAAAMAA4ABwAAAAQAAAALAA0ABwAAAAQAAAAMAA0ABwAAAAEAAAALABAABwABAAAAAAAMABAABwAAAAAAAAAMAA8ABwAAAAAAAAAMABEABwABAAAAAAACAAgABwABAAAAAAACAAcABwAAAAMAAAADAAYABwAAAAMAAAABAAcABwAAAAMAAAALAAoABwABAAEAAAAKAAoABwABAAEAAAACAA0ABwAAAAEAAAACAA4ABwAAAAEAAAABAA4ABwAAAAEAAAABAA8ABwAAAAEAAAABABAABwAAAAEAAAAAABEABwABAAEAAAAAABIABwABAAEAAAABAA0ABwABAAEAAAAAAA8ABwABAAEAAAAAABAABwABAAEAAAADAA0ABwAAAAAAAAACAA8ABwAAAAQAAAAIABAABwAAAAQAAAAIAA8ABwAAAAQAAAA=")
 
-[node name="Modifier" parent="." index="1"]
+[node name="Modifier" parent="." index="2"]
 tile_map_data = PackedByteArray("AAADAAUAEwAAAAEAAAACAAYAEwAAAAEAAAADAAYAEwABAAAAAAACAAcAEwABAAAAAAABAAYAEwABAAAAAAADAAQAEwABAAAAAAAMAAYAAwAAAAIAAAALAAUAAwABAAIAAAANAAEAAwABAAIAAAANAAIAAwABAAIAAAANAAMAAwABAAIAAAANAAQAAwABAAIAAAANAAUAAwABAAIAAAAMAAEAAwABAAIAAAAJAAMAAwABAAIAAAAJAAIAAwABAAIAAAAJAAEAAwABAAIAAAAKAAEAAwABAAIAAAAJAAQAAwABAAIAAAALAAAAAwABAAIAAAADAAsAEwABAAIAAAADAAwAEwABAAIAAAADAA0AEwAAAAAAAAAMAAgAEwAAAAEAAAANAAgAEwAAAAEAAAAOAAkAEwAAAAEAAAAOAAgAEwAAAAEAAAAOAAcAEwAAAAEAAAANAAcAEwAAAAEAAAAMAAcAEwAAAAEAAAAHAAcAEwAAAAEAAAAIAAgAEwAAAAEAAAAGAAgAEwAAAAEAAAAFAAgAEwAAAAEAAAAGAAkAEwAAAAEAAAADAAIAEwAAAAEAAAAGAAIAEwAAAAEAAAAGAAEAEwAAAAEAAAAHAAEAEwAAAAEAAAAHAAIAEwAAAAEAAAAGAAMAEwAAAAEAAAADAAEAEwAAAAEAAAACAAIAEwAAAAEAAAABAAEAEwAAAAEAAAAAAAEAEwAAAAEAAAAAAAIAEwAAAAEAAAABAAIAEwAAAAEAAAABAAMAEwAAAAEAAAACAAMAEwAAAAEAAAACAAEAEwAAAAEAAAABAAAAEwAAAAEAAAAAAAMAEwAAAAEAAAAAAAQAEwAAAAEAAAAAAAUAEwAAAAEAAAAFAAkAEwABAAAAAAAFAAoAEwABAAAAAAAGAAoAEwABAAAAAAAHAAkAEwABAAAAAAAHAAgAEwABAAAAAAAIAAkAEwABAAAAAAAJAAgAEwABAAAAAAAJAAcAEwABAAAAAAAKAAgAEwABAAAAAAALAAcAEwABAAAAAAALAAgAEwABAAAAAAANAAYAEwABAAAAAAAOAAYAEwABAAAAAAALAAYAEwABAAAAAAAOAAUAEwABAAAAAAAOAAQAEwABAAAAAAAOAAMAEwABAAAAAAAOAAIAEwABAAAAAAAOAAEAEwABAAAAAAAOAAAAEwABAAAAAAANAAAAEwABAAAAAAAMAAAAEwABAAAAAAAKAAAAEwABAAAAAAAJAAAAEwABAAAAAAAIAAAAEwABAAAAAAAHAAAAEwABAAAAAAAIAAEAEwABAAAAAAAIAAIAEwABAAAAAAAIAAMAEwABAAAAAAADAAMAEwABAAAAAAACAAQAEwABAAAAAAABAAQAEwABAAAAAAAHAAMAEwABAAAAAAAGAAQAEwABAAAAAAAEAAQAEwABAAAAAAAFAAQAEwABAAAAAAADAAAAEwABAAAAAAAEAAAAEwABAAAAAAACAAAAEwABAAAAAAAAAAAAEwABAAAAAAAGAAAAEwABAAAAAAAAAAYAEwABAAAAAAAAAAcAEwABAAAAAAAAAAgAEwABAAAAAAAAAAkAEwABAAAAAAAEABAAEwAAAAEAAAAGABEAEwAAAAEAAAAEABIAEwAAAAEAAAAFABEAEwAAAAEAAAAGABIAEwAAAAEAAAADABEAEwAAAAEAAAAIABIAEwAAAAEAAAAHABEAEwAAAAEAAAAHAA8AEwAAAAAAAAAGAAYAEwAAAAAAAAAIAA4AEwABAAAAAAAJABAAEwABAAAAAAAIABEAEwABAAAAAAAJAA4AEwABAAAAAAAGAA4AEwABAAAAAAAGABAAEwABAAAAAAALAA4AEwABAAAAAAAKABAAEwABAAAAAAALABAAEwABAAAAAAALABEAEwABAAAAAAAKAA4AEwABAAAAAAANAA0AEwABAAAAAAAOAA4AEwABAAAAAAAOAA8AEwABAAAAAAAOABIAEwABAAAAAAANABEAEwABAAAAAAAMABIAEwABAAAAAAA=")
 
-[node name="Deployments" parent="." index="3"]
+[node name="Deployments" parent="." index="4"]
 tile_map_data = PackedByteArray("AAANAA4AAAAAAAAAAAANAA8AAAAAAAAAAAAMAA8AAQAAAAAAAAAMABAAAQAAAAAAAAA=")
-tile_set = ExtResource("6_uk5sw")
 
-[node name="Context" parent="." index="4"]
+[node name="Context" parent="." index="5"]
 tile_map_data = PackedByteArray("AAAJAA8AAAABAAAAAAAKAA8AAAABAAAAAAALAA8AAAABAAAAAAADAAwAAAAAAAAAAAADAAsAAAAAAAAAAAAEAAcAAAABAAAAAAAFAAYAAAABAAAAAAAHAAYAAAABAAAAAAAIAAYAAAABAAAAAAADAA0AAAABAAYAAAAHAA8AAAABAAYAAAAGAAYAAAABAAYAAAAMAAIAAAAAAAIAAAAKAAQAAAAAAAEAAAA=")
 
-[node name="SeizeLayer" parent="." index="8"]
+[node name="SeizeLayer" parent="." index="9"]
 tile_map_data = PackedByteArray("AAAMAAIAAQAAAAAAAAA=")
 
 [node name="door" parent="." index="10" node_paths=PackedStringArray("map") instance=ExtResource("7_5odpd")]
@@ -51,22 +50,13 @@ _hp = 5
 map = NodePath("..")
 
 [node name="Fairy Cointaker lv1" parent="." index="12" instance=ExtResource("6_ub6hv")]
-position = Vector2(1344, 140)
+z_index = 102
+position = Vector2(1344, 125)
 ai_role = 4
-total_growth = Dictionary[StringName, float]({
-&"Cele": 0.45,
-&"Cha": 0.4,
-&"Comp": 0.3,
-&"Def": 0.05,
-&"Eleg": 0.25,
-&"Life": 0.2,
-&"Mag": 0.1,
-&"Move": 0.0,
-&"Pwr": 0.15
-})
 
 [node name="Cirno" parent="." index="13" instance=ExtResource("4_cpkxf")]
-position = Vector2(1596, 252)
+z_index = 105
+position = Vector2(1596, 275)
 isBoss = true
 mod_stats = Dictionary[StringName, int]({
 &"Cele": 0,
@@ -127,7 +117,8 @@ weapon_prof = {
 }
 
 [node name="Oni Troublemaker lv1" parent="." index="14" instance=ExtResource("5_5odpd")]
-position = Vector2(462, 336)
+z_index = 106
+position = Vector2(462, 350)
 ai_role = 4
 simulate_leveling = false
 unit_level = 7
@@ -146,12 +137,12 @@ total_stats = Dictionary[StringName, int]({
 &"Cele": 6,
 &"Cha": 1,
 &"Comp": 90,
-&"Def": 3,
+&"Def": 2,
 &"Eleg": 8,
 &"Life": 29,
-&"Mag": 0,
+&"Mag": -3,
 &"Move": 4,
-&"Pwr": 10
+&"Pwr": 9
 })
 total_caps = Dictionary[StringName, int]({
 &"Cele": 30,
@@ -179,7 +170,8 @@ weapon_prof = {
 }
 
 [node name="Oni Troublemaker lv2" parent="." index="15" instance=ExtResource("5_5odpd")]
-position = Vector2(462, 840)
+z_index = 116
+position = Vector2(462, 850)
 ai_role = 2
 total_growth = Dictionary[StringName, float]({
 &"Cele": 0.25,
@@ -196,12 +188,12 @@ total_stats = Dictionary[StringName, int]({
 &"Cele": 6,
 &"Cha": 1,
 &"Comp": 90,
-&"Def": 3,
+&"Def": 2,
 &"Eleg": 8,
 &"Life": 29,
-&"Mag": 0,
+&"Mag": -3,
 &"Move": 4,
-&"Pwr": 10
+&"Pwr": 9
 })
 total_caps = Dictionary[StringName, int]({
 &"Cele": 30,
@@ -229,7 +221,8 @@ weapon_prof = {
 }
 
 [node name="Oni Troublemaker lv3" parent="." index="16" instance=ExtResource("5_5odpd")]
-position = Vector2(462, 784)
+z_index = 115
+position = Vector2(462, 800)
 ai_role = 2
 total_growth = Dictionary[StringName, float]({
 &"Cele": 0.25,
@@ -246,12 +239,12 @@ total_stats = Dictionary[StringName, int]({
 &"Cele": 6,
 &"Cha": 1,
 &"Comp": 90,
-&"Def": 3,
+&"Def": 2,
 &"Eleg": 8,
 &"Life": 29,
-&"Mag": 0,
+&"Mag": -3,
 &"Move": 4,
-&"Pwr": 10
+&"Pwr": 9
 })
 total_caps = Dictionary[StringName, int]({
 &"Cele": 30,
@@ -279,7 +272,8 @@ weapon_prof = {
 }
 
 [node name="Oni Troublemaker lv4" parent="." index="17" instance=ExtResource("5_5odpd")]
-position = Vector2(840, 364)
+z_index = 107
+position = Vector2(840, 375)
 ai_role = 2
 total_growth = Dictionary[StringName, float]({
 &"Cele": 0.25,
@@ -296,12 +290,12 @@ total_stats = Dictionary[StringName, int]({
 &"Cele": 6,
 &"Cha": 1,
 &"Comp": 90,
-&"Def": 3,
+&"Def": 2,
 &"Eleg": 8,
 &"Life": 29,
-&"Mag": 0,
+&"Mag": -3,
 &"Move": 4,
-&"Pwr": 10
+&"Pwr": 9
 })
 total_caps = Dictionary[StringName, int]({
 &"Cele": 30,
@@ -329,37 +323,18 @@ weapon_prof = {
 }
 
 [node name="Fairy Cointaker lv2" parent="." index="18" instance=ExtResource("6_ub6hv")]
-position = Vector2(714, 112)
+z_index = 101
+position = Vector2(714, 100)
 ai_role = 4
-total_growth = Dictionary[StringName, float]({
-&"Cele": 0.45,
-&"Cha": 0.4,
-&"Comp": 0.3,
-&"Def": 0.05,
-&"Eleg": 0.25,
-&"Life": 0.2,
-&"Mag": 0.1,
-&"Move": 0.0,
-&"Pwr": 0.15
-})
 
 [node name="Fairy Cointaker lv3" parent="." index="19" instance=ExtResource("6_ub6hv")]
-position = Vector2(1218, 616)
+z_index = 111
+position = Vector2(1218, 600)
 ai_role = 4
-total_growth = Dictionary[StringName, float]({
-&"Cele": 0.45,
-&"Cha": 0.4,
-&"Comp": 0.3,
-&"Def": 0.05,
-&"Eleg": 0.25,
-&"Life": 0.2,
-&"Mag": 0.1,
-&"Move": 0.0,
-&"Pwr": 0.15
-})
 
 [node name="Oni Troublemaker lv5" parent="." index="20" instance=ExtResource("5_5odpd")]
-position = Vector2(840, 812)
+z_index = 116
+position = Vector2(840, 825)
 ai_role = 1
 total_growth = Dictionary[StringName, float]({
 &"Cele": 0.25,
@@ -376,12 +351,12 @@ total_stats = Dictionary[StringName, int]({
 &"Cele": 6,
 &"Cha": 1,
 &"Comp": 90,
-&"Def": 3,
+&"Def": 2,
 &"Eleg": 8,
 &"Life": 29,
-&"Mag": 0,
+&"Mag": -3,
 &"Move": 4,
-&"Pwr": 10
+&"Pwr": 9
 })
 total_caps = Dictionary[StringName, int]({
 &"Cele": 30,
@@ -409,7 +384,8 @@ weapon_prof = {
 }
 
 [node name="Oni Troublemaker lv6" parent="." index="21" instance=ExtResource("5_5odpd")]
-position = Vector2(840, 924)
+z_index = 118
+position = Vector2(840, 925)
 ai_role = 1
 total_growth = Dictionary[StringName, float]({
 &"Cele": 0.25,
@@ -426,12 +402,12 @@ total_stats = Dictionary[StringName, int]({
 &"Cele": 6,
 &"Cha": 1,
 &"Comp": 90,
-&"Def": 3,
+&"Def": 2,
 &"Eleg": 8,
 &"Life": 29,
-&"Mag": 0,
+&"Mag": -3,
 &"Move": 4,
-&"Pwr": 10
+&"Pwr": 9
 })
 total_caps = Dictionary[StringName, int]({
 &"Cele": 30,
@@ -459,86 +435,22 @@ weapon_prof = {
 }
 
 [node name="Fairy Cointaker lv4" parent="." index="22" instance=ExtResource("6_ub6hv")]
-position = Vector2(210, 560)
+z_index = 110
+position = Vector2(210, 550)
 ai_role = 2
-total_growth = Dictionary[StringName, float]({
-&"Cele": 0.45,
-&"Cha": 0.4,
-&"Comp": 0.3,
-&"Def": 0.05,
-&"Eleg": 0.25,
-&"Life": 0.2,
-&"Mag": 0.1,
-&"Move": 0.0,
-&"Pwr": 0.15
-})
 
 [node name="Fairy Cointaker lv5" parent="." index="23" instance=ExtResource("6_ub6hv")]
-position = Vector2(336, 532)
+z_index = 110
+position = Vector2(336, 525)
 ai_role = 2
-total_growth = Dictionary[StringName, float]({
-&"Cele": 0.45,
-&"Cha": 0.4,
-&"Comp": 0.3,
-&"Def": 0.05,
-&"Eleg": 0.25,
-&"Life": 0.2,
-&"Mag": 0.1,
-&"Move": 0.0,
-&"Pwr": 0.15
-})
 
 [node name="kuchisake_blade_lv1" parent="." index="24" instance=ExtResource("14_3blko")]
-position = Vector2(966, 896)
-total_growth = Dictionary[StringName, float]({
-&"Cele": 0.6,
-&"Cha": 0.05,
-&"Comp": 0.3,
-&"Def": 0.25,
-&"Eleg": 0.3,
-&"Life": 0.45,
-&"Mag": -0.05,
-&"Move": 0.0,
-&"Pwr": 0.25
-})
-total_stats = Dictionary[StringName, int]({
-&"Cele": 6,
-&"Cha": -1,
-&"Comp": 100,
-&"Def": 1,
-&"Eleg": 4,
-&"Life": 24,
-&"Mag": 1,
-&"Move": 5,
-&"Pwr": 5
-})
-total_caps = Dictionary[StringName, int]({
-&"Cele": 30,
-&"Cha": 30,
-&"Comp": 130,
-&"Def": 30,
-&"Eleg": 30,
-&"Life": 60,
-&"Mag": 30,
-&"Move": 10,
-&"Pwr": 30
-})
-weapon_prof = {
-"Barrier": false,
-"Blade": true,
-"Blunt": false,
-"Book": false,
-"Bow": false,
-"Gohei": false,
-"Gun": false,
-"Knife": true,
-"Natural": false,
-"Ofuda": false,
-"Stick": false
-}
+z_index = 117
+position = Vector2(966, 900)
 
 [node name="human_miko_lv1" parent="." index="25" instance=ExtResource("15_mxfl7")]
-position = Vector2(588, 812)
+z_index = 116
+position = Vector2(588, 825)
 total_growth = Dictionary[StringName, float]({
 &"Cele": 0.2,
 &"Cha": 0.3,
@@ -552,10 +464,10 @@ total_growth = Dictionary[StringName, float]({
 })
 total_stats = Dictionary[StringName, int]({
 &"Cele": 8,
-&"Cha": 9,
+&"Cha": 10,
 &"Comp": 105,
 &"Def": 5,
-&"Eleg": 9,
+&"Eleg": 10,
 &"Life": 21,
 &"Mag": 5,
 &"Move": 4,
@@ -587,7 +499,8 @@ weapon_prof = {
 }
 
 [node name="human_miko_lv2" parent="." index="26" instance=ExtResource("15_mxfl7")]
-position = Vector2(462, 224)
+z_index = 103
+position = Vector2(462, 200)
 total_growth = Dictionary[StringName, float]({
 &"Cele": 0.2,
 &"Cha": 0.3,
@@ -601,10 +514,10 @@ total_growth = Dictionary[StringName, float]({
 })
 total_stats = Dictionary[StringName, int]({
 &"Cele": 8,
-&"Cha": 9,
+&"Cha": 10,
 &"Comp": 105,
 &"Def": 5,
-&"Eleg": 9,
+&"Eleg": 10,
 &"Life": 21,
 &"Mag": 5,
 &"Move": 4,

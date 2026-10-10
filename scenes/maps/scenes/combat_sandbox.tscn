@@ -4,7 +4,7 @@
 [ext_resource type="Resource" uid="uid://dh630esqxwuhu" path="res://scrpt/ai/test_personality.tres" id="2_xc6ji"]
 [ext_resource type="Script" uid="uid://duoms4relhrfy" path="res://scenes/maps/objectives/objective.gd" id="3_jfjoi"]
 [ext_resource type="Resource" uid="uid://d2dx18fsw0jpm" path="res://scenes/maps/objectives/seize_test.tres" id="3_ub6hv"]
-[ext_resource type="PackedScene" uid="uid://bokxjbvpfnkqp" path="res://scenes/units/unique_units/cirno.tscn" id="4_cpkxf"]
+[ext_resource type="PackedScene" uid="uid://bokxjbvpfnkqp" path="res://scenes/units/unique_units/Boss/cirno.tscn" id="4_cpkxf"]
 [ext_resource type="Resource" uid="uid://7t8iqbg5bicy" path="res://scenes/maps/objectives/remi_saku_death_loss.tres" id="4_xc6ji"]
 [ext_resource type="PackedScene" uid="uid://d0864tysvp4bv" path="res://scenes/units/generic_units/oni_troublemaker_lv_1.tscn" id="5_5odpd"]
 [ext_resource type="PackedScene" uid="uid://dffu0k0v5tou1" path="res://scenes/units/generic_units/fairy_cointaker_lv_1.tscn" id="6_ub6hv"]
@@ -19,7 +19,8 @@ ai_personality = ExtResource("2_xc6ji")
 next_map = "uid://dy7o507urgp83"
 chapterNumber = 1
 title = "Combat Sandbox"
-objectives = Array[ExtResource("3_jfjoi")]([ExtResource("3_ub6hv"), ExtResource("4_xc6ji")])
+win_conditions = Array[ExtResource("3_jfjoi")]([ExtResource("3_ub6hv")])
+loss_conditions = Array[ExtResource("3_jfjoi")]([ExtResource("4_xc6ji")])
 start_script = "res://scenes/cutscenes/scene_events/seize_test_start_event.json"
 end_script = "res://scenes/cutscenes/scene_events/seize_test_end_event.json"
 hours = 7

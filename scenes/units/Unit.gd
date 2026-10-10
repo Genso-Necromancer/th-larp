@@ -20,6 +20,7 @@ const COMP_BREAK_EFFECT_ID := "comp_break_default"
 const COMP_BREAK_EFFECT_PATH := "res://unit_resources/effects/comp_break_default.tres"
 const MAP_POP_TEXT_PATH := preload("res://scenes/animations/combat/fx/gen/fx_pop_up.tscn")
 const MAP_POP_TEXT_SCALE := Vector2(0.35, 0.35)
+const UNIT_Z_BASE := 100
 
 
 
@@ -103,6 +104,7 @@ var leash_consumed: bool = false
 		_generate_base_stats()
 @export var _move_type:Enums.MOVE_TYPE
 var move_type:Enums.MOVE_TYPE = _move_type
+var _refreshing_total_parameters := false
 @export_category("Unit Stats")
 @export_group("Stat Modifiers") 
 ##added to combined base stats from SPEC_ID and ROLE_ID
@@ -119,6 +121,7 @@ var move_type:Enums.MOVE_TYPE = _move_type
 					}:
 						set(value):
 							mod_growth = value
+							_request_total_parameter_refresh()
 							
 								
 ##added to combined base stats from SPEC_ID and ROLE_ID
@@ -135,6 +138,7 @@ var move_type:Enums.MOVE_TYPE = _move_type
 					}:
 						set(value):
 							mod_stats = value
+							_request_total_parameter_refresh()
 							
 								
 ##added to combined base stats from SPEC_ID and ROLE_ID
@@ -151,6 +155,7 @@ var move_type:Enums.MOVE_TYPE = _move_type
 					}:
 						set(value):
 							mod_caps = value
+							_request_total_parameter_refresh()
 							
 								
 
@@ -165,7 +170,10 @@ var move_type:Enums.MOVE_TYPE = _move_type
 					"Cele": 0.0,
 					"Def": 0.0,
 					"Cha": 0.0,
-					}
+					}:
+						set(value):
+							total_growth = value
+							_request_total_parameter_refresh()
 @export var total_stats:Dictionary[StringName,int] = { 
 					"Move": 0, 
 					"Life": 0,
@@ -176,7 +184,10 @@ var move_type:Enums.MOVE_TYPE = _move_type
 					"Cele": 0,
 					"Def": 0,
 					"Cha": 0,
-					}
+					}:
+						set(value):
+							total_stats = value
+							_request_total_parameter_refresh()
 @export var total_caps:Dictionary[StringName,int] = { 
 					"Move": 0, 
 					"Life": 0,
@@ -187,7 +198,10 @@ var move_type:Enums.MOVE_TYPE = _move_type
 					"Cele": 0,
 					"Def": 0,
 					"Cha": 0,
-					}
+					}:
+						set(value):
+							total_caps = value
+							_request_total_parameter_refresh()
 var base_growth:Dictionary = { 
 					"Move": 0.0,
 					"Life": 0.0,
@@ -387,7 +401,8 @@ var masterOf : String
 var cell := Vector2i.ZERO:
 	set(value):
 		#print("fuck")
-		cell = map.cell_clamp(value)
+		cell = map.cell_clamp(value) if map else value
+		_update_draw_order()
 var lastGlbPosition := Vector2.ZERO
 var originCell
 # Toggles the "selected" animation on the unit.
@@ -479,12 +494,38 @@ func _generate_base_stats():
 
 
 func _refresh_total_parameters() -> void:
+	if _refreshing_total_parameters:
+		return
+	_refreshing_total_parameters = true
+	total_stats.clear()
+	total_growth.clear()
+	total_caps.clear()
 	for stat in base_stats.keys():
 		total_stats[stat] = base_stats.get(stat, 0) + mod_stats.get(stat, 0) + level_stats.get(stat, 0)
 	for stat in base_growth.keys():
-		total_growth[stat] = float(base_growth.get(stat, 0.0)) + float(mod_growth.get(stat, 0.0))
+		total_growth[stat] = snappedf(float(base_growth.get(stat, 0.0)) + float(mod_growth.get(stat, 0.0)), 0.01)
 	for stat in base_caps.keys():
 		total_caps[stat] = base_caps.get(stat, 0) + mod_caps.get(stat, 0)
+	_refreshing_total_parameters = false
+	if Engine.is_editor_hint():
+		notify_property_list_changed()
+
+
+func _request_total_parameter_refresh() -> void:
+	if _refreshing_total_parameters:
+		return
+	if base_stats == null or base_growth == null or base_caps == null:
+		return
+	if mod_stats == null or mod_growth == null or mod_caps == null:
+		return
+	if level_stats == null:
+		return
+	_refresh_total_parameters()
+
+
+func _validate_property(property: Dictionary) -> void:
+	if property.name == "total_growth" or property.name == "total_stats" or property.name == "total_caps":
+		property.usage = property.usage | PROPERTY_USAGE_READ_ONLY
 
 func _update_features():
 	skills.clear()
@@ -1626,13 +1667,17 @@ func get_skill_reach(skill : Skill) -> Dictionary:
 func get_aug_reach(skill : Skill) -> Dictionary:
 	var reach = {"Max":-999, "Min":999}
 	if skill.min_reach == 0 or skill.max_reach == 0:
-		for weapon:Item in inventory:
-			if weapon is not Weapon and weapon is not Ofuda: continue
-			if !check_valid_equip(weapon): continue
-			elif weapon.category != skill.weapon_category and weapon.sub_group != skill.weapon_category: continue
+		for item:Item in inventory:
+			if item is not Weapon:
+				continue
+			var weapon := item as Weapon
+			if !check_valid_equip(weapon):
+				continue
+			if not _is_valid_aug_weapon_for_skill(weapon, skill):
+				continue
 			reach.Min = mini(weapon.min_reach, reach.Min)
 			reach.Max = maxi(weapon.max_reach, reach.Max)
-		if natural:
+		if natural and _is_valid_aug_weapon_for_skill(natural, skill):
 			reach.Min = mini(natural.min_reach, reach.Min)
 			reach.Max = maxi(natural.max_reach, reach.Max)
 	else:
@@ -1644,25 +1689,39 @@ func get_aug_reach(skill : Skill) -> Dictionary:
 #endregion
 
 func has_valid_aug_weapon(skill : Skill) -> bool:
-	var isValid := false
-	var skillRange = range(skill.min_reach, skill.max_reach + 1)
-	var hasReach : bool
-	var hasType : bool
-	for weapon : Weapon in inventory:
-		if weapon is not Weapon or !check_valid_equip(weapon): continue
-		hasReach = false
-		hasType = false
-		
-		if skill.max_reach == 0 and skill.min_reach == 0: hasReach = true
-		elif skillRange.has(weapon.min_reach) or skillRange.has(weapon.max_reach): hasReach = true
-		
-		if skill.weapon_category == Enums.WEAPON_CATEGORY.ANY: hasType = true
-		elif weapon.category == skill.weapon_category or weapon.sub_group == skill.sub_group: hasType = true
-			
-		if hasReach and hasType:
-			isValid = true
-			break
-	return isValid
+	if skill == null:
+		return false
+	for item:Item in inventory:
+		if item is not Weapon:
+			continue
+		var weapon := item as Weapon
+		if !check_valid_equip(weapon):
+			continue
+		if _is_valid_aug_weapon_for_skill(weapon, skill):
+			return true
+	if natural and _is_valid_aug_weapon_for_skill(natural, skill):
+		return true
+	return false
+
+
+func _is_valid_aug_weapon_for_skill(weapon: Weapon, skill: Skill) -> bool:
+	if weapon == null or skill == null:
+		return false
+	if not _aug_weapon_type_matches(weapon, skill):
+		return false
+	return _aug_weapon_reach_matches(weapon, skill)
+
+
+func _aug_weapon_type_matches(weapon: Weapon, skill: Skill) -> bool:
+	var category_matches := skill.weapon_category == Enums.WEAPON_CATEGORY.ANY or weapon.category == skill.weapon_category
+	var sub_group_matches := skill.sub_group == Enums.WEAPON_SUB.NONE or weapon.sub_group == skill.sub_group
+	return category_matches and sub_group_matches
+
+
+func _aug_weapon_reach_matches(weapon: Weapon, skill: Skill) -> bool:
+	if skill.min_reach == 0 and skill.max_reach == 0:
+		return true
+	return weapon.max_reach >= skill.min_reach and weapon.min_reach <= skill.max_reach
 
 #region item use functions
 func use_item(_item : Item) -> void:
@@ -2118,6 +2177,8 @@ func can_use_skill(skill: Skill) -> bool:
 		return false
 	if bool(skill.magical) and check_status("Silence"):
 		return false
+	if bool(skill.augment) and not has_valid_aug_weapon(skill):
+		return false
 	return true
 
 
@@ -2277,6 +2338,7 @@ func add_exp(action, _target = null): ##Adds exp if a unit is a place, as well a
 
 func map_start_init():
 	originCell = map.local_to_map(position) #BUG GY
+	_update_draw_order()
 	#print(originCell)
 	
 
@@ -2305,6 +2367,10 @@ func _apply_sprite_faction_visual() -> void:
 func _set_sprite_disabled_visual(is_disabled: bool) -> void:
 	if _sprite and _sprite.has_method("set_disabled_visual"):
 		_sprite.set_disabled_visual(is_disabled)
+
+
+func _update_draw_order() -> void:
+	z_index = UNIT_Z_BASE + cell.y
 
 #region self signals
 func _on_unit_relocated(_old_cell = null, _new_cell = null, _unit = null):

@@ -561,7 +561,7 @@ func _determine_objective_context(state: BoardState, faction: Enums.FACTION_ID) 
 		return BoardAssessment.OBJECTIVE_CONTEXT.UNKNOWN
 	if faction == Enums.FACTION_ID.PLAYER:
 		return BoardAssessment.OBJECTIVE_CONTEXT.UNKNOWN
-	for objective in state.map.objectives:
+	for objective in state.terminal_conditions:
 		if objective is Seize:
 			return BoardAssessment.OBJECTIVE_CONTEXT.SEIZE_DEFENSE
 	return BoardAssessment.OBJECTIVE_CONTEXT.UNKNOWN

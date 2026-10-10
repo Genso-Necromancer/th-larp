@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://c80i8rqbvt1o5"]
+[gd_scene load_steps=9 format=3 uid="uid://c80i8rqbvt1o5"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_wb0c2"]
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_4ky13"]
 [ext_resource type="Texture2D" uid="uid://p1on7tv8hinr" path="res://sprites/character/sazae_oni/trblr_sprite.png" id="2_tykfd"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="3_pdp86"]
 [ext_resource type="Resource" path="res://unit_resources/items/weapons/blunt/blunt_basic.tres" id="4_e0py7"]
+[ext_resource type="Shader" uid="uid://depy5bu6535do" path="res://scenes/units/unit_palette_shift.gdshader" id="5_pdp86"]
 
 [sub_resource type="Resource" id="Resource_0nuy4"]
 script = ExtResource("3_pdp86")
@@ -13,6 +14,15 @@ equipped = true
 dropped = false
 is_broken = false
 metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pdp86"]
+resource_local_to_scene = true
+shader = ExtResource("5_pdp86")
+shader_parameter/target_dark = Color(0.54902, 0.12549, 0.12549, 1)
+shader_parameter/target_mid = Color(0.878431, 0.219608, 0.219608, 1)
+shader_parameter/target_light = Color(1, 0.541176, 0.415686, 1)
+shader_parameter/palette_strength = 1.0
+shader_parameter/grayscale_amount = 0.0
 
 [node name="AraseanailFoidspite" instance=ExtResource("1_wb0c2")]
 unit_id = "araseanail"
@@ -59,4 +69,5 @@ total_caps = Dictionary[StringName, int]({
 inventory = Array[ExtResource("2_4ky13")]([SubResource("Resource_0nuy4")])
 
 [node name="Sprite" parent="PathFollow2D" index="0"]
+material = SubResource("ShaderMaterial_pdp86")
 texture = ExtResource("2_tykfd")

@@ -7,7 +7,7 @@
 [sub_resource type="Resource" id="Resource_0421e"]
 script = ExtResource("1_4q1jv")
 type = 12
-target = 1
+target = 4
 instant = false
 on_hit = false
 proc = 0

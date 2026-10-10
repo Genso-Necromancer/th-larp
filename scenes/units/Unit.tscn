@@ -5,18 +5,19 @@
 [ext_resource type="AnimationLibrary" uid="uid://d4f2xcrr7c15q" path="res://scenes/unit_anim.tres" id="3_3vwvo"]
 [ext_resource type="Texture2D" uid="uid://bix6u63iahalq" path="res://sprites/character/fairy/trblr_sprite.png" id="3_eo5f0"]
 [ext_resource type="Shader" uid="uid://depy5bu6535do" path="res://scenes/units/unit_palette_shift.gdshader" id="4_30vxy"]
-[ext_resource type="Script" uid="uid://bv74dylssenec" path="res://scenes/area_unit.gd" id="4_xr077"]
+[ext_resource type="Script" path="res://scenes/area_unit.gd" id="4_xr077"]
 [ext_resource type="Texture2D" uid="uid://bax2371rslxv7" path="res://sprites/HPbarBack.png" id="5_4067k"]
 [ext_resource type="Texture2D" uid="uid://c5jpt0c2q47h6" path="res://sprites/HPbarUpper.png" id="6_eo5f0"]
 [ext_resource type="Texture2D" uid="uid://4jpuam16381u" path="res://sprites/HPbarProg.png" id="7_66viq"]
 [ext_resource type="Script" uid="uid://3uafufnjrn24" path="res://scenes/HPbar.gd" id="8_5cxww"]
-[ext_resource type="Script" uid="uid://dvccuyma23muf" path="res://scenes/unit_cell_label.gd" id="10_30vxy"]
+[ext_resource type="Script" path="res://scenes/unit_cell_label.gd" id="10_30vxy"]
 [ext_resource type="Theme" uid="uid://71gmwndol0sn" path="res://fonts/debug_theme.tres" id="11_xr077"]
-[ext_resource type="Script" uid="uid://gv3mia0h3wmg" path="res://scenes/units/sprite_fx_handler.gd" id="12_3vwvo"]
-[ext_resource type="Script" uid="uid://coggcm4fwji6g" path="res://scenes/units/debug_v_box.gd" id="12_4067k"]
-[ext_resource type="Script" uid="uid://kebmbksg66af" path="res://scenes/units/debug_name.gd" id="12_xr077"]
+[ext_resource type="Script" path="res://scenes/units/sprite_fx_handler.gd" id="12_3vwvo"]
+[ext_resource type="Script" path="res://scenes/units/debug_v_box.gd" id="12_4067k"]
+[ext_resource type="Script" path="res://scenes/units/debug_name.gd" id="12_xr077"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_wsvxn"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eo5f0"]
+resource_local_to_scene = true
 shader = ExtResource("4_30vxy")
 shader_parameter/target_dark = Color(0.54902, 0.12549, 0.12549, 1)
 shader_parameter/target_mid = Color(0.878431, 0.219608, 0.219608, 1)
@@ -52,7 +53,7 @@ rotates = false
 loop = false
 
 [node name="Sprite" type="Sprite2D" parent="PathFollow2D"]
-material = SubResource("ShaderMaterial_wsvxn")
+material = SubResource("ShaderMaterial_eo5f0")
 position = Vector2(-1, -36)
 scale = Vector2(4, 4)
 texture = ExtResource("3_eo5f0")

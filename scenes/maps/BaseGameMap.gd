@@ -8,11 +8,6 @@ signal danmaku_progressed
 
 
 enum MAP_EVENT{NONE, TIME, DEATH, SEIZE}
-enum OBJECTIVE_STYLE{
-	SEQUENTIAL, ##Each objective in win_conidtions occurs one after the other.
-	SIMULTANEOUS ##Every objective in win_conditions is active at the same time.
-	}
-
 const TERRAIN_VOID := &"Void"
 const UNIT_CONTAINER_NAMES := {
 	Enums.FACTION_ID.ENEMY: "EnemyUnits",
@@ -29,41 +24,32 @@ const UNIT_CONTAINER_NAMES := {
 ##WARNING: unit_id is case sensitive.
 @export var forcedUnits := ["remilia"]:
 	set(value):
-		forcedUnits.clear()
-		for id in value:
-			forcedUnits.append(id.to_snake_case())
+		forcedUnits = _normalize_unit_id_list(value)
 ##Player unit ids added to the roster when this chapter loads.
 ##Use the unit_id, e.g. "flandre". PlayerData will first look for
 ##res://scenes/units/player_units/flandre.tscn, then flandre_player.tscn.
 @export var chapterRosterAdditions: Array[String] = []:
 	set(value):
-		chapterRosterAdditions.clear()
-		for id in value:
-			chapterRosterAdditions.append(id.to_snake_case())
+		chapterRosterAdditions = _normalize_unit_id_list(value)
 @export_file("*.tscn") var next_map : String
 @export var chapterNumber: int = 0
 @export var title: String = ""
-@export var objectives:Array[Objective] = []:
-	set(value):
-		objectives = value
-		update_configuration_warnings()
 @export_group("Conditions")
 
 @export_subgroup("Win Conditions")
 
-@export var win_style : OBJECTIVE_STYLE = OBJECTIVE_STYLE.SEQUENTIAL
 ##Objective of the map.[br]
 ##Make new of any desired style of objective, then input the desired requirements
 @export var win_conditions : Array[Objective] = []:
 	set(value):
 		win_conditions = value
 		update_configuration_warnings()
-@export var winEvents : Dictionary = {"Seize" : 0} ## 0 = false, input number of event occurences required for win
-@export var winKill : Array[Unit] = [] ##Use Add Element to select map units which trigger a win condition
 @export_subgroup("Loss Conditions")
-@export var playerDeath : Dictionary = {"Remilia" : true, "Sakuya" : true, "Patchouli" : false, "Meiling" : false} ##Tick Player units whose death triggers a loss condition
-@export var lossKill : Array[Unit] = [] ##Use Add Element to select map units which trigger a loss condition
-@export var hoursPassed : int = 0 ##0 = false, set hour limit before loss
+##Objectives that trigger defeat when completed.
+@export var loss_conditions : Array[Objective] = []:
+	set(value):
+		loss_conditions = value
+		update_configuration_warnings()
 @export_category("Danmaku")
 @export var dmkScript : DanmakuScript
 @export var dmkMaster : Unit
@@ -106,9 +92,6 @@ var actingDanmaku := {"Spawning":[], "Collision":[]}
 #event trackers
 var victoryKills : Array = []
 var wasSeized : Array[Vector2i] = []
-var sequenceStep := 0:
-	set(value):
-		sequenceStep = clampi(value,0,win_conditions.size()-1)
 ##Objective tracking
 var completed_conditions:Dictionary[String,Array] = {"Loss":[],"Victory":[]}
 
@@ -142,10 +125,18 @@ func _ensure_ai_manager() -> void:
 	ai.mind = ai_personality
 
 
+func _normalize_unit_id_list(value: Array) -> Array[String]:
+	var normalized: Array[String] = []
+	for id in value:
+		normalized.append(String(id).to_snake_case())
+	return normalized
+
+
 #region objective functions
 func _ready_objectives():
-	for objective in objectives:
-		objective.completed.connect(self._on_objective_completed)
+	for objective in get_runtime_objectives():
+		if not objective.completed.is_connected(self._on_objective_completed):
+			objective.completed.connect(self._on_objective_completed)
 		if objective is Seize: _ready_seize(objective)
 		elif objective is KillUnit: _ready_kills(objective)
 	
@@ -211,7 +202,6 @@ func save()->Dictionary:
 	#saveData["actingDanmaku"] = actingDanmaku
 	#saveData["victoryKills"] = victoryKills
 	#saveData["wasSeized"] = wasSeized
-	#saveData["sequenceStep"] = sequenceStep
 	return saveData
 
 
@@ -222,7 +212,6 @@ func load_data(save_data:Dictionary):
 	#actingDanmaku = save_data.actingDanmaku
 	#victoryKills = save_data.victoryKills
 	#wasSeized = save_data.wasSeized
-	#sequenceStep = save_data.sequenceStep
 
 
 func load_map_units():
@@ -329,7 +318,7 @@ func _load_interactive_states(data:Dictionary):
 
 #region warnings
 func _get_configuration_warnings():
-	if objectives.is_empty(): return ["Objective missing in objectives, map is uncompleteable."]
+	if win_conditions.is_empty(): return ["Winning objective missing. Add one to Win Conditions."]
 	else: return []
 #endregion
 
@@ -450,11 +439,37 @@ func get_loss_conditions() -> Array:
 	return _get_condition_text(Objective.CONDITION_TYPES.LOSING)
 
 
+func get_runtime_objectives() -> Array[Objective]:
+	var runtime_objectives: Array[Objective] = []
+	_append_condition_objectives(runtime_objectives, win_conditions, Objective.CONDITION_TYPES.WINNING)
+	_append_condition_objectives(runtime_objectives, loss_conditions, Objective.CONDITION_TYPES.LOSING)
+	return runtime_objectives
+
+
+func _get_objectives_for_condition(condition_type: int) -> Array[Objective]:
+	var out: Array[Objective] = []
+	for objective in get_runtime_objectives():
+		if objective != null and objective.condition_type == condition_type:
+			out.append(objective)
+	return out
+
+
+func _append_condition_objectives(out: Array[Objective], source: Array[Objective], condition_type: int) -> void:
+	for objective in source:
+		if objective == null:
+			continue
+		objective.condition_type = condition_type
+		_append_unique_objective(out, objective)
+
+
+func _append_unique_objective(out: Array[Objective], objective: Objective) -> void:
+	if not out.has(objective):
+		out.append(objective)
+
+
 func _get_condition_text(condition_type: int) -> Array[String]:
 	var condition_text: Array[String] = []
-	for objective in objectives:
-		if objective == null or objective.condition_type != condition_type:
-			continue
+	for objective in _get_objectives_for_condition(condition_type):
 		var text := objective.get_display_text(self)
 		if not text.is_empty():
 			condition_text.append(text)
@@ -706,8 +721,6 @@ func get_used_rect() -> Rect2i:
 
 #region Event Functions
 func _on_unit_death(unit:Unit): graveyard.append(unit.unit_id)
-	#for objective in objectives:
-		#if objective is KillUnit: objective._on_unit_death(unit.unit_id)
 
 #endregion
 
@@ -727,89 +740,15 @@ func check_event(trigger:MAP_EVENT, parameter): ##Triggers: death, time, seize
 		MAP_EVENT.DEATH: triggered = _check_death_conditionals(parameter)
 		MAP_EVENT.TIME: triggered = _check_time_conditional(parameter)
 	return triggered
-#
-#
-#func _get_win_objective(event:MAP_EVENT) -> Objective:
-	#var toCheck : Array[Objective] = []
-	#var obj : Objective
-	#match win_style:
-		#OBJECTIVE_STYLE.SEQUENTIAL: obj = win_conditions[sequenceStep]
-		#OBJECTIVE_STYLE.SIMULTANEOUS: toCheck = win_conditions
-	#
-	#for con in toCheck:
-		#match event:
-			#MAP_EVENT.TIME: pass
-			#MAP_EVENT.SEIZE: if con is Seize: obj = con
-			#MAP_EVENT.DEATH:  if con is KillUnit: obj = con
-	#return obj
 
 
 func _check_seize_conditionals(cell): pass
-	#var c := 0
-	#var obj : Seize = _get_win_objective(MAP_EVENT.SEIZE)
-	#if !obj: return false
-	#elif is_seize(cell): wasSeized.append(cell)
-	#
-	#for event in dev.get_used_cells_by_id(1,Vector2i(0,0),0):
-		#if wasSeized.has(event): c += 1
-	#
-	#if c >= obj.seize_count:
-		#obj.complete = true
-		#sequenceStep += 1
-		#_check_victory()
-		#return true
-	#return false
 
 
 func _check_death_conditionals(parameter): pass
-	# Doesn't work if unit dies in non-killUnit objective
-	# Need to seperate the checks of loss kills and win kills into two seperate functions that are ran here
-	#var unitId
-	#var condition
-	#var triggered := false
-	#var winObj :Objective= _get_win_objective(MAP_EVENT.DEATH)
-	#if parameter.FACTION_ID == Enums.FACTION_ID.PLAYER:
-		#unitId = parameter.unit_id
-		#condition = "Player Death"
-	#else:
-		#condition = "NPC Death"
-		#
-	#match condition:
-		#"Player Death":
-			#if playerDeath[unitId]:
-				#Global.flags.gameOver = true
-				#triggered = true
-		#"NPC Death":
-			#if lossKill.has(parameter):
-				#Global.flags.gameOver = true
-				#triggered = true
-			#if winObj is KillUnit and winObj.hit_list.has(parameter.unit_id):
-				#_add_kill(parameter, true)
-			#_on_unit_death(parameter.unit_id)
-	#if triggered:
-		#_check_off_event.call_deferred()
-	#return triggered
-
-
-#func _add_kill(unit, victory):
-	#var winObj :KillUnit = _get_win_objective(MAP_EVENT.DEATH)
-	#if victory:
-		#victoryKills.append(unit.unit_id)
-	#if !winObj: return
-	#for kill in winObj.hit_list:
-		#if !victoryKills.has(kill):
-			#return
-	#winObj.complete = true
-	#sequenceStep += 1
-	#_check_victory()
 
 
 func _check_time_conditional(_time): pass
-	#var triggered := false
-	#if hoursPassed == 0: triggered = false
-	#elif Global.time_passed == hoursPassed:
-		#Global.flags.gameOver = true
-		#return true
 	#var childs = get_children()
 	#for child in childs:
 		#var spawner = child as UnitSpawner

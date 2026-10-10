@@ -1,0 +1,11 @@
+
+
+AI:
+- REALLY loves water
+- Boss priority causing boss to act first even when it's a bad idea
+Formation does not allow swapping to a valid space if there's no unit already there.
+
+
+
+
+
