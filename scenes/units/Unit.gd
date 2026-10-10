@@ -104,7 +104,8 @@ var leash_consumed: bool = false
 @export var _move_type:Enums.MOVE_TYPE
 var move_type:Enums.MOVE_TYPE = _move_type
 @export_category("Unit Stats")
-@export_group("Stat Modifiers") 
+@export_group("Stat Modifiers")
+
 ##added to combined base stats from SPEC_ID and ROLE_ID
 @export var mod_growth:Dictionary[StringName,float] = { 
 					"Move": 0.0, 
@@ -234,8 +235,9 @@ var level_stats:Dictionary = {
 					}
 var unit_exp:int = 0
 
-
+## Character Features
 @export_category("Features")
+
 ##Skills added to this array are treated as a unit's personal skills, they stick with a unit regardless of Species or Role
 @export var personal_skills:Array[Skill]= []:
 	set(value):
@@ -255,14 +257,16 @@ var unit_exp:int = 0
 		personal_leveled_passives = value
 		_generate_base_stats()
 
+## Totality of features, view only
 @export_category("Total Features - Do Not Edit")
-##These are the accumilated Skills from Personal, Species, Role; Items. Do NOT add skills to this. Use personal_skills you fuckin' dipshit
+
+## These are the accumilated Skills from Personal, Species, Role; Items. Do NOT add skills to this. Use personal_skills you fuckin' dipshit
 @export var skills:Array[Skill] = []
-##What did I say?
+## What did I say?
 @export var leveled_skills:Dictionary[int,Passive] = {}
-##These are the accumilated Passives from Personal, Species, Role; Items. Do NOT add passives to this. Use personal_passives you fuckin' dipshit
+## These are the accumilated Passives from Personal, Species, Role; Items. Do NOT add passives to this. Use personal_passives you fuckin' dipshit
 @export var passives:Array[Passive] = []
-##What did I tell you to do?
+## What did I tell you to do?
 @export var leveled_passives:Dictionary[int,Passive] = {}
 #feature sorting arrays
 var base_skills:Array[Skill] = []
