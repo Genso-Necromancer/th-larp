@@ -64,6 +64,7 @@ script = ExtResource("6_lbo8e")
 
 [node name="Dev" type="TileMapLayer" parent="."]
 use_parent_material = true
+tile_map_data = PackedByteArray(0, 0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0)
 tile_set = ExtResource("7_1xy5d")
 
 [node name="SeizeLayer" parent="." instance=ExtResource("10_6ts4f")]

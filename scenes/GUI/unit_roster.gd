@@ -66,16 +66,16 @@ func _instantiate_unit_buttons(order:Array, unit_refs:Dictionary, group:Enums.DE
 	match group:
 		Enums.DEPLOYMENT.FORCED: 
 			state = "Forced"
-			filled += 1
 		Enums.DEPLOYMENT.DEPLOYED: 
 			state = "Deployed"
-			filled += 1
 		Enums.DEPLOYMENT.UNDEPLOYED: 
 			state = "Undeployed"
 	for id in order:
 		var b :UnitButton= unitButton.instantiate()
 		b.set_unit(unit_refs[id])
 		b.set_state(state)
+		if group == Enums.DEPLOYMENT.FORCED or group == Enums.DEPLOYMENT.DEPLOYED:
+			filled += 1
 		grid.add_child(b)
 		unit_bars.append(b)
 		b.button.add_to_group("Rosterunit_bars")
@@ -151,8 +151,9 @@ func _font_state_change(node, state := ""):
 	node.add_theme_color_override("font_hover_pressed_color", fColor)
 
 
-func open_unit_manager() -> Control: #need catch for which items to show
-	#Global.focusUnit
+func open_unit_manager(unit: Unit = null) -> Control: #need catch for which items to show
+	if unitManager.has_method("set_unit"):
+		unitManager.set_unit(unit)
 	unitManager.visible = true
 	return unitManager.buttonBox
 

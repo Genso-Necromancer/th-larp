@@ -33,7 +33,7 @@ func _set_basic_text(data:SlotWrapper):
 	elif key == "far_min_reach" or key == "far_max_reach":
 		string = _get_range_format(data, "far_min_reach", "far_max_reach")
 	elif key == "charge_value":
-		string = "+%dH" % int(data[key]) if int(data[key]) > 0 else default
+		string = default
 	elif key == "level" and data.personal:
 		string = "Unique"
 	elif key == "category" and data.sub_group:
@@ -48,7 +48,13 @@ func _set_basic_text(data:SlotWrapper):
 	elif key == "category":
 		var types : Array = Enums.WEAPON_CATEGORY.keys()
 		string = StringGetter.get_string("type_" + str(types[data[key]]).to_snake_case())
-	elif data[key]: string = str(data[key])
+	elif data[key]:
+		string = str(data[key])
+		if data is Skill and data.augment and key in ["hit", "dmg", "crit"]:
+			string = "%+d" % int(data[key])
+		var charge_value := int(data.charge_value) if "charge_value" in data else 0
+		if key == "dmg" and charge_value > 0:
+			string += "+%dH" % charge_value
 	else: string = default
 	set_text(string)
 

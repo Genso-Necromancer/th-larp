@@ -7,4 +7,5 @@ script = ExtResource("1_8odue")
 seize_tile_layer = NodePath("SeizeLayer")
 completion_type = 0
 condition_type = 1
+display_text = ""
 metadata/_custom_type_script = "uid://b7a6ss8luhslm"

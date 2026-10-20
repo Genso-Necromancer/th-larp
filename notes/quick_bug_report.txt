@@ -1,11 +1,17 @@
 
 
+Meiling's unarmed skill hasn't been tested in a long time.
+Test if Barrier items show up in the bonus breakdown of the barrier tool tips.
+Weapon Hit Bonus shown in Total break down of Hit tool tip.
+
+Hinder: Celerity, This is an augment skill, but shows 5 hit instead of +5 hit. It's a Hit modifier when it is an augment skill as it is augmenting a standard melee attack
+
+Kuchisake-onna race doesn't exist.
+Flandre over all is just a generic "troublemaker" and has little going for her. She intentionally leaves the team after the first arc, and being "basic" is part of the narrative. She still shouldn't be a carbon copy.
+
+Movement type tooltip can get insanely long, trying to cover every type of terrain
+
+
 AI:
 - REALLY loves water
 - Boss priority causing boss to act first even when it's a bad idea
-Formation does not allow swapping to a valid space if there's no unit already there.
-
-
-
-
-

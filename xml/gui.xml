@@ -2,10 +2,10 @@
 <root>
 	<language id = "CHINA">
 		<template>
-			<entry id = "effect_chance"><![CDATA[CHING CHONG]]></entry>
+			<entry id = "effect_chance"><![CDATA[its in chinese]]></entry>
 		</template>
 		<string>
-			<entry id = "name_sleep"><![CDATA[[color=#5F9EA0]STEAL BABY ORGANS[/color]]]></entry>
+			<entry id = "name_sleep"><![CDATA[[color=#5F9EA0]its in chinese[/color]]]></entry>
 		</string>
 	</language>
 	<language id = "AMERICAN">
@@ -33,6 +33,7 @@
 			<entry id = "effect_template_dot"><![CDATA[[color=#8C1717]Damage Over Time[/color] %s]]></entry>
 			<entry id = "effect_template_hot"><![CDATA[[color=#3CB371]Regrowth[/color] %s]]></entry>
 			<entry id = "effect_template_cure"><![CDATA[[color=#26ab96]Cures:[/color] %s]]></entry>
+			<entry id = "effect_template_reloc"><![CDATA[[color=#DAA520]Relocate[/color] %s]]></entry>
 			<entry id = "effect_template_status_buffer"><![CDATA[[color=#9370DB]Status Ward[/color]]]></entry>
 			<entry id = "effect_template_purity"><![CDATA[[color=#5F9EA0]Purify[/color] %s]]></entry>
 			<entry id = "effect_template_add_skill"><![CDATA[Grants Skill: {skill}]]></entry>
@@ -49,7 +50,7 @@
 			<entry id = "void_value"><![CDATA[--]]></entry>
 			<!-- GUI -->
 			<entry id = "move_cost_title"><![CDATA[[u]Movement Cost[/u]]]></entry>
-			<entry id = "lore_move_type_swim"><![CDATA[Swim]]></entry>
+			<entry id = "lore_move_type_swim"><![CDATA[Moves through water and can benefit from water terrain.]]></entry>
 			<entry id = "target_self"><![CDATA[Self:]]></entry>
 			<entry id = "target_target"><![CDATA[Target:]]></entry>
 			<entry id = "target_global"><![CDATA[Time:]]></entry>
@@ -74,6 +75,7 @@
 			<entry id = "effect_sub_type_true"><![CDATA[True]]></entry>
 			<entry id = "effect_sub_type_silence"><![CDATA[Silence]]></entry>
 			<entry id = "effect_sub_type_sleep"><![CDATA[[color=#5F9EA0]Sleep[/color]]]></entry>
+			<entry id = "effect_sub_type_dazed"><![CDATA[Daze]]></entry>
 			<entry id = "effect_sub_type_move"><![CDATA[Move]]></entry>
 			<entry id = "effect_sub_type_life"><![CDATA[Life]]></entry>
 			<entry id = "effect_sub_type_comp"><![CDATA[Composure]]></entry>
@@ -93,6 +95,10 @@
 			<entry id = "effect_sub_type_effhit"><![CDATA[Effect Chance]]></entry>
 			<entry id = "effect_sub_type_def"><![CDATA[Defense]]></entry>
 			<entry id = "effect_sub_type_dres"><![CDATA[Damage Reduction]]></entry>
+			<entry id = "effect_sub_type_toss"><![CDATA[Toss]]></entry>
+			<entry id = "effect_sub_type_shove"><![CDATA[Shove]]></entry>
+			<entry id = "effect_sub_type_warp"><![CDATA[Warp]]></entry>
+			<entry id = "effect_sub_type_rescue"><![CDATA[Rescue]]></entry>
 			<entry id = "effect_sub_type_all"><![CDATA[All]]></entry>
 			<!-- Effect Rules -->
 			<entry id = "effect_target_spec"><![CDATA[vs {sub_rule}]]></entry>
@@ -131,6 +137,7 @@
 			<entry id = "unit_name_reimu"><![CDATA[Reimu Hakuri]]></entry>
 			<entry id = "unit_name_flandre"><![CDATA[Flandre Scarlet]]></entry>
 			<entry id = "unit_name_cirno"><![CDATA[Cirno]]></entry>
+			<entry id = "unit_name_araseasnail"><![CDATA[Araseasnail Foidspite]]></entry>
 			<!-- species -->
 			<entry id = "species_name_fairy"><![CDATA[Fairy]]></entry>
 			<entry id = "species_name_human"><![CDATA[Human]]></entry>
@@ -149,6 +156,8 @@
 			<entry id = "role_name_sorceress"><![CDATA[Sorceress]]></entry>
 			<entry id = "role_name_miko"><![CDATA[Miko]]></entry>
 			<entry id = "role_name_blade"><![CDATA[Blade]]></entry>
+			<entry id = "role_name_witch"><![CDATA[Witch]]></entry>
+			<entry id = "role_name_outrider"><![CDATA[Outrider]]></entry>
 			<entry id = "role_name_archer"><![CDATA[Archer]]></entry>
 			<!-- Weapon Types -->
 			<entry id = "type_blade"><![CDATA[Blade]]></entry>
@@ -164,6 +173,7 @@
 			<entry id = "type_item"><![CDATA[Item]]></entry>
 			<entry id = "type_natural"><![CDATA[Natural]]></entry>
 			<entry id = "type_knife"><![CDATA[Knife]]></entry>
+			<entry id = "type_barrier"><![CDATA[Barrier]]></entry>
 			<entry id = "type_augment"><![CDATA[Weapon Augment]]></entry>
 			<entry id = "type_time"><![CDATA[Chronomancy]]></entry>
 			<entry id = "type_sabotage"><![CDATA[Sabotage]]></entry>
@@ -187,6 +197,8 @@
 			<entry id = "passive_name_canto"><![CDATA[Ride-By]]></entry>
 			<entry id = "passive_name_canto_night"><![CDATA[Night Waltz]]></entry>
 			<entry id = "passive_name_shade"><![CDATA[Shade]]></entry>
+			<entry id = "passive_name_martial"><![CDATA[Martial Artist]]></entry>
+			<entry id = "passive_name_spell_memorization"><![CDATA[Vancian Study]]></entry>
 			<!-- Skill Names -->
 			<!--Sakuya-->
 			<entry id = "skill_name_locked_corpse"><![CDATA[Locked Corpse]]></entry>
@@ -197,6 +209,11 @@
 			<entry id = "skill_name_slay_fairy"><![CDATA[Fairy Slayer]]></entry>
 			<!--Meiling-->
 			<entry id = "skill_name_enemy_toss_1"><![CDATA[Toss]]></entry>
+			<entry id = "skill_name_shove_enemy"><![CDATA[Shove Foe]]></entry>
+			<entry id = "skill_name_shove_enemy01"><![CDATA[Shove Foe]]></entry>
+			<entry id = "skill_name_toss_enemy"><![CDATA[Supplex]]></entry>
+			<!--Cointaker-->
+			<entry id = "skill_name_sabo_cele05"><![CDATA[Hinder: Celerity]]></entry>
 			<!--Patchouli-->
 			<!--Spells-->
 			<entry id = "skill_name_spell_basic_fire"><![CDATA[Fire Ball]]></entry>
@@ -323,8 +340,12 @@
 			<entry id = "weapon_knife_silver"><![CDATA[Silver Knife]]></entry>
 			<entry id = "weapon_knife_dagger"><![CDATA[Dagger]]></entry>
 			<entry id = "weapon_book_fire"><![CDATA[Fire Book]]></entry>
+			<entry id = "weapon_book_basic_fire"><![CDATA[Book of Fire]]></entry>
 			<entry id = "weapon_book_debug_effects"><![CDATA[Debug Effect Book]]></entry>
 			<entry id = "weapon_gohei_simple"><![CDATA[Simple Gohei]]></entry>
+			<entry id = "weapon_gohei_evasion_ward"><![CDATA[Evasion Ward Gohei]]></entry>
+			<entry id = "weapon_gohei_status_charm"><![CDATA[Status Charm Gohei]]></entry>
+			<entry id = "weapon_gohei_hunter_fairy"><![CDATA[Fairy Hunter Gohei]]></entry>
 			<entry id = "weapon_scissor_blade_basic"><![CDATA[Scissor Blade]]></entry>
 			<entry id = "weapon_blade_basic"><![CDATA[Basic Blade]]></entry>
 			<entry id = "weapon_blunt_basic"><![CDATA[Basic Blunt]]></entry>
@@ -333,6 +354,7 @@
 			<entry id = "weapon_polearm_reach_basic"><![CDATA[Reach Polearm]]></entry>
 			<entry id = "weapon_hunter_bow_basic"><![CDATA[Hunter Bow]]></entry>
 			<entry id = "weapon_harrier_bow_basic"><![CDATA[Harrier Bow]]></entry>
+			<entry id = "weapon_martial_fist"><![CDATA[Martial Fist]]></entry>
 			<!-- Accessories -->
 			<entry id = "accesory_pwr_ring01"><![CDATA[Power Ring]]></entry>
 			<entry id = "accessory_pwr_ring01"><![CDATA[Power Ring]]></entry>
@@ -347,16 +369,33 @@
 			<entry id = "ofuda_ofuda_heal0"><![CDATA[Healing Ofuda]]></entry>
 			<entry id = "ofuda_ofuda_heal_basic"><![CDATA[Heal Ofuda]]></entry>
 			<entry id = "ofuda_ofuda_warp_basic"><![CDATA[Warp Ofuda]]></entry>
+			<entry id = "ofuda_ofuda_rescue_debug"><![CDATA[Rescue Ofuda]]></entry>
 			<entry id = "ofuda_ofuda_cure_sleep"><![CDATA[Cure Sleep Ofuda]]></entry>
 			<entry id = "ofuda_ofuda_sleep_basic"><![CDATA[Sleep Ofuda]]></entry>
 			
 			
 			<entry id = "lore_night_prot"><![CDATA[{rule_type}, negate {sub_rule} stat penalties at [color=#230f8c]Night[/color].]]></entry>
 			<entry id = "lore_day_prot"><![CDATA[{rule_type}, negate {sub_rule} stat penalties during the [color=##87CEEB]Day[/color].]]></entry>
+			<entry id = "lore_none"><![CDATA[unarmed]]></entry>
+			<entry id = "lore_time"><![CDATA[Only during {sub_rule}]]></entry>
+			<entry id = "lore_day"><![CDATA[[color=#87CEEB]Day[/color]]]></entry>
+			<entry id = "lore_night"><![CDATA[[color=#230f8c]Night[/color]]]></entry>
+			<entry id = "lore_unarmed"><![CDATA[unarmed]]></entry>
+			<entry id = "lore_natural"><![CDATA[natural]]></entry>
 			<entry id = "lore_self_spec"><![CDATA[If Unit is {sub_rule}]]></entry>
 			<entry id = "lore_target_spec"><![CDATA[If Target is {sub_rule}]]></entry>
 			<entry id = "lore_human"><![CDATA[[color=#59a198]Human[/color]]]></entry>
 			<entry id = "lore_fated"><![CDATA[This Unit has a chance to turn a Miss! into a Hit! This Unit really has this ability, she swears it.]]></entry>
+			<entry id = "lore_lockpick"><![CDATA[Unlock doors & chests]]></entry>
+			<entry id = "lore_canto"><![CDATA[Use remaining movement after acting if unharmed]]></entry>
+			<entry id = "lore_sub_weapon"><![CDATA[Grants access to {sub_type} attacks.]]></entry>
+			<entry id = "lore_pass"><![CDATA[Can move through occupied spaces.]]></entry>
+			<entry id = "lore_vantage"><![CDATA[Strikes first when able to counter.]]></entry>
+			<entry id = "lore_counter"><![CDATA[Can respond to eligible attacks.]]></entry>
+			<entry id = "lore_shade"><![CDATA[Less likely to be targeted while other options are available.]]></entry>
+			<entry id = "lore_spell_memorization"><![CDATA[Can memorize spells from carried books during setup, then cast those spells from memory alone.]]></entry>
+			<entry id = "lore_stat_change"><![CDATA[Changes stats while active.]]></entry>
+			<entry id = "lore_response"><![CDATA[Responds when its trigger condition is met.]]></entry>
 			<entry id = "lore_aura"><![CDATA[{aura}.]]></entry>
 			<entry id = "lore_range_adjacent"><![CDATA[adjacent to Unit]]></entry>
 			<entry id = "lore_range"><![CDATA[within {range} spaces of Unit]]></entry>
@@ -369,12 +408,80 @@
 			<entry id = "lore_restrict_night"><![CDATA[[i]Feature is restricted to [color=#230f8c]Night[/color][/i]]]></entry>
 			<entry id = "lore_restrict_day"><![CDATA[[i]Feature is restricted to [color=##87CEEB]Day[/color][/i]]]></entry>
 			
-			
-			
-			
-			
-			
-			
+			<!-- Profile Tool Tips -->
+			<entry id = "lore_unit_name"><![CDATA[The unit's name and short field identity.]]></entry>
+			<entry id = "lore_role"><![CDATA[Role determines a unit's main combat pattern, weapon access, and growth direction.]]></entry>
+			<entry id = "lore_species"><![CDATA[Species modifies stats, growths, movement, and sometimes time-of-day behavior.]]></entry>
+			<entry id = "lore_level"><![CDATA[Current level. Level affects experience gain and level-based feature unlocks.]]></entry>
+			<entry id = "lore_exp"><![CDATA[Experience toward the next level.]]></entry>
+			<entry id = "lore_life"><![CDATA[How much damage the unit can take before falling.]]></entry>
+			<entry id = "lore_comp"><![CDATA[Composure fuels actions and is strained by combat pressure. It persists between chapters, so overuse carries forward.]]></entry>
+			<entry id = "lore_pwr"><![CDATA[Power improves physical damage and helps carry heavier weapons without losing Celerity.]]></entry>
+			<entry id = "lore_mag"><![CDATA[Magic improves magical damage and reduces incoming magical damage.]]></entry>
+			<entry id = "lore_eleg"><![CDATA[Elegance improves hit, critical pressure, and effect chance.]]></entry>
+			<entry id = "lore_cele"><![CDATA[Celerity improves graze and helps preserve safety after weapon weight.]]></entry>
+			<entry id = "lore_def"><![CDATA[Defense reduces physical damage and strengthens barrier blocking.]]></entry>
+			<entry id = "lore_cha"><![CDATA[Charisma improves effect chance, effect resistance, and several social or spiritual checks.]]></entry>
+			<entry id = "lore_hit"><![CDATA[Chance to land attacks before target graze is applied.]]></entry>
+			<entry id = "lore_graze"><![CDATA[Chance to avoid an incoming attack.]]></entry>
+			<entry id = "lore_dmg"><![CDATA[Base combat damage before target defenses and other combat effects.]]></entry>
+			<entry id = "lore_crit"><![CDATA[Chance for a critical attack after the hit succeeds.]]></entry>
+			<entry id = "lore_luck"><![CDATA[Reduces enemy critical pressure.]]></entry>
+			<entry id = "lore_resist"><![CDATA[Chance to resist hostile status effects and debuffs.]]></entry>
+			<entry id = "lore_eff_hit"><![CDATA[Chance bonus applied when attempting hostile effects.]]></entry>
+			<entry id = "lore_effhit"><![CDATA[Chance bonus applied when attempting hostile effects.]]></entry>
+			<entry id = "lore_barrier"><![CDATA[Damage blocked when a barrier triggers.]]></entry>
+			<entry id = "lore_barprc"><![CDATA[Chance for barrier protection to trigger.]]></entry>
+			<entry id = "lore_move"><![CDATA[How many hexes this unit can move before terrain costs are applied.]]></entry>
+			<entry id = "lore_move_type_foot"><![CDATA[Standard movement. Terrain costs are applied normally.]]></entry>
+			<entry id = "lore_move_type_ranger"><![CDATA[Moves efficiently through rough ground and natural terrain.]]></entry>
+			<entry id = "lore_move_type_fly"><![CDATA[Ignores most terrain and wall movement restrictions, but loses terrain benefits.]]></entry>
+			<entry id = "lore_move_type_mount"><![CDATA[Strong open-field movement, but more sensitive to rough terrain.]]></entry>
+			<entry id = "lore_move_type_armor"><![CDATA[Heavy movement suited to stable ground.]]></entry>
+
+			<!-- Role and Species Lore -->
+			<entry id = "lore_role_trblr"><![CDATA[An aggressive brute that pressures the frontline with raw force.]]></entry>
+			<entry id = "lore_role_thief"><![CDATA[A fragile utility unit built around speed, charm, and map objectives.]]></entry>
+			<entry id = "lore_role_lady"><![CDATA[Remilia's personal role, balancing command presence with aggressive vampire combat.]]></entry>
+			<entry id = "lore_role_maid"><![CDATA[Sakuya's personal role, built for mobile precision and problem solving.]]></entry>
+			<entry id = "lore_role_sorceress"><![CDATA[Patchouli's personal role, emphasizing spell access and magical pressure.]]></entry>
+			<entry id = "lore_role_miko"><![CDATA[A spiritual hybrid that supports allies with ofuda while remaining combat-capable.]]></entry>
+			<entry id = "lore_role_guard"><![CDATA[A durable vanguard that disrupts enemies instead of waiting to be ignored.]]></entry>
+			<entry id = "lore_role_witch"><![CDATA[A dedicated caster that relies on spells for active offense.]]></entry>
+			<entry id = "lore_role_blade"><![CDATA[A defensive duelist that claims strong positions and punishes careless attacks.]]></entry>
+			<entry id = "lore_role_outrider"><![CDATA[A mounted role that trades bulk for positioning and hit-and-run pressure.]]></entry>
+			<entry id = "lore_role_archer"><![CDATA[A ranged specialist that pressures targets from favorable positions.]]></entry>
+			<entry id = "lore_species_fairy"><![CDATA[A small supernatural being with fragile but tricky combat tendencies.]]></entry>
+			<entry id = "lore_species_human"><![CDATA[Flexible and grounded, with only mild time-of-day shifts.]]></entry>
+			<entry id = "lore_species_vampire"><![CDATA[A powerful night creature weakened by daylight.]]></entry>
+			<entry id = "lore_species_dragon"><![CDATA[A rare defensive species with durable supernatural physicality.]]></entry>
+			<entry id = "lore_species_magician"><![CDATA[A magically inclined species with natural affinity for spellcraft.]]></entry>
+			<entry id = "lore_species_youkai"><![CDATA[A broad supernatural species strengthened by the night.]]></entry>
+			<entry id = "lore_species_oni"><![CDATA[A physically dominant youkai known for overwhelming force.]]></entry>
+			<entry id = "lore_species_sazae_oni"><![CDATA[A water-capable youkai that uses terrain and patience to entrap prey.]]></entry>
+
+			<!-- Unique Unit Lore -->
+			<entry id = "lore_title_remilia"><![CDATA[Scarlet Devil]]></entry>
+			<entry id = "lore_title_sakuya"><![CDATA[Perfect and Elegant Maid]]></entry>
+			<entry id = "lore_title_patchouli"><![CDATA[One-Week Wizard]]></entry>
+			<entry id = "lore_title_meiling"><![CDATA[Gatekeeper of the Scarlet Devil Mansion]]></entry>
+			<entry id = "lore_title_reimu"><![CDATA[Shrine Maiden of Paradise]]></entry>
+			<entry id = "lore_title_flandre"><![CDATA[Little Sister of the Devil]]></entry>
+			<entry id = "lore_title_cirno"><![CDATA[Ice Fairy]]></entry>
+			<entry id = "lore_remilia"><![CDATA[A vampire leader whose role shifts sharply between day and night.]]></entry>
+			<entry id = "lore_sakuya"><![CDATA[A mobile fixer who controls danger through precision and time manipulation.]]></entry>
+			<entry id = "lore_patchouli"><![CDATA[A frail but deep spellcaster with broad magical knowledge.]]></entry>
+			<entry id = "lore_meiling"><![CDATA[A martial vanguard who disrupts enemies from the front line.]]></entry>
+			<entry id = "lore_reimu"><![CDATA[A flexible miko who fills gaps, fights troublesome foes, and supports the team.]]></entry>
+			<entry id = "lore_flandre"><![CDATA[A vampire troublemaker with dangerous direct power.]]></entry>
+			<entry id = "lore_cirno"><![CDATA[A fairy with more confidence than caution.]]></entry>
+
+
+
+
+
+
+
 		</string>
 	</language>
 </root>

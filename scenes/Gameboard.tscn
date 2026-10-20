@@ -19,6 +19,14 @@ unique_name_in_owner = true
 z_index = 1
 position = Vector2(288, 156)
 
+[node name="Sprite2D" parent="Cursor/anchor" index="0"]
+z_index = 1000
+z_as_relative = false
+
+[node name="Cell" parent="Cursor" index="5"]
+z_index = 1000
+z_as_relative = false
+
 [node name="CombatManager" parent="." instance=ExtResource("8_06m4j")]
 unique_name_in_owner = true
 

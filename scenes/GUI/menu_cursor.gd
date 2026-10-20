@@ -1,12 +1,14 @@
 extends TextureRect
 class_name MenuCursor
 
+enum PLACEMENT {LEFT, TOP}
 
 @export var cursor_offset : Vector2 = Vector2(25,5)
 
 var currentButton : Button = null
 var setCursor := false
 var menu_parent
+var placement : PLACEMENT = PLACEMENT.LEFT
 
 
 func _process(_delta):
@@ -19,8 +21,18 @@ func set_cursor(button = get_viewport().gui_get_focus_owner()):
 	var cPosition = button.get_global_position()
 	var cSize = button.size
 	var newPos
-	newPos = Vector2(cPosition.x, cPosition.y + cSize.y / 2.0) - (size / 2.0) - cursor_offset
+	match placement:
+		PLACEMENT.TOP:
+			newPos = Vector2(cPosition.x + cSize.x / 2.0, cPosition.y) - (size / 2.0) - cursor_offset
+		_:
+			newPos = Vector2(cPosition.x, cPosition.y + cSize.y / 2.0) - (size / 2.0) - cursor_offset
 	set_global_position(newPos)
+
+
+func set_placement(new_placement: PLACEMENT, new_offset: Vector2 = cursor_offset) -> void:
+	placement = new_placement
+	cursor_offset = new_offset
+	rotation_degrees = 90.0 if placement == PLACEMENT.TOP else 0.0
 
 
 func toggle_visible():

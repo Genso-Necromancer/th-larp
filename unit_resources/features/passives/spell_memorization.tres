@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Passive" load_steps=2 format=3]
+
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="1_spell_memorization"]
+
+[resource]
+resource_name = "spell_memorization"
+script = ExtResource("1_spell_memorization")
+type = 15
+proc = 100
+sub_type = 0
+sub_weapon = 0
+value = 0
+is_time_sens = false
+id = "spell_memorization"
+rule_type = 0
+metadata/_custom_type_script = "uid://c5hmv6tclm43r"

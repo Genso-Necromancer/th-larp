@@ -122,12 +122,12 @@ func get_combat_effect_string(effect:Effect) -> String: #Time to create the stri
 	if value and value != 0:
 		var v
 		var path := "value_template"
-		if typeof(value) == Variant.Type.TYPE_FLOAT:
+		if _effect_value_displays_percent(effect):
 			v = value * 100
 			v = round(v)
 			path = "percent_value_template"
 		else:
-			v = value
+			v = roundi(float(value))
 		v = _get_effect_display_value(effect, v)
 		s = get_template(path) % [s, v]
 	
@@ -177,11 +177,11 @@ func get_effect_string(effect:Effect) -> String: #Needs reworking, see tooltip p
 	if effVal and effVal != 0:
 		var v
 		var path := "value_template"
-		if typeof(effVal) == Variant.Type.TYPE_FLOAT:
+		if _effect_value_displays_percent(effect):
 			v = effVal * 100
 			v = round(v)
 			path = "percent_value_template"
-		else: v = effVal
+		else: v = roundi(float(effVal))
 		v = _get_effect_display_value(effect, v)
 		s = get_template(path) % [s, v]
 	
@@ -211,7 +211,8 @@ func get_effect_string(effect:Effect) -> String: #Needs reworking, see tooltip p
 			Enums.RULE_TYPE.SELF_SPEC: value = ("species_name_" + Enums.SPEC_ID.keys()[effect.sub_rule].to_snake_case())
 			Enums.RULE_TYPE.MORPH: value = ("time_" + Enums.TIME.keys()[Global.time_of_day].to_snake_case())
 		s += " " + StringGetter.get_string("effect_" + ruleKey)
-		s = s.format({"rule":StringGetter.get_string(str(value))})
+		var rule_value := StringGetter.get_string(str(value))
+		s = s.format({"rule":rule_value, "sub_rule":rule_value})
 	
 	return s
 
@@ -228,6 +229,17 @@ func _effect_value_displays_negative(effect: Effect) -> bool:
 	match int(effect.type):
 		Enums.EFFECT_TYPE.DEBUFF, Enums.EFFECT_TYPE.DOT:
 			return true
+	return false
+
+
+func _effect_value_displays_percent(effect: Effect) -> bool:
+	if effect == null:
+		return false
+	match int(effect.type):
+		Enums.EFFECT_TYPE.TIME, Enums.EFFECT_TYPE.LIFE_STEAL:
+			return true
+		Enums.EFFECT_TYPE.HEAL, Enums.EFFECT_TYPE.DAMAGE, Enums.EFFECT_TYPE.DOT, Enums.EFFECT_TYPE.HOT:
+			return typeof(effect.value) == TYPE_FLOAT and abs(float(effect.value)) < 1.0
 	return false
 
 		

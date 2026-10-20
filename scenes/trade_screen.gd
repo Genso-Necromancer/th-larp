@@ -647,10 +647,6 @@ func _on_selection_made(selection:String, item:Item):
 			if is_setup: _play_item_anim(item)
 			else: _close_trade_menu(true)
 			SignalTower.item_used.emit(item)
-		"Equip":
-			SignalTower.item_equipped.emit(item,true)
-		"Unequip":
-			SignalTower.item_equipped.emit(item,false)
 
 
 func _resolve_chest_overflow_drop() -> void:

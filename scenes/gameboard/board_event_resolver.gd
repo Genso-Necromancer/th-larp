@@ -69,6 +69,9 @@ func update_unit_bars() -> void:
 	_add_bar_update_unit(units_to_update, board.targetUnit)
 	_add_bar_update_unit(units_to_update, board.action_context.get("Actor", null))
 	_add_bar_update_unit(units_to_update, board.action_context.get("Target", null))
+	for unit in board.collision_bar_units:
+		_add_bar_update_unit(units_to_update, unit)
+	board.collision_bar_units.clear()
 
 	if units_to_update.is_empty():
 		board.turn_step = GameBoard.TURN_STEPS.EVENT_QUEUE
@@ -98,6 +101,7 @@ func check_effect_queue() -> bool:
 
 
 func run_effect_queue() -> void:
+	board.turn_step = GameBoard.TURN_STEPS.PROCESSING
 	var post_events = sort_effect_queue()
 	var type = Enums.EFFECT_TYPE
 	var event_keys = post_events.keys()
@@ -106,20 +110,17 @@ func run_effect_queue() -> void:
 			var t = event.Type
 			var effect = event.EffectId
 			var target = event.Target
-			var is_wait = true
 			match t:
 				type.RELOC:
 					board.combatManager.start_relocation(actor, target, effect)
-				_:
-					is_wait = false
-			if is_wait:
-				await board.continue_queue
-	board.call_deferred("_clear_effect_queue")
+					if target.isShoved or target.isTossed:
+						await target.effect_complete
+	board.effect_queue.clear()
+	update_unit_bars()
 
 
 func on_effect_complete() -> void:
 	board.continue_queue.emit()
-	update_unit_bars()
 
 
 func sort_effect_queue() -> Dictionary:
@@ -129,7 +130,7 @@ func sort_effect_queue() -> Dictionary:
 		if !post_events.has(event.Actor):
 			post_events[event.Actor] = []
 			seen[event.Actor] = []
-		if seen[event.Actor].has(event.Type):
+		if event.Type != Enums.EFFECT_TYPE.RELOC and seen[event.Actor].has(event.Type):
 			continue
 		else:
 			seen[event.Actor].append(event.Type)

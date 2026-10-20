@@ -229,12 +229,16 @@ func _start_combat():
 					break
 
 				# Reset between swings
+				if not _are_animators_valid([actor_anim, target_anim]):
+					isSkipped = true
+					break
 				actor_anim.reset_action()
 				actor_anim.reset_variables()
 				target_anim.reset_variables()
 
 			# Reset defender stance after the action completes (matches your old behavior)
-			target_anim.reset_defense()
+			if is_instance_valid(target_anim):
+				target_anim.reset_defense()
 
 	if not isSkipped:
 		_clear_sequence()
@@ -286,12 +290,22 @@ func _on_target_fx_requested(unit):
 func _clear_sequence():
 	isInitiated = false
 	for anim in animations:
-		animations[anim].stop_all()
-		animations[anim].queue_free()
+		var animator = animations[anim]
+		if not is_instance_valid(animator):
+			continue
+		animator.stop_all()
+		animator.queue_free()
 	sequenceSteps.clear()
 	animations.clear()
 	activeAnims.clear()
 	print("Sequence cleared")
+
+
+func _are_animators_valid(animators: Array) -> bool:
+	for animator in animators:
+		if not is_instance_valid(animator):
+			return false
+	return true
 
 
 func _scene_skipped():

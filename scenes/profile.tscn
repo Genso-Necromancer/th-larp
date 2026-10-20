@@ -53,6 +53,7 @@ theme_override_constants/margin_bottom = 0
 
 [node name="ProfileHBox" type="HBoxContainer" parent="ProfileMargin"]
 layout_mode = 2
+theme_override_constants/separation = -120
 
 [node name="ProfileContainer" type="PanelContainer" parent="ProfileMargin/ProfileHBox"]
 layout_mode = 2

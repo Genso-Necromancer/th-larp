@@ -51,6 +51,7 @@ func update_stats():
 	_apply_mod_group(finalCombat, time_mods)
 	_apply_mod_group(finalCombat, buff_mods)
 	_apply_mod_group(finalCombat, aura_mods)
+	_apply_mod_group(finalCombat, item_mods)
 	#print("final_stats: %s" % [finalCombat])
 	unit.base_combat = base_combat
 	unit.combat_data = finalCombat
@@ -135,7 +136,7 @@ func _compute_item_modifiers() -> Dictionary:
 
 	for effect in unit.equipment_helper.equipped_effects:
 		if effect.type == Enums.EFFECT_TYPE.BUFF or effect.type == Enums.EFFECT_TYPE.DEBUFF:
-			var stat_name = subKeys[effect.sub_type].to_pascal_case()
+			var stat_name = "BarPrc" if effect.sub_type == Enums.SUB_TYPE.BARPRC else subKeys[effect.sub_type].to_pascal_case()
 			mods[stat_name] = mods.get(stat_name, 0) + effect.value
 	return mods
 

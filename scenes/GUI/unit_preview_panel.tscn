@@ -1,6 +1,7 @@
-[gd_scene load_steps=10 format=3 uid="uid://bqex5dk5vfdkm"]
+[gd_scene load_steps=11 format=3 uid="uid://bqex5dk5vfdkm"]
 
 [ext_resource type="Script" uid="uid://dh5a7imlr8hal" path="res://scenes/profile.gd" id="1_1jpqj"]
+[ext_resource type="Theme" uid="uid://b0xy887xpxwrs" path="res://fonts/Izayoi_Theme_Profile.tres" id="1_q2tx7"]
 [ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="2_q2tx7"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="3_g4s4m"]
 [ext_resource type="FontFile" uid="uid://ci08lkimq4d1y" path="res://fonts/IzayoiMonospaced-nwoY.ttf" id="4_rv2v1"]
@@ -14,6 +15,7 @@
 custom_minimum_size = Vector2(250, 350)
 offset_right = 423.0
 offset_bottom = 758.0
+theme = ExtResource("1_q2tx7")
 script = ExtResource("1_1jpqj")
 inventory = NodePath("SideBar/TradePnl")
 fBox = NodePath("SideBar/PreviewMargin/stat Margin/previewHbox/VBoxContainer/FeatureMargin/FeatureGrid")
@@ -22,6 +24,7 @@ isPreview = true
 
 [node name="SideBar" type="VBoxContainer" parent="."]
 layout_mode = 2
+theme_override_constants/separation = -152
 
 [node name="PreviewMargin" type="MarginContainer" parent="SideBar"]
 layout_mode = 2
@@ -84,9 +87,7 @@ theme_override_font_sizes/font_size = 15
 text = "%s"
 horizontal_alignment = 1
 script = ExtResource("5_5j1g2")
-key1 = &"unitData"
-key2 = &"Profile"
-key3 = &"Level"
+key1 = &"unit_level"
 
 [node name="XpBox" type="HBoxContainer" parent="SideBar/PreviewMargin/stat Margin/previewHbox/StatVbox/HeaderPanel/MarginContainer/HeaderBox"]
 layout_mode = 2
@@ -110,9 +111,7 @@ theme_override_font_sizes/font_size = 15
 text = "%s"
 horizontal_alignment = 1
 script = ExtResource("5_5j1g2")
-key1 = &"unitData"
-key2 = &"Profile"
-key3 = &"EXP"
+key1 = &"unit_exp"
 
 [node name="StatsPanel" type="PanelContainer" parent="SideBar/PreviewMargin/stat Margin/previewHbox/StatVbox"]
 layout_mode = 2
@@ -485,5 +484,6 @@ columns = 6
 script = ExtResource("8_fh3sa")
 
 [node name="TradePnl" parent="SideBar" instance=ExtResource("9_my0xn")]
+z_index = -1
 layout_mode = 2
 _style = "Profile"

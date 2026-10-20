@@ -1,6 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://bwdal2jmyoy6f"]
+[gd_scene load_steps=9 format=3 uid="uid://bwdal2jmyoy6f"]
 
-[ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="1_ausw1"]
+[ext_resource type="Theme" uid="uid://guvo0gn7pg3v" path="res://fonts/Theme_Unit_Button.tres" id="1_icoig"]
 [ext_resource type="Script" uid="uid://6l4kgqwso35c" path="res://scenes/GUI/unit_button.gd" id="2_sdugk"]
 [ext_resource type="Texture2D" uid="uid://dd5n8e6454qno" path="res://sprites/UI/characterpfptop.png" id="3_e73pf"]
 [ext_resource type="Texture2D" uid="uid://dypirsbrvnnva" path="res://sprites/UI/characterpfpoutline.png" id="3_o1etu"]
@@ -8,10 +8,12 @@
 [ext_resource type="Texture2D" uid="uid://c6a3jura2nil6" path="res://sprites/character/fairy/trblr_portrait.png" id="5_hykob"]
 [ext_resource type="Texture2D" uid="uid://dfuxqwwgadulx" path="res://sprites/UI/characterpfpwinginner.png" id="5_icoig"]
 
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_icoig"]
+
 [node name="UnitButton" type="PanelContainer"]
 offset_right = 40.0
 offset_bottom = 40.0
-theme = ExtResource("1_ausw1")
+theme = ExtResource("1_icoig")
 script = ExtResource("2_sdugk")
 
 [node name="BackgroundWhite" type="NinePatchRect" parent="."]
@@ -58,7 +60,8 @@ texture = ExtResource("3_e73pf")
 
 [node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 2
-theme_override_constants/margin_left = 230
+theme_override_constants/margin_left = 205
+theme_override_constants/margin_top = -7
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer"]
 layout_mode = 2
@@ -67,39 +70,60 @@ layout_mode = 2
 layout_mode = 2
 size_flags_vertical = 4
 
-[node name="Name" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer"]
+[node name="HBoxContainer3" type="HBoxContainer" parent="MarginContainer/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Lv" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+text = "Lv.00"
+vertical_alignment = 2
+
+[node name="Name" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer3"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 0
+theme_override_font_sizes/font_size = 15
 text = "Unknown"
 vertical_alignment = 2
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/HBoxContainer3/HBoxContainer"]
 layout_mode = 2
+alignment = 1
 
-[node name="Lv" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2"]
+[node name="VSeparator" type="VSeparator" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2"]
 layout_mode = 2
-size_flags_horizontal = 0
-size_flags_vertical = 8
-theme_override_font_sizes/font_size = 12
-text = "Lv.00"
-vertical_alignment = 2
+theme_override_constants/separation = 8
+theme_override_styles/separator = SubResource("StyleBoxEmpty_icoig")
 
 [node name="Role" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
 text = "Unemployed"
+horizontal_alignment = 1
 vertical_alignment = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer3/HBoxContainer"]
 layout_mode = 2
 
+[node name="VSeparator" type="VSeparator" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 21
+theme_override_styles/separator = SubResource("StyleBoxEmpty_icoig")
+
 [node name="CompLbl" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 text = "Comp."
 
 [node name="CompCurrent" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
@@ -107,6 +131,7 @@ text = "00"
 vertical_alignment = 2
 
 [node name="Split" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8
@@ -114,6 +139,7 @@ text = "/"
 vertical_alignment = 2
 
 [node name="CompCap" type="Label" parent="MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 8

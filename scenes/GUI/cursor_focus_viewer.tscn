@@ -1,7 +1,7 @@
 [gd_scene load_steps=28 format=3 uid="uid://bn4l14oxi8vt8"]
 
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="1_ckdua"]
-[ext_resource type="Theme" uid="uid://1r4dr7022gxk" path="res://fonts/Izayoi_Theme_Roster.tres" id="1_oay4f"]
+[ext_resource type="Theme" uid="uid://c5441fh4btnba" path="res://fonts/Izayoi_Theme_Focus.tres" id="1_kcadj"]
 [ext_resource type="Script" uid="uid://cu0id8wd4v4h2" path="res://scenes/GUI/cursor_focus_viewer.gd" id="2_f5i04"]
 [ext_resource type="Script" uid="uid://cadn212l0oo2l" path="res://scenes/GUI/terrain_panel.gd" id="3_psmhf"]
 [ext_resource type="Texture2D" uid="uid://da3t2akwt1so2" path="res://scenes/GUI/hud/focus_viewer/terrain_tracker_hex.png" id="4_rtypo"]
@@ -88,7 +88,7 @@ offset_right = -616.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme = ExtResource("1_oay4f")
+theme = ExtResource("1_kcadj")
 script = ExtResource("2_f5i04")
 terrainPanel = NodePath("PanelViewer/ViewerVBox/TerrainPanel")
 unitPanel = NodePath("PanelViewer/ViewerVBox/UnitPanel")
@@ -186,7 +186,7 @@ mouse_filter = 2
 theme_override_constants/margin_left = 18
 theme_override_constants/margin_top = 9
 theme_override_constants/margin_right = 15
-theme_override_constants/margin_bottom = -4
+theme_override_constants/margin_bottom = 8
 
 [node name="InfoVBox" type="VBoxContainer" parent="PanelViewer/ViewerVBox/TerrainPanel/TerrainMargin/TerrainHBox/InfoPanel/InfoMagin"]
 layout_mode = 2
@@ -437,7 +437,7 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/margin_left = 18
 theme_override_constants/margin_top = 11
-theme_override_constants/margin_right = 8
+theme_override_constants/margin_right = 15
 theme_override_constants/margin_bottom = 13
 
 [node name="InfoVBox" type="VBoxContainer" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin"]
@@ -763,17 +763,20 @@ key2 = &"Dmg"
 layout_mode = 2
 mouse_filter = 2
 
+[node name="Selected" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/ItemButton" index="1"]
+visible = true
+
 [node name="Icon" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/ItemButton/ContentMargin/HBoxContainer" index="0"]
 custom_minimum_size = Vector2(24, 24)
 
 [node name="Name" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/ItemButton/ContentMargin/HBoxContainer" index="1"]
-custom_minimum_size = Vector2(120, 26)
+custom_minimum_size = Vector2(90, 26)
 theme_override_colors/default_color = Color(0.800491, 0.800491, 0.800491, 1)
 theme_override_fonts/normal_font = ExtResource("17_n6bnq")
 theme_override_font_sizes/normal_font_size = 13
 
 [node name="Durability" parent="PanelViewer/ViewerVBox/UnitPanel/UnitMargin/UnitHBox/InfoPanel/InfoMagin/InfoVBox/OffenseBox/ItemButton/ContentMargin/HBoxContainer" index="2"]
-visible = false
+theme_override_font_sizes/normal_font_size = 14
 
 [node name="DanmakuPanel" type="AspectRatioContainer" parent="PanelViewer/ViewerVBox" node_paths=PackedStringArray("portrait")]
 layout_mode = 2

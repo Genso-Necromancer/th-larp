@@ -285,6 +285,7 @@ var unit_exp:int = 0
 #feature sorting arrays
 var base_skills:Array[Skill] = []
 var bonus_skills:Array[Skill]= []
+var memorized_skills:Array = []
 var base_passives:Array[Passive] = []
 var bonus_passives:Array[Passive] = []
 
@@ -429,6 +430,9 @@ var isSelected := false:
 var isWalking := false
 var isShoved := false
 var isTossed := false
+var _toss_pending := false
+var _toss_path_finished := false
+var _toss_animation_finished := false
 var hp_changed := 0
 var comp_changed := 0
 var cDir := ""
@@ -453,16 +457,8 @@ var shoveDirections := [
 	"shoved_right",
 	"shoved_left"
 ]
-var tossDirections := [
-	"tossed_from_left",
-	"tossed_from_right",
-	"tossed_from_right",
-	"tossed_from_left"
-]
-
 var walkDirectionsSize := float(walkDirections.size())
 var shoveDirectionsSize := float(shoveDirections.size())
-var tossDirectionsSize := float(tossDirections.size())
 var lastAnim := "idle"
 
 #test
@@ -554,6 +550,9 @@ func _update_features():
 			personal_passives.append(personal_leveled_passives[level])
 		
 	passives = passives + personal_passives + bonus_passives
+	for memorized_skill in get_active_memorized_skills():
+		if not skills.has(memorized_skill):
+			skills.append(memorized_skill)
 	check_passives()
 
 
@@ -725,6 +724,7 @@ func data_to_dict()->Dictionary:
 	var naturalConvert :Dictionary = {}
 	if natural: naturalConvert = natural.convert_to_save_data()
 	var bonusSkills := RC.resources_to_save_data(bonus_skills)
+	var memorizedSkills := _memorized_skills_to_save_data()
 	var personalSkills := RC.resources_to_save_data(personal_skills)
 	var bonusPassives := RC.resources_to_save_data(bonus_passives)
 	var personalPassives := RC.resources_to_save_data(personal_passives)
@@ -754,6 +754,7 @@ func data_to_dict()->Dictionary:
 		"base_skills" = base_skills,
 		"personal_skills" = personalSkills,
 		"bonus_skills" = bonusSkills,
+		"memorized_skills" = memorizedSkills,
 		"passives" = passives,
 		"base_passives" = base_passives,
 		"personal_passives" = personalPassives,
@@ -937,6 +938,10 @@ func pre_load(unit_data:Dictionary) -> bool:
 	#base_skills = unit_data.base_skills
 	_load_features(unit_data.personal_skills, personal_skills)
 	_load_features(unit_data.bonus_skills, bonus_skills)
+	if unit_data.has("memorized_skills"):
+		_load_memorized_skills(unit_data.memorized_skills)
+	else:
+		memorized_skills.clear()
 	#passives = unit_data
 	#base_passives = unit_data.base_passives
 	_load_features(unit_data.personal_passives, personal_passives)
@@ -989,6 +994,40 @@ func _load_natural(natural_data:Dictionary):
 func _load_features(features:Dictionary, destination:Array):
 	var RC:= ResourceConverter.new()
 	destination.assign(RC.features_to_resource(features))
+
+
+func _memorized_skills_to_save_data() -> Dictionary:
+	var converted: Dictionary = {}
+	for slot in range(memorized_skills.size()):
+		var skill = memorized_skills[slot]
+		var path := ""
+		if skill is Skill:
+			path = skill.resource_path
+		converted[str(slot)] = {"path": path}
+	return converted
+
+
+func _load_memorized_skills(saved_skills:Dictionary) -> void:
+	memorized_skills.clear()
+	if saved_skills == null:
+		return
+	var slot := 0
+	var size := saved_skills.size()
+	while slot < size:
+		var entry = saved_skills.get(str(slot), null) if saved_skills is Dictionary else saved_skills[slot]
+		var path := ""
+		if entry is Dictionary:
+			path = String(entry.get("path", entry.get("Properties", "")))
+		else:
+			path = String(entry)
+		if path != "" and ResourceLoader.exists(path):
+			var skill := load(path) as Skill
+			memorized_skills.append(skill)
+		else:
+			if path != "":
+				push_warning("Unit %s has an invalid memorized skill path: %s" % [unit_id, path])
+			memorized_skills.append(null)
+		slot += 1
 #endregion
 
 func initialize_cell(new_cell:Vector2i = Vector2i.ZERO):
@@ -1016,30 +1055,21 @@ func _process_motion(delta):
 		motion = "walk"
 		speed = moveSpeed
 	elif isTossed:
-		directions = tossDirections
-		directionsSize = tossDirectionsSize
 		motion = "toss"
 		speed = tossSpeed
 	
 	if isShoved or isWalking or isTossed:
-		var current_move_vec 
-		var norm_move_vec 
-		var direction_id 
-		
 		lastGlbPosition = _sprite.global_position
 
 		_pathFollow.progress += speed * delta
-		current_move_vec = _sprite.global_position - lastGlbPosition
-		lastGlbPosition = _sprite.global_position
-		
-		norm_move_vec = current_move_vec.normalized()
-		direction_id = int(directionsSize * (norm_move_vec.rotated(PI / directionsSize).angle() + PI) / TAU)
-	
-	
-		_anim_player.play(str(directions[direction_id]))
+		if motion != "toss":
+			var current_move_vec = _sprite.global_position - lastGlbPosition
+			var norm_move_vec = current_move_vec.normalized()
+			var direction_id = int(directionsSize * (norm_move_vec.rotated(PI / directionsSize).angle() + PI) / TAU)
+			_anim_player.play(str(directions[direction_id]))
 		
 		
-	if _pathFollow != null and _pathFollow.progress_ratio >= 1.0:
+	if _pathFollow != null and (isShoved or isWalking or isTossed) and _pathFollow.progress_ratio >= 1.0:
 		#print("SHOULDN'T SEE BELOW 1.0 ",_pathFollow.progress_ratio)
 		# Setting this value to 0.0 causes a Zero Length Interval error
 		_pathFollow.progress = 0.00001
@@ -1056,11 +1086,14 @@ func _process_motion(delta):
 			"shove": 
 				isShoved = false
 				revert_animation()
-				emit_signal("effect_complete")
 			"toss": 
 				isTossed = false
-				emit_signal("effect_complete")
+				_toss_path_finished = true
 		emit_signal("unit_relocated", originCell, cell, self)
+		if motion == "shove":
+			emit_signal("effect_complete")
+		elif motion == "toss":
+			_finish_toss_if_ready()
 		
 
 
@@ -1091,9 +1124,9 @@ func walk_along(path: PackedVector2Array, track_remaining:bool=false) -> void:
 #	print("unit position: ", position)
 
 
-func shove_unit(location):
+func shove_unit(location: Vector2i, travel_path: Array = [], collision_cell = null):
 	var oldCell = cell
-	var path = [cell, location]
+	var path = travel_path if not travel_path.is_empty() else [cell, location]
 	
 	lastAnim = _anim_player.current_animation
 	
@@ -1106,30 +1139,54 @@ func shove_unit(location):
 	originCell = map.local_to_map(position)
 	curve.add_point(Vector2.ZERO)
 	for point in path:
+		if point == oldCell:
+			continue
 		curve.add_point(map.map_to_local(point) - position)
-	cell = path[-1]
+	if collision_cell is Vector2i:
+		curve.add_point(map.map_to_local(collision_cell) - position)
+		curve.add_point(map.map_to_local(location) - position)
+	cell = location
 	isShoved = true
-	emit_signal("unit_relocated", oldCell, cell, self)
+	if oldCell != cell:
+		emit_signal("unit_relocated", oldCell, cell, self)
 	
 	#position = map.map_to_local(cell)
 	#
 	#cell = map.local_to_map(position)
 	#position = map.map_to_local(cell)
 	
-func toss_unit(location):
+func toss_unit(location: Vector2i, collision_cell = null):
 	var oldCell = cell
 	var path = [cell, location]
 	#localMiddle.x = ((localCell.x + localLocation.x) / 2)
 	#localMiddle.y = ((localCell.y + localLocation.y) / 2) - 100
 	lastAnim = _anim_player.current_animation
+	_toss_pending = true
+	_toss_path_finished = false
+	_toss_animation_finished = false
+	pathPaused = false
 	originCell = map.local_to_map(position)
 	curve.add_point(Vector2.ZERO)
-	curve.add_point(map.map_to_local(cell) - position)
 	#curve.add_point(localMiddle - position)
+	if collision_cell is Vector2i:
+		curve.add_point(map.map_to_local(collision_cell) - position)
 	curve.add_point(map.map_to_local(location) - position)
 	cell = path[-1]
 	isTossed = true
-	emit_signal("unit_relocated", oldCell, cell, self)
+	var first_destination: Vector2i = collision_cell if collision_cell is Vector2i else location
+	var toss_direction: Vector2 = map.map_to_local(first_destination) - map.map_to_local(oldCell)
+	_anim_player.play("tossed_from_left" if toss_direction.x >= 0 else "tossed_from_right")
+	if oldCell != cell:
+		emit_signal("unit_relocated", oldCell, cell, self)
+
+
+func _finish_toss_if_ready() -> void:
+	if not _toss_pending or not _toss_path_finished or not _toss_animation_finished:
+		return
+	_toss_pending = false
+	pathPaused = false
+	revert_animation()
+	emit_signal("effect_complete")
 
 
 func relocate_unit(location:Vector2i, gridUpdate := true):
@@ -1349,6 +1406,90 @@ func has_passive(passive_type:Enums.PASSIVE_TYPE)->bool:
 		if p == null:continue
 		if p.type == passive_type: return true
 	return false
+
+
+func has_spell_memorization() -> bool:
+	return has_passive(Enums.PASSIVE_TYPE.SPELL_MEMORIZATION)
+
+
+func get_spell_memorization_slots() -> int:
+	if not has_spell_memorization():
+		return 0
+	return maxi(1, int(floor(float(unit_level) / 10.0)) + 1)
+
+
+func get_memorized_skill_slots() -> Array:
+	var slot_count := get_spell_memorization_slots()
+	_ensure_memorized_skill_slot_count(slot_count)
+	return memorized_skills.slice(0, slot_count)
+
+
+func get_active_memorized_skills() -> Array[Skill]:
+	var active: Array[Skill] = []
+	var slot_count := get_spell_memorization_slots()
+	for i in range(mini(slot_count, memorized_skills.size())):
+		var skill = memorized_skills[i]
+		if skill is Skill and not active.has(skill):
+			active.append(skill)
+	return active
+
+
+func get_memorizable_spell_options() -> Array[Skill]:
+	var options: Array[Skill] = []
+	var seen := {}
+	for item in inventory:
+		if not _is_spell_memory_source(item):
+			continue
+		for effect in item.effects:
+			if effect == null:
+				continue
+			if effect.type != Enums.EFFECT_TYPE.ADD_SKILL:
+				continue
+			var skill := effect.skill
+			if skill == null or not bool(skill.magical):
+				continue
+			var key := _get_skill_identity_key(skill)
+			if seen.has(key):
+				continue
+			seen[key] = true
+			options.append(skill)
+	return options
+
+
+func set_memorized_skill(slot_index: int, skill: Skill) -> void:
+	if slot_index < 0:
+		return
+	_ensure_memorized_skill_slot_count(slot_index + 1)
+	memorized_skills[slot_index] = skill
+	_update_features()
+
+
+func clear_memorized_skill(slot_index: int) -> void:
+	if slot_index < 0 or slot_index >= memorized_skills.size():
+		return
+	memorized_skills[slot_index] = null
+	_update_features()
+
+
+func _ensure_memorized_skill_slot_count(slot_count: int) -> void:
+	while memorized_skills.size() < slot_count:
+		memorized_skills.append(null)
+
+
+func _is_spell_memory_source(item) -> bool:
+	if item == null:
+		return false
+	if item is not Item:
+		return false
+	return item.category == Enums.WEAPON_CATEGORY.BOOK
+
+
+func _get_skill_identity_key(skill: Skill) -> String:
+	if skill == null:
+		return ""
+	if skill.resource_path != "":
+		return skill.resource_path
+	return skill.id
 
 func can_pick()->bool:
 	for p in passives:
@@ -2279,6 +2420,9 @@ func find_nested(array, value):
 
 func _on_animation_player_animation_finished(animName):
 	match animName:
+		"tossed_from_left", "tossed_from_right":
+			_toss_animation_finished = true
+			_finish_toss_if_ready()
 		"pick":
 			revert_animation()
 			animation_complete.emit(self)
@@ -2414,6 +2558,14 @@ func get_stat_breakdown(stat: String) -> Dictionary:
 	return result
 
 func get_combat_breakdown(key: String)->Dictionary:
+	if key == "Hit":
+		var natural_hit: int = int(base_combat.get("HitBase", 0))
+		var total_hit: int = int(combat_data.get("Hit", 0))
+		return {
+			"base": natural_hit,
+			"bonus": total_hit - natural_hit,
+			"final": total_hit
+		}
 	return {
 		"base": base_combat.get(key),
 		"bonus": combat_bonus_breakdown.get(key),

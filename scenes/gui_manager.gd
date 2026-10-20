@@ -67,6 +67,7 @@ var turn_tracker_res = preload("res://scenes/turn_tracker.tscn")
 var mapSetUp : MapGui
 var rosterGrid : UnitRoster
 var tradeScreen : TradeScreen
+var spellMemorizationPanel: SpellMemorizationPanel
 var unitProf : UnitProfile
 var actMenu : ActionMenu
 var foreCast : CombatForecast
@@ -173,7 +174,11 @@ func regress_menu():
 		sStates.TRDSEEK: _open_unit_options(activeBtn)
 		sStates.TRADING: tradeScreen.regress_trade()
 		sStates.SUPPLY: tradeScreen.regress_trade()
-		sStates.MANAGE: tradeScreen.regress_trade()
+		sStates.MANAGE:
+			if spellMemorizationPanel != null and spellMemorizationPanel.visible:
+				spellMemorizationPanel._on_close_pressed()
+			else:
+				tradeScreen.regress_trade()
 
 
 func _font_color_change(b, style):
@@ -321,6 +326,8 @@ func reset_for_soft_reset() -> void:
 		rosterGrid.visible = false
 	if tradeScreen:
 		tradeScreen.visible = false
+	if spellMemorizationPanel:
+		spellMemorizationPanel.visible = false
 	if unitProf:
 		unitProf.visible = false
 	if actMenu:
@@ -337,6 +344,7 @@ func _load_assets():
 	mapSetUp = load("res://scenes/GUI/MapSetup.tscn").instantiate()
 	rosterGrid = load("res://scenes/GUI/unit_roster.tscn").instantiate()
 	tradeScreen = load("res://scenes/trade_screen.tscn").instantiate()
+	spellMemorizationPanel = load("res://scenes/GUI/spell_memorization_panel.tscn").instantiate()
 	unitProf = load("res://scenes/profile.tscn").instantiate()
 	actMenu = load("res://scenes/GUI/action_menu.tscn").instantiate()
 	foreCast = load("res://scenes/GUI/hud/forecast/combat_forecast.tscn").instantiate()
@@ -354,6 +362,7 @@ func _load_assets():
 	add_child(actMenu)
 	add_child(rosterGrid)
 	add_child(tradeScreen)
+	add_child(spellMemorizationPanel)
 	add_child(unitProf)
 	add_child(menuCursor)
 	hud_clock.add_to_group("hud")
@@ -364,6 +373,10 @@ func _connect_asset_signals():
 	var expContainer : XpContainer = $ExpGain
 	unitProf.tooltips_on.connect(self._on_profile_tooltips_on)
 	unitProf.tooltips_off.connect(self._on_profile_tooltips_off)
+	if not spellMemorizationPanel.closed.is_connected(_on_spell_memorization_closed):
+		spellMemorizationPanel.closed.connect(_on_spell_memorization_closed)
+	if not spellMemorizationPanel.focus_buttons_changed.is_connected(_on_spell_memorization_focus_buttons_changed):
+		spellMemorizationPanel.focus_buttons_changed.connect(_on_spell_memorization_focus_buttons_changed)
 	_connect_action_menu_signals()
 	actMenu.action_menu_suspending_game.connect(self._on_action_suspending)
 	if not expContainer.exp_finished.is_connected(_on_exp_gain_exp_finished):
@@ -502,6 +515,7 @@ func _open_unit_menu():
 
 func _assign_cursor_to_roster():
 	var btns : Array = []
+	menuCursor.set_placement(MenuCursor.PLACEMENT.TOP, Vector2(0, 12))
 	for bar in rosterGrid.unit_bars:
 		btns.append(bar.button)
 		_connect_unit_btn(bar)
@@ -566,6 +580,7 @@ func _resignal_menuCursor(p, strip = true, oldP = menuCursor.menu_parent):
 	var btns = p.get_children()
 	#var focus
 	
+	menuCursor.set_placement(MenuCursor.PLACEMENT.LEFT, Vector2(40, 0))
 	if strip and oldP != null:
 		_strip_menuCursor(oldP)
 	menuCursor.visible = true
@@ -588,6 +603,8 @@ func _resignal_menuCursor_array(btns:Array, mode:= 0):
 	var i = 0
 	var focus
 	if btns.is_empty(): return
+	if mode != 1:
+		menuCursor.set_placement(MenuCursor.PLACEMENT.LEFT, Vector2(40, 0))
 	menuCursor.visible = true
 	for b in btns:
 		_connect_btn_to_cursor(b)
@@ -666,7 +683,7 @@ func _on_gameboard_formation_closed():
 func _open_unit_options(b):
 	sState = sStates.UNITOP
 	_set_active_btn(b)
-	var cursorParent = rosterGrid.open_unit_manager()
+	var cursorParent = rosterGrid.open_unit_manager(activeBtn.get_unit())
 	_resignal_menuCursor(cursorParent)
 	
 
@@ -739,6 +756,25 @@ func _on_manage_pressed():
 	_close_unit_options()
 	rosterGrid.close_menu()
 	tradeScreen.open_manage_menu(unit)
+
+
+func _on_memorize_pressed():
+	var unit = activeBtn.get_unit()
+	sState = sStates.MANAGE
+	_close_unit_options()
+	rosterGrid.close_menu()
+	spellMemorizationPanel.open_for_unit(unit)
+
+
+func _on_spell_memorization_closed() -> void:
+	if activeBtn == null:
+		return
+	rosterGrid.toggle_visible()
+	_open_unit_options(activeBtn)
+
+
+func _on_spell_memorization_focus_buttons_changed(buttons: Array) -> void:
+	_resignal_menuCursor_array(buttons)
 
 
 func _on_action_item_pressed(unit:Unit):

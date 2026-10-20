@@ -299,6 +299,7 @@ var global_effects := {}
 var effect_queue:= []
 var sequencing_units := {}
 var bar_queue:= []
+var collision_bar_units: Array[Unit] = []
 #Camera
 var cam_con:CameraController
 #AI
@@ -1003,11 +1004,6 @@ func _on_item_used(item:Item):
 		Enums.SKILL_TARGET.SELF: _self_use_item(item)
 		Enums.SKILL_TARGET.MAP: _map_use_item(item)
 		_: _target_use_item(item)
-
-
-func _on_item_equipped(item:Item,is_equipping:bool):
-	if is_equipping: activeUnit.set_equipped(item)
-	else: activeUnit.unequip(item)
 
 
 func _on_unit_item_targeting(item, unit):

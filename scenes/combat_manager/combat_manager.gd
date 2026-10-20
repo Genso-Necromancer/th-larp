@@ -101,8 +101,6 @@ func start_relocation(actor: Unit, target: Unit, effect: Effect) -> void:
 	if applier == null:
 		return
 	applier.apply_relocation(actor, target, effect)
-	if gameBoard and gameBoard.has_signal("continue_queue"):
-		gameBoard.continue_queue.emit()
 
 
 func _with_charge_context(attacker: UnitSim, action: Dictionary) -> Dictionary:

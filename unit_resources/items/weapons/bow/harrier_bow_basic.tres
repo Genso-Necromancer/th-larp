@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="WeaponResource" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=3 format=3 uid="uid://6wr6ou25vxhv"]
 
 [ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_hrbfx"]
 [ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="2_hrbw"]
@@ -7,6 +7,7 @@
 resource_name = "harrier_bow_basic"
 script = ExtResource("2_hrbw")
 dmg = 6
+charge_value = 0
 hit = 65
 crit = 0
 crit_min = 10
@@ -15,6 +16,8 @@ barrier = 0
 barrier_chance = 0
 min_reach = 2
 max_reach = 3
+close_min_reach = 0
+close_max_reach = 0
 far_min_reach = 4
 far_max_reach = 4
 damage_type = 1

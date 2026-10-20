@@ -243,6 +243,9 @@ func _apply_event(results: CombatResults, event: Dictionary, unit_map: Dictionar
 				return
 			var actor: Unit = _get_unit(unit_map, actor_id)
 			var target: Unit = _get_unit(unit_map, target_id)
+			if effect.sub_type in [Enums.SUB_TYPE.SHOVE, Enums.SUB_TYPE.TOSS] and actor != null and target != null and gameBoard != null:
+				gameBoard.add_effect_queue({"Actor": actor, "Target": target, "Type": Enums.EFFECT_TYPE.RELOC, "EffectId": effect})
+				return
 			var destination = event.get("destination", null)
 			_apply_relocation(actor, target, effect, destination)
 
@@ -297,21 +300,41 @@ func _apply_relocation(actor: Unit, target: Unit, effect: Effect, destination = 
 func _apply_shove(actor: Unit, target: Unit, effect: Effect) -> void:
 	var distance := maxi(1, int(effect.value))
 	var hex := AHexGrid2D.new(gameBoard.current_map)
-	var result: Dictionary = hex.resolve_shove(actor.cell, target.cell, hex.get_BFS_nhbr(target.cell, true), distance)
-	var destination :Vector2i= result.get("Hex", target.cell)
-	if destination == target.cell:
+	var result: Dictionary = hex.resolve_shove(actor.cell, target.cell, distance)
+	var destination: Vector2i = result.get("Hex", target.cell)
+	var blocker: Unit = result.get("UniColl") as Unit
+	var collided := bool(result.get("WallColl", false))
+	if blocker != null or collided:
+		_apply_relocation_collision(actor, target, blocker)
+	if destination == target.cell and blocker == null and not collided:
 		return
-	target.shove_unit(destination)
+	target.shove_unit(destination, result.get("Path", []), result.get("CollisionHex") if blocker != null or collided else null)
 
 
 func _apply_toss(actor: Unit, target: Unit, effect: Effect) -> void:
 	var distance := maxi(1, int(effect.value))
 	var hex := AHexGrid2D.new(gameBoard.current_map)
-	var result: Dictionary = hex.resolve_shove(target.cell, actor.cell, hex.get_BFS_nhbr(actor.cell, true), distance)
-	var destination :Vector2i= result.get("Hex", target.cell)
-	if destination == target.cell:
+	var result: Dictionary = hex.resolve_toss(target.cell, actor.cell, distance)
+	var blocker: Unit = result.get("UniColl") as Unit
+	var collided := bool(result.get("WallColl", false))
+	if blocker != null or collided:
+		_apply_relocation_collision(actor, target, blocker)
+		target.toss_unit(target.cell, result.get("CollisionHex"))
+		return
+	var destination: Vector2i = result.get("Hex", target.cell)
+	if destination == target.cell or bool(result.get("Slam", false)):
 		return
 	target.toss_unit(destination)
+
+
+func _apply_relocation_collision(actor: Unit, target: Unit, blocker: Unit) -> void:
+	var impacted: Array[Unit] = [target]
+	if blocker != null:
+		impacted.append(blocker)
+	for unit in impacted:
+		unit.apply_dmg(Global.slamage, actor)
+		if not gameBoard.collision_bar_units.has(unit):
+			gameBoard.collision_bar_units.append(unit)
 
 
 func _apply_warp(actor: Unit, target: Unit, effect: Effect, destination = null) -> void:

@@ -24,12 +24,12 @@ shader_parameter/target_light = Color(1, 0.541176, 0.415686, 1)
 shader_parameter/palette_strength = 1.0
 shader_parameter/grayscale_amount = 0.0
 
-[node name="AraseanailFoidspite" instance=ExtResource("1_wb0c2")]
-unit_id = "araseanail"
+[node name="AraseasnailFoidspite" instance=ExtResource("1_wb0c2")]
+unit_id = "araseasnail"
 isBoss = true
 archetype = 4
 ai_role = 1
-simulate_leveling = false
+unique_art = true
 unit_level = 3
 SPEC_ID = 8
 ROLE_ID = 1

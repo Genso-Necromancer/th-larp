@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://b2uys3ijcwes2"]
 
-[ext_resource type="Theme" uid="uid://vjf2mwcfssah" path="res://fonts/Izayoi_Theme_Trading.tres" id="1_2shno"]
+[ext_resource type="Theme" uid="uid://bgmsp1teiq68f" path="res://fonts/Izayoi_Theme_Action.tres" id="1_3gcu6"]
 [ext_resource type="Script" uid="uid://evhdm24enr2w" path="res://scenes/GUI/unit_manager.gd" id="2_33cgi"]
 [ext_resource type="Texture2D" uid="uid://bhofondcn84ew" path="res://sprites/UIPanel.png" id="2_eh42n"]
 
@@ -11,7 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("1_2shno")
+theme = ExtResource("1_3gcu6")
 script = ExtResource("2_33cgi")
 
 [node name="Blocker" type="Panel" parent="."]
@@ -52,3 +52,7 @@ text = "Supply"
 [node name="Manage" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 text = "Manage"
+
+[node name="Memorize" type="Button" parent="PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Memorize Spell"

@@ -427,54 +427,42 @@ func _get_passby_cost(unit:Unit, moveType) -> float:
 	return cost
 
 
-func find_path(start: Vector2i, end: Vector2i, unit = false,) -> Array[Vector2i]: 
+func find_path(start: Vector2i, end: Vector2i, unit = false) -> Array[Vector2i]:
+	clear_lists()
+	if unit is Unit:
+		_set_units()
+		_sort_solids()
+		_sort_hostiles(unit)
+		_sort_walls(unit)
 	open_list.clear()
 	closed_list.clear()
-	var start_node = start #/ tileSize
-	var endNode = end #/ tileSize
-	var initial_f_cost = 0.0
-	var initial_g_cost = 0.0
-	var initial_h_cost = 0.0
-	var parent = null
-	
-	add_to_open_list(start_node, initial_f_cost, initial_g_cost, initial_h_cost, parent)
-	while open_list.size() > 0:
-		var currentNode = get_lowest_f_cost_node()
-
-		
-			
-		open_list.erase(currentNode)
-		closed_list.append(currentNode.node)
-		if currentNode.node == endNode:
-#			print("PathTest: ", reconstruct_path(currentNode))
-			return reconstruct_path(currentNode)
-
-		var neighbors = get_neighbor_nodes(currentNode, unit)
-		for neighbor in neighbors:
-			if neighbor in closed_list:
+	var costs := {}
+	costs[start] = 0.0
+	var parents := {}
+	open_list.append({"node": start, "cost": estimate_cost(start, end)})
+	while not open_list.is_empty():
+		var best_index := 0
+		for i in range(1, open_list.size()):
+			if open_list[i].cost < open_list[best_index].cost:
+				best_index = i
+		var current: Vector2i = open_list.pop_at(best_index).node
+		if closed_list.has(current):
+			continue
+		if current == end:
+			var path: Array[Vector2i] = [end]
+			while path[0] != start:
+				path.push_front(parents[path[0]])
+			return path
+		closed_list.append(current)
+		for neighbor in get_BFS_nhbr(current, false, unit):
+			var next_cost: float = costs[current] + compute_cost(current, neighbor, unit)
+			if next_cost >= costs.get(neighbor, INF):
 				continue
-#		for neighbor in get_neighbor_nodes(currentNode.node):
-#			if closed_list.find(neighbor) != -1:
-#				continue
-				
-				
-			var g_cost = currentNode.g_cost + compute_cost(currentNode.node, neighbor.node, unit)
-			var h_cost = compute_cost(neighbor.node, endNode, unit)
-			var f_cost = g_cost + h_cost
-			
-			
-			var neighbor_node = neighbor
-			
-			if neighbor_node not in open_list or f_cost < neighbor_node.f_cost:
-				neighbor_node.g_cost = g_cost
-				neighbor_node.h_cost = h_cost
-				neighbor_node.f_cost = f_cost
-				neighbor_node.parent = currentNode
-						
-				if neighbor_node not in open_list:
-					open_list.append(neighbor_node)
-	
-	return [] # Path not found
+			costs[neighbor] = next_cost
+			parents[neighbor] = current
+			closed_list.erase(neighbor)
+			open_list.append({"node": neighbor, "cost": next_cost + estimate_cost(neighbor, end)})
+	return []
 #endregion
 
 ##Utility functions
@@ -842,45 +830,57 @@ func estimate_cost(a, b) -> float:
 	return distance
 
 
-func resolve_shove(matchHex, targetHex, neighbors, distance): #for Shove, give target's neighbores and matchHex = actor's hex. for Toss, give actor's neighbors and matchHex = target's hex.
-	#if <3 +3 if >= 3 -3
-	var i = 0
-	var shoveTo
-	var isSlam = false
-	var travel = 0
-	var shoveStopper
-	
-	if !distance:
-		distance = 0
-	
-	for hex in neighbors:
-		if hex == matchHex and i < 3:
-			i += 3
-			shoveTo = neighbors[i]
+func _blocks_relocation(from_cell: Vector2i, to_cell: Vector2i, allow_fly_wall: bool) -> bool:
+	if not has_directional_wall_between(from_cell, to_cell):
+		return false
+	if not allow_fly_wall:
+		return true
+	var wall_types := _get_directional_wall_types_between(from_cell, to_cell)
+	if wall_types.is_empty():
+		return true
+	for wall_type in wall_types:
+		if wall_type != WALL_TYPE_FLY_PASS:
+			return true
+	return false
+
+
+func resolve_toss(target_hex: Vector2i, actor_hex: Vector2i, distance: int) -> Dictionary:
+	if _blocks_relocation(target_hex, actor_hex, true):
+		return {
+			"Hex": target_hex, "Slam": true, "Travel": 0, "UniColl": null,
+			"CollisionHex": actor_hex, "WallColl": true, "Path": [target_hex]
+		}
+	return resolve_shove(target_hex, actor_hex, distance, true)
+
+
+func resolve_shove(matchHex: Vector2i, targetHex: Vector2i, distance: int, allow_fly_wall: bool = false) -> Dictionary:
+	var path: Array[Vector2i] = [targetHex]
+	var result := {"Hex": targetHex, "Slam": false, "Travel": 0, "UniColl": null, "CollisionHex": null, "WallColl": false, "Path": path}
+	var match_axial := oddq_to_axial(matchHex)
+	var target_axial := oddq_to_axial(targetHex)
+	if axial_distance(match_axial, target_axial) != 1:
+		return result
+	var direction := target_axial - match_axial
+	var active_units: Dictionary = tileMap.get_active_units()
+	var current := target_axial
+	for step in range(maxi(0, distance)):
+		var current_cell := axial_to_oddq(current)
+		var next_cell := axial_to_oddq(current + direction)
+		if _blocks_relocation(current_cell, next_cell, allow_fly_wall):
+			result["Slam"] = true
+			result["CollisionHex"] = next_cell
+			result["WallColl"] = true
 			break
-		elif hex == matchHex and i >= 3:
-			i -= 3
-			shoveTo = neighbors[i]
+		if not mapCells.has(next_cell) or active_units.has(next_cell):
+			result["Slam"] = true
+			result["CollisionHex"] = next_cell
+			result["UniColl"] = active_units.get(next_cell)
 			break
-		i += 1
-	if _slam_check(shoveTo):
-		isSlam = true
-		shoveStopper = shoveTo
-		shoveTo = targetHex
-	distance -= 1
-	while distance > 0 and !isSlam:
-		neighbors = get_BFS_nhbr(shoveTo, true)
-		if _slam_check(neighbors[i]):
-			isSlam = true
-			shoveStopper = neighbors[i]
-		else:
-			shoveTo = neighbors[i]
-			travel += 1
-		distance -= 1
-	var unitCollide = is_units_check(shoveStopper)
-		
-	var shoveResult = {"Hex": shoveTo, "Slam": isSlam, "Travel": travel, "UniColl": unitCollide}
-	return shoveResult
+		path.append(next_cell)
+		result["Hex"] = next_cell
+		result["Travel"] = step + 1
+		current += direction
+	return result
 	
 #func resolve_toss(actorHex, targetHex, neighbors): #Delete if shove actually works for shove and toss
 #	var tossTo

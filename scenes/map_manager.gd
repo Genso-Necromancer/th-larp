@@ -89,7 +89,6 @@ func _connect_signals()-> void:
 	SignalTower.chest_opened.connect(self._on_chest_opened)
 	SignalTower.chest_stolen.connect(self._on_chest_stolen)
 	SignalTower.item_used.connect(gameBoard._on_item_used)
-	SignalTower.item_equipped.connect(gameBoard._on_item_equipped)
 	#SignalTower.item_used.connect(guiManager._on_item_used)
 	gameBoard.map_loaded.connect(self._on_map_loaded)
 	gameBoard.gameboard_targeting_canceled.connect(guiManager._on_gameboard_targeting_canceled)

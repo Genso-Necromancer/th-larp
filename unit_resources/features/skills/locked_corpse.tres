@@ -7,6 +7,7 @@
 [resource]
 script = ExtResource("2_w7nhw")
 augment = false
+magical = false
 target = 3
 can_miss = true
 can_crit = false
@@ -21,6 +22,8 @@ bonus_max_range = 3
 hit = 100
 dmg = 0
 crit = 0
+crit_min = 0
+crit_max = 0
 dmg_type = 0
 effects = Array[ExtResource("1_dbi7k")]([ExtResource("2_jnooo")])
 feature_id = "locked_corpse"

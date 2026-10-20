@@ -1,7 +1,38 @@
-[gd_scene load_steps=3 format=3 uid="uid://b34x3byaqmmdq"]
+[gd_scene load_steps=12 format=3 uid="uid://b34x3byaqmmdq"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_6v0ax"]
+[ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="2_drlv1"]
 [ext_resource type="Texture2D" uid="uid://cgjo8gjm150ig" path="res://sprites/character/human/archer_sprite.png" id="2_p3avv"]
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="3_7yi7n"]
+[ext_resource type="Resource" uid="uid://6wr6ou25vxhv" path="res://unit_resources/items/weapons/bow/harrier_bow_basic.tres" id="4_vacw0"]
+[ext_resource type="Script" uid="uid://cdxxa8c20rded" path="res://unit_resources/items/accessories/quiver/quiver.gd" id="5_v2ok5"]
+[ext_resource type="Resource" uid="uid://dso6lwe5h70fv" path="res://unit_resources/items/accessories/quiver/quiver_barbed.tres" id="6_guu08"]
+[ext_resource type="Shader" uid="uid://depy5bu6535do" path="res://scenes/units/unit_palette_shift.gdshader" id="7_7ln6o"]
+
+[sub_resource type="Resource" id="Resource_ybt3u"]
+script = ExtResource("3_7yi7n")
+stats = ExtResource("4_vacw0")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[sub_resource type="Resource" id="Resource_ii647"]
+script = ExtResource("5_v2ok5")
+stats = ExtResource("6_guu08")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://cdxxa8c20rded"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_616ro"]
+resource_local_to_scene = true
+shader = ExtResource("7_7ln6o")
+shader_parameter/target_dark = Color(0.54902, 0.12549, 0.12549, 1)
+shader_parameter/target_mid = Color(0.878431, 0.219608, 0.219608, 1)
+shader_parameter/target_light = Color(1, 0.541176, 0.415686, 1)
+shader_parameter/palette_strength = 1.0
+shader_parameter/grayscale_amount = 0.0
 
 [node name="HumanArcherLv1" instance=ExtResource("1_6v0ax")]
 archetype = 1
@@ -54,11 +85,12 @@ weapon_prof = {
 "Ofuda": false,
 "Stick": false
 }
-max_inv = 6
+inventory = Array[ExtResource("2_drlv1")]([SubResource("Resource_ybt3u"), SubResource("Resource_ii647")])
 status = {
 "Acted": false,
 "Sleep": false
 }
 
 [node name="Sprite" parent="PathFollow2D" index="0"]
+material = SubResource("ShaderMaterial_616ro")
 texture = ExtResource("2_p3avv")

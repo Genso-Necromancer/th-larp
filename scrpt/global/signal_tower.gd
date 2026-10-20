@@ -21,7 +21,6 @@ signal chest_opened(cell:Vector2i, contents:Array[Item], currency:int, unit:Unit
 signal chest_stolen(cell:Vector2i, contents:Array[Item], currency:int, unit:Unit)
 signal door_unlocked(cell:Vector2i)
 signal item_used(item:Item)
-signal item_equipped(item:Item,is_equipping:bool)
 
 ##Map Event Signals
 signal seize_event(cell:Vector2i)

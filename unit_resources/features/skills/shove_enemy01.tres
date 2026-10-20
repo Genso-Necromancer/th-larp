@@ -7,12 +7,13 @@
 [resource]
 script = ExtResource("3_1any1")
 augment = false
+magical = false
 target = 3
 can_miss = true
 can_crit = false
 can_dmg = false
-min_reach = 0
-max_reach = 0
+min_reach = 1
+max_reach = 1
 cost = 4
 weapon_category = 1
 sub_group = 0
@@ -21,6 +22,8 @@ bonus_max_range = 0
 hit = 95
 dmg = 0
 crit = 0
+crit_min = 0
+crit_max = 0
 dmg_type = 0
 effects = Array[ExtResource("1_q43g0")]([ExtResource("2_8bppx")])
 feature_id = "shove_enemy01"

@@ -358,8 +358,8 @@ tracks/5/path = NodePath(".")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0.4, 0.9, 1.5, 2.4),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
+"times": PackedFloat32Array(0.4, 0.9, 1.5),
+"transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
 "args": [],
 "method": &"toggle_path_pause"
@@ -369,9 +369,6 @@ tracks/5/keys = {
 }, {
 "args": [],
 "method": &"update_life_bar"
-}, {
-"args": [],
-"method": &"revert_animation"
 }]
 }
 
@@ -446,8 +443,8 @@ tracks/5/path = NodePath(".")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0.6, 0.9, 1.9, 2.4),
-"transitions": PackedFloat32Array(1, 1, 1, 1),
+"times": PackedFloat32Array(0.6, 0.9, 1.9),
+"transitions": PackedFloat32Array(1, 1, 1),
 "values": [{
 "args": [],
 "method": &"toggle_path_pause"
@@ -457,9 +454,6 @@ tracks/5/keys = {
 }, {
 "args": [],
 "method": &"update_life_bar"
-}, {
-"args": [],
-"method": &"revert_animation"
 }]
 }
 

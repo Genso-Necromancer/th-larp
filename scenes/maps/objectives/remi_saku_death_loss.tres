@@ -7,4 +7,5 @@ script = ExtResource("1_k475s")
 completion_type = 1
 hit_list_unit_ids = Array[String](["remilia", "sakuya"])
 condition_type = 0
+display_text = ""
 metadata/_custom_type_script = "uid://c7tvc3aqd1v3r"

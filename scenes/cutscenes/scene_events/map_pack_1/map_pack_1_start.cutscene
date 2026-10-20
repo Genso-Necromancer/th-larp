@@ -55,7 +55,7 @@ with
 	enter remilia left 0.75
 	enter patchouli right 0.25
 	focus remilia
-	remilia: Opening line.
+	remilia: Good news everyone!
 end
 
 with

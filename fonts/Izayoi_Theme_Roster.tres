@@ -44,6 +44,7 @@ Button/styles/hover = SubResource("StyleBoxEmpty_kl6js")
 Button/styles/normal = SubResource("StyleBoxEmpty_hsiuf")
 Button/styles/pressed = SubResource("StyleBoxEmpty_rfvx0")
 Fonts/fonts/normal = ExtResource("2_htj5f")
+Label/colors/font_color = Color(0.117647, 0.129412, 0.160784, 1)
 MarginContainer/constants/margin_bottom = 4
 MarginContainer/constants/margin_left = 4
 MarginContainer/constants/margin_right = 4

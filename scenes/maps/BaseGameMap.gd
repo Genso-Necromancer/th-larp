@@ -94,11 +94,23 @@ var victoryKills : Array = []
 var wasSeized : Array[Vector2i] = []
 ##Objective tracking
 var completed_conditions:Dictionary[String,Array] = {"Loss":[],"Victory":[]}
+var map_start_blocked := false
+var map_validation_errors: Array[String] = []
+var _map_validation_refresh_queued := false
 
 
 func _ready():
 	_ensure_unit_containers()
 	_ensure_ai_manager()
+	map_validation_errors = validate_positive_map_space()
+	if Engine.is_editor_hint():
+		_connect_editor_tile_validation()
+	if not map_validation_errors.is_empty():
+		map_start_blocked = true
+		_report_map_validation_errors()
+		update_configuration_warnings()
+		if not Engine.is_editor_hint():
+			return
 	if not Engine.is_editor_hint():
 		_load_danmaku_scripts()
 		dev.visible = false
@@ -315,11 +327,93 @@ func _load_interactive_states(data:Dictionary):
 		elif kid is BreakableWall and d.is_destroyed: swap_tile_to(kid.cell, "broken")
 #endregion
 
+#region map validation
+func _connect_editor_tile_validation() -> void:
+	for layer in get_children():
+		if layer is TileMapLayer and not layer.changed.is_connected(_queue_map_validation_refresh):
+			layer.changed.connect(_queue_map_validation_refresh)
+
+
+func _queue_map_validation_refresh() -> void:
+	if _map_validation_refresh_queued:
+		return
+	_map_validation_refresh_queued = true
+	call_deferred("_refresh_editor_map_validation")
+
+
+func _refresh_editor_map_validation() -> void:
+	_map_validation_refresh_queued = false
+	map_validation_errors = validate_positive_map_space()
+	map_start_blocked = not map_validation_errors.is_empty()
+	update_configuration_warnings()
+
+
+func validate_positive_map_space() -> Array[String]:
+	var errors: Array[String] = []
+	_validate_tile_layer_positive_space(errors, "Ground", ground)
+	_validate_tile_layer_positive_space(errors, "Wall", wall)
+	_validate_tile_layer_positive_space(errors, "Modifier", modifier)
+	_validate_tile_layer_positive_space(errors, "Object", object)
+	_validate_tile_layer_positive_space(errors, "Deployments", deploy)
+	_validate_tile_layer_positive_space(errors, "Narrative", narrative)
+	_validate_tile_layer_positive_space(errors, "Context", context)
+	_validate_tile_layer_positive_space(errors, "Dev", dev)
+	for seize_layer in seizeLayers:
+		_validate_tile_layer_positive_space(errors, "SeizeLayer:%s" % [seize_layer.name], seize_layer)
+	for objective in get_runtime_objectives():
+		if objective is Seize:
+			var layer := get_node_or_null(objective.seize_tile_layer)
+			_validate_tile_layer_positive_space(errors, "Objective:%s" % [objective.resource_name], layer)
+	for unit in get_map_units():
+		_validate_cell_positive_space(errors, "Unit:%s" % [unit.name], unit.cell)
+	for child in get_children():
+		if child is InteractableTile:
+			_validate_cell_positive_space(errors, "Interactable:%s" % [child.name], child.cell)
+		elif child is Danmaku:
+			_validate_cell_positive_space(errors, "Danmaku:%s" % [child.name], child.cell)
+	return errors
+
+
+func _validate_tile_layer_positive_space(errors: Array[String], label: String, layer) -> void:
+	if layer == null or not layer.has_method("get_used_cells"):
+		return
+	for cell: Vector2i in layer.get_used_cells():
+		_validate_cell_positive_space(errors, label, cell)
+
+
+func _validate_cell_positive_space(errors: Array[String], label: String, cell: Vector2i) -> void:
+	if cell.x < 0 or cell.y < 0:
+		errors.append("%s has negative cell %s" % [label, cell])
+
+
+func _format_negative_space_warnings(errors: Array[String]) -> Array[String]:
+	if errors.is_empty():
+		return []
+	var warnings: Array[String] = [
+		"Map uses negative tile coordinates. Move all map content into positive space before testing."
+	]
+	for error in errors:
+		warnings.append(error)
+	return warnings
+
+
+func _report_map_validation_errors() -> void:
+	var warnings := _format_negative_space_warnings(map_validation_errors)
+	for warning in warnings:
+		push_error("[Map Validation] %s" % [warning])
+#endregion
+
 
 #region warnings
 func _get_configuration_warnings():
-	if win_conditions.is_empty(): return ["Winning objective missing. Add one to Win Conditions."]
-	else: return []
+	var warnings := []
+	if win_conditions.is_empty():
+		warnings.append("Winning objective missing. Add one to Win Conditions.")
+	if Engine.is_editor_hint() or not is_inside_tree():
+		warnings.append_array(_format_negative_space_warnings(validate_positive_map_space()))
+	elif not map_validation_errors.is_empty():
+		warnings.append_array(_format_negative_space_warnings(map_validation_errors))
+	return warnings
 #endregion
 
 #region property list functions

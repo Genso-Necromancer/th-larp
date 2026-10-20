@@ -74,7 +74,7 @@ func get_passive(passive:Passive) -> String:
 		Enums.PASSIVE_TYPE.STAT_CHANGE: pass
 		Enums.PASSIVE_TYPE.RESPONSE: pass
 		Enums.PASSIVE_TYPE.FATED: pass
-		Enums.PASSIVE_TYPE.SUB_WEAPON:  converted.sub_type = StringGetter.get_string("lore_" + Enums.WEAPON_CATEGORY.keys()[passive.sub_type].to_snake_case())
+		Enums.PASSIVE_TYPE.SUB_WEAPON:  converted.sub_type = StringGetter.get_string("lore_" + Enums.WEAPON_SUB.keys()[passive.sub_weapon].to_snake_case())
 	
 	converted.rule_type = StringGetter.get_string("lore_" + Enums.RULE_TYPE.keys()[passive.rule_type].to_snake_case())
 	
@@ -87,6 +87,8 @@ func get_passive(passive:Passive) -> String:
 		converted.sub_rule = StringGetter.get_string("lore_" + enumKeys[passive.sub_rule].to_snake_case())
 	converted.rule_type = converted.rule_type.format(converted)
 	finished = working.format(converted)
+	if passive.rule_type != Enums.RULE_TYPE.NONE and "{rule_type}" not in working:
+		finished += "\n" + converted.rule_type
 	
 	return finished
 
@@ -179,23 +181,30 @@ func get_lore(unit:Unit, key:String) -> String:
 			if unit.unique_art: 
 				title= StringGetter.get_string("lore_title_" + unit.unit_id.to_snake_case())
 				titleString = "%s - %s" % [uName, title]
-				stringPath = str(stringPath,unit.unit_id)
+				stringPath = "lore_" + unit.unit_id.to_snake_case()
+				string = titleString + "\n" + StringGetter.get_string(stringPath)
 			else:
 				var spec :String= Enums.SPEC_ID.keys()[unit.SPEC_ID].to_snake_case()
 				var role :String= Enums.ROLE_ID.keys()[unit.ROLE_ID].to_snake_case()
 				titleString = uName
-				stringPath = stringPath + "_" + spec + "_" + role
-			string = titleString + "\n" + StringGetter.get_string(stringPath)
+				stringPath = "lore_" + spec + "_" + role
+				var unit_lore := StringGetter.get_string(stringPath)
+				if unit_lore == stringPath:
+					unit_lore = "%s\n%s" % [
+						StringGetter.get_string("lore_species_" + spec),
+						StringGetter.get_string("lore_role_" + role),
+					]
+				string = titleString + "\n" + unit_lore
 		"Role":
 			var role :String= Enums.ROLE_ID.keys()[unit.ROLE_ID].to_snake_case()
-			stringPath = str(stringPath,key,"_",role).to_snake_case()
+			stringPath = "lore_role_" + role
 			string = StringGetter.get_string(stringPath)
 		"Species": 
 			var spec :String= Enums.SPEC_ID.keys()[unit.SPEC_ID].to_snake_case()
-			stringPath = str(stringPath,key,"_",spec).to_snake_case()
+			stringPath = "lore_species_" + spec
 			string = StringGetter.get_string(stringPath)
 		"Level", "EXP": 
-			stringPath = str(stringPath,key).to_snake_case()
+			stringPath = "lore_" + key.to_snake_case()
 			string = StringGetter.get_string(stringPath)
 			
 	finished = string
@@ -372,11 +381,11 @@ func _get_effect_string_without_duration(effect: Effect) -> String:
 	if effect.value and effect.value != 0:
 		var value = effect.value
 		var path := "value_template"
-		if typeof(value) == Variant.Type.TYPE_FLOAT:
+		if _effect_value_should_display_as_percent(effect):
 			value = round(float(value) * 100.0)
 			path = "percent_value_template"
 		else:
-			value = int(value)
+			value = roundi(float(value))
 		if _effect_tray_value_should_be_negative(effect):
 			value = -abs(value)
 		text = StringGetter.get_template(path) % [text, value]
@@ -387,6 +396,17 @@ func _effect_tray_value_should_be_negative(effect: Effect) -> bool:
 	match int(effect.type):
 		Enums.EFFECT_TYPE.DEBUFF, Enums.EFFECT_TYPE.DOT, Enums.EFFECT_TYPE.DAMAGE, Enums.EFFECT_TYPE.COMP_DMG:
 			return true
+	return false
+
+
+func _effect_value_should_display_as_percent(effect: Effect) -> bool:
+	if effect == null:
+		return false
+	match int(effect.type):
+		Enums.EFFECT_TYPE.TIME, Enums.EFFECT_TYPE.LIFE_STEAL:
+			return true
+		Enums.EFFECT_TYPE.HEAL, Enums.EFFECT_TYPE.DAMAGE, Enums.EFFECT_TYPE.DOT, Enums.EFFECT_TYPE.HOT:
+			return typeof(effect.value) == TYPE_FLOAT and abs(float(effect.value)) < 1.0
 	return false
 
 

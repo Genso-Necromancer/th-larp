@@ -390,7 +390,7 @@ func _collect_effect_modifiers(effects: Array) -> Dictionary:
 		var sub_type = int(effect_data.get("sub_type", -1))
 		if sub_type < 0 or sub_type >= sub_keys.size():
 			continue
-		var stat_name = sub_keys[sub_type].to_pascal_case()
+		var stat_name = "BarPrc" if sub_type == Enums.SUB_TYPE.BARPRC else sub_keys[sub_type].to_pascal_case()
 		mods[stat_name] = mods.get(stat_name, 0) + int(value)
 	return mods
 
@@ -481,6 +481,10 @@ func recompute_derived_state() -> void:
 	combat["Graze"] = (int(derived_stats.get("Cele", 0)) * 2) + int(derived_stats.get("Cha", 0)) + int(terrain_mods.get("GrzBonus", 0))
 	combat["BarPrc"] = (int(derived_stats.get("Eleg", 0)) / 2) + (int(derived_stats.get("Def", 0)) / 2) + int(wep.get("barrier_chance", 0)) + int(terrain_mods.get("DefBonus", 0))
 	combat["Crit"] = int(combat["CritBase"]) + int(wep.get("crit", 0))
+	for pool in [buff_mods, aura_mods, item_mods]:
+		for key in pool.keys():
+			if combat.has(key):
+				combat[key] += int(pool[key])
 
 	if has_status("Sleep"):
 		combat["Graze"] = 0

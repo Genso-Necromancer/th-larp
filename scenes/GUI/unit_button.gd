@@ -1,11 +1,23 @@
 extends Control
 class_name UnitButton
 
+const GRAYSCALE_SHADER := preload("res://scenes/units/unit_palette_shift.gdshader")
+const GRAYSCALE_ON := 1.0
+const GRAYSCALE_OFF := 0.0
 
 @onready var button = $MarginContainer/TextureButton
+@onready var grayscale_nodes: Array[CanvasItem] = [
+	$GreenTemplate/PortraitMargin/UnitPortrait,
+	$RedWings,
+	$BackgroundCenter,
+]
 var buttonState : StringName
 
 
+func _ready() -> void:
+	_init_grayscale_materials()
+	if buttonState != &"":
+		_font_state_change(buttonState)
 
 
 
@@ -22,18 +34,21 @@ func temp_font_change(state : StringName = ""):
 func _font_state_change(state):
 	var fColor : Color
 	var bgColor : Color
-	var labels = [$MarginContainer/HBoxContainer3/HBoxContainer/Name]
+	var labels = [%Name]
 	var backGround := $BackgroundWhite
 	match state:
 		"Deployed": 
 			bgColor = Color(1.0, 1.0, 1.0)
 			fColor = Color(1,1,1)
+			_set_deployment_grayscale(false)
 		"Undeployed": 
 			bgColor = Color(1.0, 1.0, 1.0)
-			fColor = Color(0.194, 0.194, 0.194)
+			fColor = Color(1,1,1)
+			_set_deployment_grayscale(true)
 		"Forced": 
 			bgColor = Color(1.0, 1.0, 1.0)
 			fColor = Color(0, 0.62, 0)
+			_set_deployment_grayscale(false)
 		"Selected": bgColor = Color(1.0, 0.0, 0.0)
 			
 	if fColor:
@@ -44,6 +59,28 @@ func _font_state_change(state):
 			l.add_theme_color_override("font_focus_color", fColor)
 			l.add_theme_color_override("font_hover_pressed_color", fColor)
 	backGround.set_self_modulate(bgColor)
+
+
+func _init_grayscale_materials() -> void:
+	for node in grayscale_nodes:
+		if node == null:
+			continue
+		var shader_material := ShaderMaterial.new()
+		shader_material.shader = GRAYSCALE_SHADER
+		shader_material.set_shader_parameter("palette_strength", 0.0)
+		shader_material.set_shader_parameter("grayscale_amount", GRAYSCALE_OFF)
+		node.material = shader_material
+
+
+func _set_deployment_grayscale(is_grayscale: bool) -> void:
+	if not is_node_ready():
+		return
+	var amount := GRAYSCALE_ON if is_grayscale else GRAYSCALE_OFF
+	for node in grayscale_nodes:
+		if node == null or node.material == null:
+			continue
+		if node.material is ShaderMaterial:
+			node.material.set_shader_parameter("grayscale_amount", amount)
 
 
 func _change_font_color(label, style : String = "") -> void:
@@ -82,11 +119,11 @@ func get_unit() -> Unit:
 
 func refresh_data():
 	var unitLink :Unit= get_unit()
-	var n := $MarginContainer/HBoxContainer3/HBoxContainer/Name
-	var l := $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2/Lv
-	var r := $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer2/Role
-	var c := $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer/CompCurrent
-	var cap := $MarginContainer/HBoxContainer3/HBoxContainer/HBoxContainer/CompCap
+	var n := %Name
+	var l := %Lv
+	var r := %Role
+	var c := %CompCurrent
+	var cap := %CompCap
 	var texture := $GreenTemplate/PortraitMargin/UnitPortrait
 	var unitName :String= unitLink.unit_name
 	var spec :String= Enums.SPEC_ID.keys()[unitLink.SPEC_ID]
