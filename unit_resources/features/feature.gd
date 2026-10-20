@@ -2,13 +2,16 @@
 extends SlotWrapper
 class_name Feature
 
-@export var feature_id : String: ##this overwrites parent var 'id'. just call that for consistency
+## Stable skill/passive ID used for saves, names, and icons. Also sets the inherited ID.
+@export var feature_id : String:
 	set(value):
 		feature_id = value
 		id = value
 @export_category("Rules")
+## Time of day or species required by Rule Type; ignored when Rule Type is NONE.
 var sub_rule
-@export var rule_type : Enums.RULE_TYPE: ##Determins requirements for equipping. Specifically Species and Role
+## Optional condition for this feature. TIME checks time of day; SELF_SPEC checks the owner; TARGET_SPEC checks the target.
+@export var rule_type : Enums.RULE_TYPE:
 	set(value):
 		rule_type = value
 		if value == Enums.RULE_TYPE.NONE: sub_rule = 0

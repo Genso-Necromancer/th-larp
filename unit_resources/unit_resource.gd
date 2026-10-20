@@ -3,12 +3,15 @@ extends Resource
 class_name UnitResource
 
 
+## Stable resource ID used by saves and text lookups. Keep it unique and consistent with the resource filename.
 @export var id: String = ""
 
 
 @export_category("Rules")
+## Time of day or species required by Rule Type; ignored when Rule Type is NONE.
 var sub_rule
-@export var rule_type : Enums.RULE_TYPE = Enums.RULE_TYPE.NONE: ##Determins requirements for equipping. Specifically Species and Role
+## Optional activation/equipment condition. TIME uses Sub Rule; SELF_SPEC checks the owner, TARGET_SPEC checks the target.
+@export var rule_type : Enums.RULE_TYPE = Enums.RULE_TYPE.NONE:
 	set(value):
 		if value == Enums.EFFECT_TYPE.NONE: sub_rule = 0
 		rule_type = value

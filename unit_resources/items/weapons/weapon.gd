@@ -2,6 +2,7 @@
 extends Item
 class_name Weapon
 
+## Shared weapon definition. Use NaturalResource for a natural weapon; durability belongs to this inventory copy.
 @export var stats : WeaponResource:
 	set(value):
 		stats = value

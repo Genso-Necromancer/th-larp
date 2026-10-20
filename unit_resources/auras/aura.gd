@@ -1,10 +1,15 @@
 extends UnitResource
 class_name Aura
 
+## Aura radius in hexes. One reaches adjacent cells.
 @export var range : int
+## Includes the owner's cell in the aura area.
 @export var is_self := false
+## Which teams can trigger/receive the aura, relative to its owner.
 @export var target_team : Enums.TARGET_TEAM = Enums.TARGET_TEAM.NONE
+## Who receives aura effects: the owner or units inside its area, according to the selected mode.
 @export var target : Enums.EFFECT_TARGET = Enums.EFFECT_TARGET.NONE
+## Effects supplied while the aura applies. Stacking effects can accumulate from multiple qualifying units.
 @export var effects : Array[Effect] = []
 
 

@@ -2,18 +2,30 @@
 extends Feature
 class_name Passive
 
+## Passive mechanic to enable. Only fields used by that mechanic have an effect.
 @export var type : Enums.PASSIVE_TYPE = Enums.PASSIVE_TYPE.NONE
-@export var proc: int = 100 ## 0-100 lower to make passive random, not valid with all passives.
+## Base proc chance for passive types that roll. Usually 0-100; some types add their own modifiers or ignore this field.
+@export var proc: int = 100
+## Stat or secondary mechanic used by the selected passive type.
 @export var sub_type : Enums.SUB_TYPE = Enums.SUB_TYPE.NONE
+## Weapon subtype granted by a SUB_WEAPON passive. Natural weapons also use String Value.
 @export var sub_weapon: Enums.WEAPON_SUB
+## Name/icon ID used during the day when Is Time Sens is enabled.
 @export var day_id : String
+## Name/icon ID used at night when Is Time Sens is enabled.
 @export var night_id :String
+## Amount used by the selected passive type; not a universal percentage.
 @export var value : int = 0
+## Type-specific lookup key. SUB_WEAPON uses this to identify its natural weapon/scaling rule.
 @export var string_value : StringName
 @export_category("Auras")
+## Uses day/night aura variants and display IDs instead of the ordinary Aura and feature ID.
 @export var is_time_sens : bool = false
+## Aura used when this passive is not time-sensitive.
 @export var aura : Aura
+## Aura used during the day for a time-sensitive passive. Leave empty for no day aura.
 @export var day : Aura
+## Aura used at night for a time-sensitive passive. Leave empty for no night aura.
 @export var night : Aura
 
 

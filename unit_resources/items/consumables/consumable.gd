@@ -2,6 +2,7 @@
 extends Item
 class_name Consumable
 
+## Shared consumable definition. Use OfudaResource for Ofuda; remaining uses belong to this inventory copy.
 @export var stats: ConsumableResource:
 	set(value):
 		stats = value

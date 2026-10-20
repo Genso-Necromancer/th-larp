@@ -3,8 +3,11 @@ extends Effect
 class_name CompBreak
 
 
+## Flat Hit modifier during this composure-break effect. Use a negative value for a penalty.
 @export var hit_penalty := -10
+## Flat Graze modifier during this composure-break effect. Use a negative value for a penalty.
 @export var graze_penalty := -10
+## Flat Crit modifier during this composure-break effect. Use a negative value for a penalty.
 @export var crit_penalty := -5
 
 

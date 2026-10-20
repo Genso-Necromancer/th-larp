@@ -2,6 +2,7 @@
 extends Item
 class_name Accessory
 
+## Shared accessory definition. QuiverResource and BarrierResource identify their separate equipment slots.
 @export var stats : AccessoryResource:
 	set(value):
 		stats = value

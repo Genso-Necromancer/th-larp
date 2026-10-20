@@ -5,8 +5,11 @@ class_name Item
 signal durability_reduced(item)
 
 @export_group("Item Parameters")
+## Whether this inventory copy is currently equipped.
 @export var equipped := false
+## Drop flag for this inventory copy, rather than every item using the same stats resource.
 @export var dropped := false
+## Whether this inventory copy is broken. Normally set when a non-expendable item reaches zero durability.
 @export var is_broken := false
 var temp_remove : bool = false
 #Property holders

@@ -3,32 +3,53 @@ extends UnitResource
 class_name Effect
 
 
+## Effect mechanic. Determines how Value, Sub Type, and the type-specific fields are interpreted.
 @export var type : Enums.EFFECT_TYPE = Enums.EFFECT_TYPE.NONE:
 	set(value):
 		if value == Enums.EFFECT_TYPE.NONE: sub_type = 0
 		type = value
 		notify_property_list_changed()
+## Stat, status, or relocation mode affected. DAMAGE instead uses a damage type.
 var sub_type
+## Who receives the effect. EQUIPPED is for ongoing equipment benefits, not an attack target.
 @export var target : Enums.EFFECT_TARGET
-@export var instant : bool = false ##only set for effects that should occur before an augment skill is rolled.
-@export var on_hit := false ##require successful accuracy check to activate effect
-@export var proc : int = 0 ##Set to -1 to always proc
+## Resolves before damage; required for Slayer and critical modifiers. Instant stat buffs modify the current combat.
+@export var instant : bool = false
+## Requires a successful attack hit before this effect can apply, even when Proc is -1.
+@export var on_hit := false
+## Base effect chance added to the user's Effect Hit; hostile effects subtract Resistance. -1 always procs, but still obeys On Hit and rules.
+@export var proc : int = 0
+## Number of Duration Type ticks before expiry. TURN and ROUND are distinct; zero is not an unlimited duration.
 @export var duration : int = 0
+## When duration decreases: unit turns or full rounds. PERMANENT applies permanent stat changes.
 @export var duration_type : Enums.DURATION_TYPE
-@export var stack := false ##True: Effect will stack atop existing versions of itself. False: will overwrite existing versions of itself
-var value  ##use 0-2 float for time speed up/slow down. USE NEGATIVE VALUES FOR DEBUFFS, OR YOU BUFF THEM
-@export var permanent := false ##if the effect is added as a permanent change to unit
+## Allows separate stacks of the same effect. If false, reapplication refreshes/replaces its existing entry.
+@export var stack := false
+## Effect amount; use negative values for stat debuffs. LIFE_STEAL accepts integer percent (50 = half). Float Life effects use max-Life fractions; only TIME currently exposes a float editor.
+var value
+## Legacy flag stored in effect data. Use Duration Type = PERMANENT for permanent stat changes.
+@export var permanent := false
 @export_group("Effect Type properties")
-@export var curable := true ##STATUS/DEBUFF/BUFF
-@export var from_item := false ##HEAL. true disallows stat bonus to healing
-@export var hostile := false ##RELOC. determins if relocation is treated as hostile
-@export var skill :Skill ##ADD_SKILL
-@export var passive :Passive ##ADD_PASSIVE
-@export var multi_swing := 0 ## # of extra attacks per swing
-@export var multi_round := 0 ## # of extra rounds of combat, it's death match bro
-@export var crit_dmg :Array[int]=[0,0] ##CRIT_BUFF adjustment to min and max crit damage roll, can be negative for penalty
-@export var crit_mult := false ##CRIT_BUFF Alternative crit damage multiplier, dunno which will be used yet
-@export var crit_rate := 0 ##CRIT_BUFF Bonus crit chance
+## Allows removal by Cure/Purge as appropriate. Disable for effects that those actions must never remove.
+@export var curable := true
+## For flat HEAL/HOT, uses half the caster's Mag bonus instead of full Mag. Percentage healing ignores this.
+@export var from_item := false
+## Makes target-directed effects subtract Resistance from proc chance. Proc -1 bypasses this resistance roll.
+@export var hostile := false
+## Skill granted by ADD_SKILL. For book access while held equipped, set Target to EQUIPPED.
+@export var skill :Skill
+## Passive granted by ADD_PASSIVE.
+@export var passive :Passive
+## Extra attacks per swing for MULTI_SWING; zero adds none.
+@export var multi_swing := 0
+## Extra combat rounds for MULTI_ROUND; zero adds none.
+@export var multi_round := 0
+## CRIT_BUFF: signed additions to minimum and maximum critical bonus damage, in that order.
+@export var crit_dmg :Array[int]=[0,0]
+## Reserved critical-multiplier option; currently not implemented by the combat resolver.
+@export var crit_mult := false
+## CRIT_BUFF: signed critical chance modifier in percentage points.
+@export var crit_rate := 0
 
 func _get_property_list():
 	var properties = []

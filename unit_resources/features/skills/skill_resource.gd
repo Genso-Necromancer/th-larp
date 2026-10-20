@@ -3,36 +3,55 @@ extends Feature
 class_name Skill
 
 
+## Modifies a compatible weapon attack. Hit, Dmg, and Crit become signed bonuses instead of standalone values.
 @export var augment : bool = false
-@export var magical : bool = false: ##Determins if the skill is treated as a spell, like in use with Silence. Does not determine if the skill uses Power or Magic. dmg_type determines this.
+## Marks this skill as a spell for Silence and other magic checks. Damage Type still chooses Pwr or Mag.
+@export var magical : bool = false:
 	set(value):
 		magical = value
 		if not magical:
 			element = Enums.SPELL_ELEMENT.NONE
 		notify_property_list_changed()
+## Element of this magical skill. Hidden and reset to NONE when Magical is disabled.
 var element : Enums.SPELL_ELEMENT = Enums.SPELL_ELEMENT.NONE
+## Which units the skill may target: self, allies, enemies, or another supported target mode.
 @export var target : Enums.SKILL_TARGET = Enums.SKILL_TARGET.NONE
+## Enables the attack's Hit roll. Disabling it does not guarantee attached effect proc rolls.
 @export var can_miss : bool = true
+## Allows this skill's direct damage to critically hit.
 @export var can_crit : bool = true
+## Allows direct attack damage. Disable for effect-only skills; attached effects still resolve.
 @export var can_dmg : bool = true
-@export var min_reach : int = 0 ##if 0, ignored by Augment. Set value to require specific weapon reach. Otherwise is range of regular skill
+## Nearest target distance. For augments, 0 uses compatible weapon reach; nonzero values also constrain eligible weapons.
+@export var min_reach : int = 0
+## Farthest target distance. For augments, 0 uses compatible weapon reach; nonzero values also constrain eligible weapons.
 @export var max_reach : int = 0
-@export var cost : int = 0 ##Composure cost to use
+## Composure cost of using this skill.
+@export var cost : int = 0
 @export_category("Augment Skill Parameters")
+## Weapon family required by an augment. ANY accepts any otherwise compatible weapon.
 @export var weapon_category : Enums.WEAPON_CATEGORY = Enums.WEAPON_CATEGORY.ANY
+## Additional weapon subtype required by an augment. NONE leaves subtype unrestricted.
 @export var sub_group : Enums.WEAPON_SUB = Enums.WEAPON_SUB.NONE
+## Signed adjustment to an augment's minimum target range, after resolving its base reach.
 @export var bonus_min_range : int = 0
+## Signed adjustment to an augment's maximum target range, after resolving its base reach.
 @export var bonus_max_range : int = 0
 @export_category("Skill Parameters")
+## Base Hit for a standalone skill; signed Hit modifier for an augment.
 @export var hit : int = 0
+## Might for a standalone skill; signed weapon-damage modifier for an augment. Zero Might can still deal stat-based damage.
 @export var dmg : int = 0
+## Critical chance in percentage points; added to the weapon's Crit for an augment.
 @export var crit : int = 0
-##this is *added* to existing weapon crit range if used on a weapon skill, otherwise is the literal crit range of a normal skill
+## Minimum extra critical damage. Added to the weapon's minimum for an augment.
 @export_range(0,99,1.0) var crit_min:int= 0
-##this is *added* to existing weapon crit range if used on a weapon skill, otherwise is the literal crit range of a normal skill
+## Maximum extra critical damage. Added to the weapon's maximum for an augment.
 @export_range(0,99,1.0) var crit_max:int= 0
+## Direct damage type: PHYS uses Pwr, MAG uses Mag. Independent of Magical and Element.
 @export var dmg_type : Enums.DAMAGE_TYPE = Enums.DAMAGE_TYPE.NONE
 @export_category("Effects")
+## Effects applied by the skill. Each effect independently controls its target, hit requirement, proc, and duration.
 @export var effects : Array[Effect] = []
 
 func _get_property_list():
