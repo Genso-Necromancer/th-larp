@@ -89,7 +89,7 @@ Notes:
 Potential tasks:
 
 - Define story format: VN-style scenes, map events, narration cards, dialogue-only, or mixed.
-- Audit current cutscene/event tooling.
+- Completed: cutscene authoring format, compiler, standalone testing, template, and companion manual. Map-event integration remains separate.
 - Build one opening scene, one mid-map event, and one victory scene as reference material.
 - Create a story scene checklist: speakers, portraits, camera, music, flags, map transition, skip/debug controls.
 - Draft chapter-level story beats only after the first chapter gameplay target is chosen.

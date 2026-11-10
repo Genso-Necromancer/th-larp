@@ -1,0 +1,85 @@
+[gd_scene load_steps=11 format=3 uid="uid://dkxaku2g8mp8y"]
+
+[ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_hoi3m"]
+[ext_resource type="Shader" uid="uid://depy5bu6535do" path="res://scenes/units/unit_palette_shift.gdshader" id="2_n1xfl"]
+[ext_resource type="Script" uid="uid://c5hmv6tclm43r" path="res://unit_resources/features/passives/passive_resource.gd" id="2_xsjpb"]
+[ext_resource type="Resource" uid="uid://3o0hv3vmn8qo" path="res://unit_resources/features/passives/ambush.tres" id="3_lxo06"]
+[ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="4_snoxd"]
+[ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="5_it12c"]
+[ext_resource type="Resource" uid="uid://2rd8otigdweg" path="res://unit_resources/items/weapons/blade/scissor_blade_basic.tres" id="6_1w7p3"]
+[ext_resource type="Texture2D" uid="uid://bjspcd42wu06f" path="res://sprites/character/kuchisake_onna/blade_sprite.png" id="8_0mrix"]
+
+[sub_resource type="Resource" id="Resource_ixv20"]
+script = ExtResource("5_it12c")
+stats = ExtResource("6_1w7p3")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_i5nqc"]
+resource_local_to_scene = true
+shader = ExtResource("2_n1xfl")
+shader_parameter/target_dark = Color(0.54902, 0.12549, 0.12549, 1)
+shader_parameter/target_mid = Color(0.878431, 0.219608, 0.219608, 1)
+shader_parameter/target_light = Color(1, 0.541176, 0.415686, 1)
+shader_parameter/palette_strength = 1.0
+shader_parameter/grayscale_amount = 0.0
+
+[node name="Kuchisake-onnaBlade" instance=ExtResource("1_hoi3m")]
+archetype = 2
+ai_role = 2
+SPEC_ID = 9
+ROLE_ID = 9
+total_growth = Dictionary[StringName, float]({
+&"Cele": 0.7,
+&"Cha": 0.1,
+&"Comp": 0.3,
+&"Def": 0.2,
+&"Eleg": 0.4,
+&"Life": 0.4,
+&"Mag": -0.1,
+&"Move": 0.0,
+&"Pwr": 0.2
+})
+total_stats = Dictionary[StringName, int]({
+&"Cele": 10,
+&"Cha": 3,
+&"Comp": 100,
+&"Def": 0,
+&"Eleg": 10,
+&"Life": 17,
+&"Mag": 0,
+&"Move": 5,
+&"Pwr": 4
+})
+total_caps = Dictionary[StringName, int]({
+&"Cele": 30,
+&"Cha": 30,
+&"Comp": 130,
+&"Def": 30,
+&"Eleg": 30,
+&"Life": 60,
+&"Mag": 30,
+&"Move": 10,
+&"Pwr": 30
+})
+passives = Array[ExtResource("2_xsjpb")]([ExtResource("3_lxo06")])
+weapon_prof = {
+"Barrier": false,
+"Blade": true,
+"Blunt": false,
+"Book": false,
+"Bow": false,
+"Gohei": false,
+"Gun": false,
+"Knife": false,
+"Natural": false,
+"Ofuda": false,
+"Stick": false
+}
+inventory = Array[ExtResource("4_snoxd")]([SubResource("Resource_ixv20")])
+
+[node name="Sprite" parent="PathFollow2D" index="0"]
+material = SubResource("ShaderMaterial_i5nqc")
+texture = ExtResource("8_0mrix")

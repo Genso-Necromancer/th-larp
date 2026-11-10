@@ -270,6 +270,14 @@ func _source_bool(source, key: String, default_value := false) -> bool:
 	return bool(value)
 
 
+func can_action_crit(special = null, uses_weapon := true) -> bool:
+	if special != null and not _source_bool(special, "can_crit", true):
+		return false
+	var skill_crit = _source_value(special, "crit", 0)
+	var weapon_crit := int(get_equipped_weapon().get("crit", 0)) if uses_weapon else 0
+	return weapon_crit > 0 or (skill_crit != null and int(skill_crit) > 0)
+
+
 func get_skill_combat_stats(special, augmented := false) -> Dictionary:
 	var stats := combat_data.duplicate(true)
 	var dmg_stat := 0
@@ -301,11 +309,10 @@ func get_skill_combat_stats(special, augmented := false) -> Dictionary:
 	else:
 		stats["Hit"] = int(stats.get("HitBase", 0)) + int(_source_value(attack, "hit", 0))
 
-	var skill_crit = _source_value(special, "crit", null)
-	stats["CanCrit"] = _source_bool(special, "can_crit", true)
+	var raw_skill_crit = _source_value(special, "crit", 0)
+	var skill_crit := int(raw_skill_crit) if raw_skill_crit != null else 0
+	stats["CanCrit"] = can_action_crit(special, augmented)
 	if not bool(stats["CanCrit"]):
-		stats["Crit"] = 0
-	elif skill_crit == null:
 		stats["Crit"] = 0
 	elif augmented:
 		stats["Crit"] = int(stats.get("CritBase", 0)) + int(_source_value(attack, "crit", 0)) + int(skill_crit)
@@ -464,9 +471,10 @@ func recompute_derived_state() -> void:
 		"HitBase": (int(derived_stats.get("Eleg", 0)) * 2) + int(derived_stats.get("Cha", 0)),
 		"CritBase": int(derived_stats.get("Eleg", 0)),
 		"Resist": int(derived_stats.get("Cha", 0)) * 2,
-		"EffHit": int(derived_stats.get("Cha", 0)),
+		"EffHit": int(derived_stats.get("Cha", 0)) + (int(derived_stats.get("Eleg", 0)) / 2),
 		"DRes": 0,
 		"CanMiss": true,
+		"CanCrit": int(wep.get("crit", 0)) > 0,
 	}
 
 	match int(combat["Type"]):
@@ -485,6 +493,11 @@ func recompute_derived_state() -> void:
 		for key in pool.keys():
 			if combat.has(key):
 				combat[key] += int(pool[key])
+
+	# Match live stats: equipment Barrier adds, but only the higher chance applies.
+	combat["BarPrc"] -= mini(int(wep.get("barrier_chance", 0)), int(item_mods.get("BarPrc", 0)))
+	if not combat["CanCrit"]:
+		combat["Crit"] = 0
 
 	if has_status("Sleep"):
 		combat["Graze"] = 0

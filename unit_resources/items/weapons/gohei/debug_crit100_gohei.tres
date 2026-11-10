@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=3 format=3 uid="uid://b5442vjitcrsf"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_26un4"]
+[ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="1_weapon"]
+
+[resource]
+resource_name = "debug_crit100_gohei"
+script = ExtResource("1_weapon")
+dmg = 6
+charge_value = 0
+hit = 200
+crit = 100
+crit_min = 10
+crit_max = 20
+barrier = 0
+barrier_chance = 0
+min_reach = 1
+max_reach = 1
+close_min_reach = 0
+close_max_reach = 0
+far_min_reach = 0
+far_max_reach = 0
+damage_type = 1
+personal = false
+level = 1
+use = false
+equippable = true
+breakable = true
+expendable = true
+trade = true
+max_dur = 40
+weight = 4
+category = 8
+sub_group = 0
+effects = Array[ExtResource("1_26un4")]([])
+id = "debug_crit100_gohei"
+rule_type = 0

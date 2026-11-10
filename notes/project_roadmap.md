@@ -40,6 +40,7 @@ Hard blockers:
 
 Related document:
 
+- `ai_design_guide.md` defines the intended AI behavior, fairness principles, and decision checklist for AI development.
 - `development_roadmap.md` covers the balance/mechanics branch in more detail.
 - `feature_backlog.md` holds focused feature groups that should not bloat this milestone roadmap.
 - `systems_sandbox_notes.md` tracks what `feature_workshop.tscn` currently can and cannot test.
@@ -238,8 +239,8 @@ Current read: Soon after sandbox.
 | Character | Status | Missing/Needs Review |
 |---|---|---|
 | Reimu | Usable | Slayer progression, Miko/Gohei/Ofuda role teaching. |
-| Meiling | Usable | Toss finalization, invalid-space behavior, Guard disruption tests. |
-| Patchouli | Partial | Spell Memorization, Magical Counter. |
+| Meiling | Usable | Shove/Toss collision handling completed; unarmed attacks need regression testing. |
+| Patchouli | Partial | Spell Memorization implemented and tested; Magical Counter remains missing. |
 | Sakuya | Usable | Time-tool identity, target-killer transition, Locked Corpse tuning. |
 | Remilia | Usable | Superior Vampire, day/night aura behavior, exclusive weapon identity. |
 
@@ -269,7 +270,7 @@ Current read: Missing/Unknown.
 | Debug validation map suite | Missing | Sandbox can become first suite. |
 | Asset naming conventions | Usable | Needs review before content scales, but existing naming is consistent enough to work from. |
 | String/data conventions | Missing | Centralize IDs and text flow for UI, items, skills, objectives, and story before large content production. |
-| Story scene creation checklist | Missing | Needed before narrative production scales beyond one-off test scenes. |
+| Story scene authoring guidance | Usable | Commented template, quick reference, and detailed authoring manual implemented. |
 
 ### Exit Criteria
 
@@ -291,7 +292,7 @@ Current read: Deferred.
 | Setup/deployment between chapters | Usable | Setup flow exists and should be part of the demo arc. |
 | Persistent roster/inventory/composure/EXP | Usable | Campaign persistence exists enough to test, but needs demo validation. |
 | Core cast established | Partial | Current core cast exists; full demo cast and availability need confirmation. |
-| Story scene before/after map | Usable/Outdated | Event support exists, but old scene flow needs review before production use. |
+| Story scene before/after map | Usable | Cutscene authoring and standalone playback tested; chapter-specific content and transition regression testing remain. |
 | Sub-objectives | Missing | Needed for loot pressure and optional tactical goals. |
 | Day/night planning | Missing | Needs map content that makes time-state planning matter. |
 

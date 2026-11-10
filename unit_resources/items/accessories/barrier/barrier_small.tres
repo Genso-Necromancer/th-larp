@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="BarrierResource" load_steps=5 format=3]
+[gd_resource type="Resource" script_class="BarrierResource" load_steps=5 format=3 uid="uid://drk21dp75bafq"]
 
 [ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_i6gk7"]
 [ext_resource type="Resource" path="res://unit_resources/effects/barrier_item_small_amt.tres" id="2_rfvxd"]
 [ext_resource type="Resource" path="res://unit_resources/effects/barrier_item_small_chance.tres" id="3_y6t6v"]
-[ext_resource type="Script" path="res://unit_resources/items/accessories/barrier/barrier_resource.gd" id="4_1bdbb"]
+[ext_resource type="Script" uid="uid://cqnj8qdmyi7fv" path="res://unit_resources/items/accessories/barrier/barrier_resource.gd" id="4_1bdbb"]
 
 [resource]
 resource_name = "barrier_small"
@@ -22,4 +22,3 @@ sub_group = 3
 effects = Array[ExtResource("1_i6gk7")]([ExtResource("2_rfvxd"), ExtResource("3_y6t6v")])
 id = "barrier_small"
 rule_type = 0
-metadata/_custom_type_script = "res://unit_resources/items/accessories/barrier/barrier_resource.gd"

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://diaw7xn4hvfd7"]
+[gd_scene load_steps=19 format=3 uid="uid://diaw7xn4hvfd7"]
 
 [ext_resource type="PackedScene" uid="uid://x6dmleipd452" path="res://scenes/units/Unit.tscn" id="1_5xt48"]
 [ext_resource type="Script" uid="uid://cc71mceo7glas" path="res://unit_resources/features/skills/skill_resource.gd" id="2_mte8d"]
@@ -10,8 +10,10 @@
 [ext_resource type="Script" uid="uid://bhh4vyyas56kf" path="res://unit_resources/items/item.gd" id="7_xjp6u"]
 [ext_resource type="Script" uid="uid://bas4mbl00uet6" path="res://unit_resources/items/weapons/weapon.gd" id="8_04v6q"]
 [ext_resource type="Resource" uid="uid://ck2mfsbmow1ok" path="res://unit_resources/items/weapons/knife/knife_silver.tres" id="9_srosb"]
+[ext_resource type="Shader" uid="uid://depy5bu6535do" path="res://scenes/units/unit_palette_shift.gdshader" id="12_76ftn"]
 [ext_resource type="Texture2D" uid="uid://dljh0liccgicy" path="res://sprites/character/sakuya/maid_sprite.png" id="12_pg4wh"]
-[ext_resource type="Resource" path="res://unit_resources/items/weapons/blade/blade_basic.tres" id="13_blade"]
+[ext_resource type="Resource" uid="uid://5qomfgdb3ctb" path="res://unit_resources/items/weapons/blade/debug_eleg_no_crit.tres" id="12_xihvp"]
+[ext_resource type="Resource" uid="uid://cflj4p1kamonk" path="res://unit_resources/items/weapons/blade/blade_basic.tres" id="13_blade"]
 
 [sub_resource type="Resource" id="Resource_blade"]
 script = ExtResource("8_04v6q")
@@ -28,6 +30,23 @@ equipped = false
 dropped = false
 is_broken = false
 metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[sub_resource type="Resource" id="Resource_ghyhf"]
+script = ExtResource("8_04v6q")
+stats = ExtResource("12_xihvp")
+equipped = false
+dropped = false
+is_broken = false
+metadata/_custom_type_script = "uid://bas4mbl00uet6"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_xihvp"]
+resource_local_to_scene = true
+shader = ExtResource("12_76ftn")
+shader_parameter/target_dark = Color(0.219608, 0.219608, 0.564706, 1)
+shader_parameter/target_mid = Color(0.156863, 0.627451, 0.972549, 1)
+shader_parameter/target_light = Color(0.0941176, 0.941176, 0.972549, 1)
+shader_parameter/palette_strength = 0.0
+shader_parameter/grayscale_amount = 0.0
 
 [node name="Sakuya" instance=ExtResource("1_5xt48")]
 unit_id = "sakuya"
@@ -110,10 +129,10 @@ weapon_prof = {
 "Ofuda": false,
 "Stick": false
 }
-max_inv = 6
-inventory = Array[ExtResource("7_xjp6u")]([SubResource("Resource_blade"), SubResource("Resource_katwc")])
+inventory = Array[ExtResource("7_xjp6u")]([SubResource("Resource_blade"), SubResource("Resource_katwc"), SubResource("Resource_ghyhf")])
 
 [node name="Sprite" parent="PathFollow2D" index="0"]
+material = SubResource("ShaderMaterial_xihvp")
 texture = ExtResource("12_pg4wh")
 
 [node name="HPbar" parent="PathFollow2D/Sprite" index="2"]

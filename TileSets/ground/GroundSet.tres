@@ -51,6 +51,8 @@ texture_region_size = Vector2i(168, 50)
 0:8/0 = 0
 1:8/0 = 0
 0:0/0 = 0
+0:0/0/custom_data_0 = &"Flat"
+0:0/0/custom_data_1 = &"Dirt"
 
 [resource]
 tile_shape = 3

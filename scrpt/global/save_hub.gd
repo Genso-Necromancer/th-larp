@@ -17,7 +17,14 @@ func _verify_save_dir(dir:String)->void:
 	DirAccess.make_dir_absolute(dir)
 
 
+func can_write_save(file_name: String, save_type: Enums.SAVE_TYPE) -> bool:
+	return file_name.get_file() != suspended_format or save_type == Enums.SAVE_TYPE.SUSPENDED
+
+
 func save_to_file(file_name:String,save_type:Enums.SAVE_TYPE):
+	if not can_write_save(file_name, save_type):
+		push_warning("Regular saves cannot overwrite the suspend slot.")
+		return
 	match save_type:
 		Enums.SAVE_TYPE.TRANSITION,Enums.SAVE_TYPE.SET_UP:_write_to_file(file_name,save_type)
 		Enums.SAVE_TYPE.SUSPENDED:
@@ -27,6 +34,9 @@ func save_to_file(file_name:String,save_type:Enums.SAVE_TYPE):
 
 
 func _write_to_file(file_name:String,save_type:Enums.SAVE_TYPE)->void:
+	if not can_write_save(file_name, save_type):
+		push_warning("Regular saves cannot overwrite the suspend slot.")
+		return
 	var saveNodes := get_tree().get_nodes_in_group("Persist")
 	var storage: Dictionary = {}
 	var global : Dictionary = Global.save()

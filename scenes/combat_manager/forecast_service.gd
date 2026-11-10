@@ -71,7 +71,7 @@ func _add_forecast_action(
 	# Single representative swing preview (UI uses swing_count separately)
 	var swing := cr.add_swing(action_node)
 	swing["hit_chance"] = clamp_chance(int(clash.get("Hit", 0)))
-	swing["crit_chance"] = clamp_chance(int(clash.get("Crit", 0)))
+	swing["crit_chance"] = clamp_chance(int(clash.get("Crit", 0))) if bool(clash.get("CanCrit", false)) else 0
 	swing["dmg"] = preview_dmg if bool(clash.get("CanDmg", true)) else 0
 	swing["reduction"] = reduction
 
@@ -244,7 +244,7 @@ func _evaluate_clash(a: UnitSim, t: UnitSim, action: Dictionary) -> Dictionary:
 	results["reduction"] = max(0, reduction)
 
 	# CanCrit + Crit + crit_range
-	if not bool(aData.get("CanCrit", true)):
+	if not a.can_action_crit(special, is_weapon):
 		results["CanCrit"] = false
 		results["Crit"] = 0
 		results["crit_range"] = [0, 0]

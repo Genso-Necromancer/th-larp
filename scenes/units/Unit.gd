@@ -360,6 +360,7 @@ var moved_hexes:int = 0
 #Stats and derivatives
 var base_stats_final:Dictionary
 var stat_mod_breakdown:Dictionary
+var weight_breakdown: Dictionary = {"weight": 0, "power": 0, "penalty": 0}
 var active_stats :Dictionary={}
 var combat_bonus_breakdown:Dictionary
 #Call for pre-formualted combat stats
@@ -414,6 +415,8 @@ var originCell
 var isSelected := false:
 	set(value): #Buggy, causes idling when hovering unit after selecting and choosing movement
 		isSelected = value
+		if _toss_pending:
+			return
 		if isSelected:
 			_set_sprite_disabled_visual(false)
 			_anim_player.play("selected")
@@ -580,7 +583,8 @@ func _add_features(new_skills:Array, new_passives:Array) -> void:
 			skill = load(skill)
 		else:
 			continue
-		base_skills.append(skill)
+		if not base_skills.has(skill):
+			base_skills.append(skill)
 	base_passives.clear()
 	for passive in new_passives:
 		if passive is Passive:
@@ -589,7 +593,8 @@ func _add_features(new_skills:Array, new_passives:Array) -> void:
 			passive = load(passive)
 		else:
 			continue
-		base_passives.append(passive)
+		if not base_passives.has(passive):
+			base_passives.append(passive)
 	#print("unit features Updated")
 
 
@@ -1226,6 +1231,8 @@ func play_animation(anim):
 
 
 func revert_animation():
+	if _toss_pending:
+		return
 	if _anim_player.current_animation == lastAnim:
 		return
 	#print(lastAnim, " surely I will return to idle")
@@ -2039,13 +2046,15 @@ func _update_natural(passive) -> void:
 	var tier : int = unit_level
 	
 	match scaleType: 
-		"NaturalMartial": 
-			dmgScale = 2 + ceili(unit_level/4)
-			hitScale = 65 + ceili(unit_level)
-			barrierScale = 2 + ceili(unit_level/6)
+		"martial_fist":
+			dmgScale = 1 + floori(unit_level / 4.0)
+			hitScale = 65 + unit_level
+			barrierScale = 2 + floori(unit_level / 6.0)
+		_:
+			return
 	
 	match tier:
-		40: tier = 6
+		tier when tier >= 40: tier = 6
 		tier when tier > 35: tier = 5
 		tier when tier > 25: tier = 4
 		tier when tier > 15: tier = 3
@@ -2176,7 +2185,7 @@ func _turn_complete():
 
 
 func update_sprite() -> void:
-	if !_anim_player: return
+	if !_anim_player or _toss_pending: return
 	if check_status("Sleep") or check_status("Acted"):
 		_set_sprite_disabled_visual(true)
 		_anim_player.play("disabled")
@@ -2189,7 +2198,7 @@ func update_sprite() -> void:
 
 
 func refresh_state_visual() -> void:
-	if !_anim_player:
+	if !_anim_player or _toss_pending:
 		return
 	update_sprite()
 	if !check_status("Sleep") and !check_status("Acted") and !isWalking and !isShoved and !needDeath and !isSelected:
@@ -2218,14 +2227,16 @@ func check_break():
 
 
 func update_life_bar():
+	lifeBar.max_value = maxi(0, int(active_stats.get("Life", 0)))
 	var tween = get_tree().create_tween()
 	if hp_changed < 0:
-		play_animation("Hit")
+		if not _toss_pending:
+			play_animation("Hit")
 		hp_changed = 0
 	elif hp_changed > 0:
 		hp_changed = 0
 	tween.finished.connect(self._life_tween_finished)
-	tween.tween_property($PathFollow2D/Sprite/HPbar, "value", current_life, 0.5)
+	tween.tween_property(lifeBar, "value", current_life, 0.5)
 
 
 func process_bars():
@@ -2233,6 +2244,9 @@ func process_bars():
 
 
 func _life_tween_finished():
+	# The effect queue checks bars and death after the toss presentation completes.
+	if _toss_pending:
+		return
 	if !check_death(): update_composure_bar()
 	#confirm_post_sequence_flags("Bars")
 
@@ -2558,6 +2572,16 @@ func get_stat_breakdown(stat: String) -> Dictionary:
 	return result
 
 func get_combat_breakdown(key: String)->Dictionary:
+	if key == "Barrier" or key == "BarPrc":
+		var natural_barrier := 0
+		if key == "BarPrc":
+			natural_barrier = int(base_stats_final.get("Eleg", 0)) / 2 + int(base_stats_final.get("Def", 0)) / 2
+		var total_barrier := int(combat_data.get(key, 0))
+		return {
+			"base": natural_barrier,
+			"bonus": total_barrier - natural_barrier,
+			"final": total_barrier
+		}
 	if key == "Hit":
 		var natural_hit: int = int(base_combat.get("HitBase", 0))
 		var total_hit: int = int(combat_data.get("Hit", 0))

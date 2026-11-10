@@ -52,6 +52,10 @@ func update_stats():
 	_apply_mod_group(finalCombat, buff_mods)
 	_apply_mod_group(finalCombat, aura_mods)
 	_apply_mod_group(finalCombat, item_mods)
+	# Both equipment sources were added above; remove the lower chance contribution.
+	finalCombat.BarPrc -= mini(int(unit.get_equipped_weapon().barrier_chance), int(item_mods.get("BarPrc", 0)))
+	if not finalCombat.CanCrit:
+		finalCombat.Crit = 0
 	#print("final_stats: %s" % [finalCombat])
 	unit.base_combat = base_combat
 	unit.combat_data = finalCombat
@@ -146,6 +150,8 @@ func _apply_weight_penalty(stats: Dictionary) -> void:
 	var total_weight := _compute_equipped_weight()
 	var pwr := int(stats.get("Pwr", 0))
 	var cele_penalty := clampi(total_weight - pwr, 0, 999)
+	unit.weight_breakdown = {"weight": total_weight, "power": pwr, "penalty": cele_penalty}
+	unit.stat_mod_breakdown["weight"] = {"Cele": -cele_penalty}
 	stats["Cele"] -= cele_penalty
 
 func _compute_equipped_weight() -> int:
@@ -196,9 +202,10 @@ func _compute_combat_stats(stats: Dictionary) -> Dictionary:
 		"HitBase": (stats.Eleg * 2) + stats.Cha,
 		"CritBase": stats.Eleg,
 		"Resist": stats.Cha * 2,
-		"EffHit": stats.Cha,
+		"EffHit": int(stats.Cha) + (int(stats.Eleg) / 2),
 		"DRes": 0,
 		"CanMiss": true,
+		"CanCrit": wep.crit > 0,
 	}
 	
 	match wep.damage_type:
@@ -211,7 +218,7 @@ func _compute_combat_stats(stats: Dictionary) -> Dictionary:
 	c.Hit = c.HitBase + wep.hit + t.HitBonus
 	c.Graze = (stats.Cele * 2) + stats.Cha + t.GrzBonus
 	c.BarPrc = (stats.Eleg/2) + (stats.Def/2) + wep.barrier_chance + t.DefBonus
-	c.Crit = c.CritBase + wep.crit
+	c.Crit = c.CritBase + wep.crit if c.CanCrit else 0
 
 	if unit.status.Sleep:
 		c.Graze = 0

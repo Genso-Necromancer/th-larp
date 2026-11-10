@@ -282,6 +282,8 @@ func _add_action_result(
 
 		var crit_chance := int(clash.get("Crit", 0)) + crit_bonus
 		crit_chance = clamp_chance(crit_chance)
+		if not bool(clash.get("CanCrit", false)):
+			crit_chance = 0
 		swing["crit_chance"] = crit_chance
 
 		if did_hit and bool(clash.get("CanCrit", false)) and policy.decide_crit(crit_chance):
@@ -437,7 +439,7 @@ func _evaluate_clash(actor: UnitSim, target: UnitSim, action: Dictionary) -> Dic
 
 	var can_miss := true
 	var can_dmg := true
-	var can_crit := true
+	var can_crit := actor.can_action_crit(special, is_weapon)
 
 	var actor_hit := int(a_cd.get("Hit", 0)) + int(actor_mods.get("Hit", 0))
 	var target_graze := int(t_cd.get("Graze", 0)) + int(target_mods.get("Graze", 0))
@@ -451,7 +453,6 @@ func _evaluate_clash(actor: UnitSim, target: UnitSim, action: Dictionary) -> Dic
 	if special != null:
 		can_miss = bool(a_cd.get("CanMiss", true))
 		can_dmg = bool(a_cd.get("CanDmg", true))
-		can_crit = bool(a_cd.get("CanCrit", true))
 
 	var dr := int(t_cd.get("DRes", 0))
 	var reduction := 0
@@ -471,6 +472,8 @@ func _evaluate_clash(actor: UnitSim, target: UnitSim, action: Dictionary) -> Dic
 
 	var crit := int(a_cd.get("Crit", 0)) + int(actor_mods.get("Crit", 0)) - (int(t_cd.get("Luck", 0)) + int(target_mods.get("Luck", 0)))
 	crit = clampi(crit, 0, 1000)
+	if not can_crit:
+		crit = 0
 	
 	var crit_range: Array[int] = _get_crit_range(actor, action)
 

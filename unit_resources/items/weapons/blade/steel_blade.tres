@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=3 format=3 uid="uid://k6cf0ag2kldx"]
+
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="1_m2hww"]
+[ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="2_wab6d"]
+
+[resource]
+script = ExtResource("2_wab6d")
+dmg = 0
+charge_value = 0
+hit = 0
+crit = 0
+crit_min = 10
+crit_max = 20
+barrier = 0
+barrier_chance = 0
+min_reach = 1
+max_reach = 1
+close_min_reach = 0
+close_max_reach = 0
+far_min_reach = 0
+far_max_reach = 0
+damage_type = 0
+personal = false
+level = 0
+use = false
+equippable = true
+breakable = true
+expendable = true
+trade = true
+max_dur = 1
+weight = 0
+category = 0
+sub_group = 0
+effects = Array[ExtResource("1_m2hww")]([])
+id = "steel_blade"
+rule_type = 0
+metadata/_custom_type_script = "uid://b7y6ry7pkb23i"

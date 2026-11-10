@@ -177,6 +177,8 @@ func end_targeting(emit_cancel := true) -> void:
 func trade_target_selected() -> void:
 	if board.targeting_input_blocked:
 		return
+	if not _resolve_selected_unit():
+		return
 	if board.focusUnit == null or board.activeUnit == null:
 		return
 	if board.focusUnit == board.activeUnit:
@@ -194,7 +196,7 @@ func feature_target_selected(feature: SlotWrapper) -> void:
 		return
 	if not board.snap_path.has(board.cursor.cell):
 		return
-	if not board.is_occupied(board.cursor.cell):
+	if not _resolve_selected_unit():
 		return
 	if not feature:
 		print("No Valid SkillID")
@@ -241,9 +243,25 @@ func attack_target_selected() -> void:
 		return
 	if not board.snap_path.has(board.cursor.cell):
 		return
-	if board.is_occupied(board.cursor.cell) and not board._check_friendly(board.activeUnit, board.focusUnit):
+	if not _resolve_selected_unit():
+		return
+	if not board._check_friendly(board.activeUnit, board.focusUnit):
 		board.turn_step = GameBoard.TURN_STEPS.FORECAST_ATTACK
 		grab_target(board.cursor.cell)
+
+
+func _resolve_selected_unit() -> bool:
+	if not is_instance_valid(board.activeUnit):
+		return false
+	if not board.snap_path.has(board.cursor.cell):
+		return false
+	var target = board.units.get(board.cursor.cell)
+	if not is_instance_valid(target) or not (target is Unit):
+		return false
+	if not target.is_active or target.current_life <= 0 or target.deployment == Enums.DEPLOYMENT.UNDEPLOYED:
+		return false
+	board.focusUnit = target
+	return true
 
 
 func warp_destination_selected() -> void:

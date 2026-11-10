@@ -162,6 +162,10 @@ func get_skill(data:SlotWrapper) -> String:
 		working += effectString
 	
 	finished = _mash_together(working, converted)
+	if data is Natural and data.is_scaling:
+		if not finished.is_empty():
+			finished += "\n"
+		finished += StringGetter.get_string("lore_natural_scaling")
 	return finished
 
 
@@ -241,13 +245,30 @@ func _generate_stat_tt(unit:Unit, key_stat: String,base:int,bonus:int) -> String
 		print("Bonus: %s String: %s" % [bonus, formula])
 		string = StringGetter.get_string((stringPath+key_stat.to_snake_case()))
 	match key_stat:
+		"Cele":
+			var weight: Dictionary = unit.weight_breakdown
+			fString += "\n" + StringGetter.get_string("stat_equipped_weight") % [weight.weight, weight.power]
+			if int(weight.penalty) > 0:
+				var penalty_text := StringGetter.get_string("stat_weight_penalty") % int(weight.penalty)
+				fString += "\n[color=%s]%s[/color]" % [debuffColor.to_html(true), penalty_text]
 		"Barrier":
 			var barprc: String = StringGetter.get_string(stringPath+"barprc")
 			string = str(string, "\n", barprc)
 			var cbBp:Dictionary=unit.get_combat_breakdown("BarPrc")
 			var bPFormula: String = _generate_formula([cbBp.bonus])
 			fString = fString + str("\n","Barrier Chance: ",cbBp.base,"%% %s") % bPFormula
-		"Dmg": pass
+		"Dmg":
+			var weapon: Weapon = unit.get_equipped_weapon()
+			var innate_damage := 0
+			match weapon.damage_type:
+				Enums.DAMAGE_TYPE.PHYS:
+					innate_damage = unit.get_stat("Pwr")
+				Enums.DAMAGE_TYPE.MAG:
+					innate_damage = unit.get_stat("Mag")
+			var other_damage := int(unit.combat_data.get("Dmg", 0)) - innate_damage - weapon.dmg
+			fString = StringGetter.get_string("stat_damage_breakdown") % [innate_damage, weapon.dmg]
+			if other_damage != 0:
+				fString += " " + _generate_formula([other_damage])
 		"Hit": pass
 		"Graze": pass
 		"Crit": pass

@@ -6,6 +6,7 @@
 [resource]
 script = ExtResource("1_uaspp")
 dmg = 0
+charge_value = 0
 hit = 0
 crit = 0
 crit_min = 10

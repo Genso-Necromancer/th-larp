@@ -60,6 +60,7 @@ func open_weapon_select(unit: Unit, reach: Array = [0, 0]) -> void:
 	inv.clear_items()
 	inv.set_meta("Unit", unit)
 	inv.fill_items(false, reach, true)
+	inv.fill_natural_attack(unit, reach)
 	_connect_forecast_signal(inv.get_item_buttons())
 	_load_cursor()
 	inv.visible = true
@@ -128,7 +129,9 @@ func _update_from_results(data: Dictionary) -> void:
 		return
 
 	# Always show left panel (attacker preview)
-	_fill_side_panel(left_name, left_stats, atk_unit, def_unit, init_action)
+	var attacker_remaining := int(counter_action.get("target_life_after", atk_unit.current_life))
+	var defender_remaining := int(init_action.get("target_life_after", def_unit.current_life))
+	_fill_side_panel(left_name, left_stats, atk_unit, attacker_remaining, init_action)
 
 	# Right panel depends on whether a counter preview exists OR counter_possible flag
 	var show_counter := false
@@ -142,22 +145,23 @@ func _update_from_results(data: Dictionary) -> void:
 		right_stat_box.visible = true
 		right_name_margin.visible = true
 		if counter_action != null:
-			_fill_side_panel(right_name, right_stats, def_unit, atk_unit, counter_action)
+			_fill_side_panel(right_name, right_stats, def_unit, defender_remaining, counter_action)
 		else:
 			# Fallback: show defender name/HP with blanks
-			_fill_empty_side_panel(right_name, right_stats, def_unit)
+			_fill_empty_side_panel(right_name, right_stats, def_unit, defender_remaining)
 	else:
-		right_stat_box.visible = false
-		right_name_margin.visible = false
+		right_stat_box.visible = true
+		right_name_margin.visible = true
+		_fill_empty_side_panel(right_name, right_stats, def_unit, defender_remaining)
 
 	# Effects row
 	_load_effects_from_results(cr, atk_unit, def_unit, init_action, counter_action)
 
-func _fill_side_panel(name_label: RichTextLabel, stat_box: VBoxContainer, actor_unit: Unit, hp_preview_unit: Unit, action: Dictionary) -> void:
+func _fill_side_panel(name_label: RichTextLabel, stat_box: VBoxContainer, actor_unit: Unit, remaining: int, action: Dictionary) -> void:
 	var labels: Array = stat_box.get_children()
 	# stat_box order:
 	# 0 life, 1 hit, 2 dmg, 3 crit, 4 action name
-	if name_label == null or labels.size() < 5 or actor_unit == null or hp_preview_unit == null:
+	if name_label == null or labels.size() < 5 or actor_unit == null:
 		return
 
 	var swing: Dictionary = {}
@@ -169,23 +173,8 @@ func _fill_side_panel(name_label: RichTextLabel, stat_box: VBoxContainer, actor_
 	name_label.set_text(actor_unit.unit_name)
 
 	# HP display (optionally show remaining)
-	var lifeTemplate: String = StringGetter.get_template("combat_hp")
-	var remainTemplate: String = StringGetter.get_template("combat_hp_remain")
-	var lifeText: String = "[center]%s[/center]"
-
-	
-	#var active := unit.active_stats
-	var hp := lifeTemplate % [hp_preview_unit.current_life, hp_preview_unit.active_stats.Life]
 	var swing_count := int(action.get("swing_count", 1))
-	var remaining := int(action.get("target_life_after", hp_preview_unit.current_life))
-
-	if remaining != hp_preview_unit.current_life:
-		lifeText = lifeText % [remainTemplate]
-		lifeText = lifeText % [remaining, hp]
-	else:
-		lifeText = lifeText % [hp]
-
-	labels[0].set_text(lifeText)
+	labels[0].set_text(_format_life_preview(actor_unit, remaining))
 
 	# Hit/Crit/Dmg are already in CombatResults for forecast
 	var hit_text := "--"
@@ -208,16 +197,23 @@ func _fill_side_panel(name_label: RichTextLabel, stat_box: VBoxContainer, actor_
 	labels[4].set_text(_get_action_string_for_unit(actor_unit, action))
 
 
-func _fill_empty_side_panel(name_label: RichTextLabel, stat_box: VBoxContainer, unit: Unit) -> void:
+func _fill_empty_side_panel(name_label: RichTextLabel, stat_box: VBoxContainer, unit: Unit, remaining: int) -> void:
 	var labels: Array = stat_box.get_children()
 	if name_label == null or labels.size() < 5:
 		return
 	name_label.set_text(unit.unit_name)
-	labels[0].set_text("[center]--[/center]")
+	labels[0].set_text(_format_life_preview(unit, remaining))
 	labels[1].set_text("--")
 	labels[2].set_text("--")
 	labels[3].set_text("--")
 	labels[4].set_text("--")
+
+
+func _format_life_preview(unit: Unit, remaining: int) -> String:
+	var hp := StringGetter.get_template("combat_hp") % [unit.current_life, unit.active_stats.Life]
+	if remaining != unit.current_life:
+		hp = StringGetter.get_template("combat_hp_remain") % [remaining, hp]
+	return "[center]%s[/center]" % hp
 
 
 func _get_remaining_life_from_unit(unit: Unit, dmg: int, swings: int = 1) -> int:

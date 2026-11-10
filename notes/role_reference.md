@@ -34,9 +34,9 @@ Role values are the foundation that Species values modify. All current roles hav
 | `Troublemaker` | `FOOT` | 4 | 25 | 100 | 8 | 0 | 6 | 6 | 2 | 1 |
 | `Cointaker` | `RANGER` | 5 | 18 | 100 | 4 | 0 | 7 | 9 | 1 | 7 |
 | `Witch` | `FOOT` | 4 | 18 | 95 | 1 | 9 | 9 | 4 | 1 | 6 |
-| `Outrider` | `MOUNT` | 6 | 23 | 95 | 5 | 0 | 8 | 8 | 2 | 3 |
-| `Blade` | `RANGER` | 5 | 17 | 100 | 4 | 0 | 4 | 6 | 0 | 0 |
-| `Archer` | `FOOT` | 4 | 21 | 100 | 5 | 0 | 9 | 7 | 2 | 5 |
+| `Outrider` | `MOUNT` | 6 | 23 | 95 | 5 | 0 | 6 | 7 | 2 | 3 |
+| `Blade` | `FOOT` | 5 | 17 | 100 | 4 | 0 | 8 | 8 | 0 | 3 |
+| `Archer` | `FOOT` | 4 | 21 | 100 | 5 | 0 | 9 | 5 | 2 | 5 |
 
 ## Growths
 
@@ -67,7 +67,7 @@ Role values are the foundation that Species values modify. All current roles hav
 | `Cointaker` | Blade, Knife | `sabo_cele05` | None |
 | `Witch` | Book | None | None |
 | `Outrider` | Stick | None | None |
-| `Blade` | Blade, Knife | None | `ambush` |
+| `Blade` | Blade | None | `ambush` |
 | `Archer` | Bow | None | None |
 
 ## Feature Paths

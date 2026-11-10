@@ -89,7 +89,9 @@ func _update_inventory(unit) -> Array:
 	inventory.set_meta("Unit", unit)
 	inventory.clear_items()
 	var itemButtons :Array = []
-	for b in inventory.fill_items():
+	inventory.fill_items()
+	inventory.fill_natural_attack(unit)
+	for b in inventory.items:
 		var button = b.get_button()
 		_connect_focus_signals(b)
 		button.add_to_group("ItemTT")

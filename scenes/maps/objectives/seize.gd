@@ -10,10 +10,18 @@ var seize_tracker:Dictionary[Vector2i,bool]={}
 
 func _ready():
 	super()
-	SignalTower.action_seize.connect(self._on_seize)
+	_connect_seize_signal()
+
+
+func _connect_seize_signal() -> void:
+	if not SignalTower.action_seize.is_connected(self._on_seize):
+		SignalTower.action_seize.connect(self._on_seize)
 
 
 func ready_tracker(map_layer:SeizeLayer):
+	_connect_seize_signal()
+	seize_tracker.clear()
+	complete = false
 	if !map_layer: 
 		printerr("[%s]seize_tile_layer does not lead to a SeizeLayer" % ["Seize Objective"])
 		return
@@ -24,9 +32,10 @@ func ready_tracker(map_layer:SeizeLayer):
 
 
 func _on_seize(cell:Vector2i):
-	if seize_tracker.has(cell):
-		seize_tracker[cell] = true
-		emit_changed()
+	if complete or not seize_tracker.has(cell) or seize_tracker[cell]:
+		return
+	seize_tracker[cell] = true
+	emit_changed()
 	_check_complete(seize_tracker,completion_type)
 
 

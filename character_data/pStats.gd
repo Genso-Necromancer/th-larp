@@ -402,6 +402,52 @@ static func get_spec(specInd):
 				}
 
 
+		SPEC_ID.KUCHISAKE_ONNA:
+			return {
+			"Spec": SPEC_ID.KUCHISAKE_ONNA,
+			"StatGroups": {
+				"Stats": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 2,
+					"Cele": 2,
+					"Def": 0,
+					"Cha": 0
+				},
+				"Growths": {
+					"Move": 0,
+					"Life": 0.0,
+					"Comp": 0.0,
+					"Pwr": 0.0,
+					"Mag": 0.0,
+					"Eleg": 0.1,
+					"Cele": 0.1,
+					"Def": 0.0,
+					"Cha": 0.0
+				},
+				"Caps": {
+					"Move": 0,
+					"Life": 0,
+					"Comp": 0,
+					"Pwr": 0,
+					"Mag": 0,
+					"Eleg": 0,
+					"Cele": 0,
+					"Def": 0,
+					"Cha": 0
+				}
+			},
+			"Passives": ["res://unit_resources/features/passives/ambush.tres"],
+			"LeveledPassives": {0:""},
+			"Skills": [],
+			"LeveledSkills": {0:""},
+			"MoveType": MOVE_TYPE.FOOT
+			}
+
+
 static func get_job(jobInd):
 	match jobInd:
 		ROLE_ID.NONE: return {
@@ -927,8 +973,8 @@ static func get_job(jobInd):
 					"Comp": 95,
 					"Pwr": 5,
 					"Mag": 0,
-					"Eleg": 8,
-					"Cele": 8,
+					"Eleg": 7,
+					"Cele": 6,
 					"Def": 2,
 					"Cha": 3
 					},
@@ -984,10 +1030,10 @@ static func get_job(jobInd):
 					"Comp": 100,
 					"Pwr": 4,
 					"Mag": 0,
-					"Eleg": 4,
-					"Cele": 6,
+					"Eleg": 8,
+					"Cele": 8,
 					"Def": 0,
-					"Cha": 0
+					"Cha": 3
 					},
 				"Growths": {
 					"Move": 0,
@@ -1026,11 +1072,11 @@ static func get_job(jobInd):
 				"Ofuda": false,
 				"Bow": false,
 				"Gun": false,
-				"Knife": true,
+				"Knife": false,
 				"Natural": false,
 				"Barrier": false,
 				},
-			"MoveType": MOVE_TYPE.RANGER
+			"MoveType": MOVE_TYPE.FOOT
 				}
 		ROLE_ID.ARCHER: return {
 			"Role": "Archer",
@@ -1042,7 +1088,7 @@ static func get_job(jobInd):
 					"Pwr": 5,
 					"Mag": 0,
 					"Eleg": 9,
-					"Cele": 7,
+					"Cele": 5,
 					"Def": 2,
 					"Cha": 5
 					},
@@ -2110,4 +2156,5 @@ static func get_time_mods():
 						}
 		}
 	}
+	timeMods[Enums.SPEC_ID.KUCHISAKE_ONNA] = {Enums.TIME.DAY: {}, Enums.TIME.NIGHT: {}}
 	return timeMods

@@ -34,6 +34,38 @@ var isHit = false
 
 var grazeFx : FxPlayer
 var popUp : PopText
+var _step_generation := 0
+var _pending_players: Dictionary = {}
+var _step_tweens: Array[Tween] = []
+
+
+func begin_step() -> void:
+	_step_generation += 1
+	_pending_players.clear()
+	_step_tweens.clear()
+
+
+func is_step_complete() -> bool:
+	return _pending_players.is_empty()
+
+
+func _track_player(player: AnimationPlayer) -> void:
+	if _pending_players.has(player):
+		return
+	_pending_players[player] = true
+	player.animation_finished.connect(_visual_finished.bind(player, _step_generation), CONNECT_ONE_SHOT)
+
+
+func _visual_finished(_animation: StringName, player: AnimationPlayer, generation: int) -> void:
+	if generation == _step_generation:
+		_pending_players.erase(player)
+
+
+func _play_visual(visual) -> void:
+	if not is_instance_valid(visual):
+		return
+	_track_player(visual.get_node("AnimationPlayer"))
+	visual.play_action()
 
 func _ready():
 	combatPlayer.play("Entry")
@@ -125,7 +157,6 @@ func _assign_attack_animation():
 func _assign_skill_animation(skill:SlotWrapper):
 	if skill == null:
 		activeAnim = "Cast"
-		combatPlayer.play(activeAnim)
 		return
 	var variant : String = skill.id.to_pascal_case()
 	var default := "Cast"
@@ -137,7 +168,7 @@ func _assign_skill_animation(skill:SlotWrapper):
 	else:
 		activeAnim = default
 		
-	combatPlayer.play(activeAnim)
+	# Playback starts with the action step, not while preparing its data.
 	
 	
 func set_if_death(isDead):
@@ -156,6 +187,13 @@ func reset_defense():
 	combatPlayer.play(activeAnim)
 	
 func reset_variables():
+	var visuals: Array = [weaponFx, skillFx, skillNameFx, grazeFx, popUp]
+	visuals.append_array(effectQue)
+	visuals.append_array(targetFxQue)
+	visuals.append_array(passiveQue)
+	for visual in visuals:
+		if is_instance_valid(visual) and not visual.is_queued_for_deletion():
+			visual.queue_free()
 	weaponFx = null
 	skillFx = null
 	skillNameFx = null
@@ -178,21 +216,23 @@ func flip_animation():
 	isFlipped = true
 
 func play_animation():
+	if activeAnim == "" or activeAnim == "Idle":
+		return
 	emit_signal("animation_start")
+	_track_player(combatPlayer)
+	combatPlayer.stop(true)
 	combatPlayer.play(activeAnim)
 	
 func play_pop_up():
 	if popUp:
-		popUp.play_action()
+		_play_visual(popUp)
 	if grazeFx:
-		grazeFx.play_action()
+		_play_visual(grazeFx)
 	
 func play_target_fx():
 	if targetFxQue.size() > 0:
 		for targetFx in targetFxQue:
-			targetFx.play_action()
-	else:
-		emit_signal("animation_end")
+			_play_visual(targetFx)
 
 
 func add_skill_fx(skill:SlotWrapper):
@@ -313,6 +353,15 @@ func load_effect_result(effect : Dictionary):
 	bone.add_child(effectText)
 
 func stop_all():
+	_step_generation += 1
+	for tween in _step_tweens:
+		if tween.is_valid():
+			tween.kill()
+	_step_tweens.clear()
+	for player in _pending_players:
+		if is_instance_valid(player):
+			player.stop()
+	_pending_players.clear()
 	combatPlayer.stop()
 	if popUp:
 		popUp.end_all()
@@ -331,20 +380,24 @@ func _on_pop_up_finished(_anim_name):
 
 func play_passive_que():
 	var tween = get_tree().create_tween()
+	_step_tweens.append(tween)
 	var delay = 0.1
 	if passiveQue.size() > 0:
 		emit_signal("animation_start")
 	for passive in passiveQue:
+		_track_player(passive.get_node("AnimationPlayer"))
 		tween.tween_callback(_tween_play.bind(passive)).set_delay(delay)
 		delay += 0.3
 
 func play_effects_que():
 	var tween = get_tree().create_tween()
+	_step_tweens.append(tween)
 	var delay = 0.1
 	if effectQue.size() > 0:
 		emit_signal("animation_start")
 		effectQue[-1].connect_signal(self)
 	for effect in effectQue:
+		_track_player(effect.get_node("AnimationPlayer"))
 		tween.tween_callback(_tween_play.bind(effect)).set_delay(delay)
 		delay += 0.3
 
@@ -353,7 +406,7 @@ func skip_animations():
 		
 		
 func _tween_play(player):
-	player.play_action()
+	_play_visual(player)
 		
 	
 ##Animation call functions
@@ -367,8 +420,8 @@ func target_fx_request():
 	
 func play_self_fx():
 	if skillFx:
-		skillNameFx.play_action()
-		skillFx.play_action()
+		_play_visual(skillNameFx)
+		_play_visual(skillFx)
 	elif weaponFx:
-		weaponFx.play_action()
+		_play_visual(weaponFx)
 	

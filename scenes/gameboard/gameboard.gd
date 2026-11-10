@@ -637,6 +637,8 @@ func _start_canto():
 	turn_step = TURN_STEPS.MOVE_SEEK
 	unit_path.clear_path()
 	_update_walkable_range(activeUnit.remaining_move)
+	# Post-combat input resumes only after the Canto movement area is ready.
+	apply_default_control_state()
 #endregion
 
 
@@ -1020,8 +1022,7 @@ func on_exp_gained(oldExp, expSteps, results, portrait, unitName):
 
 
 func _on_exp_gain_exp_finished():
-	#GameState.change_state(self, GameState.gState.LOADING)
-	GameState.change_state()
+	GameState.change_state(self, GameState.gState.LOADING)
 	continue_turn.emit()
 
 
@@ -1221,7 +1222,9 @@ func _on_area_2d_area_entered(area):
 func _on_area_2d_area_exited(area):
 	#print("Exited: ", area)
 	match area.collision_layer:
-		2: focusUnit = null
+		2:
+			if focusUnit == area.get_master():
+				focusUnit = null
 		4: focusDanmaku = null
 #endregion
 
@@ -1706,6 +1709,8 @@ func update_canto_trigger_from_last_results() -> void:
 
 
 func _check_friendly(unit1, unit2, sameOnly:=false) ->bool:
+	if not is_instance_valid(unit1) or not is_instance_valid(unit2):
+		return false
 	if unit1.FACTION_ID == unit2.FACTION_ID: return true
 	elif !sameOnly and unit1.FACTION_ID != Enums.FACTION_ID.ENEMY and unit2.FACTION_ID != Enums.FACTION_ID.ENEMY: return true
 	return false
@@ -1934,7 +1939,7 @@ func _on_inventory_weapon_changed(button) -> void:
 	var i = button.get_meta("Item")
 	if button.disabled:
 		return
-	activeUnit.set_equipped(i) #See if it can find it's own index based on ID?
+	activeUnit.set_equipped(i, true)
 	_set_action_forecast(combatManager.get_forecast(activeUnit, targetUnit, active_action))
 	SignalTower.forecast_predicted.emit({
   "results": get_last_forecast(),
@@ -1944,11 +1949,13 @@ func _on_inventory_weapon_changed(button) -> void:
 
 
 func _on_action_weapon_selected(button = false):
-	var target: Unit = focusUnit
-	turn_step = TURN_STEPS.COMBAT_DISPLAY
+	var target: Unit = targetUnit
 
 	if state == STATES.ENEMY_PHASE or state == STATES.NPC_PHASE:
 		target = ai_target
+	if not is_instance_valid(activeUnit) or not is_instance_valid(target):
+		return
+	turn_step = TURN_STEPS.COMBAT_DISPLAY
 
 	sequencing_units[activeUnit] = true
 	sequencing_units[target] = true

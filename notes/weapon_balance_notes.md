@@ -4,6 +4,8 @@ These notes are working direction, not final implementation. Older mentions of "
 
 ## Working Weapon Family Split
 
+Critical hits require positive innate Crit on the weapon or skill used. Eleg and temporary Crit bonuses cannot enable critical hits alone. Weapon augments qualify through either source, unless the skill explicitly disables crits. This reserves critical-hit risk for recognizable threats rather than ubiquitous low-probability surprises.
+
 Weapon access is part of role identity. These are not universal options for every character. Books belong to caster roles, Gohei belong to priestess-like roles, Barrier Items belong to suitable physically defensive roles, and so on.
 
 - Blade: self-protective reliability weapon. Blades keep the user functional through high accuracy, low weight, and light Barrier support rather than raw damage. They are the sidearm for units that need to attack safely, dodge cleanly, and avoid being punished too hard for a miss.
@@ -72,6 +74,8 @@ Terminology:
 - Hunter means a passive effect that turns on when targeting a species.
 
 ## Barrier Items
+
+Equipment stacking: weapon and accessory Barrier amounts add together. For Barrier Chance, use the higher of the weapon's chance and the equipped-item chance bonus, not their sum. Natural chance, terrain, and non-equipment modifiers remain additive. A basic Blade (2 Barrier, 30% chance) plus a Small Barrier (4 Barrier, 40% chance) provides 6 Barrier and +40 percentage points of equipment chance.
 
 Barrier Items are not weapons, but they behave like weapon-family equipment. They establish physical defensive identity for suitable roles.
 

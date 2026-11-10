@@ -49,7 +49,7 @@ func process_exp_events() -> void:
 
 func on_animation_handler_sequence_complete() -> void:
 	var has_post_events = check_effect_queue()
-	board.apply_default_control_state()
+	GameState.change_state(board, GameState.gState.LOADING)
 	board._wipe_region()
 	board.current_map.pathAttack.clear()
 	if board.activeUnit:

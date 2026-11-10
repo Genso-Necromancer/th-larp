@@ -106,6 +106,8 @@ func get_combat_effect_string(effect:Effect) -> String: #Time to create the stri
 	#Get Template: "Buff %s"
 	var templatePath : String = "effect_template_%s" % [typeKeys[effect.type].to_lower()]
 	var s : String = get_template(templatePath)
+	if effect.type == Enums.EFFECT_TYPE.MULTI_SWING:
+		s = s.format({"strikes": effect.multi_swing})
 	var duration = false
 	var durationType = false
 	var value = effect.value
@@ -158,6 +160,8 @@ func get_effect_string(effect:Effect) -> String: #Needs reworking, see tooltip p
 	#Get Template: "Buff %s"
 	var templatePath : String = "effect_template_%s" % [typeKeys[effect.type].to_lower()]
 	var s : String = get_template(templatePath)
+	if effect.type == Enums.EFFECT_TYPE.MULTI_SWING:
+		s = s.format({"strikes": effect.multi_swing})
 	var duration = false
 	var durationType = false
 	var effVal = effect.value

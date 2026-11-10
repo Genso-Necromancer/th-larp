@@ -16,8 +16,11 @@ Species values are added on top of Role values. Stat and growth entries only lis
 | `Dragon` | `FOOT` | Life +4, Mag +1, Def +2 | Life +0.10, Cele -0.05, Def +0.05 | None |
 | `Oni` | `FOOT` | Life +4, Comp -10, Pwr +1, Mag -3, Eleg -2 | Life +0.10, Pwr +0.10, Eleg -0.10, Def +0.10 | None |
 | `Sazae-Oni` | `SWIM` | Life +2, Pwr -1, Mag -1, Cele +1, Def +1 | Life +0.05, Cele +0.05 | None |
+| `Kuchisake-onna` | `FOOT` | Eleg +2, Cele +2 | Eleg +0.10, Cele +0.10 | `ambush` (Vantage) |
 
 ## Time Notes
+
+Kuchisake-onna currently has no day/night modifiers; those remain undecided.
 
 Only species with non-zero day/night changes are listed here.
 
@@ -35,8 +38,11 @@ Only species with non-zero day/night changes are listed here.
 | --- | --- |
 | `canto_night` | `res://unit_resources/features/passives/canto_night.tres` |
 | `life_steal_rem` | `res://unit_resources/features/skills/life_steal_rem.tres` |
+| `ambush` (Vantage) | `res://unit_resources/features/passives/ambush.tres` |
 
 ## Notes
+
+- Kuchisake-onna is intended for the Blade role: a position-holding counterattacker using Vantage, evasion, and allied support. Ranged attacks are its primary weakness. This is a content pairing, not a hard species/role restriction. Scissor Blade retuning remains pending approval.
 
 - `Sazae-Oni` currently exists to test aquatic Troublemaker-style units on `map_pack_1`.
 - `Sazae-Oni` is tuned as a defensive aquatic predator rather than a paid-for Swim variant: shell-like base Def, improving Cele, and strong water terrain synergy.

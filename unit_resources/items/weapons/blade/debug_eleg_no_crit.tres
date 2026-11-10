@@ -1,0 +1,61 @@
+[gd_resource type="Resource" script_class="WeaponResource" load_steps=4 format=3 uid="uid://5qomfgdb3ctb"]
+
+[ext_resource type="Script" uid="uid://b7y6ry7pkb23i" path="res://unit_resources/items/weapons/weapon_resource.gd" id="1_weapon"]
+[ext_resource type="Script" uid="uid://bu76i50vv08ad" path="res://unit_resources/effects/effect.gd" id="2_effect"]
+
+[sub_resource type="Resource" id="Effect_eleg"]
+script = ExtResource("2_effect")
+type = 3
+target = 4
+instant = false
+on_hit = false
+proc = -1
+duration = 0
+duration_type = 0
+stack = false
+permanent = false
+curable = false
+from_item = false
+hostile = false
+multi_swing = 0
+multi_round = 0
+crit_dmg = Array[int]([0, 0])
+crit_mult = false
+crit_rate = 0
+value = 100
+sub_type = 11
+id = "debug_equipped_eleg100"
+rule_type = 0
+
+[resource]
+resource_name = "debug_eleg_no_crit"
+script = ExtResource("1_weapon")
+dmg = 7
+charge_value = 0
+hit = 200
+crit = 0
+crit_min = 10
+crit_max = 20
+barrier = 2
+barrier_chance = 30
+min_reach = 1
+max_reach = 1
+close_min_reach = 0
+close_max_reach = 0
+far_min_reach = 0
+far_max_reach = 0
+damage_type = 1
+personal = false
+level = 1
+use = false
+equippable = true
+breakable = true
+expendable = true
+trade = true
+max_dur = 40
+weight = 4
+category = 3
+sub_group = 0
+effects = Array[ExtResource("2_effect")]([SubResource("Effect_eleg")])
+id = "debug_eleg_no_crit"
+rule_type = 0

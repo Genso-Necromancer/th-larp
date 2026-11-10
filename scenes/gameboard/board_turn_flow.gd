@@ -154,8 +154,14 @@ func set_next_acted() -> void:
 
 
 func check_end_of_turn() -> void:
+	board.turn_step = GameBoard.TURN_STEPS.PROCESSING
+	GameState.change_state(board, GameState.gState.LOADING)
 	if board.death_list:
 		await board._wipe_dead()
+	# Non-combat actions such as Seize bypass the combat event queue.
+	if board.current_map.check_map_completion():
+		board.turn_step = GameBoard.TURN_STEPS.END
+		return
 	if !board.activeUnit:
 		board.turn_step = GameBoard.TURN_STEPS.END
 	elif board.activeUnit.can_canto():

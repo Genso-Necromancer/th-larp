@@ -4,11 +4,14 @@
 
 - Reimu, Meiling, Patchouli, Sakuya, and Remilia have initial testing stat lines.
 
+## Completed Follow-Ups
+
+Removed from active missing work: Patchouli's spell memorization; Kuchisake-onna species; generated objective text; chest overflow resolution and separate incoming-item slot; bounded Rescue placement; Shove/Toss collision resolution; cutscene authoring tools, template, and manual. These do not imply that related balance, map fixtures, or general UI polish are finished.
+
 ## Patchouli Follow-Up Features
 
-Patchouli is intentionally missing two character features during the initial baseline-stat pass:
+Patchouli's remaining character feature:
 
-- Spell Memorization: setup-phase spell slotting from spellbooks in inventory, allowing Patchouli to keep access to selected spells while freeing the books for other mages.
 - Magical Counter: personal passive that lets Patchouli perform a magical reaction attack when eligible to counter, protecting her spellbook durability and reinforcing her pure-mage identity.
 
 ## Remilia Follow-Up Features
@@ -26,8 +29,6 @@ Remilia is intentionally missing a character feature during the initial baseline
 
 ## Map And Sandbox Follow-Up Features
 
-- Objective/loss condition text: `BaseGameMap.get_objectives()` and `get_loss_conditions()` still return placeholder strings; recheck whether setup UI expects full strings or self-built fragments.
-- Chest overflow visual polish: chests can now route full inventories into a drop-only inventory prompt, but the chest item is currently shown as the first normal inventory entry. Revisit the old equipped/special slot concept later so the incoming chest item stands apart visually.
 - Game-over follow-up behavior: the old fail screen can be shown again on `GAME_OVER`, but accepting/closing it needs a real flow decision, such as retry, soft reset, title return, or save/load.
 - Focus viewer terrain sizing: terrain entries with a third displayed parameter can bleed past the focus viewer asset instead of resizing correctly.
 - Camera controls tuning: camera controls function, but need a later feel/usability pass.
@@ -38,8 +39,7 @@ Remilia is intentionally missing a character feature during the initial baseline
 
 ## Magic Follow-Up Features
 
-- Shove/Toss/Pull invalid-space resolution: direct relocation effects need a formal per-subtype resolution pass when their inferred destination is blocked or invalid. Shove/Toss currently stop through the old shove resolver, but this still needs intentional rules and validation.
-- Rescue invalid-space resolution: Rescue-style relocation currently chooses a valid adjacent caster-side space for the debug Ofuda, but still needs a formal blocked-destination design pass because it relocates a distant target beside the caster rather than projecting a target away from the caster.
+- Pull invalid-space handling: review separately if this relocation variant is developed; completed Shove/Toss collision handling does not establish Pull's behavior.
 - Temporary movement-type changes: Wood-style temporary Ranger/other move-type swaps need explicit effect support. Movement type is stored and used by pathing, but current buff/debuff stat aggregation does not modify `move_type`.
 - Hostile spell/effect proc rates: hostile effects currently use default effect-hit/resist behavior unless explicitly set. Good proc offsets for Purge, Silence, Daze, Bleed/DoT, and similar effects need a dedicated tuning pass.
 - Freeze status family: water/ice effects may use a stacking freeze mechanic. First stack applies a combined debuff; second stack replaces it with a frozen state that forces 0 Move and 0 Graze for its duration.
@@ -64,4 +64,3 @@ Remilia is intentionally missing a character feature during the initial baseline
 
 - Potential for Yamanba Species/Role which Mix Physical and some Magic. They're mountain hags and witches. In Touhou the character Nemuno Sakata is a butcher knife wielding Yamanba giving inspiration to this.
 - Supernatural species Mag audit: initial demon-oriented pass expresses Mag through day/night only. Youkai-style species use day as neutral and gain supernatural force at night; Vampire uses night as neutral and loses force during day. Revisit future supernatural species with this pattern in mind before adding base Mag or Mag growth.
-- Kuchisake-onna species pass: `Blade` exists as the intended specialist role, but the associated Kuchisake-onna species still needs implementation.

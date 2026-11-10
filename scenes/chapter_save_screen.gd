@@ -172,7 +172,6 @@ func _new_state_chain() -> void:
 
 func _load_save_files() -> void:
 	var saveFiles : Array = SaveHub.get_save_files()
-	var remainder := 8 - saveFiles.size()
 	var first : SaveFileButton = null
 	var previous : SaveFileButton
 	#var plusOne := false
@@ -180,7 +179,8 @@ func _load_save_files() -> void:
 	#call for existing save files
 	
 	var suspended:= _get_suspended_save(saveFiles)
-	if suspended:
+	var remainder := maxi(0, 8 - saveFiles.size())
+	if suspended and save_type == Enums.SAVE_TYPE.NONE:
 		var b : SaveFileButton = _instantiate_save_button(suspended)
 		first = b
 		previous = b
@@ -336,6 +336,9 @@ func _connect_save(b: SaveFileButton) -> void:
 
 
 func _on_save_pressed(button:SaveFileButton) -> void:
+	if save_type != Enums.SAVE_TYPE.NONE and not SaveHub.can_write_save(button.get_save_file(), save_type):
+		_button_invalid_sfx()
+		return
 	match save_type:
 		Enums.SAVE_TYPE.NONE: 
 			match button.state:
@@ -362,6 +365,9 @@ func _format_save(save_name:String, button:SaveFileButton) -> void:
 #region saving
 func _make_new_save(button:SaveFileButton) -> void:
 	var saveFile :String= button.get_save_file()
+	if not SaveHub.can_write_save(saveFile, save_type):
+		_button_invalid_sfx()
+		return
 	print("["+saveFile+"]"+"creating new save....")
 	_change_state(SCENE_STATE.SAVING)
 	cursor.visible = false

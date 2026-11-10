@@ -131,12 +131,11 @@ Priority: Soon, after Phase 1 and enough of Phase 2.
 
 Player unit features:
 
-- Patchouli: Spell Memorization.
 - Patchouli: Magical Counter.
 - Remilia: Superior Vampire level-count passive.
 - Remilia: day/night aura swap and vampire skill progression review.
 - Sakuya: time-manipulation identity review, including Locked Corpse and future time tools.
-- Meiling: Toss final behavior and invalid-space rules.
+- Meiling: Shove/Toss collision handling completed; unarmed attacks need regression testing.
 - Reimu: Slayer progression plan and Miko/Gohei/Ofuda role checks.
 
 Why after the sandbox:
@@ -158,8 +157,7 @@ Work items:
 
 - Shove invalid-space resolution.
 - Pull invalid-space resolution.
-- Toss invalid-space resolution.
-- Rescue blocked-destination design pass.
+- Completed: Shove/Toss collision handling and Rescue's bounded destination search.
 - Warp destination validation polish.
 - Determine which relocation effects are player-only, AI-safe, or require special AI handling.
 
@@ -250,7 +248,6 @@ These are valid ideas, but they should wait because they are likely to cause rew
 - What is the intended first playable map roster?
 - Which reference items should appear in the first true chapter versus only in test maps?
 - How quickly should the player gain access to Ofuda relocation?
-- Should Patchouli's Spell Memorization exist before the first additional mage joins, or only when book competition becomes real?
 - How strong should Remilia's day support role become before it stops feeling like a limitation?
 - How much terrain Graze is acceptable before low-Hit weapons feel unreliable?
 - Should enemy Cointakers be common enough to teach sub-objective pressure early?

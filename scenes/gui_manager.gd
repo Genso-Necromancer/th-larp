@@ -97,6 +97,8 @@ var activeBtn : Node
 
 ##focusTracking
 var prevFocus
+var _profile_cursor_placement: MenuCursor.PLACEMENT = MenuCursor.PLACEMENT.LEFT
+var _profile_cursor_offset := Vector2.ZERO
 
 ##trade variables
 var trade1 : Unit
@@ -209,6 +211,8 @@ func toggle_profile() -> void:
 		toggle_tooltips()
 	elif !unitProf.visible:
 		prevFocus = get_viewport().gui_get_focus_owner()
+		_profile_cursor_placement = menuCursor.placement
+		_profile_cursor_offset = menuCursor.cursor_offset
 		
 		if prevFocus:
 			prevFocus.release_focus()
@@ -222,6 +226,7 @@ func toggle_profile() -> void:
 		focusViewer.hide_fv()
 	else:
 		_strip_menuCursor(false, unitProf.focusLabels)
+		menuCursor.set_placement(_profile_cursor_placement, _profile_cursor_offset)
 		rosterGrid.set_bar_focus(true)
 		if sState != sStates.BEGIN and sState != sStates.FORM: 
 			menuCursor.visible = true

@@ -29,6 +29,7 @@
 			<entry id = "effect_template_damage"><![CDATA[[color=#8C1717]Damage[/color] %s]]></entry>
 			<entry id = "effect_template_slayer"><![CDATA[[color=#3CB371]Slayer[/color]]]></entry>
 			<entry id = "effect_template_brace"><![CDATA[[color=#6495ED]Brace[/color]]]></entry>
+			<entry id = "effect_template_multi_swing"><![CDATA[Strikes {strikes} times per attack]]></entry>
 			<entry id = "effect_template_purge"><![CDATA[[color=#5F9EA0]Purge[/color] %s]]></entry>
 			<entry id = "effect_template_dot"><![CDATA[[color=#8C1717]Damage Over Time[/color] %s]]></entry>
 			<entry id = "effect_template_hot"><![CDATA[[color=#3CB371]Regrowth[/color] %s]]></entry>
@@ -147,6 +148,10 @@
 			<entry id = "species_name_youkai"><![CDATA[Youkai]]></entry>
 			<entry id = "species_name_oni"><![CDATA[Oni]]></entry>
 			<entry id = "species_name_sazae_oni"><![CDATA[Sazae-Oni]]></entry>
+			<entry id = "species_name_kuchisake_onna"><![CDATA[Kuchisake-onna]]></entry>
+			<entry id = "weapon_debug_eleg_no_crit"><![CDATA[DEBUG: Eleg Blade (No Crit)]]></entry>
+			<entry id = "weapon_debug_crit100_gohei"><![CDATA[DEBUG: Crit 100 Gohei]]></entry>
+			<entry id = "passive_name_ambush"><![CDATA[Vantage]]></entry>
 			<!-- character roles -->
 			<entry id = "role_name_trblr"><![CDATA[Troublemaker]]></entry>
 			<entry id = "role_name_thief"><![CDATA[Cointaker]]></entry>
@@ -245,6 +250,7 @@
 			
 			<!-- Tool Tips:Rules-->
 			<entry id = "rule_type_1"><![CDATA[Feature is restricted to {sub_rule}]]></entry>
+			<entry id = "rule_type_2"><![CDATA[If Target is {sub_rule}]]></entry>
 			<entry id = "rule_type_3"><![CDATA[If Unit is {sub_rule}]]></entry>
 			<entry id = "time_night"><![CDATA[[color=#230f8c]Night[/color]]]></entry>
 			<!-- Tool Tips: labels -->
@@ -355,6 +361,13 @@
 			<entry id = "weapon_hunter_bow_basic"><![CDATA[Hunter Bow]]></entry>
 			<entry id = "weapon_harrier_bow_basic"><![CDATA[Harrier Bow]]></entry>
 			<entry id = "weapon_martial_fist"><![CDATA[Martial Fist]]></entry>
+			<!-- Working names until the martial name brackets are authored. -->
+			<entry id = "weapon_martial_fist1"><![CDATA[Martial Fist]]></entry>
+			<entry id = "weapon_martial_fist2"><![CDATA[Martial Fist]]></entry>
+			<entry id = "weapon_martial_fist3"><![CDATA[Martial Fist]]></entry>
+			<entry id = "weapon_martial_fist4"><![CDATA[Martial Fist]]></entry>
+			<entry id = "weapon_martial_fist5"><![CDATA[Martial Fist]]></entry>
+			<entry id = "weapon_martial_fist6"><![CDATA[Martial Fist]]></entry>
 			<!-- Accessories -->
 			<entry id = "accesory_pwr_ring01"><![CDATA[Power Ring]]></entry>
 			<entry id = "accessory_pwr_ring01"><![CDATA[Power Ring]]></entry>
@@ -382,6 +395,7 @@
 			<entry id = "lore_night"><![CDATA[[color=#230f8c]Night[/color]]]></entry>
 			<entry id = "lore_unarmed"><![CDATA[unarmed]]></entry>
 			<entry id = "lore_natural"><![CDATA[natural]]></entry>
+			<entry id = "lore_natural_scaling"><![CDATA[Scales with level.]]></entry>
 			<entry id = "lore_self_spec"><![CDATA[If Unit is {sub_rule}]]></entry>
 			<entry id = "lore_target_spec"><![CDATA[If Target is {sub_rule}]]></entry>
 			<entry id = "lore_human"><![CDATA[[color=#59a198]Human[/color]]]></entry>
@@ -419,19 +433,31 @@
 			<entry id = "lore_pwr"><![CDATA[Power improves physical damage and helps carry heavier weapons without losing Celerity.]]></entry>
 			<entry id = "lore_mag"><![CDATA[Magic improves magical damage and reduces incoming magical damage.]]></entry>
 			<entry id = "lore_eleg"><![CDATA[Elegance improves hit, critical pressure, and effect chance.]]></entry>
-			<entry id = "lore_cele"><![CDATA[Celerity improves graze and helps preserve safety after weapon weight.]]></entry>
+			<entry id = "lore_cele"><![CDATA[Celerity improves graze. Each point of equipped weapon and accessory weight above Power reduces Celerity by 1, to a minimum of 0.]]></entry>
+			<entry id = "stat_equipped_weight"><![CDATA[Equipped weight: %s | Power: %s]]></entry>
+			<entry id = "stat_weight_penalty"><![CDATA[Weight penalty: -%s Cele (included above)]]></entry>
 			<entry id = "lore_def"><![CDATA[Defense reduces physical damage and strengthens barrier blocking.]]></entry>
 			<entry id = "lore_cha"><![CDATA[Charisma improves effect chance, effect resistance, and several social or spiritual checks.]]></entry>
-			<entry id = "lore_hit"><![CDATA[Chance to land attacks before target graze is applied.]]></entry>
-			<entry id = "lore_graze"><![CDATA[Chance to avoid an incoming attack.]]></entry>
-			<entry id = "lore_dmg"><![CDATA[Base combat damage before target defenses and other combat effects.]]></entry>
-			<entry id = "lore_crit"><![CDATA[Chance for a critical attack after the hit succeeds.]]></entry>
-			<entry id = "lore_luck"><![CDATA[Reduces enemy critical pressure.]]></entry>
-			<entry id = "lore_resist"><![CDATA[Chance to resist hostile status effects and debuffs.]]></entry>
-			<entry id = "lore_eff_hit"><![CDATA[Chance bonus applied when attempting hostile effects.]]></entry>
-			<entry id = "lore_effhit"><![CDATA[Chance bonus applied when attempting hostile effects.]]></entry>
-			<entry id = "lore_barrier"><![CDATA[Damage blocked when a barrier triggers.]]></entry>
-			<entry id = "lore_barprc"><![CDATA[Chance for barrier protection to trigger.]]></entry>
+			<entry id = "lore_hit"><![CDATA[Chance to land attacks before target graze is applied.
+Hit = Eleg x 2 + Cha]]></entry>
+			<entry id = "lore_graze"><![CDATA[Reduces incoming attack accuracy.
+Graze = Cele x 2 + Cha]]></entry>
+			<entry id = "lore_dmg"><![CDATA[Damage before target defenses.]]></entry>
+			<entry id = "stat_damage_breakdown"><![CDATA[Dmg: %d + %d Mt]]></entry>
+			<entry id = "lore_crit"><![CDATA[Chance for a critical attack after the hit succeeds.
+Crit = Eleg
+Requires innate Crit on the weapon or skill used.]]></entry>
+			<entry id = "lore_luck"><![CDATA[Reduces enemy critical chance.
+Luck = Cha]]></entry>
+			<entry id = "lore_resist"><![CDATA[Reduces the chance of resistible hostile effects.
+Resist = Cha x 2]]></entry>
+			<entry id = "lore_eff_hit"><![CDATA[Chance bonus when applying effects.
+Effect Chance = Eleg/2 + Cha]]></entry>
+			<entry id = "lore_effhit"><![CDATA[Chance bonus when applying effects.
+Effect Chance = Eleg/2 + Cha]]></entry>
+			<entry id = "lore_barrier"><![CDATA[Damage blocked when a barrier triggers. No core-stat contribution.]]></entry>
+			<entry id = "lore_barprc"><![CDATA[Chance for barrier protection to trigger.
+Barrier Chance = Eleg/2 + Def/2]]></entry>
 			<entry id = "lore_move"><![CDATA[How many hexes this unit can move before terrain costs are applied.]]></entry>
 			<entry id = "lore_move_type_foot"><![CDATA[Standard movement. Terrain costs are applied normally.]]></entry>
 			<entry id = "lore_move_type_ranger"><![CDATA[Moves efficiently through rough ground and natural terrain.]]></entry>
@@ -459,6 +485,7 @@
 			<entry id = "lore_species_youkai"><![CDATA[A broad supernatural species strengthened by the night.]]></entry>
 			<entry id = "lore_species_oni"><![CDATA[A physically dominant youkai known for overwhelming force.]]></entry>
 			<entry id = "lore_species_sazae_oni"><![CDATA[A water-capable youkai that uses terrain and patience to entrap prey.]]></entry>
+			<entry id = "lore_species_kuchisake_onna"><![CDATA[A swift, precise youkai that invites careless attacks and punishes them with dangerous counterattacks.]]></entry>
 
 			<!-- Unique Unit Lore -->
 			<entry id = "lore_title_remilia"><![CDATA[Scarlet Devil]]></entry>

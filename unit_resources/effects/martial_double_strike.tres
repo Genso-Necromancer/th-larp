@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Effect" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://unit_resources/effects/effect.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+type = 14
+target = 4
+proc = -1
+curable = false
+multi_swing = 2
+value = 0
+id = "martial_double_strike"

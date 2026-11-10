@@ -35,7 +35,7 @@ This is a first-pass checklist based on the scene, its objective resources, and 
 | Seize tile fixture | Present / Provable | `SeizeLayer` has tile data. |
 | Loss on mandatory unit death | Present / Provable | `remi_saku_death_loss.tres` uses `KillUnit`, `ANY`, and IDs `remilia`, `sakuya`. |
 | Objective completion routing | Present / Provable | Objective completion calls back into map completion checks. |
-| Objective UI wording | Partial | `BaseGameMap.get_objectives()` and `get_loss_conditions()` still return placeholder text. Need to recheck whether strings are full sentences or self-built UI fragments. |
+| Objective UI wording | Confirmed | Generated win/loss descriptions and optional text overrides implemented. |
 
 ## Core Play Systems
 
@@ -74,8 +74,8 @@ This is a first-pass checklist based on the scene, its objective resources, and 
 | Door interaction | Needs Manual Check | Action menu supports door targeting; needs a visible, convenient fixture. |
 | Breakable wall fixture | Present / Awkward Fixture | `BreakableWall` is placed with `_hp = 5`, but its location is inconvenient for feature testing. |
 | Chest fixture | Present / Needs Coverage | A chest fixture has been used for manual testing; add convenient fixture coverage for currency, item, and full-inventory cases. |
-| Chest interaction pipeline | Usable / Needs Manual Overflow Check | Chest action routes directly from the action menu and MapManager handles opening, rewards, and turn completion. |
-| Chest reward flow | Usable / Needs Polish | Currency/item prompts work; full inventory now opens a drop-only overflow inventory, with visual chest-item distinction deferred. |
+| Chest interaction pipeline | Confirmed | Chest opening, rewards, turn completion, and full-inventory resolution tested. |
+| Chest reward flow | Usable / Needs Polish | Currency/item prompts and drop-only overflow selection work; incoming item has its own separate slot. General inventory layout polish remains. |
 | Passive special terrain | Usable / Needs Fixture Check | Shrine/HotSpring-style terrain can restore Life/Composure and charge Mon during the between-round step; needs convenient feature-workshop fixtures and manual value checks. |
 | Active special terrain | Not Represented | Shops, visits, and other scene-driven terrain are not placed or in scope for this pass. |
 
@@ -87,7 +87,7 @@ This is a first-pass checklist based on the scene, its objective resources, and 
 | Victory/end event script | Present / Provable | End JSON exists and contains a simple text event. |
 | Mid-chapter event triggers | Not Represented | `event_scripts` is empty and no trigger fixture was identified. |
 | Camera manipulation for events | Not Represented | Supported elsewhere, but this map has no mid-chapter camera trigger fixture. |
-| Narrative layer behavior | Recheck Later | Worked in older tests, but should be rechecked and reevaluated when scenes become the active task again. |
+| Narrative layer behavior | Usable | Cutscene authoring, compiler, standalone testing, template, and manual implemented and tested. Mid-map integration remains separate. |
 
 ## Campaign And Persistence
 

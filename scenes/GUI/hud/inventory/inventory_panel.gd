@@ -5,6 +5,7 @@ class_name InventoryPanel
 
 @export var itemList : VBoxContainer
 @export var equipContainer : MarginContainer
+@export var naturalContainer : MarginContainer
 @export_category("Bag Style")
 @export var styleNodes : Array[NinePatchRect]
 var _style : String = "NONE" :
@@ -66,6 +67,21 @@ func _ready_style():
 func fill_items(isTrade : = false, reach := [0,0], useBorder := false) -> Array:
 	var unit :Unit = get_meta("Unit")
 	return fill_item_array(unit.inventory, unit, isTrade, reach, useBorder)
+
+
+func fill_natural_attack(unit: Unit, reach: Array = [0, 0]) -> void:
+	if naturalContainer == null or unit.natural == null:
+		return
+	var weapon: Natural = unit.natural
+	if not unit.check_valid_equip(weapon):
+		return
+	if reach[0] > 0 and (weapon.max_reach < reach[0] or weapon.min_reach > reach[1]):
+		return
+	var button := _generate_item_button(load("res://scenes/GUI/item_button.tscn"), weapon, -1, unit, false)
+	button.useBorder = true
+	items.push_front(button)
+	naturalContainer.add_child(button)
+	naturalContainer.visible = true
 
 
 func fill_item_array(inv:Array, unit:Unit, isTrade : = false, reach := [0,0], useBorder := false, start_index := 0) -> Array:
@@ -178,6 +194,11 @@ func reindex_buttons():
 		i += 1
 
 func clear_items():
+	if naturalContainer:
+		for child in naturalContainer.get_children():
+			naturalContainer.remove_child(child)
+			child.queue_free()
+		naturalContainer.visible = false
 	if equipContainer and equipContainer.get_children().size() > 0:
 		for kid in equipContainer.get_children():
 			kid.queue_free()

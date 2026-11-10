@@ -28,7 +28,7 @@ metadata/_custom_type_script = "uid://c7tvc3aqd1v3r"
 [node name="MapPack1" instance=ExtResource("1_a0u66")]
 ai_personality = ExtResource("2_7bd6c")
 chapterRosterAdditions = Array[String](["flandre"])
-next_map = "uid://bni47aamnnilg"
+next_map = "uid://bkc85u306ugro"
 chapterNumber = 1
 title = "FE1M1"
 win_conditions = Array[ExtResource("2_42u38")]([SubResource("Resource_5vibb")])
@@ -50,7 +50,7 @@ tile_map_data = PackedByteArray("AAAVAAgAEwAAAAIAAAAWAAkAEwAAAAIAAAAXAAkAEwAAAAI
 tile_map_data = PackedByteArray("AAAYAAoAAAAAAAAAAAAaAAwAAAAAAAAAAAAaAA4AAAAAAAAAAAAWAA4AAAAAAAAAAAAXAA4AAAAAAAAAAAAZAA0AAQAAAAAAAAAZAAwAAQAAAAAAAAA=")
 
 [node name="SeizeLayer" parent="." index="9"]
-tile_map_data = PackedByteArray("AAAEAAUAAQAAAAAAAAA=")
+tile_map_data = PackedByteArray("AAAYAAwAAQAAAAAAAAA=")
 
 [node name="DanmakuManager" parent="." index="10"]
 position = Vector2(-2, 0)
@@ -106,9 +106,21 @@ position = Vector2(1722, 450)
 [node name="Human Archer Lv1" parent="EnemyUnits" index="12" instance=ExtResource("7_s8mma")]
 z_index = 108
 position = Vector2(588, 425)
+total_stats = Dictionary[StringName, int]({
+&"Cele": 5,
+&"Cha": 7,
+&"Comp": 100,
+&"Def": 2,
+&"Eleg": 11,
+&"Life": 21,
+&"Mag": 0,
+&"Move": 4,
+&"Pwr": 5
+})
 
 [node name="AraseanailFoidspite" parent="EnemyUnits" index="13" instance=ExtResource("8_vfxsu")]
 z_index = 105
 position = Vector2(588, 275)
 leash = 0
+ai_role = 7
 simulate_leveling = false

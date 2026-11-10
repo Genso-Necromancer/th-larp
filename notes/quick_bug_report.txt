@@ -1,12 +1,11 @@
+"Carmine Marrysworth" A bloody mary inspired enemy, the buried alive version
 
+
+
+Rework Reach to be like Range 0
 
 Meiling's unarmed skill hasn't been tested in a long time.
-Test if Barrier items show up in the bonus breakdown of the barrier tool tips.
-Weapon Hit Bonus shown in Total break down of Hit tool tip.
 
-Hinder: Celerity, This is an augment skill, but shows 5 hit instead of +5 hit. It's a Hit modifier when it is an augment skill as it is augmenting a standard melee attack
-
-Kuchisake-onna race doesn't exist.
 Flandre over all is just a generic "troublemaker" and has little going for her. She intentionally leaves the team after the first arc, and being "basic" is part of the narrative. She still shouldn't be a carbon copy.
 
 Movement type tooltip can get insanely long, trying to cover every type of terrain
@@ -15,3 +14,53 @@ Movement type tooltip can get insanely long, trying to cover every type of terra
 AI:
 - REALLY loves water
 - Boss priority causing boss to act first even when it's a bad idea
+
+See if I can phase out item_id
+
+
+=====Saved loose ends ref
+
+Yes. I checked your notes against our recent work, and **some of the apparent backlog is actually stale documentation**. Here’s the useful separation, without turning this into another enormous roadmap.
+
+**Recent Loose Ends**
+- **Kuchisake-onna day/night modifiers:** explicitly left undecided. Her bases, growths, Vantage, sprites, and Scissor Blade are now established.
+- **Meiling’s unarmed attacks:** your scratch pad specifically says they haven’t been tested in a long time.
+- **Flandre’s identity:** currently too close to a generic Vampire Troublemaker. You wanted her relatively straightforward for narrative reasons, but not a carbon copy.
+- **Weapon progression and level requirements:** reference weapons exist, but their actual place in the game’s power curve remains unsettled. You also noticed the item catalogue omits equipment levels.
+
+**Character And Magic Features**
+These remain recorded as unfinished; I haven’t freshly audited their implementation:
+- **Patchouli’s Magical Counter.**
+- **Remilia’s effective-level bonus for unlocking Vampire features.**
+- **Temporary passive grants and Shade’s influence on AI:** important for making the Moon references function as intended.
+- **Limited-count Purge/Purity:** removing one or several effects instead of always removing everything eligible.
+- **DoT identities and cures:** Bleed/Burn/Poison distinctions were deferred rather than settled.
+
+**Demo-Pack Concerns**
+These look more directly relevant to reaching map two:
+- **Chapter transition and persistence verification:** victory → end scene → save/transition → next chapter, preserving the intended roster, inventory, Life/Composure, and other state.
+- **Game-over follow-up:** the screen works, but the next action, such as retry or return to title, was left unfinished.
+- **Recruitment/Talk, reinforcements, and mid-map triggers:** still backlog candidates to revisit when a demo map requires them.
+- **Active special terrain:** Shops and Visits are separate from the working passive Shrine/HotSpring system.
+- **Danmaku:** intentionally deferred until an encounter actually needs it.
+
+**AI And Polish**
+- Your newest scratch notes say AI **overvalues water** and **prioritizes bosses acting first even when inappropriate**.
+- AI optimization, cycle charging, and the usefulness of context hints remain deferred.
+- Movement-type tooltips can become excessively long.
+- Earlier outstanding polish included camera feel, terrain focus-viewer overflow, empty combat scrolls remaining open, and oversized inventory information panels.
+- Your scratch pad also contains **“Rework Reach to be like Range 0”** and **“See if I can phase out item_id.”** Those are reminders, not clear enough specifications to act on without reconstructing your intent.
+
+**Already Finished, Despite Old Notes**
+Don’t let these get counted as missing again:
+- Patchouli’s spell memorization.
+- Kuchisake-onna implementation.
+- Generated objective text.
+- Chest overflow handling and its separate incoming-item slot.
+- Rescue’s bounded destination search.
+- Shove/Toss collision handling.
+- The cutscene authoring system and manual.
+
+My recommendation: **verify the new crit rules, then prove the chapter-to-chapter loop with a minimal second-map destination**. It needn’t be the real second map yet. That would test the foundation of your five-map plan without requiring you to finish another chapter’s design first.
+
+No documents changed during this review.

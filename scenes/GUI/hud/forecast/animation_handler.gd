@@ -17,11 +17,18 @@ var isInitiated = false
 var sequenceSteps = []
 var begin := false
 var sequence = false
+var _step_running := false
 
 func _process(_delta):
 	if begin:
 		begin = false
 		_start_combat()
+	if _step_running:
+		for animator in animations.values():
+			if is_instance_valid(animator) and not animator.is_step_complete():
+				return
+		_step_running = false
+		_progress_sequence()
 
 
 func _ready():
@@ -59,8 +66,6 @@ func load_animations(units):
 		# Connect once; bind the UNIT as the key (keeps your current activeAnims structure)
 		if !anim.animation_start.is_connected(self._on_animation_start.bind(unit)):
 			anim.animation_start.connect(self._on_animation_start.bind(unit))
-		if !anim.animation_end.is_connected(self._on_animation_end.bind(unit)):
-			anim.animation_end.connect(self._on_animation_end.bind(unit))
 
 		animations[unit] = anim
 		anim_by_id[unit.unit_id] = anim
@@ -232,13 +237,14 @@ func _start_combat():
 				if not _are_animators_valid([actor_anim, target_anim]):
 					isSkipped = true
 					break
-				actor_anim.reset_action()
 				actor_anim.reset_variables()
 				target_anim.reset_variables()
 
 			# Reset defender stance after the action completes (matches your old behavior)
 			if is_instance_valid(target_anim):
 				target_anim.reset_defense()
+			if is_instance_valid(actor_anim):
+				actor_anim.reset_action()
 
 	if not isSkipped:
 		_clear_sequence()
@@ -250,12 +256,8 @@ func _on_animation_start(player):
 
 
 func _on_animation_end(player):
-	activeAnims[player] = false
-	for anim in activeAnims:
-		if activeAnims[anim]:
-			return
-	activeAnims.clear()
-	_progress_sequence()
+	# Legacy FX notifications cannot advance a tracked step.
+	pass
 
 #func _check_if_continue():
 	#for anim in activeAnims:
@@ -265,19 +267,21 @@ func _on_animation_end(player):
 	#
 	
 func _progress_sequence():
-	var nextStep 
-	
-	if sequenceSteps.size() == 0: nextStep = "Complete"
-	else: nextStep = sequenceSteps.pop_front()
-	
-	for anim in animations:
-		match nextStep:
-			"Passives": animations[anim].call_deferred("play_passive_que")
-			"Actions": animations[anim].call_deferred("play_animation")
-			"Complete": 
-				animations_complete.emit(false)
-				break
-			"Effects": animations[anim].call_deferred("play_effects_que")
+	if not isInitiated:
+		return
+	if sequenceSteps.is_empty():
+		animations_complete.emit(false)
+		return
+	var next_step: String = sequenceSteps.pop_front()
+	# Register both participants before either timeline can request target FX.
+	for animator in animations.values():
+		animator.begin_step()
+	_step_running = true
+	for animator in animations.values():
+		match next_step:
+			"Passives": animator.play_passive_que()
+			"Actions": animator.play_animation()
+			"Effects": animator.play_effects_que()
 
 func _on_pop_up_requested(unit):
 	var target = targets[unit]
@@ -289,6 +293,7 @@ func _on_target_fx_requested(unit):
 
 func _clear_sequence():
 	isInitiated = false
+	_step_running = false
 	for anim in animations:
 		var animator = animations[anim]
 		if not is_instance_valid(animator):
@@ -310,7 +315,7 @@ func _are_animators_valid(animators: Array) -> bool:
 
 func _scene_skipped():
 	if isInitiated: 
-		activeAnims.clear()
+		_clear_sequence()
 		animations_complete.emit(true)
 
 func _make_popup_effect_result(effect_res: Effect, resolved_value, procced: bool) -> Dictionary:

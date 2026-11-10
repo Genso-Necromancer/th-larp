@@ -6,6 +6,7 @@
 [resource]
 script = ExtResource("1_t8fpg")
 type = 3
+proc = 100
 sub_type = 0
 sub_weapon = 0
 day_id = ""

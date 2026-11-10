@@ -4,12 +4,21 @@ Working list of implemented item resources, sorted by family. Template/base reso
 
 ## Weapons
 
+### Temporary Critical-Test Equipment
+
+| Item | Assigned Unit | Test Properties |
+| --- | --- | --- |
+| `debug_eleg_no_crit` | Sakuya, equipped in starting scene | Basic Blade stats, +100 Eleg while equipped, 0 innate Crit. Ordinary attacks must never crit. |
+| `debug_crit100_gohei` | Reimu, equipped in starting scene | Simple Gohei stats, 100 innate Crit, standard +10-20 critical damage. Hit and target Luck still apply. |
+
+Reference weapons are unchanged. Start a fresh game to load these inventories; revert the starting weapon resource references after testing.
+
 ### Blade
 
 | Item | Resource ID | Mt | Hit | Wt | Range | Barrier | Dur | Notes |
 |---|---|---:|---:|---:|---|---|---:|---|
 | Basic Blade | `blade_basic` | 7 | 65 | 4 | 1 | 2 / 30% | 40 | Baseline reliable defensive blade. |
-| Scissor Blade | `scissor_blade_basic` | 5 | 80 | 0 | 1 | 2 / 10% | 30 | Older/high-accuracy blade test item. |
+| Scissor Blade | `scissor_blade_basic` | 8 | 70 | 5 | 1 | 2 / 30% | 30 | Crit +15; standard +10-20 critical damage. Level requirement 1 for testing. Relative upgrade over Basic Blade. |
 
 ### Blunt
 

@@ -790,8 +790,10 @@ func get_chest_tiles()->Dictionary[Vector2i,ChestTile]:
 	#else: return false
 
 func is_seize(cell:Vector2i) -> bool:
-	if dev.get_used_cells_by_id(1,Vector2i(0,0),0).has(cell) and !wasSeized.has(cell):
-		return true
+	for objective in get_runtime_objectives():
+		if objective is Seize and not objective.complete:
+			if objective.seize_tracker.has(cell) and not objective.seize_tracker[cell]:
+				return true
 	return false
 
 

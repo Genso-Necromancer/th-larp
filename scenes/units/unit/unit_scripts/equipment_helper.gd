@@ -46,6 +46,8 @@ func unequip(item: Item, as_command := false) -> void:
 
 	# *as_command* means: user intentionally unequipped; we must assign fallback weapon.
 	if not as_command:
+		_sync_equipped_item_effects()
+		_refresh_granted_skills()
 		unit.update_stats()
 		return
 
@@ -64,18 +66,21 @@ func unequip(item: Item, as_command := false) -> void:
 
 func restore_temp_weapon() -> void:
 	# Restores the weapon that was temporarily unequipped during a preview.
-	for item in unit.inventory:
+	for item in _equipment_items():
 		if item is Weapon and item.temp_remove:
 			item.temp_remove = false
-			set_equipped(item)
+			set_equipped(item, true)
+			for candidate in _equipment_items():
+				candidate.temp_remove = false
 			return
 
 
 func snapshot_equipment_state() -> Array[Dictionary]:
 	var snapshot: Array[Dictionary] = []
-	for item in unit.inventory:
+	for item in _equipment_items():
 		snapshot.append({
 			"Item": item,
+			"Inventory": unit.inventory.has(item),
 			"Equipped": item.equipped,
 			"TempRemove": item.temp_remove,
 		})
@@ -95,20 +100,26 @@ func restore_equipment_state(snapshot: Array[Dictionary]) -> void:
 		var item: Item = entry.Item
 		item.equipped = entry.Equipped
 		item.temp_remove = entry.TempRemove
-		restored_inventory.append(item)
-		if item.equipped:
-			_add_item_effects(item)
-
-	if unit.natural and unit.natural.equipped:
-		_add_item_effects(unit.natural)
+		if entry.get("Inventory", true):
+			restored_inventory.append(item)
 
 	unit.inventory = restored_inventory
+	_sync_equipped_item_effects()
 	_refresh_granted_skills()
 	unit.update_stats()
 
 
 
 # INTERNAL IMPLEMENTATION
+func _equipment_items() -> Array[Item]:
+	var items: Array[Item] = []
+	items.append_array(unit.inventory)
+	for fallback in [unit.natural, unit.unarmed]:
+		if fallback != null and not items.has(fallback):
+			items.append(fallback)
+	return items
+
+
 func _has_equipped_weapon() -> bool:
 	for item in unit.inventory:
 		if item is Weapon and item.equipped:
@@ -129,24 +140,22 @@ func _find_first_valid_weapon() -> Weapon:
 
 
 func _equip_weapon(weapon: Weapon, is_temp: bool=false) -> void:
-	var old_equip : Weapon
+	var old_equip: Weapon = unit.get_equipped_weapon()
 	var original_temp : Weapon
 
 	# 1. Detect currently equipped or temp-removed existing weapon
-	for item in unit.inventory:
+	for item in _equipment_items():
 		if item is Weapon:
-			if item.equipped and item == weapon:
-				return   # Already equipped.
 			if item.temp_remove:
 				original_temp = item
-			elif item.equipped:
-				old_equip = item
 
 	# 2. Unequip current weapon if any
-	if old_equip:
+	if old_equip != weapon:
 		if is_temp and not original_temp:
 			old_equip.temp_remove = true
-		unequip(old_equip)
+	for item in _equipment_items():
+		if item is Weapon:
+			item.equipped = false
 
 	# 3. Equip new weapon
 	weapon.equipped = true
@@ -158,10 +167,11 @@ func _equip_weapon(weapon: Weapon, is_temp: bool=false) -> void:
 		unit.inventory.push_front(stored_item)
 
 	# Clear temp_remove if applying a real equip
-	if not is_temp and original_temp:
-		original_temp.temp_remove = false
+	if not is_temp:
+		for item in _equipment_items():
+			item.temp_remove = false
 
-	_add_item_effects(weapon)
+	_sync_equipped_item_effects()
 
 
 func _equip_accessory(acc: Accessory) -> void:
@@ -220,8 +230,11 @@ func _sync_equipped_item_effects() -> void:
 		unit.buff_controller.remove_effect(effect)
 	equipped_effects.clear()
 
-	for item in unit.inventory:
-		if item != null and item.equipped:
+	var weapon := unit.get_equipped_weapon()
+	for item in _equipment_items():
+		if item is Weapon:
+			item.equipped = item == weapon
+		if item.equipped:
 			_add_item_effects(item)
 
 

@@ -8,6 +8,7 @@
 [resource]
 script = ExtResource("2_a2w6i")
 augment = false
+magical = false
 target = 1
 can_miss = false
 can_crit = false
@@ -22,6 +23,8 @@ bonus_max_range = 0
 hit = 0
 dmg = 0
 crit = 0
+crit_min = 0
+crit_max = 0
 dmg_type = 0
 effects = Array[ExtResource("1_v7lr3")]([ExtResource("2_bpa4v"), ExtResource("3_ulwj6")])
 feature_id = "rest"
